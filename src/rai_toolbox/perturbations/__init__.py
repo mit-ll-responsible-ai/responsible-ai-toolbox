@@ -3,8 +3,11 @@
 # SPDX-License-Identifier: MIT
 
 from .models import AdditivePerturbation, PerturbationModel
+from .solvers import gradient_descent, random_restart
 
 __all__ = [
     "AdditivePerturbation",
     "PerturbationModel",
+    "gradient_descent",
+    "random_restart",
 ]
