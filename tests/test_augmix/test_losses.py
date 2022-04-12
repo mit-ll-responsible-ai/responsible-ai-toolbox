@@ -35,7 +35,7 @@ def test_jsd_symmetry(probs, data: st.DataObject):
 @given(probs=st.lists(prob_tensors, min_size=2))
 def test_jsd_bounds(probs):
     jsd = float(jensen_shannon_divergence(*probs).item())
-    assert 0 - 1e-9 <= jsd <= np.log(len(probs)) + 1e-9
+    assert 0 - 1e-6 <= jsd <= np.log(len(probs)) + 1e-6
 
 
 @given(num_probs=st.integers(2, 100))
