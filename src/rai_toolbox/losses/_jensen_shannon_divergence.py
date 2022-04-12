@@ -48,9 +48,9 @@ def jensen_shannon_divergence(
 
     zero = tr.tensor(0.0).type_as(probs[0])
     # Clamp mixture distribution to avoid exploding KL divergence
-    log_p_mixture = tr.clamp(sum(probs, start=zero) / len(probs), 1e-7, 1).log()
+    log_p_mixture = tr.clamp(sum(probs, zero) / len(probs), 1e-7, 1).log()
     loss = sum(
-        (F.kl_div(log_p_mixture, p, reduction="batchmean") for p in probs), start=zero
+        (F.kl_div(log_p_mixture, p, reduction="batchmean") for p in probs), zero
     ) / len(probs)
 
     if weight is not None:

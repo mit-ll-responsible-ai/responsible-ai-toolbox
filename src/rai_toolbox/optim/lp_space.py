@@ -6,6 +6,8 @@ import math
 from random import random
 from typing import Any, Dict, Optional, Union
 
+import numpy as np
+
 import torch
 from torch import Tensor
 from torch.optim import SGD
@@ -227,7 +229,7 @@ class L1qNormedGradientOptim(GradientTransformerOptimizer):
         shp = param.grad.shape
         nb = shp[0]
 
-        num_pix = math.prod(shp[1:])
+        num_pix = np.prod(shp[1:])
         num_q = 1.0 - q
         num_q = max(1, int(num_q * num_pix))
 
