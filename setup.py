@@ -33,6 +33,8 @@ INSTALL_REQUIRES = [
 TESTS_REQUIRE = [
     "pytest >= 3.8",
     "hypothesis >= 6.28.0",
+    "mygrad >= 2.0.0",
+    "hydra-zen >= 0.6.0",
 ]
 
 DESCRIPTION = "PyTorch-centric library for evaluating and enhancing the robustness of AI technologies"
@@ -70,4 +72,7 @@ setup(
     packages=find_packages(where="src", exclude=["tests", "tests.*"]),
     package_dir={"": "src"},
     package_data={"rai_toolbox": ["py.typed"]},
+    extras_require={
+        "tests": TESTS_REQUIRE,
+    },
 )
