@@ -8,8 +8,6 @@ from .losses._utils import negate
 
 __all__ = ["evaluating", "frozen", "freeze", "negate"]
 
-
-__version__ = "0.0.1"
-# __version__ = _version.get_versions()["version"]
+__version__ = _version.get_versions()["version"]
 
 del _version

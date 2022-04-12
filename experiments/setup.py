@@ -13,7 +13,7 @@ INSTALL_REQUIRES = [
 setup(
     name="rai_experiments",
     install_requires=INSTALL_REQUIRES,
-    python_requires=">=3.8",
+    python_requires=">=3.7",
     packages=find_packages(where="src", exclude=["tests", "tests.*"]),
     package_dir={"": "src"},
 )
