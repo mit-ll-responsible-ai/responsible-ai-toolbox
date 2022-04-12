@@ -18,11 +18,11 @@ from torchvision import datasets, models, transforms
 
 from rai_experiments.models.small_resnet import resnet50 as cifar_resnet50
 from rai_toolbox import datasets as rai_datasets
-from rai_toolbox.mushin import load_from_checkpoint, solve_perturbation
+from rai_toolbox.mushin import load_from_checkpoint
 from rai_toolbox.mushin._lightning import CustomDDP, MetricsCallback
 from rai_toolbox.mushin._tasks import RobustnessCurve
 from rai_toolbox.optim import L2ProjectedOptim
-from rai_toolbox.perturbations import AdditivePerturbation
+from rai_toolbox.perturbations import AdditivePerturbation, gradient_descent
 from rai_toolbox.perturbations.init import uniform_like_l2_n_ball_
 
 # parameter populated by robustness-curve generation
@@ -122,7 +122,7 @@ PGDModel = pbuilds(
 )
 
 L2PGD = pbuilds(
-    solve_perturbation,
+    gradient_descent,
     # Type of Perturbation
     perturbation_model=PGDModel,
     # Optimizer (e.g., L2 PGD)

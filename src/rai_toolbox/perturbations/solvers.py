@@ -22,7 +22,7 @@ from rai_toolbox.perturbations import AdditivePerturbation, PerturbationModel
 
 
 @torch.enable_grad()
-def solve_perturbation(
+def gradient_descent(
     *,
     model: Module,
     data: Tensor,
