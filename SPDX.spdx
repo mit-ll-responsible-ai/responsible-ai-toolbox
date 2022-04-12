@@ -1,0 +1,6 @@
+SPDXVersion: SPDX-2.1
+PackageName: rai-toolbox
+PackageHomePage: https://github.com/mit-ll-responsible-ai/rai-toolbox
+PackageOriginator: MIT Lincoln Laboratory
+PackageCopyrightText: 2022 Massachusetts Institute of Technology <tvo@ll.mit.edu>
+PackageLicenseDeclared: MIT
