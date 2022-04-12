@@ -267,7 +267,7 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
 
                     p = _to_batch(p, group["param_ndim"])
 
-                    self._inplace_grad_transform_(p, optim_group=group)
+                    #self._inplace_grad_transform_(p, optim_group=group)
 
                     if p.grad is None or not _shares_memory(orig_p.grad, p.grad):
                         raise ValueError(
