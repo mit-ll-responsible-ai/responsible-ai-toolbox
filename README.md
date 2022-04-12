@@ -13,6 +13,8 @@ instance, one can naturally leverage the rAI-toolbox together with
 [PyTorch Lightning](https://www.pytorchlightning.ai/) to perform distributed 
 adversarial training.
 
+To see `rai_toolbox` in action, please refer to [`examples/`](https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox/tree/main/examples) and [`experiments/`](https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox/tree/main/experiments).
+
 
 ## Installation
 
