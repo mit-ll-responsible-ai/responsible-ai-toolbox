@@ -84,7 +84,7 @@ jobs:
         path: .tox
         # setup.cfg and pyproject.toml have versioning info that would
         # impact the tox environment.
-        key: tox-coverage-${{ hashFiles('setup.cfg') }}
+        key: tox-coverage-${{ hashFiles('setup.cfg') }}-${{ hashFiles('tests/conftest.py') }}-${{ hashFiles('.github/workflows/tox.yml') }}
 
     - name: Measure coverage
       run: tox -e coverage
@@ -111,7 +111,7 @@ jobs:
         path: .tox
         # setup.cfg and pyproject.toml have versioning info that would
         # impact the tox environment.
-        key: tox-experiments-${{ hashFiles('setup.cfg') }}
+        key: tox-experiments-${{ hashFiles('setup.cfg') }}-${{ hashFiles('tests/conftest.py') }}-${{ hashFiles('.github/workflows/tox.yml') }}
 
     - name: Run experiments checks
       run: tox -e experiments-checks
@@ -136,7 +136,7 @@ jobs:
       uses: actions/cache@v3
       with:
         path: .tox
-        key: tox-no-mushin-${{ hashFiles('setup.cfg') }}
+        key: tox-no-mushin-${{ hashFiles('setup.cfg') }}-${{ hashFiles('tests/conftest.py') }}-${{ hashFiles('.github/workflows/tox.yml') }}
 
     - name: Run experiments checks
       run: tox -e no-mushin
