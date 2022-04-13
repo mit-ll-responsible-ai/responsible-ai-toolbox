@@ -240,9 +240,9 @@ else:  # pragma: no cover
                 command += ["-cp", hydra_output, "-cn", "config.yaml"]
 
                 if trainer_fn == TrainerFn.FITTING:
-                    command += ["+_ddp_testing=false"]
+                    command += ["+pl_testing=false"]
                 else:
-                    command += ["+_ddp_testing=true"]
+                    command += ["+pl_testing=true"]
 
                 command += [
                     f"hydra.output_subdir=.pl_hydra_{local_rank}",
