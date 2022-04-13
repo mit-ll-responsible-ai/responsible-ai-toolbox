@@ -348,7 +348,7 @@ def test_various_forms_of_pert_model(pert_model, x: float):
 
     assert torch.allclose(adv, 3 * data)
 
-def test_gradient_descent_with_fn_as_model():
+def test_solve_with_fn_as_model():
     adv, _ = gradient_descent(
         model=lambda x: x ** 2,
         data=torch.tensor([2.0]),
@@ -359,4 +359,19 @@ def test_gradient_descent_with_fn_as_model():
         criterion=lambda pred, _: pred,
         targeted=True
     )
+    assert adv.item() == -2.0
+
+
+def test_solve_works_within_no_grad():
+    with torch.no_grad():
+        adv, _ = gradient_descent(
+            model=lambda x: x ** 2,
+            data=torch.tensor([2.0]),
+            target=torch.tensor([0.0]),
+            optimizer=SGD,
+            steps=1,
+            lr=1,
+            criterion=lambda pred, _: pred,
+            targeted=True
+        )
     assert adv.item() == -2.0
