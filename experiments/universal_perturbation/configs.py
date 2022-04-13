@@ -15,8 +15,8 @@ from torchvision import datasets, transforms
 
 from rai_experiments.models.small_resnet import resnet50 as cifar_resnet50
 from rai_toolbox import negate
-from rai_toolbox.mushin._lightning import CustomDDP, MetricsCallback
-from rai_toolbox.mushin._utils import load_from_checkpoint
+from rai_toolbox.mushin import load_from_checkpoint
+from rai_toolbox.mushin.lightning import HydraDDP, MetricsCallback
 from rai_toolbox.optim import L1qFrankWolfe, L2ProjectedOptim
 from rai_toolbox.perturbations import AdditivePerturbation
 from rai_toolbox.perturbations.init import (
@@ -123,7 +123,7 @@ Trainer = builds(
     gpus="${gpus}",
     max_epochs="${max_epochs}",
     accelerator="gpu",
-    strategy=builds(CustomDDP),
+    strategy=builds(HydraDDP),
     callbacks=[
         builds(MetricsCallback),
         builds(

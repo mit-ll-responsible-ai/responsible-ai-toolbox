@@ -2,7 +2,7 @@
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 
-from typing import Dict
+from typing import Callable, Dict, Iterable
 
 from pytorch_lightning import LightningModule
 from torch import Tensor, nn
@@ -11,7 +11,10 @@ from torch.utils.data import DataLoader
 from torchmetrics import Accuracy, MeanMetric
 
 from rai_toolbox import freeze
-from rai_toolbox.mushin.typing import Criterion, PartialOptimizer
+
+# Types
+Criterion = Callable[[Tensor, Tensor], Tensor]
+PartialOptimizer = Callable[[Iterable], Optimizer]
 
 
 class UniversalPerturbationSolver(LightningModule):

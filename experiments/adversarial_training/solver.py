@@ -2,16 +2,22 @@
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 
-from typing import Dict, Optional
+from typing import Callable, Dict, Iterable, Optional
 
 import torch
 from pytorch_lightning import LightningModule
 from torch import Tensor, nn
+from torch.optim import Optimizer
+from torch.optim.lr_scheduler import _LRScheduler
 from torch.utils.data import DataLoader
 from torchmetrics import Accuracy, MeanMetric
 
 from rai_toolbox import evaluating, frozen, negate
-from rai_toolbox.mushin.typing import Criterion, PartialLRScheduler, PartialOptimizer
+
+# Types
+Criterion = Callable[[Tensor, Tensor], Tensor]
+PartialOptimizer = Callable[[Iterable], Optimizer]
+PartialLRScheduler = Callable[[Optimizer], _LRScheduler]
 
 
 class AdversarialTrainer(LightningModule):

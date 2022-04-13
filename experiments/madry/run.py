@@ -10,7 +10,7 @@ import pytorch_lightning as pl
 import torch
 from hydra.core.config_store import ConfigStore
 
-from rai_toolbox.mushin._tasks import RobustnessCurve
+from rai_toolbox.mushin.workflows import RobustnessCurve
 
 cs = ConfigStore.instance()
 cs.store(name="madry_config", node=configs.Config)
