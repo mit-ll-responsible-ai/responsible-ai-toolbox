@@ -4,7 +4,7 @@
 
 import logging
 import os
-import tempfile
+
 import pkg_resources
 import pytest
 from hypothesis import Verbosity, settings
@@ -22,15 +22,14 @@ MUSHIN_EXTRAS = {"pytorch-lightning", "hydra-zen"}
 collect_ignore_glob = []
 
 if not MUSHIN_EXTRAS & _installed:
-    collect_ignore_glob.append(f"test_mushin/*.py")
+    collect_ignore_glob.append("test_mushin/*.py")
 
 
 @pytest.fixture()
-def cleandir():
+def cleandir(tmp_path):
     """Run function in a temporary directory."""
-    with tempfile.TemporaryDirectory() as tmpdirname:
-        old_dir = os.getcwd()  # get current working directory (cwd)
-        os.chdir(tmpdirname)  # change cwd to the temp-directory
-        yield tmpdirname  # yields control to the test to be run
-        os.chdir(old_dir)
-        logging.shutdown()
+    old_dir = os.getcwd()  # get current working directory (cwd)
+    os.chdir(tmp_path)  # change cwd to the temp-directory
+    yield tmp_path  # yields control to the test to be run
+    os.chdir(old_dir)
+    logging.shutdown()
