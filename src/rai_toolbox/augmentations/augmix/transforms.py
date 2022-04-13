@@ -109,7 +109,7 @@ class Fork(tr.nn.Module):
         One transform for each fork to create.
 
     Examples
-    -------
+    --------
     >>> from rai_toolbox.augmix.transforms import Fork
 
     Here are some trivial examples:
