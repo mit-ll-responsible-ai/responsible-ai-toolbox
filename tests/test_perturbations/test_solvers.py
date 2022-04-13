@@ -23,7 +23,6 @@ from rai_toolbox.perturbations.solvers import (
     random_restart,
 )
 
-l2p = partial(gradient_descent, optimizer=L2ProjectedOptim)
 
 simple_arrays = hnp.arrays(
     shape=hnp.array_shapes(min_dims=2, max_dims=2),
@@ -62,6 +61,7 @@ def test_pgp(Step, norm, tensors, eps):
     xadv, _ = gradient_descent(
         model=model,
         data=orig,
+        steps=10,
         target=target,
         optimizer=optimizer,
         targeted=False,
@@ -108,6 +108,7 @@ def test_targeted_attacks(Optim, x) -> None:
         _, loss_adv = gradient_descent(
             model=model,
             data=x,
+            steps=10,
             target=target_classes,
             optimizer=Optim,
             targeted=True,
@@ -133,6 +134,7 @@ def test_random_restart_repeats(Optim, x, use_best, repeats):
 
             _, loss_adv = perturber(
                 model=model,
+                steps=10,
                 data=x,
                 target=y,
                 optimizer=optimizer,
@@ -150,6 +152,7 @@ def test_epsilon_check(x, eps):
         with pytest.raises(AssertionError):
             gradient_descent(
                 model=model,
+                steps=10,
                 data=x,
                 target=y,
                 optimizer=optimizer,
@@ -157,6 +160,7 @@ def test_epsilon_check(x, eps):
     else:
         gradient_descent(
             model=model,
+            steps=10,
             data=x,
             target=y,
             optimizer=optimizer,
@@ -175,6 +179,7 @@ def test_use_best(x, eps):
     with pytest.raises(ValueError):
         gradient_descent(
             model=model,
+            steps=10,
             data=x,
             target=y,
             optimizer=optimizer,
@@ -185,6 +190,7 @@ def test_use_best(x, eps):
     # get losses with use best = False
     _, losses = gradient_descent(
         model=model,
+        steps=10,
         data=x,
         target=y,
         optimizer=optimizer,
@@ -195,6 +201,7 @@ def test_use_best(x, eps):
     # get best loss
     _, losses_best = gradient_descent(
         model=model,
+        steps=10,
         data=x,
         target=y,
         optimizer=optimizer,

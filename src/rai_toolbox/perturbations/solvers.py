@@ -28,7 +28,7 @@ def gradient_descent(
     data: Tensor,
     target: Tensor,
     optimizer: Union[OptimizerType, Partial[Optimizer]],
-    steps: int = 7,
+    steps: int,
     perturbation_model: Union[
         PerturbationModel, InstantiatesTo[PerturbationModel]
     ] = AdditivePerturbation,
@@ -56,7 +56,7 @@ def gradient_descent(
     optimizer : Type[Optimizer] | Partial[Optimizer]
         The optimizer to use for updating the perturbation model
 
-    steps: int (default: 7)
+    steps: int
         Number of projected gradient steps
 
     perturbation_model : PerturbationModel | Type[PerturbationModel]
