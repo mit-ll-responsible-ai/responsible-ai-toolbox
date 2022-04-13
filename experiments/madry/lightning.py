@@ -1,12 +1,16 @@
 # Copyright 2022, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
+from typing import Callable, Tuple
+
 from pytorch_lightning import LightningModule
 from torch import Tensor, nn
 from torch.utils.data import DataLoader, Dataset
 from torchmetrics import Accuracy
 
-from rai_toolbox.mushin.typing import Criterion, Perturbation
+# Types
+Criterion = Callable[[Tensor, Tensor], Tensor]
+Perturbation = Callable[[nn.Module, Tensor, Tensor], Tuple[Tensor, Tensor]]
 
 
 class EvaluateModule(LightningModule):

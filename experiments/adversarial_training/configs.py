@@ -12,8 +12,8 @@ from torch.utils.data.dataloader import DataLoader
 from torchvision import datasets, transforms
 
 from rai_experiments.models.small_resnet import resnet50 as cifar_resnet50
-from rai_toolbox.mushin._lightning import CustomDDP, MetricsCallback
 from rai_toolbox.mushin._utils import load_from_checkpoint
+from rai_toolbox.mushin.lightning import HydraDDP, MetricsCallback
 from rai_toolbox.optim import L2ProjectedOptim
 from rai_toolbox.perturbations.models import AdditivePerturbation
 
@@ -117,7 +117,7 @@ Trainer = builds(
     pl.Trainer,
     gpus="${gpus}",
     max_epochs="${max_epochs}",
-    strategy=builds(CustomDDP),
+    strategy=builds(HydraDDP),
     callbacks=[
         builds(MetricsCallback),
         builds(
@@ -159,7 +159,7 @@ DatasetCfg = make_config(
 
 ModelCfg = make_config(ckpt=None, model=CIFARModel)
 
-SolverCfg = make_config(
+ModuleCfg = make_config(
     # SGD Parameters
     momentum=0.9,
     lr=0.1,
@@ -170,6 +170,7 @@ SolverCfg = make_config(
     # PGD Parameters
     perturb_steps=7,
     epsilon=1.0,
+    # The LightningModule
     module=Solver,
 )
 
@@ -177,5 +178,5 @@ TrainerCfg = make_config(max_epochs=100, gpus=2, trainer=Trainer)
 
 Config = make_config(
     random_seed=234,
-    bases=(DatasetCfg, ModelCfg, SolverCfg, TrainerCfg),
+    bases=(DatasetCfg, ModelCfg, ModuleCfg, TrainerCfg),
 )
