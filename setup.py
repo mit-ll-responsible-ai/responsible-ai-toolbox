@@ -26,7 +26,6 @@ INSTALL_REQUIRES = [
     "numpy > 1.17.2, != 1.19.3",
     "torchvision >= 0.10.0",
     "torch >= 1.9.0",
-    "pytorch-lightning >= 1.5.0",
     "torchmetrics >= 0.6.0",
     "typing-extensions >= 3.10.0.1",
 ]
@@ -74,5 +73,6 @@ setup(
     package_data={"rai_toolbox": ["py.typed"]},
     extras_require={
         "tests": TESTS_REQUIRE,
+        "mushin": ["pytorch-lightning >= 1.5.0", "hydra-zen >= 0.6.0"]
     },
 )
