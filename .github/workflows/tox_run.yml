@@ -115,3 +115,28 @@ jobs:
 
     - name: Run experiments checks
       run: tox -e experiments-checks
+
+  run-experiments-checks:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: 3.8
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install tox
+
+    - name: Cache tox environments
+      id: cache-experiments
+      uses: actions/cache@v3
+      with:
+        path: .tox
+        key: tox-no-mushin-${{ hashFiles('setup.cfg') }}
+
+    - name: Run experiments checks
+      run: tox -e no-mushin
