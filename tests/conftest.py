@@ -17,11 +17,11 @@ settings.register_profile("debug", max_examples=10, verbosity=Verbosity.verbose)
 
 _installed = {pkg.key for pkg in pkg_resources.working_set}
 
-MUSHIN_EXTRAS = {"pytorch_lightning", "hydra_zen"}
+MUSHIN_EXTRAS = {"pytorch-lightning", "hydra-zen"}
 
 collect_ignore_glob = []
 
-if not MUSHIN_EXTRAS <= _installed:
+if not MUSHIN_EXTRAS & _installed:
     collect_ignore_glob.append(f"test_mushin/*.py")
 
 
