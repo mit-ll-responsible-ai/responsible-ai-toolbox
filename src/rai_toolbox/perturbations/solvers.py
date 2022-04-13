@@ -21,61 +21,50 @@ from rai_toolbox._utils.stateful import evaluating, frozen
 from rai_toolbox.perturbations import AdditivePerturbation, PerturbationModel
 
 
-@torch.enable_grad()
 def gradient_descent(
     *,
-    model: Module,
+    model: Callable[[Tensor], Tensor],
     data: Tensor,
     target: Tensor,
     optimizer: Union[OptimizerType, Partial[Optimizer]],
-    steps: int = 7,
+    steps: int,
+    perturbation_model: Union[
+        PerturbationModel, InstantiatesTo[PerturbationModel]
+    ] = AdditivePerturbation,
     targeted: bool = False,
     use_best: bool = False,
     criterion: Optional[Callable[[Tensor, Tensor], Tensor]] = None,
     reduction_fn: Callable[[Tensor], Tensor] = torch.sum,
-    perturbation_model: Union[
-        PerturbationModel, InstantiatesTo[PerturbationModel]
-    ] = AdditivePerturbation,
     **optim_kwargs: Any,
 ) -> Tuple[Tensor, Tensor]:
     """Solve for a set of perturbations for a given set of data and a model.
 
+    Note that, by default, this perturbs the data away from ``target`` (i.e.
+    this performs gradient *ascent*). See ``targeted`` to toggle this behavior.
+
     Parameters
     ----------
-    model: Module
-        PyTorch module for calculating the loss.
+    model : Callable[[Tensor], Tensor]
+        Differentiable function that processes the (perturbed) data prior to computing 
+        the loss. 
+        
+        If `model` is a `torch.nn.Module` then its weights will be frozen and it will 
+        be set to eval mode during the perturbation-solve phase.
 
-    data: Tensor, shape-(N, ...)
+    data : Tensor, shape-(N, ...)
         The input data to perturb.
 
-    target: Tensor, shape-(N, ...)
-        If `targeted==False` this is the target to perturb away from
-        If `targeted==True` this is the target to perturb toward
+    target : Tensor, shape-(N, ...)
+        If `targeted==False` (default), then this is the target to perturb away from.
+        If `targeted==True`, then this is the target to perturb toward.
 
-
-    optimizer: Type[Optimizer] | Partial[Optimizer]
+    optimizer : Type[Optimizer] | Partial[Optimizer]
         The optimizer to use for updating the perturbation model
 
-    steps: int (default: 10)
+    steps : int
         Number of projected gradient steps
 
-    targeted: bool (default: False)
-        If `True`, then perturb towards the defined `target` otherwise move away from
-        `target`.
-
-    use_best: bool (default: True)
-        Whether to only report the best perturbation over all steps.
-        Note: Requires criterion to output a loss per sample, e.g., set
-        `reduction="none"`
-
-    criterion: Optional[Callable[[Tensor, Tensor], Tensor]]
-        The criterion to use for calculating the loss.  If `None` then
-        `CrossEntropyLoss` is used.
-
-    reduction_fn: Callable[[Tensor], Tensor], optional (default=torch.sum)
-        Used to reduce the shape-(N,) per-datum loss to a scalar.
-
-    perturbation_model: PerturbationModel | Type[PerturbationModel]
+    perturbation_model : PerturbationModel | Type[PerturbationModel]
         A `torch.nn.Module` whose parameters are the perturbations being solved for. Its
         forward-pass applies the perturbation to the data. Default is
         `AdditivePerturbation`, which simply adds the perturbation to the data.
@@ -83,15 +72,30 @@ def gradient_descent(
         If `perturbation_model` is a type, then it will be instantiated as
         `perturbation_model(data)`.
 
+    targeted : bool (default: False)
+        If `True`, then perturb towards the defined `target` otherwise move away from
+        `target`.
+
+    use_best : bool (default: True)
+        Whether to only report the best perturbation over all steps.
+        Note: Requires criterion to output a loss per sample, e.g., set
+        `reduction="none"`
+
+    criterion : Optional[Callable[[Tensor, Tensor], Tensor]]
+        The criterion to use for calculating the loss.  If `None` then
+        `CrossEntropyLoss` is used.
+
+    reduction_fn : Callable[[Tensor], Tensor], optional (default=torch.sum)
+        Used to reduce the shape-(N,) per-datum loss to a scalar.
+
     **optim_kwargs : Any
        Keyword arguments passed to `optimizer` when it is instatiated.
 
     Returns
     -------
-    xadv: Tensor, shape-(N, ...)
+    xadv, losses : tuple[Tensor, Tensor], shape-(N, ...), shape-(N, ...)
         The perturbed data, if `use_best==True` then this is the best perturbation based on the loss across all steps.
 
-    losses: Tensor, shape-(N, ...)
         The loss for each perturbed data point, if `use_best==True` then this is the best loss across all steps.
     """
     # Do not modify the input
@@ -122,8 +126,11 @@ def gradient_descent(
 
     optim = optimizer(pmodel.parameters(), **optim_kwargs)
 
+    # don't pass non nn.Module to frozen/eval
+    packed_model = (model,) if isinstance(model, Module) else ()
+
     # Projected Gradient Descent
-    with frozen(model), evaluating(model):
+    with frozen(*packed_model), evaluating(*packed_model), torch.enable_grad():
         for _ in range(steps):
             # Calculate the gradient of loss
             xadv = pmodel(data)
@@ -174,15 +181,15 @@ def random_restart(
 
     Parameters
     ----------
-    perturber: Callable[..., Tuple[Tensor, Tensor]]
+    perturber : Callable[..., Tuple[Tensor, Tensor]]
         The perturbation function, e.g., projected_gradient_perturbation.
 
-    repeats: int
+    repeats : int
         The number of times to run perturber
 
     Returns
     -------
-    random_restart_fn: Callable[..., Tuple[Tensor, Tensor]]
+    random_restart_fn : Callable[..., Tuple[Tensor, Tensor]]
         Wrapped function that will execute `perturber` `repeats` times.
 
     """
@@ -228,24 +235,24 @@ def _replace_best(
 
     Parameters
     ----------
-    loss: Tensor, shape-(N, ...)
+    loss : Tensor, shape-(N, ...)
         N: batch size
 
-    best_loss: Optional[Tensor], shape-(N, ...)
+    best_loss : Optional[Tensor], shape-(N, ...)
         N: batch size
 
-    data: Tensor, shape-(N, ...)
+    data : Tensor, shape-(N, ...)
         N: batch size
 
-    best_data: Optional[Tensor], shape-(N, ...)
+    best_data : Optional[Tensor], shape-(N, ...)
         N: batch size
 
-    min: bool (default: True)
+    min : bool (default: True)
         Whether best is minimum (True) or maximum (False)
 
     Returns
     -------
-    best_loss, best_data: Tuple[Tensor, Tensor]
+    best_loss, best_data : Tuple[Tensor, Tensor]
     """
     if best_loss is None:
         best_data = data
