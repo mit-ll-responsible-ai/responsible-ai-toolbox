@@ -27,7 +27,7 @@ from hydra.core.utils import JobReturn
 from hydra.plugins.sweeper import Sweeper
 from hydra.types import HydraContext, RunMode
 from hydra_zen import instantiate
-from hydra_zen.typing._implementations import (  # TODO: requires hydra-zen >= 0.6.0
+from hydra_zen.typing._implementations import (
     DataClass_,
 )
 from omegaconf import OmegaConf

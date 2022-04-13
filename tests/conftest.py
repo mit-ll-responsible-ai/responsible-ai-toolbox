@@ -5,7 +5,7 @@
 import logging
 import os
 import tempfile
-
+import pkg_resources
 import pytest
 from hypothesis import Verbosity, settings
 
@@ -14,6 +14,15 @@ from hypothesis import Verbosity, settings
 settings.register_profile("ci", deadline=None)
 settings.register_profile("fast", max_examples=10)
 settings.register_profile("debug", max_examples=10, verbosity=Verbosity.verbose)
+
+_installed = {pkg.key for pkg in pkg_resources.working_set}
+
+MUSHIN_EXTRAS = {"pytorch-lightning", "hydra-zen"}
+
+collect_ignore_glob = []
+
+if not MUSHIN_EXTRAS & _installed:
+    collect_ignore_glob.append(f"test_mushin/*.py")
 
 
 @pytest.fixture()
