@@ -55,6 +55,11 @@ class MetricsCallback(Callback):
         metrics = trainer.callback_metrics
         self.val_metrics["epoch"].append(pl_module.current_epoch)
         for k, v in metrics.items():
+            if isinstance(v, torch.Tensor):
+                if v.ndim == 0:
+                    v = v.item()
+                else:
+                    v = v.cpu().numpy()
             self.val_metrics[k].append(v)
 
         torch.save(self.val_metrics, self._get_filename("fit"))
@@ -63,6 +68,11 @@ class MetricsCallback(Callback):
     def on_test_end(self, trainer, pl_module):
         metrics = trainer.callback_metrics
         for k, v in metrics.items():
+            if isinstance(v, torch.Tensor):
+                if v.ndim == 0:
+                    v = v.item()
+                else:
+                    v = v.cpu().numpy()
             self.test_metrics[k].append(v)
 
         torch.save(self.test_metrics, self._get_filename("test"))
