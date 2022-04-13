@@ -61,7 +61,7 @@ def gradient_descent(
     optimizer : Type[Optimizer] | Partial[Optimizer]
         The optimizer to use for updating the perturbation model
 
-    steps: int
+    steps : int
         Number of projected gradient steps
 
     perturbation_model : PerturbationModel | Type[PerturbationModel]
