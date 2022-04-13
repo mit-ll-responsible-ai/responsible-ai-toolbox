@@ -1,3 +1,7 @@
+# Copyright 2022, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
+# Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
+# SPDX-License-Identifier: MIT
+
 import torch
 from pytorch_lightning import LightningModule
 from torch.utils.data import DataLoader, Dataset
