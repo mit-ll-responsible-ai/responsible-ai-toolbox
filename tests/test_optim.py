@@ -9,7 +9,6 @@ from typing import Callable, Tuple, Type
 import numpy as np
 import pytest
 import torch as tr
-from hydra_zen.typing import Partial
 from hypothesis import assume, given, note, settings
 from hypothesis import strategies as st
 from hypothesis.extra import numpy as hnp
@@ -33,7 +32,7 @@ from rai_toolbox.optim import (
 )
 from rai_toolbox.optim.lp_space import _LpNormOptimizer
 from rai_toolbox.optim.optimizer import _to_batch
-
+from rai_toolbox._typing import Partial
 simple_arrays = hnp.arrays(
     shape=hnp.array_shapes(min_dims=2, max_dims=4),
     dtype=np.float64,
