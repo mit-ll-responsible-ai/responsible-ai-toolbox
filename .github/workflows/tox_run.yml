@@ -116,7 +116,7 @@ jobs:
     - name: Run experiments checks
       run: tox -e experiments-checks
 
-  run-experiments-checks:
+  run-no-mushin:
     runs-on: ubuntu-latest
 
     steps:
