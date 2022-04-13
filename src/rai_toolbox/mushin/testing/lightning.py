@@ -40,6 +40,7 @@ class TestLightningModule(LightningModule):
         output = self(batch)
         loss = self.loss(batch, output)
         self.log("Tensor Metric", torch.tensor(1.0))
+        self.log("Tensor 1 Metric", torch.tensor([1.0]))
         self.log("Number Metric", 1.0)
         return {"loss": loss}
 
@@ -53,6 +54,7 @@ class TestLightningModule(LightningModule):
         output = self(batch)
         loss = self.loss(batch, output)
         self.log("Val Tensor Metric", torch.tensor(1.0))
+        self.log("Val Tensor 1 Metric", torch.tensor([1.0]))
         self.log("Val Number Metric", 1.0)
         return {"x": loss}
 
@@ -63,6 +65,7 @@ class TestLightningModule(LightningModule):
         output = self(batch)
         loss = self.loss(batch, output)
         self.log("Tensor Metric", torch.tensor(1.0))
+        self.log("Tensor 1 Metric", torch.tensor([1.0]))
         self.log("Number Metric", 1.0)
         return {"y": loss}
 

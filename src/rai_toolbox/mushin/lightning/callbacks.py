@@ -47,6 +47,15 @@ class MetricsCallback(Callback):
     def _get_filename(self, stage: str):
         return Path(self.save_dir) / f"{stage}_{self.filename}"
 
+    def _process_metrics(self, stored_metrics, metrics):
+        for k, v in metrics.items():
+            if isinstance(v, torch.Tensor):
+                if v.ndim == 0:
+                    v = v.item()
+                else:
+                    v = v.cpu().numpy()
+            stored_metrics[k].append(v)
+
     def on_validation_end(self, trainer, pl_module):
         # Make sure PL is not doing it's sanity check run
         if trainer.sanity_checking:
@@ -54,26 +63,12 @@ class MetricsCallback(Callback):
 
         metrics = trainer.callback_metrics
         self.val_metrics["epoch"].append(pl_module.current_epoch)
-        for k, v in metrics.items():
-            if isinstance(v, torch.Tensor):
-                if v.ndim == 0:
-                    v = v.item()
-                else:
-                    v = v.cpu().numpy()
-            self.val_metrics[k].append(v)
-
+        self._process_metrics(self.val_metrics, metrics)
         torch.save(self.val_metrics, self._get_filename("fit"))
         return self.val_metrics
 
     def on_test_end(self, trainer, pl_module):
         metrics = trainer.callback_metrics
-        for k, v in metrics.items():
-            if isinstance(v, torch.Tensor):
-                if v.ndim == 0:
-                    v = v.item()
-                else:
-                    v = v.cpu().numpy()
-            self.test_metrics[k].append(v)
-
+        self._process_metrics(self.test_metrics, metrics)
         torch.save(self.test_metrics, self._get_filename("test"))
         return self.test_metrics
