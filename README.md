@@ -18,8 +18,16 @@ To see `rai_toolbox` in action, please refer to [`examples/`](https://github.com
 
 ## Installation
 
+To install the basic toolbox, run:
+
 ```console
 pip install rai-toolbox
+```
+
+To include our "mushin" capabilities, which leverages [pytorch lightning](https://www.pytorchlightning.ai/) and [hydra-zen](https://github.com/mit-ll-responsible-ai/hydra-zen) for enhanced boilerplate-free ML, run:
+
+```console
+pip install rai-toolbox[mushin]
 ```
 
 ## Citation
