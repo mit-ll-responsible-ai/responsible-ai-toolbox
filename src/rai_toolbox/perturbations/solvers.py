@@ -21,10 +21,9 @@ from rai_toolbox._utils.stateful import evaluating, frozen
 from rai_toolbox.perturbations import AdditivePerturbation, PerturbationModel
 
 
-@torch.enable_grad()
 def gradient_descent(
     *,
-    model: Module,
+    model: Callable[[Tensor], Tensor],
     data: Tensor,
     target: Tensor,
     optimizer: Union[OptimizerType, Partial[Optimizer]],
@@ -40,18 +39,24 @@ def gradient_descent(
 ) -> Tuple[Tensor, Tensor]:
     """Solve for a set of perturbations for a given set of data and a model.
 
+    Note that, by default, this perturbs the data away from ``target`` (i.e.
+    this performs gradient *ascent*). See ``targeted`` to toggle this behavior.
+
     Parameters
     ----------
-    model : torch.nn.Module
-        Differentiable model that processes the (perturbed) data
-        prior to computing the loss.
+    model : Callable[[Tensor], Tensor]
+        Differentiable function that processes the (perturbed) data prior to computing 
+        the loss. 
+        
+        If ``model`` is a ``torch.nn.Module``its weights will be frozen and it will be 
+        set to eval mode during the perturbation-solve phase.
 
     data : Tensor, shape-(N, ...)
         The input data to perturb.
 
     target : Tensor, shape-(N, ...)
-        If `targeted==False` this is the target to perturb away from
-        If `targeted==True` this is the target to perturb toward
+        If `targeted==False` (default), then this is the target to perturb away from.
+        If `targeted==True`, then this is the target to perturb toward.
 
     optimizer : Type[Optimizer] | Partial[Optimizer]
         The optimizer to use for updating the perturbation model
@@ -121,8 +126,11 @@ def gradient_descent(
 
     optim = optimizer(pmodel.parameters(), **optim_kwargs)
 
+    # don't pass non nn.Module to frozen/eval
+    packed_model = (model,) if isinstance(model, Module) else ()
+
     # Projected Gradient Descent
-    with frozen(model), evaluating(model):
+    with frozen(*packed_model), evaluating(*packed_model), torch.enable_grad():
         for _ in range(steps):
             # Calculate the gradient of loss
             xadv = pmodel(data)
