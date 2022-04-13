@@ -48,8 +48,8 @@ def gradient_descent(
         Differentiable function that processes the (perturbed) data prior to computing 
         the loss. 
         
-        If ``model`` is a ``torch.nn.Module``its weights will be frozen and it will be 
-        set to eval mode during the perturbation-solve phase.
+        If `model` is a `torch.nn.Module` then its weights will be frozen and it will 
+        be set to eval mode during the perturbation-solve phase.
 
     data : Tensor, shape-(N, ...)
         The input data to perturb.
