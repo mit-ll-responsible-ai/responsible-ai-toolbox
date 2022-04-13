@@ -72,8 +72,8 @@ if PL_VERSION >= Version(1, 6, 0):
         processes on setup of this function.  This will lead to issues if running multiple jobs
         in the notebook or trying to do `Trainer.fit` followed by `Trainer.test`.
 
-        Example
-        -------
+        Examples
+        --------
         >> trainer = Trainer(Trainer, accelerator="auto", devices=2, strategy=builds(HydraDDP))
         >> trainer.fit(module)
 
@@ -194,8 +194,8 @@ else:  # pragma: no cover
         processes on setup of this function.  This will lead to issues if running multiple jobs
         in the notebook or trying to do `Trainer.fit` followed by `Trainer.test`.
 
-        Example
-        -------
+        Examples
+        --------
         >> trainer = Trainer(Trainer, accelerator="auto", devices=2, strategy=builds(HydraDDP))
         >> trainer.fit(module)
 
