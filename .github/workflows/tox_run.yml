@@ -132,7 +132,7 @@ jobs:
         pip install tox
 
     - name: Cache tox environments
-      id: cache-experiments
+      id: cache-no-mushin
       uses: actions/cache@v3
       with:
         path: .tox
@@ -155,7 +155,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install tox tox-gh-actions
     - name: Cache tox environments
-      id: cache-experiments
+      id: cache-min-deps
       uses: actions/cache@v3
       with:
         path: .tox
