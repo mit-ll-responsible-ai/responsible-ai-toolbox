@@ -5,7 +5,7 @@
 import functools
 from typing import Any, Callable, Optional, Tuple, Union
 
-import torch
+import torch as tr
 from torch import Tensor
 from torch.nn import CrossEntropyLoss, Module
 
@@ -34,15 +34,23 @@ def gradient_ascent(
     targeted: bool = False,
     use_best: bool = False,
     criterion: Optional[Callable[[Tensor, Tensor], Tensor]] = None,
-    reduction_fn: Callable[[Tensor], Tensor] = torch.sum,
+    reduction_fn: Callable[[Tensor], Tensor] = tr.sum,
     **optim_kwargs: Any,
 ) -> Tuple[Tensor, Tensor]:
     """Solve for a set of perturbations for a given set of data and a model.
 
-    Note that, by default, this perturbs the data away from ``target`` (i.e.
-    this performs gradient *ascent*), given a standard loss function that seeks
-    to minimize the diffence between the model's output and the target. See 
-    `targeted` to toggle this behavior.
+    This performs, for `steps` iterations, the following optimization::
+       
+       optim = optimizer(perturbation_model.parameters)
+       pert_data = perturbation_model(data)
+       loss = criterion(model(pert_data), target)
+       loss = (1 if targeted else -1) * loss  # default: targeted=False
+       optim.step()
+
+    Note that, by default, this perturbs the data away from `target` (i.e. this performs 
+    gradient *ascent*), given a standard loss function that seeks to minimize the 
+    diffence between the model's output and the target. See `targeted` to toggle this 
+    behavior.
 
     Parameters
     ----------
@@ -50,7 +58,7 @@ def gradient_ascent(
         Differentiable function that processes the (perturbed) data prior to computing 
         the loss. 
         
-        If `model` is a `torch.nn.Module` then its weights will be frozen and it will 
+        If `model` is a `tr.nn.Module` then its weights will be frozen and it will 
         be set to eval mode during the perturbation-solve phase.
 
     data : Tensor, shape-(N, ...)
@@ -67,8 +75,8 @@ def gradient_ascent(
         Number of projected gradient steps
 
     perturbation_model : PerturbationModel | Type[PerturbationModel]
-        A `torch.nn.Module` whose parameters are the perturbations being solved for. Its
-        forward-pass applies the perturbation to the data. Default is
+        A `torch.nn.Module` whose parameters determine the perturbations being solved 
+        for. Its forward-pass applies the perturbation to the data. Default is
         `AdditivePerturbation`, which simply adds the perturbation to the data.
 
         If `perturbation_model` is a type, then it will be instantiated as
@@ -87,7 +95,7 @@ def gradient_ascent(
         The criterion to use for calculating the loss.  If `None` then
         `CrossEntropyLoss` is used.
 
-    reduction_fn : Callable[[Tensor], Tensor], optional (default=torch.sum)
+    reduction_fn : Callable[[Tensor], Tensor], optional (default=tr.sum)
         Used to reduce the shape-(N,) per-datum loss to a scalar.
 
     **optim_kwargs : Any
@@ -132,7 +140,7 @@ def gradient_ascent(
     packed_model = (model,) if isinstance(model, Module) else ()
 
     # Projected Gradient Descent
-    with frozen(*packed_model), evaluating(*packed_model), torch.enable_grad():
+    with frozen(*packed_model), evaluating(*packed_model), tr.enable_grad():
         for _ in range(steps):
             # Calculate the gradient of loss
             xadv = pmodel(data)
@@ -164,7 +172,7 @@ def gradient_ascent(
         optim.zero_grad(set_to_none=True)
 
         # Final evalulation
-        with torch.no_grad():
+        with tr.no_grad():
             xadv = pmodel(data)
             logits = model(xadv)
             losses = criterion(logits, target)
