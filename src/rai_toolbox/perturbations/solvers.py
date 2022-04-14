@@ -3,9 +3,10 @@
 # SPDX-License-Identifier: MIT
 
 import functools
-from typing import Any, Callable, Optional, Tuple, Union, List
+from typing import Any, Callable, List, Optional, Tuple, Union
 
 import torch as tr
+
 from torch import Tensor
 from torch.nn import CrossEntropyLoss, Module
 
@@ -19,13 +20,14 @@ from rai_toolbox._typing import (
 )
 from rai_toolbox._utils.stateful import evaluating, frozen
 from rai_toolbox.perturbations import AdditivePerturbation, PerturbationModel
+from rai_toolbox._typing import ArrayLike
 
-# TODO: annotations for data/target can be broadened
+
 def gradient_ascent(
     *,
     model: Callable[[Tensor], Tensor],
-    data: Tensor,
-    target: Tensor,
+    data: ArrayLike,
+    target: ArrayLike,
     optimizer: Union[OptimizerType, Partial[Optimizer]],
     steps: int,
     perturbation_model: Union[
@@ -40,25 +42,25 @@ def gradient_ascent(
     """Solve for a set of perturbations for a given set of data and a model.
 
     This performs, for `steps` iterations, the following optimization::
-       
+
        optim = optimizer(perturbation_model.parameters)
        pert_data = perturbation_model(data)
        loss = criterion(model(pert_data), target)
        loss = (1 if targeted else -1) * loss  # default: targeted=False
        optim.step()
 
-    Note that, by default, this perturbs the data away from `target` (i.e. this performs 
-    gradient *ascent*), given a standard loss function that seeks to minimize the 
-    diffence between the model's output and the target. See `targeted` to toggle this 
+    Note that, by default, this perturbs the data away from `target` (i.e. this performs
+    gradient *ascent*), given a standard loss function that seeks to minimize the
+    diffence between the model's output and the target. See `targeted` to toggle this
     behavior.
 
     Parameters
     ----------
     model : Callable[[Tensor], Tensor]
-        Differentiable function that processes the (perturbed) data prior to computing 
-        the loss. 
-        
-        If `model` is a `tr.nn.Module` then its weights will be frozen and it will 
+        Differentiable function that processes the (perturbed) data prior to computing
+        the loss.
+
+        If `model` is a `tr.nn.Module` then its weights will be frozen and it will
         be set to eval mode during the perturbation-solve phase.
 
     data : Tensor, shape-(N, ...)
@@ -105,19 +107,19 @@ def gradient_ascent(
     Returns
     -------
     xadv, losses : tuple[Tensor, Tensor], shape-(N, ...), shape-(N, ...)
-        The perturbed data, if `use_best==True` then this is the best perturbation 
+        The perturbed data, if `use_best==True` then this is the best perturbation
         based on the loss across all steps.
 
-        The loss for each perturbed data point, if `use_best==True` then this is the 
+        The loss for each perturbed data point, if `use_best==True` then this is the
         best loss across all steps.
-    
+
     Examples
     --------
-    Let's perturb two data points, x=-1.0 and x=2.0, to maximize `L(x) = |x|`. We will 
-    use five standard gradient steps, using a learning rate of 0.1. The default 
-    perturbation model is simply additive: `x -> x + δ`. 
-    
-    This solver is refining `δ`, whose initial value is 0 by default, to maximize 
+    Let's perturb two data points, x=-1.0 and x=2.0, to maximize `L(x) = |x|`. We will
+    use five standard gradient steps, using a learning rate of 0.1. The default
+    perturbation model is simply additive: `x -> x + δ`.
+
+    This solver is refining `δ`, whose initial value is 0 by default, to maximize
     `L(x) = |x|`. Thus we should find that our solved perturbations modify our data as:
     `-1.0 -> -1.5` and `2.0 -> 2.5`, respectively.
 
@@ -138,8 +140,8 @@ def gradient_ascent(
     ... )
     >>> perturbed_data
     tensor([-1.5000,  2.5000])
-    
-    We can instead specify `targeted=True` and perform gradient *descent*. 
+
+    We can instead specify `targeted=True` and perform gradient *descent*.
     Here, the perturbations we solve for should modify our data as:
     -1.0 -> -0.5 and 2.0 -> 1.5, respectively.
 

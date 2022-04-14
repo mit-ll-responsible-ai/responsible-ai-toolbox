@@ -16,8 +16,10 @@ from typing import (
     Type,
     TypeVar,
     Union,
+    overload,
 )
 
+import numpy as np
 from torch import Tensor
 from typing_extensions import Protocol, TypeAlias, TypedDict, TypeGuard
 
@@ -118,3 +120,32 @@ def instantiates_to(x: Any, co_var_type: Type[T]) -> TypeGuard[InstantiatesTo[T]
         if _is_protocol(co_var_type)
         else issubclass(obj, co_var_type)
     )
+
+
+Scalar = Union[
+    int,
+    float,
+    complex,
+    str,
+    bytes,
+    np.generic,
+]
+
+
+class _SupportsArray(Protocol):
+    @overload
+    def __array__(self, __dtype: Any = ...) -> np.ndarray:
+        ...
+
+    @overload
+    def __array__(self, dtype: Any = ...) -> np.ndarray:
+        ...
+
+
+# mypy doesn't support recursive types
+ArrayLike = Union[
+    Scalar,
+    Sequence[Scalar],
+    Sequence[Sequence[Any]],
+    _SupportsArray,
+]
