@@ -10,7 +10,7 @@ from rai_experiments.models import resnet
 from rai_toolbox import datasets
 from rai_toolbox.mushin import load_from_checkpoint
 from rai_toolbox.optim import L1qFrankWolfe
-from rai_toolbox.perturbations import gradient_descent
+from rai_toolbox.perturbations import 
 from rai_toolbox.perturbations.models import AdditivePerturbation
 
 ###############
@@ -67,7 +67,7 @@ ImageNetModel = builds(
 #####
 L1q = pbuilds(L1qFrankWolfe, lr=1.0, epsilon=1.0, q=0.975, pert_q=0.05)
 L1FW = pbuilds(
-    gradient_descent,
+    ,
     perturbation_model=pbuilds(AdditivePerturbation),
     optimizer=L1q,
     steps=45,

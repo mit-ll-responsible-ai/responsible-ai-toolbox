@@ -2,7 +2,6 @@
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 
-import math
 from random import random
 from typing import Any, Dict, Optional, Union
 
@@ -41,7 +40,7 @@ class _LpNormOptimizer(GradientTransformerOptimizer):
     def __init__(
         self,
         params: OptimParams,
-        InnerOpt: Union[Partial[Opt], OptimizerType] = SGD,
+        InnerOpt: Union[Partial[Opt], Opt] = SGD,
         *,
         param_ndim: Optional[int] = -1,
         div_by_zero_eps: float = _TINY,

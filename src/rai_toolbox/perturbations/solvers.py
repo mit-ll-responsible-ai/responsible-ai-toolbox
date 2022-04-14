@@ -21,7 +21,7 @@ from rai_toolbox._utils.stateful import evaluating, frozen
 from rai_toolbox.perturbations import AdditivePerturbation, PerturbationModel
 
 
-def gradient_descent(
+def gradient_ascent(
     *,
     model: Callable[[Tensor], Tensor],
     data: Tensor,
@@ -40,7 +40,9 @@ def gradient_descent(
     """Solve for a set of perturbations for a given set of data and a model.
 
     Note that, by default, this perturbs the data away from ``target`` (i.e.
-    this performs gradient *ascent*). See ``targeted`` to toggle this behavior.
+    this performs gradient *ascent*), given a standard loss function that seeks
+    to minimize the diffence between the model's output and the target. See 
+    `targeted` to toggle this behavior.
 
     Parameters
     ----------
