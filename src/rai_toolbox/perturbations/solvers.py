@@ -180,6 +180,8 @@ def gradient_ascent(
             if use_best:
                 losses, xadv = _replace_best(losses, best_loss, xadv, best_x)
 
+    if not targeted:
+        losses = -1 * losses
     return xadv.detach(), losses.detach()
 
 
