@@ -1,0 +1,377 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>rai_toolbox.datasets._imagenet_base &#8212; rai-toolbox  documentation</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/tabs.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/clipboard.min.js"></script>
+    <script src="../../../_static/copybutton.js"></script>
+    <script src="../../../_static/tabs.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="../../../index.html">
+<p class="title">rai-toolbox</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../tutorials.html">
+  Tutorials
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../how_tos.html">
+  How-To Guides
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../explanation.html">
+  Explanation
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../api_reference.html">
+  Reference
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../changes.html">
+  Changelog
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    
+  </div>
+</nav>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <h1>Source code for rai_toolbox.datasets._imagenet_base</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2022, MASSACHUSETTS INSTITUTE OF TECHNOLOGY</span>
+<span class="c1"># Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).</span>
+<span class="c1"># SPDX-License-Identifier: MIT</span>
+
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">from</span> <span class="nn">torchvision.datasets</span> <span class="kn">import</span> <span class="n">folder</span>
+
+
+<div class="viewcode-block" id="ImageNet"><a class="viewcode-back" href="../../../generated/rai_toolbox.datasets.ImageNet.html#rai_toolbox.datasets.ImageNet">[docs]</a><span class="k">class</span> <span class="nc">ImageNet</span><span class="p">(</span><span class="n">folder</span><span class="o">.</span><span class="n">DatasetFolder</span><span class="p">):</span>
+<div class="viewcode-block" id="ImageNet.__init__"><a class="viewcode-back" href="../../../generated/rai_toolbox.datasets.ImageNet.html#rai_toolbox.datasets.ImageNet.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">root</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span>
+        <span class="n">transform</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">target_transform</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">loader</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">folder</span><span class="o">.</span><span class="n">default_loader</span><span class="p">,</span>
+        <span class="n">is_valid_file</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">root</span><span class="p">,</span>
+            <span class="n">loader</span><span class="p">,</span>
+            <span class="n">folder</span><span class="o">.</span><span class="n">IMG_EXTENSIONS</span> <span class="k">if</span> <span class="n">is_valid_file</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">,</span>
+            <span class="n">target_transform</span><span class="o">=</span><span class="n">target_transform</span><span class="p">,</span>
+            <span class="n">is_valid_file</span><span class="o">=</span><span class="n">is_valid_file</span><span class="p">,</span>
+        <span class="p">)</span></div></div>
+
+
+<span class="k">def</span> <span class="nf">remap_classes</span><span class="p">(</span>
+    <span class="n">range_sets</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Set</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="o">...</span><span class="p">],</span> <span class="n">class_to_idx</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
+    <span class="sd">&quot;&quot;&quot;Filters existing classes and maps them to new index based on a pre-defined mapping.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    range_sets: Tuple[Set[int], ...]</span>
+<span class="sd">        Each element of the tuple is a list of indices that map the original class to the new class.</span>
+
+<span class="sd">    class_to_idx: Dict[str, int]</span>
+<span class="sd">        Dictionary mapping class name to class index</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Tuple[List[str], Dict[str, int]]</span>
+<span class="sd">        List of classes and dictionary mapping each class to an index.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mapping</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">class_name</span><span class="p">,</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">class_to_idx</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">new_idx</span><span class="p">,</span> <span class="n">range_set</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">range_sets</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">range_set</span><span class="p">:</span>
+                <span class="n">mapping</span><span class="p">[</span><span class="n">class_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_idx</span>
+                <span class="k">break</span>
+
+    <span class="n">filtered_classes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">mapping</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="n">filtered_classes</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">filtered_classes</span><span class="p">,</span> <span class="n">mapping</span>
+
+
+<span class="k">class</span> <span class="nc">_ReducedImageNet</span><span class="p">(</span><span class="n">folder</span><span class="o">.</span><span class="n">DatasetFolder</span><span class="p">):</span>
+    <span class="n">_range_sets</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Set</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">root</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span>
+        <span class="n">transform</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">target_transform</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">loader</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">folder</span><span class="o">.</span><span class="n">default_loader</span><span class="p">,</span>
+        <span class="n">is_valid_file</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">root</span><span class="o">=</span><span class="n">root</span><span class="p">,</span>
+            <span class="n">loader</span><span class="o">=</span><span class="n">loader</span><span class="p">,</span>
+            <span class="n">extensions</span><span class="o">=</span><span class="n">folder</span><span class="o">.</span><span class="n">IMG_EXTENSIONS</span> <span class="k">if</span> <span class="n">is_valid_file</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">,</span>
+            <span class="n">target_transform</span><span class="o">=</span><span class="n">target_transform</span><span class="p">,</span>
+            <span class="n">is_valid_file</span><span class="o">=</span><span class="n">is_valid_file</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">find_classes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
+        <span class="n">classes</span><span class="p">,</span> <span class="n">class_to_idx</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">find_classes</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
+        <span class="n">classes</span><span class="p">,</span> <span class="n">class_to_idx</span> <span class="o">=</span> <span class="n">remap_classes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_range_sets</span><span class="p">,</span> <span class="n">class_to_idx</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">classes</span><span class="p">,</span> <span class="n">class_to_idx</span>
+
+
+<div class="viewcode-block" id="RestrictedImageNet"><a class="viewcode-back" href="../../../generated/rai_toolbox.datasets.RestrictedImageNet.html#rai_toolbox.datasets.RestrictedImageNet">[docs]</a><span class="k">class</span> <span class="nc">RestrictedImageNet</span><span class="p">(</span><span class="n">_ReducedImageNet</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Restricted ImageNet, see https://arxiv.org/abs/1906.00945</span>
+
+
+<span class="sd">    **WARNING**: This dataset is imbalanced</span>
+
+
+<span class="sd">    Dog:</span>
+<span class="sd">        ImageNet Class Indices: 151-268</span>
+<span class="sd">    Cat:</span>
+<span class="sd">        ImageNet Class Indices: 281-285</span>
+<span class="sd">    Frog:</span>
+<span class="sd">        ImageNet Class Indices: 30-32</span>
+<span class="sd">    Turtle:</span>
+<span class="sd">        ImageNet Class Indices: 33-37</span>
+<span class="sd">    Bird:</span>
+<span class="sd">        ImageNet Class Indices: 80-100</span>
+<span class="sd">    Monkey:</span>
+<span class="sd">        ImageNet Class Indices: 365-382</span>
+<span class="sd">    Fish:</span>
+<span class="sd">        ImageNet Class Indices: 389-397</span>
+<span class="sd">    Crab:</span>
+<span class="sd">        ImageNet Class Indices: 118-121</span>
+<span class="sd">    Insect:</span>
+<span class="sd">        ImageNet Class Indices: 300-319</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_range_sets</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
+        <span class="nb">set</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">e</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span> <span class="p">[</span>
+            <span class="p">(</span><span class="mi">151</span><span class="p">,</span> <span class="mi">268</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">281</span><span class="p">,</span> <span class="mi">285</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">33</span><span class="p">,</span> <span class="mi">37</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">80</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">365</span><span class="p">,</span> <span class="mi">382</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">389</span><span class="p">,</span> <span class="mi">397</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">118</span><span class="p">,</span> <span class="mi">121</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">300</span><span class="p">,</span> <span class="mi">319</span><span class="p">),</span>
+        <span class="p">]</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ImageNetM10"><a class="viewcode-back" href="../../../generated/rai_toolbox.datasets.ImageNetM10.html#rai_toolbox.datasets.ImageNetM10">[docs]</a><span class="k">class</span> <span class="nc">ImageNetM10</span><span class="p">(</span><span class="n">_ReducedImageNet</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;ImageNet-M10, see https://arxiv.org/pdf/2112.15329.pdf</span>
+
+<span class="sd">    ImageNet-M10 consists of ten super-classes, each corresponding a WordNet ID in the hierarchy.</span>
+<span class="sd">    Different super-classes contain varying number of ImageNet classes, so the dataset is balanced by</span>
+<span class="sd">    choosing six classes within each super-class.</span>
+
+<span class="sd">    Dog:</span>
+<span class="sd">        WordNet ID: n02084071</span>
+<span class="sd">        ImageNet Class Indices: 151 to 156</span>
+<span class="sd">    Bird:</span>
+<span class="sd">        WordNet ID: n01503061</span>
+<span class="sd">        ImageNet Class Indices: 7 to 12</span>
+<span class="sd">    Insect:</span>
+<span class="sd">        WordNet ID: n02159955</span>
+<span class="sd">        ImageNet Class Indices: 300 to 305</span>
+<span class="sd">    Monkey:</span>
+<span class="sd">        WordNet ID: n02484322</span>
+<span class="sd">        ImageNet Class Indices: 370 to 375</span>
+<span class="sd">    Car:</span>
+<span class="sd">        WordNet ID: n02958343</span>
+<span class="sd">        ImageNet Class Indices: 407, 436, 468, 511, 609, 627</span>
+<span class="sd">    Feline:</span>
+<span class="sd">        WordNet ID: n02120997</span>
+<span class="sd">        ImageNet Class Indices: 286 to 291</span>
+<span class="sd">    Truck:</span>
+<span class="sd">        WordNet ID: n04490091</span>
+<span class="sd">        ImageNet Class Indices: 555, 569, 675, 717, 734, 864</span>
+<span class="sd">    Fruit:</span>
+<span class="sd">        WordNet ID: n13134947</span>
+<span class="sd">        ImageNet Class Indices: 948, 984, 987 to 990</span>
+<span class="sd">    Fungus:</span>
+<span class="sd">        WordNet ID: n12992868</span>
+<span class="sd">        ImageNet Class Indices: 991 to 996</span>
+<span class="sd">    Boat:</span>
+<span class="sd">        WordNet ID: n02858304</span>
+<span class="sd">        ImageNet Class Indices: 472, 554, 576, 625, 814, 914</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_range_sets</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="nb">set</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">151</span><span class="p">,</span> <span class="mi">156</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)),</span>
+        <span class="nb">set</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">12</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)),</span>
+        <span class="nb">set</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">300</span><span class="p">,</span> <span class="mi">305</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)),</span>
+        <span class="nb">set</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">370</span><span class="p">,</span> <span class="mi">375</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)),</span>
+        <span class="p">{</span><span class="mi">407</span><span class="p">,</span> <span class="mi">436</span><span class="p">,</span> <span class="mi">468</span><span class="p">,</span> <span class="mi">511</span><span class="p">,</span> <span class="mi">609</span><span class="p">,</span> <span class="mi">627</span><span class="p">},</span>
+        <span class="nb">set</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">286</span><span class="p">,</span> <span class="mi">291</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)),</span>
+        <span class="p">{</span><span class="mi">555</span><span class="p">,</span> <span class="mi">569</span><span class="p">,</span> <span class="mi">675</span><span class="p">,</span> <span class="mi">717</span><span class="p">,</span> <span class="mi">734</span><span class="p">,</span> <span class="mi">864</span><span class="p">},</span>
+        <span class="p">{</span><span class="mi">948</span><span class="p">,</span> <span class="mi">984</span><span class="p">,</span> <span class="mi">987</span><span class="p">,</span> <span class="mi">988</span><span class="p">,</span> <span class="mi">999</span><span class="p">,</span> <span class="mi">990</span><span class="p">},</span>
+        <span class="nb">set</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">991</span><span class="p">,</span> <span class="mi">996</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)),</span>
+        <span class="p">{</span><span class="mi">472</span><span class="p">,</span> <span class="mi">554</span><span class="p">,</span> <span class="mi">576</span><span class="p">,</span> <span class="mi">625</span><span class="p">,</span> <span class="mi">814</span><span class="p">,</span> <span class="mi">914</span><span class="p">},</span>
+    <span class="p">)</span></div>
+</pre></div>
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2022 Massachusetts Institute of Technology.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
+</html>

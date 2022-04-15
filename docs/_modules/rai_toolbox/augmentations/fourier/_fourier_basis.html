@@ -1,0 +1,380 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>rai_toolbox.augmentations.fourier._fourier_basis &#8212; rai-toolbox  documentation</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/tabs.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/clipboard.min.js"></script>
+    <script src="../../../../_static/copybutton.js"></script>
+    <script src="../../../../_static/tabs.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="../../../../index.html">
+<p class="title">rai-toolbox</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../../tutorials.html">
+  Tutorials
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../../how_tos.html">
+  How-To Guides
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../../explanation.html">
+  Explanation
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../../api_reference.html">
+  Reference
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../../changes.html">
+  Changelog
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../../../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    
+  </div>
+</nav>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <h1>Source code for rai_toolbox.augmentations.fourier._fourier_basis</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2022, MASSACHUSETTS INSTITUTE OF TECHNOLOGY</span>
+<span class="c1"># Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).</span>
+<span class="c1"># SPDX-License-Identifier: MIT</span>
+
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">product</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">numpy.typing</span> <span class="kn">import</span> <span class="n">DTypeLike</span>
+
+
+<div class="viewcode-block" id="FourierBasis"><a class="viewcode-back" href="../../../../generated/rai_toolbox.augmentations.fourier.FourierBasis.html#rai_toolbox.augmentations.fourier.FourierBasis">[docs]</a><span class="k">class</span> <span class="nc">FourierBasis</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Describes a 2D planewave generated via:</span>
+
+<span class="sd">    A * cos(2pi * freq_vector @ x + phase_shift)</span>
+
+<span class="sd">    Where `A` normalizes the 2D array to have an L2-norm of 1,</span>
+<span class="sd">    and `x` is evaluated on a grid of positions on [0, H] x [0, W].</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    basis: np.ndarray, shape-(H, W)</span>
+<span class="sd">        The amplitudes of the 2D planewave.</span>
+
+<span class="sd">    position : Tuple[int, int]</span>
+<span class="sd">        The (k-row, k-col) coordinate in shifted k-space, where</span>
+<span class="sd">        the freq-0 component has been shifted to resides at the</span>
+<span class="sd">        center of the shape-(H, W) &quot;k-image&quot;.</span>
+
+<span class="sd">    sym_position : Tuple[int, int]</span>
+<span class="sd">        The k-space coordinate symmetric to `position`, about the</span>
+<span class="sd">        center of the k-space image.</span>
+
+<span class="sd">    phase_shift : float</span>
+<span class="sd">        The total phase-shift applied to the cosine-generated</span>
+<span class="sd">        planewave</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+    <span class="n">position</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
+    <span class="n">sym_position</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
+    <span class="n">phase_shift</span><span class="p">:</span> <span class="nb">float</span></div>
+
+
+<div class="viewcode-block" id="generate_fourier_bases"><a class="viewcode-back" href="../../../../generated/rai_toolbox.augmentations.fourier.generate_fourier_bases.html#rai_toolbox.augmentations.fourier.generate_fourier_bases">[docs]</a><span class="k">def</span> <span class="nf">generate_fourier_bases</span><span class="p">(</span>
+    <span class="n">nrows</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">ncols</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLike</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">factor_2pi_phase_shift</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">row_col_coords</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">FourierBasis</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;Yields each unique, real-valued 2D array with unit norm, such that its Fourier</span>
+<span class="sd">    transform is supported at each (i, j) and its symmetric position on a shape-(nrows, ncols)</span>
+<span class="sd">    grid in Fourier space, where the lowest frequency component resides at the center of</span>
+<span class="sd">    the grid.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    nrows : int</span>
+
+<span class="sd">    ncols : int</span>
+
+<span class="sd">    dtype : DTypeLike</span>
+
+<span class="sd">    factor_2pi_phase_shift : float (optional, default=0)</span>
+<span class="sd">        E.g. specifying ``0.5`` will induce a phase-shift of pi on all bases.</span>
+
+<span class="sd">    row_col_coords : Optional[Iterable[Tuple[int, int]]]</span>
+<span class="sd">        If provided, specifies the specific Fourier-bases to generate in terms of their</span>
+<span class="sd">        Fourier-space locations. Otherwise, all non-redundant entries on the nrows x ncols</span>
+<span class="sd">        grip will be generated.</span>
+
+<span class="sd">    Yields</span>
+<span class="sd">    ------</span>
+<span class="sd">    fourier_basis: FourierBasis</span>
+<span class="sd">        Yields the array&#39;s position in Fourier space, (k_row, k_col), its symmetric position, and the</span>
+<span class="sd">        shape-(nrows, ncols) real-valued basis array itself.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The iteration is performed in row-major order in 2D Fourier space, starting with the position (0, 0).</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    Here we will visualize the collection of bases in Fourier space that support the</span>
+
+<span class="sd">    &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">    &gt;&gt;&gt; from ll_freq_analysis import generate_fourier_bases</span>
+<span class="sd">    &gt;&gt;&gt; [np.round(out.basis, 2) for out in generate_fourier_bases(3, 3)]</span>
+<span class="sd">    [array([[ 0.33,  0.12, -0.46],</span>
+<span class="sd">        [ 0.12, -0.46,  0.33],</span>
+<span class="sd">        [-0.46,  0.33,  0.12]]),</span>
+<span class="sd">    array([[ 0.33,  0.33,  0.33],</span>
+<span class="sd">            [ 0.12,  0.12,  0.12],</span>
+<span class="sd">            [-0.46, -0.46, -0.46]]),</span>
+<span class="sd">    array([[ 0.33, -0.46,  0.12],</span>
+<span class="sd">            [ 0.12,  0.33, -0.46],</span>
+<span class="sd">            [-0.46,  0.12,  0.33]]),</span>
+<span class="sd">    array([[ 0.33,  0.12, -0.46],</span>
+<span class="sd">            [ 0.33,  0.12, -0.46],</span>
+<span class="sd">            [ 0.33,  0.12, -0.46]]),</span>
+<span class="sd">    array([[0.33, 0.33, 0.33],</span>
+<span class="sd">            [0.33, 0.33, 0.33],</span>
+<span class="sd">            [0.33, 0.33, 0.33]])]</span>
+
+<span class="sd">    We&#39;ll now inspect the corresponding support arrays in Fourier space.</span>
+<span class="sd">    Note that only five basis arrays, not nine, are returned in association with the</span>
+<span class="sd">    specified 3x3 grid. This is because the remaining four bases are redundant due</span>
+<span class="sd">    to the symmetries in the support space.</span>
+
+<span class="sd">    &gt;&gt;&gt; f = lambda x: np.round(np.abs(np.fft.fftshift(np.fft.fft2(x))))</span>
+<span class="sd">    &gt;&gt;&gt; [f(out.basis) for out in generate_fourier_bases(3, 3)]</span>
+<span class="sd">    [array([[2., 0., 0.],</span>
+<span class="sd">            [0., 0., 0.],</span>
+<span class="sd">            [0., 0., 2.]]),</span>
+<span class="sd">    array([[0., 2., 0.],</span>
+<span class="sd">            [0., 0., 0.],</span>
+<span class="sd">            [0., 2., 0.]]),</span>
+<span class="sd">    array([[0., 0., 2.],</span>
+<span class="sd">            [0., 0., 0.],</span>
+<span class="sd">            [2., 0., 0.]]),</span>
+<span class="sd">    array([[0., 0., 0.],</span>
+<span class="sd">            [2., 0., 2.],</span>
+<span class="sd">            [0., 0., 0.]]),</span>
+<span class="sd">    array([[0., 0., 0.],</span>
+<span class="sd">            [0., 3., 0.],</span>
+<span class="sd">            [0., 0., 0.]])]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ndindex</span><span class="p">(</span><span class="n">nrows</span><span class="p">,</span> <span class="n">ncols</span><span class="p">)))</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">nrows</span><span class="p">,</span> <span class="n">ncols</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">shape</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((</span><span class="n">nrows</span><span class="p">,</span> <span class="n">ncols</span><span class="p">))</span>
+
+    <span class="n">marker</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">nrows</span><span class="p">,</span> <span class="n">ncols</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">row_col_coords</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">row_col_coords</span> <span class="o">=</span> <span class="n">product</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">nrows</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="n">ncols</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">row_col_coords</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">marker</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+        <span class="n">k</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">])</span>
+
+        <span class="c1"># Given a point, (kx, ky), in 2D Fourier space for real-valued data, compute</span>
+        <span class="c1"># the symmetric point (kx&#39;, ky&#39;). I.e. the Fourier coefficients at these points</span>
+        <span class="c1"># are related by complex conjugation: c_{kx, ky} = c^*_{kx&#39;, ky&#39;}</span>
+        <span class="n">sym_i</span><span class="p">,</span> <span class="n">sym_j</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">mod</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mod</span><span class="p">(</span><span class="n">shape</span> <span class="o">-</span> <span class="n">k</span><span class="p">,</span> <span class="n">shape</span><span class="p">),</span> <span class="n">shape</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">k</span>
+        <span class="p">)</span>
+
+        <span class="n">marker</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">marker</span><span class="p">[</span><span class="n">sym_i</span><span class="p">,</span> <span class="n">sym_j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="n">phase_shift</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">+</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">factor_2pi_phase_shift</span><span class="p">)</span>
+
+        <span class="c1"># shift k so 0-freq resides at k=(Lx/2, Ly/2)</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="n">k</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">shape</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="c1"># basis = A * np.cos((2 * np.pi) * (pos @ (k / shape)) + phase_shift)</span>
+        <span class="n">basis</span> <span class="o">=</span> <span class="n">pos</span> <span class="o">@</span> <span class="p">(</span><span class="n">k</span> <span class="o">/</span> <span class="n">shape</span><span class="p">)</span>
+        <span class="n">basis</span> <span class="o">*=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+        <span class="n">basis</span> <span class="o">+=</span> <span class="n">phase_shift</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">basis</span><span class="p">)</span>
+
+        <span class="n">basis</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># TODO: calculate frequency-vector to make it simple for users</span>
+        <span class="c1"># to deduce per-image-length frequency of each basis</span>
+        <span class="c1">#</span>
+        <span class="c1"># This works for even-valued image-shapes:</span>
+        <span class="c1">#</span>
+        <span class="c1"># freq_vector=tuple(</span>
+        <span class="c1">#     float(ele) if ele &lt;= np.ceil(s / 2) else abs(s - ele)</span>
+        <span class="c1">#     for ele, s in zip(k, shape)</span>
+        <span class="c1"># )</span>
+        <span class="c1">#</span>
+
+        <span class="k">yield</span> <span class="n">FourierBasis</span><span class="p">(</span>
+            <span class="n">basis</span><span class="o">=</span><span class="n">basis</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">),</span>
+            <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">),</span>
+            <span class="n">sym_position</span><span class="o">=</span><span class="p">(</span><span class="n">sym_i</span><span class="p">,</span> <span class="n">sym_j</span><span class="p">),</span>
+            <span class="n">phase_shift</span><span class="o">=</span><span class="n">phase_shift</span><span class="p">,</span>
+        <span class="p">)</span></div>
+</pre></div>
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2022 Massachusetts Institute of Technology.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
+</html>

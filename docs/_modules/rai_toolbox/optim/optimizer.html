@@ -1,0 +1,552 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>rai_toolbox.optim.optimizer &#8212; rai-toolbox  documentation</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/tabs.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/clipboard.min.js"></script>
+    <script src="../../../_static/copybutton.js"></script>
+    <script src="../../../_static/tabs.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="../../../index.html">
+<p class="title">rai-toolbox</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../tutorials.html">
+  Tutorials
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../how_tos.html">
+  How-To Guides
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../explanation.html">
+  Explanation
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../api_reference.html">
+  Reference
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../changes.html">
+  Changelog
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    
+  </div>
+</nav>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <h1>Source code for rai_toolbox.optim.optimizer</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2022, MASSACHUSETTS INSTITUTE OF TECHNOLOGY</span>
+<span class="c1"># Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).</span>
+<span class="c1"># SPDX-License-Identifier: MIT</span>
+
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABCMeta</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Any</span><span class="p">,</span>
+    <span class="n">Callable</span><span class="p">,</span>
+    <span class="n">Iterable</span><span class="p">,</span>
+    <span class="n">List</span><span class="p">,</span>
+    <span class="n">Mapping</span><span class="p">,</span>
+    <span class="n">Optional</span><span class="p">,</span>
+    <span class="n">TypeVar</span><span class="p">,</span>
+    <span class="n">Union</span><span class="p">,</span>
+    <span class="n">cast</span><span class="p">,</span>
+    <span class="n">overload</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
+<span class="kn">from</span> <span class="nn">torch.optim</span> <span class="kn">import</span> <span class="n">SGD</span><span class="p">,</span> <span class="n">Optimizer</span>
+
+<span class="kn">from</span> <span class="nn">rai_toolbox._typing</span> <span class="kn">import</span> <span class="n">Optimizer</span> <span class="k">as</span> <span class="n">Opt</span>
+<span class="kn">from</span> <span class="nn">rai_toolbox._typing</span> <span class="kn">import</span> <span class="n">OptimizerType</span><span class="p">,</span> <span class="n">OptimParams</span><span class="p">,</span> <span class="n">ParamGroup</span><span class="p">,</span> <span class="n">Partial</span>
+
+<span class="n">_T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;_T&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">float</span><span class="p">]])</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;GradientTransformerOptimizer&quot;</span><span class="p">,</span> <span class="s2">&quot;ProjectionMixin&quot;</span><span class="p">]</span>
+
+
+<span class="k">class</span> <span class="nc">DatumParamGroup</span><span class="p">(</span><span class="n">ParamGroup</span><span class="p">):</span>
+    <span class="n">param_ndim</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">_identity</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">x</span>
+
+
+<span class="k">def</span> <span class="nf">_atleast_2d</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="c1"># (N,) -&gt; (N, 1)</span>
+        <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">*</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="p">,)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">-</span> <span class="n">x</span><span class="o">.</span><span class="n">ndim</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">x</span>
+
+
+<span class="k">def</span> <span class="nf">_shares_memory</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">storage</span><span class="p">()</span><span class="o">.</span><span class="n">data_ptr</span><span class="p">()</span> <span class="o">==</span> <span class="n">y</span><span class="o">.</span><span class="n">storage</span><span class="p">()</span><span class="o">.</span><span class="n">data_ptr</span><span class="p">()</span>  <span class="c1"># type: ignore</span>
+
+
+<span class="k">def</span> <span class="nf">_to_batch</span><span class="p">(</span><span class="n">p</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">param_ndim</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns a view of `p`, reshaped as shape-(N, d0, ...) where (d0, ...)</span>
+<span class="sd">    has `param_ndim` entries.</span>
+
+<span class="sd">    See Parameters for further description</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    p: Tensor</span>
+
+<span class="sd">    param_ndim: Optional[int]</span>
+<span class="sd">        Determines the shape of the resulting parameter</span>
+
+<span class="sd">        - A positive number determines the dimensionality of the tensor that the transformation will act on.</span>
+<span class="sd">        - A negative number indicates the &#39;offset&#39; from the dimensionality of the tensor.</span>
+<span class="sd">        - `None` means that the transformation will be applied to the tensor without any broadcasting.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    reshaped_p: Tensor</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; import torch as tr</span>
+<span class="sd">    &gt;&gt;&gt; x = tr.rand((3, 5, 2))</span>
+
+<span class="sd">    &gt;&gt;&gt; _to_batch(x, 0).shape</span>
+<span class="sd">    torch.Size([30, 1])</span>
+
+<span class="sd">    &gt;&gt;&gt; _to_batch(x, 1).shape</span>
+<span class="sd">    torch.Size([15, 2])</span>
+
+<span class="sd">    &gt;&gt;&gt; _to_batch(x, 2).shape</span>
+<span class="sd">    torch.Size([3, 5, 2])</span>
+
+<span class="sd">    &gt;&gt;&gt; _to_batch(x, None).shape</span>
+<span class="sd">    torch.Size([1, 3, 5, 2])</span>
+
+<span class="sd">    &gt;&gt;&gt; _to_batch(x, -1).shape</span>
+<span class="sd">    torch.Size([3, 5, 2])</span>
+
+<span class="sd">    &gt;&gt;&gt; _to_batch(x, -2).shape</span>
+<span class="sd">    torch.Size([15, 2])</span>
+
+<span class="sd">    &gt;&gt;&gt; _to_batch(x, -3).shape</span>
+<span class="sd">    torch.Size([30, 1])</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">param_ndim</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">param_ndim</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">ndim</span>
+
+    <span class="k">assert</span> <span class="n">p</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">param_ndim</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">param_ndim</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">param_ndim</span> <span class="o">+=</span> <span class="n">p</span><span class="o">.</span><span class="n">ndim</span>
+
+    <span class="c1"># `1 + param_ndim` is the required dimensionality</span>
+    <span class="c1"># for a shape-(N, d0, d1, ...) tensor, where (d0, d1, ...)</span>
+    <span class="c1"># is the shape of the param_ndim-dimension tensor.</span>
+    <span class="c1">#</span>
+    <span class="c1"># We compute `ndim_delta` to determine if we need to add</span>
+    <span class="c1"># or consolidate dimensions to create the shape-(N, d0, d1, ...)</span>
+    <span class="c1"># tensor.</span>
+    <span class="n">ndim_delta</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">param_ndim</span><span class="p">)</span> <span class="o">-</span> <span class="n">p</span><span class="o">.</span><span class="n">ndim</span>
+
+    <span class="n">reshape</span> <span class="o">=</span> <span class="n">_identity</span>  <span class="c1"># type: ignore</span>
+
+    <span class="k">if</span> <span class="n">ndim_delta</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># E.g.:</span>
+        <span class="c1">#   p.shape: (d0, )</span>
+        <span class="c1">#   desired shape: (N=1, d0)</span>
+        <span class="k">def</span> <span class="nf">reshape</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">x</span><span class="p">[</span><span class="n">ndim_delta</span> <span class="o">*</span> <span class="p">(</span><span class="kc">None</span><span class="p">,)]</span>
+
+    <span class="k">elif</span> <span class="n">ndim_delta</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># E.g.:</span>
+        <span class="c1">#   p.shape: (d0, d1, d2, d3)</span>
+        <span class="c1">#   desired shape: (N=d0*d1, d2, d3)</span>
+        <span class="n">param_shape</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">ndim</span> <span class="o">-</span> <span class="n">param_ndim</span> <span class="p">:]</span>
+
+        <span class="k">def</span> <span class="nf">reshape</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">*</span><span class="n">param_shape</span><span class="p">)</span>
+
+    <span class="c1"># atleast_2d needed for case where p was scalar</span>
+    <span class="n">vp</span> <span class="o">=</span> <span class="n">_atleast_2d</span><span class="p">(</span><span class="n">reshape</span><span class="p">(</span><span class="n">p</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">grad</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">vp</span><span class="o">.</span><span class="n">grad</span> <span class="o">=</span> <span class="n">_atleast_2d</span><span class="p">(</span><span class="n">reshape</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">grad</span><span class="p">))</span>
+
+    <span class="c1"># vp (vp.grad) must be a view of p (p.grad). There is</span>
+    <span class="c1"># not a simple way to assert this.</span>
+
+    <span class="c1"># our views must be size-preserving</span>
+    <span class="k">assert</span> <span class="n">torch</span><span class="o">.</span><span class="n">numel</span><span class="p">(</span><span class="n">vp</span><span class="p">)</span> <span class="o">==</span> <span class="n">torch</span><span class="o">.</span><span class="n">numel</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">vp</span>
+
+
+<div class="viewcode-block" id="GradientTransformerOptimizer"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.GradientTransformerOptimizer.html#rai_toolbox.optim.GradientTransformerOptimizer">[docs]</a><span class="k">class</span> <span class="nc">GradientTransformerOptimizer</span><span class="p">(</span><span class="n">Optimizer</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;An optimizer that performs an in-place transformation to the</span>
+<span class="sd">    gradient of each parameter, before performing the gradient-based</span>
+<span class="sd">    update on each parameter::</span>
+
+<span class="sd">       param = step(param, transformation(param.grad), ...)</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    `GradientTransformerOptimizer` is designed to be combined with other,</span>
+<span class="sd">    standard gradient-based optimizers (e.g. Adam) via encapsulation, rather</span>
+<span class="sd">    then through inheritance. I.e., `GradientTransformerOptimizer(InnerOpt=&lt;...&gt;)`</span>
+<span class="sd">    Permits a standard optimizer to include an additional gradient-transformation</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    _inplace_grad_transform_</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">param_groups</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">DatumParamGroup</span><span class="p">]</span>
+
+<div class="viewcode-block" id="GradientTransformerOptimizer.__init__"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.GradientTransformerOptimizer.html#rai_toolbox.optim.GradientTransformerOptimizer.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">params</span><span class="p">:</span> <span class="n">OptimParams</span><span class="p">,</span>
+        <span class="n">InnerOpt</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Partial</span><span class="p">[</span><span class="n">Opt</span><span class="p">],</span> <span class="n">OptimizerType</span><span class="p">]</span> <span class="o">=</span> <span class="n">SGD</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">param_ndim</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">defaults</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">inner_opt_kwargs</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        params: Iterable</span>
+<span class="sd">            iterable of parameters to optimize or dicts defining parameter groups</span>
+
+<span class="sd">        InnerOpt: Type[Optimizer] | Partial[Optimizer], optional (default=SGD)</span>
+<span class="sd">            The optimizer to update parameters</span>
+
+<span class="sd">        param_ndim : Optional[int] = -1</span>
+<span class="sd">            Controls how `_inplace_grad_transform_` is broadcast onto the gradient</span>
+<span class="sd">            of a given parameter. This can be specified per param-group. By default,</span>
+<span class="sd">            the gradient transformation broadcasts over the first dimension in a</span>
+<span class="sd">            batch-like style.</span>
+
+<span class="sd">               - A positive number determines the dimensionality of the gradient that the transformation will act on.</span>
+<span class="sd">               - A negative number indicates the &#39;offset&#39; from the dimensionality of the gradient.</span>
+<span class="sd">               - `None` means that the transformation will be applied to the gradient without any broadcasting.</span>
+
+<span class="sd">        defaults: Optional[dict]</span>
+<span class="sd">            Specifies default parameters for all parameter groups.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Additional Explanation of `param_ndim`:</span>
+<span class="sd">        </span>
+<span class="sd">        If the gradient has a shape (d0, d1, d2) and `param_ndim=1` then the</span>
+<span class="sd">        transformation will be broadcast over each shape-(d2,) sub-tensor in the</span>
+<span class="sd">        gradient (of which there are d0 * d1).</span>
+
+<span class="sd">        E.g. if a gradient has a shape (d0, d1, d2, d3), and if `delta_ndim=-1`,</span>
+<span class="sd">        then the transformation will broadcast over each shape-(d1, d2, d3) sub-tensor</span>
+<span class="sd">        in the gradient (of which there are d0).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">defaults</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">defaults</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;param_ndim&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">param_ndim</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">defaults</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inner_opt</span> <span class="o">=</span> <span class="n">InnerOpt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">param_groups</span><span class="p">,</span> <span class="o">**</span><span class="n">inner_opt_kwargs</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_groups</span><span class="p">:</span>
+            <span class="n">param_ndim</span> <span class="o">=</span> <span class="n">group</span><span class="p">[</span><span class="s2">&quot;param_ndim&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">param_ndim</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">param_ndim</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;`param_ndim` must be an int or None, got: </span><span class="si">{</span><span class="n">param_ndim</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">group</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">]:</span>
+                <span class="n">p</span><span class="p">:</span> <span class="n">Tensor</span>
+                <span class="k">if</span> <span class="n">param_ndim</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&lt;</span> <span class="nb">abs</span><span class="p">(</span><span class="n">param_ndim</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;`param_ndim=</span><span class="si">{</span><span class="n">param_ndim</span><span class="si">}</span><span class="s2">` specified for parameter with &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;ndim=</span><span class="si">{</span><span class="n">p</span><span class="o">.</span><span class="n">ndim</span><span class="si">}</span><span class="s2"> is not valid. `abs(param_ndim) &lt;= ndim` must &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;hold.&quot;</span>
+                    <span class="p">)</span></div>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_inplace_grad_transform_</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">optim_group</span><span class="p">:</span> <span class="n">DatumParamGroup</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+        <span class="sd">&quot;&quot;&quot;Applies a transformation, in place, on the gradient of the each parameter</span>
+<span class="sd">        in the provided param group.</span>
+
+<span class="sd">        This transform should *always* be designed to broadcast over the leading</span>
+<span class="sd">        dimension of the parameters&#39;s gradient. That is, each gradient  should be</span>
+<span class="sd">        assumed to have the shape-(N, d0, ...) and the transformation should be</span>
+<span class="sd">        applied - in-place - to each shape-(d0, ...) sub-tensor.</span>
+
+<span class="sd">        Prior to calling `_in_place_grad_transform`, `GradientTransformerOptimizer`</span>
+<span class="sd">        will reshape each parameter and its gradient to have the appropriate shape,</span>
+<span class="sd">        in accordance with the value specified for `param_ndim` such that the shape</span>
+<span class="sd">        (d0, ...) contains `param_ndim` entries.</span>
+
+<span class="sd">        In the case where `param_ndim=0`, the tensor shapes will be (N, 1).&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+
+    <span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">_create_gradient_transforming_closure</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">closure</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[],</span> <span class="n">_T</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">Optional</span><span class="p">[</span><span class="n">_T</span><span class="p">]]:</span>
+        <span class="k">def</span> <span class="nf">scaled_closure</span><span class="p">():</span>
+            <span class="n">loss</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="n">closure</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">enable_grad</span><span class="p">():</span>
+                    <span class="n">loss</span> <span class="o">=</span> <span class="n">closure</span><span class="p">()</span>
+
+            <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_groups</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">group</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">]:</span>
+                    <span class="n">p</span><span class="p">:</span> <span class="n">Tensor</span>
+                    <span class="n">orig_p</span> <span class="o">=</span> <span class="n">p</span>
+                    <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">grad</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">continue</span>
+                    <span class="k">assert</span> <span class="n">orig_p</span><span class="o">.</span><span class="n">grad</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+
+                    <span class="n">p</span> <span class="o">=</span> <span class="n">_to_batch</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">group</span><span class="p">[</span><span class="s2">&quot;param_ndim&quot;</span><span class="p">])</span>
+
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_inplace_grad_transform_</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">optim_group</span><span class="o">=</span><span class="n">group</span><span class="p">)</span>
+
+                    <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">grad</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">_shares_memory</span><span class="p">(</span><span class="n">orig_p</span><span class="o">.</span><span class="n">grad</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">grad</span><span class="p">):</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;`</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">._inplace_grad_transform_` did &quot;</span>
+                            <span class="s2">&quot; not modify the gradient of the parameter in-place.&quot;</span>
+                            <span class="s2">&quot; </span><span class="se">\n</span><span class="s2">Note that setting `p.grad` directly replaces the&quot;</span>
+                            <span class="s2">&quot; tensor, rather than writing to the tensor.&quot;</span>
+                        <span class="p">)</span>
+            <span class="k">return</span> <span class="n">loss</span>
+
+        <span class="k">return</span> <span class="n">scaled_closure</span>
+
+    <span class="nd">@overload</span>
+    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">closure</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">_T</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">_T</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+        <span class="o">...</span>
+
+    <span class="nd">@overload</span>
+    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+        <span class="o">...</span>
+
+    <span class="nd">@overload</span>
+    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">closure</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[],</span> <span class="n">_T</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">_T</span><span class="p">]:</span>  <span class="c1"># pragma: no cover</span>
+        <span class="o">...</span>
+
+    <span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">closure</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">closure</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">closure</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">enable_grad</span><span class="p">()(</span><span class="n">closure</span><span class="p">)</span>
+        <span class="n">closure</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_gradient_transforming_closure</span><span class="p">(</span><span class="n">closure</span><span class="p">)</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inner_opt</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">closure</span><span class="p">)</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]],</span> <span class="n">loss</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">loss</span></div>
+
+
+<div class="viewcode-block" id="ProjectionMixin"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.ProjectionMixin.html#rai_toolbox.optim.ProjectionMixin">[docs]</a><span class="k">class</span> <span class="nc">ProjectionMixin</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A mixin that adds a parameter-projection method to an optimizer.</span>
+
+<span class="sd">    Calling `.project()` will apply the in-place projection on each parameter</span>
+<span class="sd">    stored by the optimizer.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    &#39;param_ndim&#39; must be included in the optimizer&#39;s param groups, which describes</span>
+<span class="sd">    how the projection should be applied to each parameter (i.e., whether or not</span>
+<span class="sd">    it is broadcasted).</span>
+
+<span class="sd">        - A positive number determines the dimensionality of the tensor that the projection will act on.</span>
+<span class="sd">        - A negative number indicates the &#39;offset&#39; from the dimensionality of the tensor.</span>
+<span class="sd">        - `None` means that the projection will be applied to the tensor without any broadcasting.</span>
+<span class="sd">    </span>
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    _project_parameter_</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">param_groups</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">DatumParamGroup</span><span class="p">]</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_project_parameter_</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">optim_group</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+        <span class="sd">&quot;&quot;&quot;Applies an in-place projection on each parameter in the given param group.</span>
+
+<span class="sd">        This operation should *always* be designed to broadcast over the leading</span>
+<span class="sd">        dimension of the tensor. That is, each parameter gradient should be assumed</span>
+<span class="sd">        to have the shape-(N, d0, ...) and the transformation should be applied -</span>
+<span class="sd">        in-place - to each shape-(d0, ...) sub-tensor.&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+
+    <span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">project</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Project each parameter in-place.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_groups</span><span class="p">:</span>
+            <span class="n">param_ndim</span> <span class="o">=</span> <span class="n">group</span><span class="p">[</span><span class="s2">&quot;param_ndim&quot;</span><span class="p">]</span>
+
+            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">group</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">]:</span>
+                <span class="n">p</span> <span class="o">=</span> <span class="n">_to_batch</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">param_ndim</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_project_parameter_</span><span class="p">(</span><span class="n">param</span><span class="o">=</span><span class="n">p</span><span class="p">,</span> <span class="n">optim_group</span><span class="o">=</span><span class="n">group</span><span class="p">)</span></div>
+</pre></div>
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2022 Massachusetts Institute of Technology.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
+</html>

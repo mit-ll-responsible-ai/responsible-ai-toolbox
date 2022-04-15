@@ -1,0 +1,583 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>rai_toolbox.datasets.cifar_corruptions &#8212; rai-toolbox  documentation</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/tabs.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/clipboard.min.js"></script>
+    <script src="../../../_static/copybutton.js"></script>
+    <script src="../../../_static/tabs.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="../../../index.html">
+<p class="title">rai-toolbox</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../tutorials.html">
+  Tutorials
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../how_tos.html">
+  How-To Guides
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../explanation.html">
+  Explanation
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../api_reference.html">
+  Reference
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../changes.html">
+  Changelog
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    
+  </div>
+</nav>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <h1>Source code for rai_toolbox.datasets.cifar_corruptions</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2022, MASSACHUSETTS INSTITUTE OF TECHNOLOGY</span>
+<span class="c1"># Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).</span>
+<span class="c1"># SPDX-License-Identifier: MIT</span>
+
+<span class="kn">from</span> <span class="nn">numbers</span> <span class="kn">import</span> <span class="n">Integral</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
+<span class="kn">from</span> <span class="nn">torchvision.datasets.utils</span> <span class="kn">import</span> <span class="n">download_and_extract_archive</span>
+<span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Literal</span>
+
+<span class="kn">from</span> <span class="nn">._cifar10_base</span> <span class="kn">import</span> <span class="n">_CIFAR10Base</span>
+<span class="kn">from</span> <span class="nn">._utils</span> <span class="kn">import</span> <span class="n">md5_check</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;CIFAR10C&quot;</span><span class="p">,</span> <span class="s2">&quot;CIFAR100C&quot;</span><span class="p">]</span>
+
+<span class="n">PathLike</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]</span>
+<span class="n">Corruptions</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span>
+    <span class="s2">&quot;brightness&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;contrast&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;defocus_blur&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;elastic_transform&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;fog&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;frost&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;gaussian_blur&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;gaussian_noise&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;glass_blur&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;impulse_noise&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;jpeg_compression&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;motion_blur&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;pixelate&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;saturate&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;shot_noise&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;snow&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;spatter&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;speckle_noise&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;zoom_blur&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="n">Severity</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="CIFAR10C"><a class="viewcode-back" href="../../../generated/rai_toolbox.datasets.CIFAR10C.html#rai_toolbox.datasets.CIFAR10C">[docs]</a><span class="k">class</span> <span class="nc">CIFAR10C</span><span class="p">(</span><span class="n">_CIFAR10Base</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;CIFAR10C(root: PathLike,</span>
+<span class="sd">             corruption: str,</span>
+<span class="sd">             severity: Literal[1, 2, 3, 4, 5],</span>
+<span class="sd">             transform: Optional[Callable[[Image.Image], Any]] = None,</span>
+<span class="sd">             target_transform: Optional[Callable] = None,</span>
+<span class="sd">             download: bool = False)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    root: str</span>
+<span class="sd">        Root directory of dataset where directory</span>
+<span class="sd">            ``CIFAR-10-C`` exists or will be saved to if download is set to True.</span>
+
+<span class="sd">    corruption: str</span>
+<span class="sd">        The type of corruption, e.g. &quot;fog&quot;. See `CIFAR10C.all_corruptions()` for a full</span>
+<span class="sd">        list of corruptions.</span>
+
+<span class="sd">    severity: Literal[1, 2, 3, 4, 5]</span>
+<span class="sd">        The severity-level of the corruption, ranging from 1 to 5.</span>
+
+<span class="sd">    transform:  Optional[Callable[[Image], Any]]</span>
+<span class="sd">        A function/transform that takes in an PIL image</span>
+<span class="sd">        and returns a transformed version. E.g, ``transforms.RandomCrop``</span>
+
+<span class="sd">    target_transform: Optional[Callable],</span>
+
+<span class="sd">    download: bool, optional (default=False)</span>
+<span class="sd">        If true, downloads the dataset from the internet and puts it in root directory.</span>
+<span class="sd">        If dataset is already downloaded, it is not downloaded again.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;https://zenodo.org/record/2535967/files/CIFAR-10-C.tar&quot;</span>
+    <span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;CIFAR-10-C.tar&quot;</span>
+    <span class="n">tar_md5</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;56bf5dcef84df0e2308c6dcbcbbd8499&quot;</span>
+    <span class="n">base_folder</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;CIFAR-10-C&quot;</span>
+
+    <span class="n">_file_to_md5</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;brightness&quot;</span><span class="p">:</span> <span class="s2">&quot;0a81ef75e0b523c3383219c330a85d48&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;contrast&quot;</span><span class="p">:</span> <span class="s2">&quot;3c8262171c51307f916c30a3308235a8&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;defocus_blur&quot;</span><span class="p">:</span> <span class="s2">&quot;7d1322666342a0702b1957e92f6254bc&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;elastic_transform&quot;</span><span class="p">:</span> <span class="s2">&quot;9421657c6cd452429cf6ce96cc412b5f&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;fog&quot;</span><span class="p">:</span> <span class="s2">&quot;7b397314b5670f825465fbcd1f6e9ccd&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;frost&quot;</span><span class="p">:</span> <span class="s2">&quot;31f6ab3bce1d9934abfb0cc13656f141&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;gaussian_blur&quot;</span><span class="p">:</span> <span class="s2">&quot;c33370155bc9b055fb4a89113d3c559d&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;gaussian_noise&quot;</span><span class="p">:</span> <span class="s2">&quot;ecaf8b9a2399ffeda7680934c33405fd&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;glass_blur&quot;</span><span class="p">:</span> <span class="s2">&quot;7361fb4019269e02dbf6925f083e8629&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;impulse_noise&quot;</span><span class="p">:</span> <span class="s2">&quot;2090e01c83519ec51427e65116af6b1a&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;jpeg_compression&quot;</span><span class="p">:</span> <span class="s2">&quot;2b9cc4c864e0193bb64db8d7728f8187&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;labels&quot;</span><span class="p">:</span> <span class="s2">&quot;c439b113295ed5254878798ffe28fd54&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;motion_blur&quot;</span><span class="p">:</span> <span class="s2">&quot;fffa5f852ff7ad299cfe8a7643f090f4&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;pixelate&quot;</span><span class="p">:</span> <span class="s2">&quot;0f14f7e2db14288304e1de10df16832f&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;saturate&quot;</span><span class="p">:</span> <span class="s2">&quot;1cfae0964219c5102abbb883e538cc56&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;shot_noise&quot;</span><span class="p">:</span> <span class="s2">&quot;3a7239bb118894f013d9bf1984be7f11&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;snow&quot;</span><span class="p">:</span> <span class="s2">&quot;bb238de8555123da9c282dea23bd6e55&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;spatter&quot;</span><span class="p">:</span> <span class="s2">&quot;8a5a3903a7f8f65b59501a6093b4311e&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;speckle_noise&quot;</span><span class="p">:</span> <span class="s2">&quot;ef00b87611792b00df09c0b0237a1e30&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;zoom_blur&quot;</span><span class="p">:</span> <span class="s2">&quot;6ea8e63f1c5cdee1517533840641641b&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="n">all_corruptions</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;brightness&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;contrast&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;defocus_blur&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;elastic_transform&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;fog&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;frost&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;gaussian_blur&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;gaussian_noise&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;glass_blur&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;impulse_noise&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;jpeg_compression&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;motion_blur&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;pixelate&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;saturate&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;shot_noise&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;snow&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;spatter&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;speckle_noise&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;zoom_blur&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">noise_corruptions</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;gaussian_noise&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;impulse_noise&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;shot_noise&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">blur_corruptions</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;defocus_blur&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;glass_blur&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;motion_blur&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;zoom_blur&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">weather_corruptions</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;brightness&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;fog&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;frost&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;snow&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">digital_corruptions</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;contrast&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;elastic_transform&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;jpeg_compression&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;pixelate&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># not included in augmix results</span>
+    <span class="n">extra_corruptions</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;gaussian_blur&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;saturate&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;spatter&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;speckle_noise&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="CIFAR10C.__init__"><a class="viewcode-back" href="../../../generated/rai_toolbox.datasets.CIFAR10C.html#rai_toolbox.datasets.CIFAR10C.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">root</span><span class="p">:</span> <span class="n">PathLike</span><span class="p">,</span>
+        <span class="n">corruption</span><span class="p">:</span> <span class="n">Corruptions</span><span class="p">,</span>
+        <span class="n">severity</span><span class="p">:</span> <span class="n">Severity</span><span class="p">,</span>
+        <span class="n">transform</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">],</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">target_transform</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="nb">int</span><span class="p">],</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">download</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">root</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">root</span><span class="p">),</span> <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">,</span> <span class="n">target_transform</span><span class="o">=</span><span class="n">target_transform</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_root</span> <span class="o">=</span> <span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_folder</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="n">corruption</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_to_md5</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">corruption</span> <span class="o">=</span> <span class="n">corruption</span>
+
+        <span class="k">if</span> <span class="n">download</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_integrity</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="s2">&quot;Dataset not found or corrupted.&quot;</span>
+                <span class="o">+</span> <span class="s2">&quot; You can use download=True to download it&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">severity</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">Integral</span><span class="p">))</span> <span class="ow">and</span> <span class="mi">1</span> <span class="o">&lt;=</span> <span class="n">severity</span> <span class="o">&lt;=</span> <span class="mi">5</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;`severity` must be an integer in [1, 5]. Got </span><span class="si">{</span><span class="n">severity</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">severity</span> <span class="o">-=</span> <span class="mi">1</span>
+
+        <span class="n">mmap</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_root</span> <span class="o">/</span> <span class="p">(</span><span class="n">corruption</span> <span class="o">+</span> <span class="s2">&quot;.npy&quot;</span><span class="p">),</span> <span class="n">mmap_mode</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">)</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">mmap</span><span class="p">)</span> <span class="o">//</span> <span class="mi">5</span>
+
+        <span class="c1"># shape-(N, H, W, C)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">mmap</span><span class="p">[</span><span class="n">severity</span> <span class="o">*</span> <span class="n">size</span> <span class="p">:</span> <span class="p">(</span><span class="n">severity</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">size</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">targets</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_root</span> <span class="o">/</span> <span class="s2">&quot;labels.npy&quot;</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_check_integrity</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="n">img_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_root</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">corruption</span> <span class="o">+</span> <span class="s2">&quot;.npy&quot;</span><span class="p">)</span>
+        <span class="n">labels_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_root</span> <span class="o">/</span> <span class="s2">&quot;labels.npy&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">img_path</span><span class="o">.</span><span class="n">is_file</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">labels_path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="n">img_md5</span> <span class="o">=</span> <span class="n">md5_check</span><span class="p">(</span><span class="n">img_path</span><span class="p">)</span>
+        <span class="n">label_md5</span> <span class="o">=</span> <span class="n">md5_check</span><span class="p">(</span><span class="n">labels_path</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">img_md5</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_to_md5</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">corruption</span><span class="p">]</span>
+            <span class="ow">and</span> <span class="n">label_md5</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_to_md5</span><span class="p">[</span><span class="s2">&quot;labels&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">download</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_integrity</span><span class="p">():</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Files already downloaded and verified&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="n">download_and_extract_archive</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="n">md5</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tar_md5</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">extra_repr</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;Split: Test&quot;</span></div>
+
+
+<div class="viewcode-block" id="CIFAR100C"><a class="viewcode-back" href="../../../generated/rai_toolbox.datasets.CIFAR100C.html#rai_toolbox.datasets.CIFAR100C">[docs]</a><span class="k">class</span> <span class="nc">CIFAR100C</span><span class="p">(</span><span class="n">CIFAR10C</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;CIFAR100C(root: PathLike,</span>
+<span class="sd">              corruption: str,</span>
+<span class="sd">              severity: Literal[1, 2, 3, 4, 5],</span>
+<span class="sd">              transform: Optional[Callable[[Image.Image], Any]] = None,</span>
+<span class="sd">              target_transform: Optional[Callable] = None,</span>
+<span class="sd">              download: bool = False)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    root: str</span>
+<span class="sd">        Root directory of dataset where directory</span>
+<span class="sd">            ``CIFAR-100-C`` exists or will be saved to if download is set to True.</span>
+
+<span class="sd">    corruption: str</span>
+<span class="sd">        The type of corruption, e.g. &quot;fog&quot;. See `CIFAR100C.all_corruptions()` for a full</span>
+<span class="sd">        list of corruptions.</span>
+
+<span class="sd">    severity: Literal[1, 2, 3, 4, 5]</span>
+<span class="sd">        The severity-level of the corruption, ranging from 1 to 5.</span>
+
+<span class="sd">    transform:  Optional[Callable[[Image], Any]]</span>
+<span class="sd">        A function/transform that takes in an PIL image</span>
+<span class="sd">        and returns a transformed version. E.g, ``transforms.RandomCrop``</span>
+
+<span class="sd">    target_transform: Optional[Callable],</span>
+
+<span class="sd">    download: bool, optional (default=False)</span>
+<span class="sd">        If true, downloads the dataset from the internet and puts it in root directory.</span>
+<span class="sd">        If dataset is already downloaded, it is not downloaded again.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;https://zenodo.org/record/3555552/files/CIFAR-100-C.tar&quot;</span>
+    <span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;CIFAR-100-C.tar&quot;</span>
+    <span class="n">tar_md5</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;11f0ed0f1191edbf9fa23466ae6021d3&quot;</span>
+    <span class="n">base_folder</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;CIFAR-100-C&quot;</span>
+
+    <span class="n">_file_to_md5</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;brightness&quot;</span><span class="p">:</span> <span class="s2">&quot;f22d7195aecd6abb541e27fca230c171&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;contrast&quot;</span><span class="p">:</span> <span class="s2">&quot;322bb385f1d05154ee197ca16535f71e&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;defocus_blur&quot;</span><span class="p">:</span> <span class="s2">&quot;d923e3d9c585a27f0956e2f2ad832564&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;elastic_transform&quot;</span><span class="p">:</span> <span class="s2">&quot;a0792bd6581f6810878be71acedfc65a&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;fog&quot;</span><span class="p">:</span> <span class="s2">&quot;4efc7ebd5e82b028bdbe13048e3ea564&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;frost&quot;</span><span class="p">:</span> <span class="s2">&quot;3a39c6823bdfaa0bf8b12fe7004b8117&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;gaussian_blur&quot;</span><span class="p">:</span> <span class="s2">&quot;5204ba0d557839772ef5a4196a052c3e&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;gaussian_noise&quot;</span><span class="p">:</span> <span class="s2">&quot;ecc4d366eac432bdf25c024086f5e97d&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;glass_blur&quot;</span><span class="p">:</span> <span class="s2">&quot;0bf384f38e5ccbf8dd479d9059b913e1&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;impulse_noise&quot;</span><span class="p">:</span> <span class="s2">&quot;3b3c210ddfa0b5cb918ff4537a429fef&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;jpeg_compression&quot;</span><span class="p">:</span> <span class="s2">&quot;c851b7f1324e1d2ffddeb76920576d11&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;labels&quot;</span><span class="p">:</span> <span class="s2">&quot;bb4026e9ce52996b95f439544568cdb2&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;motion_blur&quot;</span><span class="p">:</span> <span class="s2">&quot;732a7e2e54152ff97c742d4c388c5516&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;pixelate&quot;</span><span class="p">:</span> <span class="s2">&quot;96c00c60f144539e14cffb02ddbd0640&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;saturate&quot;</span><span class="p">:</span> <span class="s2">&quot;c0697e9fdd646916a61e9c312c77bf6b&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;shot_noise&quot;</span><span class="p">:</span> <span class="s2">&quot;b0a1fa6e1e465a747c1b204b1914048a&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;snow&quot;</span><span class="p">:</span> <span class="s2">&quot;0237be164583af146b7b144e73b43465&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;spatter&quot;</span><span class="p">:</span> <span class="s2">&quot;12ccf41d62564d36e1f6a6ada5022728&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;speckle_noise&quot;</span><span class="p">:</span> <span class="s2">&quot;e3f215b1a0f9fd9fd6f0d1cf94a7ce99&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;zoom_blur&quot;</span><span class="p">:</span> <span class="s2">&quot;0204613400c034a81c4830d5df81cb82&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="n">classes</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;apple&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;aquarium_fish&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;baby&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;bear&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;beaver&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;bed&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;bee&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;beetle&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;bicycle&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;bottle&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;bowl&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;boy&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;bridge&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;bus&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;butterfly&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;camel&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;can&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;castle&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;caterpillar&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;cattle&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;chair&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;chimpanzee&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;clock&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;cloud&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;cockroach&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;couch&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;crab&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;crocodile&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;cup&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;dinosaur&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;dolphin&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;elephant&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;flatfish&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;forest&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;fox&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;girl&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;hamster&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;house&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;kangaroo&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;keyboard&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;lamp&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;lawn_mower&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;leopard&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;lion&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;lizard&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;lobster&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;man&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;maple_tree&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;motorcycle&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;mountain&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;mouse&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;mushroom&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;oak_tree&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;orange&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;orchid&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;otter&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;palm_tree&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;pear&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;pickup_truck&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;pine_tree&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;plain&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;plate&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;poppy&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;porcupine&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;possum&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;rabbit&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;raccoon&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;ray&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;road&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;rocket&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;rose&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;sea&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;seal&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;shark&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;shrew&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;skunk&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;skyscraper&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;snail&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;snake&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;spider&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;squirrel&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;streetcar&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;sunflower&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;sweet_pepper&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;table&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;tank&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;telephone&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;television&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;tiger&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;tractor&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;train&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;trout&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;tulip&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;turtle&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;wardrobe&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;whale&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;willow_tree&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;wolf&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;woman&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;worm&quot;</span><span class="p">,</span>
+    <span class="p">)</span></div>
+</pre></div>
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2022 Massachusetts Institute of Technology.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
+</html>

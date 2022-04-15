@@ -1,0 +1,431 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>rai_toolbox.perturbations.gradient_ascent &#8212; rai-toolbox  documentation</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/tabs.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="rai_toolbox.perturbations.PerturbationModel" href="rai_toolbox.perturbations.PerturbationModel.html" />
+    <link rel="prev" title="Perturbations" href="../ref_perturbation.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="../index.html">
+<p class="title">rai-toolbox</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../tutorials.html">
+  Tutorials
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../how_tos.html">
+  How-To Guides
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../explanation.html">
+  Explanation
+ </a>
+</li>
+
+<li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="../api_reference.html">
+  Reference
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../changes.html">
+  Changelog
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    <p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Contents:
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../ref_optim.html">
+   Optimizers
+  </a>
+ </li>
+ <li class="toctree-l1 current active has-children">
+  <a class="reference internal" href="../ref_perturbation.html">
+   Perturbations
+  </a>
+  <input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul class="current">
+   <li class="toctree-l2 current active">
+    <a class="current reference internal" href="#">
+     rai_toolbox.perturbations.gradient_ascent
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="rai_toolbox.perturbations.PerturbationModel.html">
+     rai_toolbox.perturbations.PerturbationModel
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="rai_toolbox.perturbations.AdditivePerturbation.html">
+     rai_toolbox.perturbations.AdditivePerturbation
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="rai_toolbox.perturbations.uniform_like_l1_n_ball_.html">
+     rai_toolbox.perturbations.uniform_like_l1_n_ball_
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="rai_toolbox.perturbations.uniform_like_l2_n_ball_.html">
+     rai_toolbox.perturbations.uniform_like_l2_n_ball_
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="rai_toolbox.perturbations.uniform_like_linf_n_ball_.html">
+     rai_toolbox.perturbations.uniform_like_linf_n_ball_
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../ref_datasets.html">
+   Datasets
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../ref_augmentations.html">
+   Augmentations
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../ref_losses.html">
+   Losses
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="rai_toolbox.evaluating.html">
+   rai_toolbox.evaluating
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="rai_toolbox.freeze.html">
+   rai_toolbox.freeze
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="rai_toolbox.frozen.html">
+   rai_toolbox.frozen
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="rai_toolbox.negate.html">
+   rai_toolbox.negate
+  </a>
+ </li>
+</ul>
+
+  </div>
+</nav>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+
+<nav id="bd-toc-nav">
+    
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <section id="rai-toolbox-perturbations-gradient-ascent">
+<h1>rai_toolbox.perturbations.gradient_ascent<a class="headerlink" href="#rai-toolbox-perturbations-gradient-ascent" title="Permalink to this headline">#</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="rai_toolbox.perturbations.gradient_ascent">
+<span class="sig-prename descclassname"><span class="pre">rai_toolbox.perturbations.</span></span><span class="sig-name descname"><span class="pre">gradient_ascent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perturbation_model=&lt;class</span> <span class="pre">'rai_toolbox.perturbations.models.AdditivePerturbation'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targeted=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_best=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">criterion=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction_fn=&lt;built-in</span> <span class="pre">method</span> <span class="pre">sum</span> <span class="pre">of</span> <span class="pre">type</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**optim_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/perturbations/solvers.html#gradient_ascent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.perturbations.gradient_ascent" title="Permalink to this definition">#</a></dt>
+<dd><p>Solve for a set of perturbations for a given set of data and a model.</p>
+<p>This performs, for <code class="xref py py-obj docutils literal notranslate"><span class="pre">steps</span></code> iterations, the following optimization:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">optim</span> <span class="o">=</span> <span class="n">optimizer</span><span class="p">(</span><span class="n">perturbation_model</span><span class="o">.</span><span class="n">parameters</span><span class="p">)</span>
+<span class="n">pert_data</span> <span class="o">=</span> <span class="n">perturbation_model</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">model</span><span class="p">(</span><span class="n">pert_data</span><span class="p">),</span> <span class="n">target</span><span class="p">)</span>
+<span class="n">loss</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="k">if</span> <span class="n">targeted</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">loss</span>  <span class="c1"># default: targeted=False</span>
+<span class="n">optim</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Note that, by default, this perturbs the data away from <code class="xref py py-obj docutils literal notranslate"><span class="pre">target</span></code> (i.e. this performs
+gradient <em>ascent</em>), given a standard loss function that seeks to minimize the
+diffence between the model’s output and the target. See <code class="xref py py-obj docutils literal notranslate"><span class="pre">targeted</span></code> to toggle this
+behavior.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>model</strong><span class="classifier">Callable[[Tensor], Tensor]</span></dt><dd><p>Differentiable function that processes the (perturbed) data prior to computing
+the loss.</p>
+<p>If <code class="xref py py-obj docutils literal notranslate"><span class="pre">model</span></code> is a <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.nn.Module</span></code> then its weights will be frozen and it will
+be set to eval mode during the perturbation-solve phase.</p>
+</dd>
+<dt><strong>data</strong><span class="classifier">Tensor, shape-(N, …)</span></dt><dd><p>The input data to perturb.</p>
+</dd>
+<dt><strong>target</strong><span class="classifier">Tensor, shape-(N, …)</span></dt><dd><p>If <code class="xref py py-obj docutils literal notranslate"><span class="pre">targeted==False</span></code> (default), then this is the target to perturb away from.
+If <code class="xref py py-obj docutils literal notranslate"><span class="pre">targeted==True</span></code>, then this is the target to perturb toward.</p>
+</dd>
+<dt><strong>optimizer</strong><span class="classifier">Type[Optimizer] | Partial[Optimizer]</span></dt><dd><p>The optimizer to use for updating the perturbation model</p>
+</dd>
+<dt><strong>steps</strong><span class="classifier">int</span></dt><dd><p>Number of projected gradient steps</p>
+</dd>
+<dt><strong>perturbation_model</strong><span class="classifier">PerturbationModel | Type[PerturbationModel], optional (default=AdditivePerturbation)</span></dt><dd><p>A <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.nn.Module</span></code> whose parameters are updated by the solver. Its forward-pass applies the perturbation to the data. Default is
+<a class="reference internal" href="rai_toolbox.perturbations.AdditivePerturbation.html#rai_toolbox.perturbations.AdditivePerturbation" title="rai_toolbox.perturbations.AdditivePerturbation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AdditivePerturbation</span></code></a>, which simply adds the perturbation to the data.</p>
+<p>The perturbation model should not modify the data in-place.</p>
+<p>If <code class="xref py py-obj docutils literal notranslate"><span class="pre">perturbation_model</span></code> is a type, then it will be instantiated as
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">perturbation_model(data)</span></code>.</p>
+</dd>
+<dt><strong>targeted</strong><span class="classifier">bool (default: False)</span></dt><dd><p>If <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a>, then perturb towards the defined <code class="xref py py-obj docutils literal notranslate"><span class="pre">target</span></code> otherwise move away from
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">target</span></code>.</p>
+</dd>
+<dt><strong>use_best</strong><span class="classifier">bool (default: True)</span></dt><dd><p>Whether to only report the best perturbation over all steps.
+Note: Requires criterion to output a loss per sample, e.g., set
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">reduction=&quot;none&quot;</span></code></p>
+</dd>
+<dt><strong>criterion</strong><span class="classifier">Optional[Callable[[Tensor, Tensor], Tensor]]</span></dt><dd><p>The criterion to use for calculating the loss.  If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> then
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">CrossEntropyLoss</span></code> is used.</p>
+</dd>
+<dt><strong>reduction_fn</strong><span class="classifier">Callable[[Tensor], Tensor], optional (default=tr.sum)</span></dt><dd><p>Used to reduce the shape-(N,) per-datum loss to a scalar.</p>
+</dd>
+<dt><strong>**optim_kwargs</strong><span class="classifier">Any</span></dt><dd><p>Keyword arguments passed to <code class="xref py py-obj docutils literal notranslate"><span class="pre">optimizer</span></code> when it is instatiated.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl>
+<dt><strong>xadv, losses</strong><span class="classifier">tuple[Tensor, Tensor], shape-(N, …), shape-(N, …)</span></dt><dd><p>The perturbed data, if <code class="xref py py-obj docutils literal notranslate"><span class="pre">use_best==True</span></code> then this is the best perturbation
+based on the loss across all steps.</p>
+<p>The loss for each perturbed data point, if <code class="xref py py-obj docutils literal notranslate"><span class="pre">use_best==True</span></code> then this is the
+best loss across all steps.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Let’s perturb two data points, x=-1.0 and x=2.0, to maximize <code class="xref py py-obj docutils literal notranslate"><span class="pre">L(x)</span> <span class="pre">=</span> <span class="pre">|x|</span></code>. We will
+use five standard gradient steps, using a learning rate of 0.1. The default
+perturbation model is simply additive: <code class="xref py py-obj docutils literal notranslate"><span class="pre">x</span> <span class="pre">-&gt;</span> <span class="pre">x</span> <span class="pre">+</span> <span class="pre">δ</span></code>.</p>
+<p>This solver is refining <code class="xref py py-obj docutils literal notranslate"><span class="pre">δ</span></code>, whose initial value is 0 by default, to maximize
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">L(x)</span> <span class="pre">=</span> <span class="pre">|x|</span></code>. Thus we should find that our solved perturbations modify our data as:
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">-1.0</span> <span class="pre">-&gt;</span> <span class="pre">-1.5</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">2.0</span> <span class="pre">-&gt;</span> <span class="pre">2.5</span></code>, respectively.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">rai_toolbox.perturbations</span> <span class="kn">import</span> <span class="n">gradient_ascent</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">torch.optim</span> <span class="kn">import</span> <span class="n">SGD</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">identity_model</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">data</span><span class="p">:</span> <span class="n">data</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">abs_diff</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">model_out</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="p">(</span><span class="n">model_out</span> <span class="o">-</span> <span class="n">target</span><span class="p">)</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">perturbed_data</span><span class="p">,</span> <span class="n">losses</span> <span class="o">=</span> <span class="n">gradient_ascent</span><span class="p">(</span>
+<span class="gp">... </span>   <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">],</span>
+<span class="gp">... </span>   <span class="n">target</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+<span class="gp">... </span>   <span class="n">model</span><span class="o">=</span><span class="n">identity_model</span><span class="p">,</span>
+<span class="gp">... </span>   <span class="n">criterion</span><span class="o">=</span><span class="n">abs_diff</span><span class="p">,</span>
+<span class="gp">... </span>   <span class="n">optimizer</span><span class="o">=</span><span class="n">SGD</span><span class="p">,</span>
+<span class="gp">... </span>   <span class="n">lr</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+<span class="gp">... </span>   <span class="n">steps</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">perturbed_data</span>
+<span class="go">tensor([-1.5000,  2.5000])</span>
+</pre></div>
+</div>
+<p>We can instead specify <code class="xref py py-obj docutils literal notranslate"><span class="pre">targeted=True</span></code> and perform gradient <em>descent</em>.
+Here, the perturbations we solve for should modify our data as:
+-1.0 -&gt; -0.5 and 2.0 -&gt; 1.5, respectively.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">perturbed_data</span><span class="p">,</span> <span class="n">losses</span> <span class="o">=</span> <span class="n">gradient_ascent</span><span class="p">(</span>
+<span class="gp">... </span>   <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">],</span>
+<span class="gp">... </span>   <span class="n">target</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+<span class="gp">... </span>   <span class="n">model</span><span class="o">=</span><span class="n">identity_model</span><span class="p">,</span>
+<span class="gp">... </span>   <span class="n">criterion</span><span class="o">=</span><span class="n">abs_diff</span><span class="p">,</span>
+<span class="gp">... </span>   <span class="n">optimizer</span><span class="o">=</span><span class="n">SGD</span><span class="p">,</span>
+<span class="gp">... </span>   <span class="n">lr</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+<span class="gp">... </span>   <span class="n">steps</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+<span class="gp">... </span>   <span class="n">targeted</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">perturbed_data</span>
+<span class="go">tensor([-0.5000,  1.5000])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="../ref_perturbation.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">Perturbations</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="rai_toolbox.perturbations.PerturbationModel.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">rai_toolbox.perturbations.PerturbationModel</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2022 Massachusetts Institute of Technology.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
+</html>
