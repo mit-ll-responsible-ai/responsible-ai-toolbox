@@ -19,7 +19,7 @@ Solvers
 .. autosummary::
    :toctree: generated/
 
-   gradient_descent
+   gradient_ascent
 
 
 ******
