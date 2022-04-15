@@ -40,7 +40,7 @@ class _LpNormOptimizer(GradientTransformerOptimizer):
     def __init__(
         self,
         params: OptimParams,
-        InnerOpt: Union[Partial[Opt], Opt] = SGD,
+        InnerOpt: Union[Partial[Opt], OptimizerType] = SGD,
         *,
         param_ndim: Optional[int] = -1,
         div_by_zero_eps: float = _TINY,
