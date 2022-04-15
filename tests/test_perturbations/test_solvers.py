@@ -19,7 +19,7 @@ from rai_toolbox.optim import L2ProjectedOptim, LinfProjectedOptim
 from rai_toolbox.perturbations import AdditivePerturbation
 from rai_toolbox.perturbations.solvers import (
     _replace_best,
-    gradient_descent,
+    gradient_ascent,
     random_restart,
 )
 
@@ -58,7 +58,7 @@ def test_pgp(Step, norm, tensors, eps):
 
     optimizer = partial(Step, epsilon=eps)
 
-    xadv, _ = gradient_descent(
+    xadv, _ = gradient_ascent(
         model=model,
         data=orig,
         steps=10,
@@ -105,7 +105,7 @@ def test_targeted_attacks(Optim, x) -> None:
         num_classes = model(x).shape[-1]
         target_classes = (y + 1) % num_classes
 
-        _, loss_adv = gradient_descent(
+        _, loss_adv = gradient_ascent(
             model=model,
             data=x,
             steps=10,
@@ -124,9 +124,9 @@ def test_targeted_attacks(Optim, x) -> None:
 def test_random_restart_repeats(Optim, x, use_best, repeats):
     if repeats < 1:
         with pytest.raises(ValueError):
-            random_restart(gradient_descent, repeats=repeats)
+            random_restart(gradient_ascent, repeats=repeats)
     else:
-        perturber = random_restart(gradient_descent, repeats=repeats)
+        perturber = random_restart(gradient_ascent, repeats=repeats)
         with torch.no_grad():
             model, x, y = pytorch_simple_model(x)
             loss = -F.cross_entropy(model(x), y, reduction="none")
@@ -140,7 +140,7 @@ def test_random_restart_repeats(Optim, x, use_best, repeats):
                 optimizer=optimizer,
                 use_best=use_best,
             )
-            assert torch.all(loss_adv <= loss)
+            assert torch.all(loss_adv >= loss)
 
 
 @given(x=tensors(), eps=st.floats(-1, 1))
@@ -150,7 +150,7 @@ def test_epsilon_check(x, eps):
 
     if eps < 0:
         with pytest.raises(AssertionError):
-            gradient_descent(
+            gradient_ascent(
                 model=model,
                 steps=10,
                 data=x,
@@ -158,7 +158,7 @@ def test_epsilon_check(x, eps):
                 optimizer=optimizer,
             )
     else:
-        gradient_descent(
+        gradient_ascent(
             model=model,
             steps=10,
             data=x,
@@ -177,7 +177,7 @@ def test_use_best(x, eps):
 
     # test runtime warning
     with pytest.raises(ValueError):
-        gradient_descent(
+        gradient_ascent(
             model=model,
             steps=10,
             data=x,
@@ -188,7 +188,7 @@ def test_use_best(x, eps):
         )
 
     # get losses with use best = False
-    _, losses = gradient_descent(
+    _, losses = gradient_ascent(
         model=model,
         steps=10,
         data=x,
@@ -199,7 +199,7 @@ def test_use_best(x, eps):
     )
 
     # get best loss
-    _, losses_best = gradient_descent(
+    _, losses_best = gradient_ascent(
         model=model,
         steps=10,
         data=x,
@@ -209,7 +209,7 @@ def test_use_best(x, eps):
         criterion=criterion_batch,
     )
 
-    assert torch.all(losses_best <= losses)
+    assert torch.all(losses_best >= losses)
 
 
 @given(min=st.booleans())
@@ -252,7 +252,7 @@ def test_solutions_invariant_to_batch_size(batch_size, x):
     target = torch.tensor([0.0] * batch_size)
 
     # should apply update:: x += 2 * x
-    adv, _ = gradient_descent(
+    adv, _ = gradient_ascent(
         model=IdentityModel(),
         data=data,
         target=target,
@@ -279,7 +279,7 @@ def test_steps_lr_equivalence_under_special_circumstances(
     target = torch.tensor([0.0])
 
     # should apply update:: x += 1
-    adv_via_step, _ = gradient_descent(
+    adv_via_step, _ = gradient_ascent(
         model=IdentityModel(),
         data=data,
         target=target,
@@ -289,7 +289,7 @@ def test_steps_lr_equivalence_under_special_circumstances(
         criterion=loss,
     )
 
-    adv_via_lr, _ = gradient_descent(
+    adv_via_lr, _ = gradient_ascent(
         model=IdentityModel(),
         data=data,
         target=target,
@@ -311,7 +311,7 @@ class SomeClass:
 )
 def test_pert_model_validation(pert_model):
     with pytest.raises(TypeError):
-        _ = gradient_descent(
+        _ = gradient_ascent(
             model=IdentityModel(),
             data=torch.tensor([1.0]),
             target=torch.tensor([0.0]),
@@ -335,7 +335,7 @@ def test_various_forms_of_pert_model(pert_model, x: float):
 
     data = torch.tensor([x])
 
-    adv, _ = gradient_descent(
+    adv, _ = gradient_ascent(
         model=IdentityModel(),
         data=data,
         target=torch.tensor([0.0]),
@@ -349,7 +349,7 @@ def test_various_forms_of_pert_model(pert_model, x: float):
     assert torch.allclose(adv, 3 * data)
 
 def test_solve_with_fn_as_model():
-    adv, _ = gradient_descent(
+    adv, _ = gradient_ascent(
         model=lambda x: x ** 2,
         data=torch.tensor([2.0]),
         target=torch.tensor([0.0]),
@@ -364,7 +364,7 @@ def test_solve_with_fn_as_model():
 
 def test_solve_works_within_no_grad():
     with torch.no_grad():
-        adv, _ = gradient_descent(
+        adv, _ = gradient_ascent(
             model=lambda x: x ** 2,
             data=torch.tensor([2.0]),
             target=torch.tensor([0.0]),
