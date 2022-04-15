@@ -22,7 +22,7 @@ from rai_toolbox.mushin import load_from_checkpoint
 from rai_toolbox.mushin.lightning import HydraDDP, MetricsCallback
 from rai_toolbox.mushin.workflows import RobustnessCurve
 from rai_toolbox.optim import L2ProjectedOptim
-from rai_toolbox.perturbations import AdditivePerturbation, gradient_descent
+from rai_toolbox.perturbations import AdditivePerturbation, gradient_ascent
 from rai_toolbox.perturbations.init import uniform_like_l2_n_ball_
 
 # parameter populated by robustness-curve generation
@@ -122,7 +122,7 @@ PGDModel = pbuilds(
 )
 
 L2PGD = pbuilds(
-    gradient_descent,
+    gradient_ascent,
     # Type of Perturbation
     perturbation_model=PGDModel,
     # Optimizer (e.g., L2 PGD)
