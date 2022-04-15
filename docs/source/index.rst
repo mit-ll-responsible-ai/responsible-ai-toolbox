@@ -41,8 +41,12 @@ will enrich their understanding of hydra-zen and Hydra.
    :maxdepth: 2
    :caption: Contents:
 
+   tutorials
+   how_tos
+   explanation
    api_reference
-
+   changes
+   
 Indices and tables
 ==================
 

@@ -4,6 +4,3 @@ numpydoc==1.2.0
 sphinx-copybutton==0.5.0
 sphinx-tabs==3.3.1
 sphinx-codeautolink==0.10.0
-# third-party utilities
-beartype==0.8.1
-pydantic==1.8.2

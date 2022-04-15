@@ -1,6 +1,6 @@
-﻿rai\_toolbox.perturbations.gradient\_ascent
-===========================================
+﻿rai\_toolbox.perturbations.gradient\_descent
+============================================
 
 .. currentmodule:: rai_toolbox.perturbations
 
-.. autofunction:: gradient_ascent
+.. autofunction:: gradient_descent
