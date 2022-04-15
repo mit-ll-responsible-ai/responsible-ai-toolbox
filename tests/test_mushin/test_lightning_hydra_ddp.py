@@ -4,6 +4,7 @@
 
 import os
 from pathlib import Path
+from typing import Any
 
 import pytest
 import torch
@@ -15,8 +16,8 @@ from rai_toolbox.mushin.lightning._pl_main import task as pl_main_task
 from rai_toolbox.mushin.testing.lightning import TestLightningModule
 
 
-def task_fn(cfg):
-    trainer = instantiate(cfg.trainer)
+def task_fn(cfg: Any):
+    trainer: Trainer = instantiate(cfg.trainer)
     module = instantiate(cfg.module)
     if "pl_testing" in cfg and cfg.pl_testing:
         trainer.test(module)
@@ -37,7 +38,7 @@ def test_ddp_with_hydra_raises():
     module = builds(TestLightningModule)
     Config = make_config(trainer=trainer, wrong_config_name=module, devices=2)
     with pytest.raises(TypeError):
-        launch(Config, pl_main_task)
+        launch(Config, pl_main_task)  # type: ignore
 
 
 @pytest.mark.skipif(
