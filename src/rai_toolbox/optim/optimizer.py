@@ -157,6 +157,10 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
     standard gradient-based optimizers (e.g. Adam) via encapsulation, rather
     then through inheritance. I.e., `GradientTransformerOptimizer(InnerOpt=<...>)`
     Permits a standard optimizer to include an additional gradient-transformation
+
+    Methods
+    -------
+    _inplace_grad_transform_
     """
 
     param_groups: List[DatumParamGroup]
@@ -194,8 +198,9 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
 
         Notes
         -----
-        **Additional Explanation of `param_ndim`**
-        E.g. If the gradient has a shape (d0, d1, d2) and `param_ndim=1` then the
+        Additional Explanation of `param_ndim`:
+        
+        If the gradient has a shape (d0, d1, d2) and `param_ndim=1` then the
         transformation will be broadcast over each shape-(d2,) sub-tensor in the
         gradient (of which there are d0 * d1).
 
@@ -232,7 +237,8 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
     def _inplace_grad_transform_(
         self, param: Tensor, optim_group: DatumParamGroup
     ) -> None:  # pragma: no cover
-        """Applies a transformation, in place, on the gradient of the given parameter.
+        """Applies a transformation, in place, on the gradient of the each parameter
+        in the provided param group.
 
         This transform should *always* be designed to broadcast over the leading
         dimension of the parameters's gradient. That is, each gradient  should be
@@ -319,6 +325,10 @@ class ProjectionMixin(metaclass=ABCMeta):
         - A positive number determines the dimensionality of the tensor that the projection will act on.
         - A negative number indicates the 'offset' from the dimensionality of the tensor.
         - `None` means that the projection will be applied to the tensor without any broadcasting.
+    
+    Methods
+    -------
+    _project_parameter_
     """
 
     param_groups: Iterable[DatumParamGroup]
@@ -327,7 +337,7 @@ class ProjectionMixin(metaclass=ABCMeta):
     def _project_parameter_(
         self, param: Tensor, optim_group: Mapping[str, Any]
     ) -> None:  # pragma: no cover
-        """Applies an in-place projection on the given parameter.
+        """Applies an in-place projection on each parameter in the given param group.
 
         This operation should *always* be designed to broadcast over the leading
         dimension of the tensor. That is, each parameter gradient should be assumed

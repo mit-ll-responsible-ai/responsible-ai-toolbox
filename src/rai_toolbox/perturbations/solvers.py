@@ -60,7 +60,7 @@ def gradient_ascent(
         Differentiable function that processes the (perturbed) data prior to computing
         the loss.
 
-        If `model` is a `tr.nn.Module` then its weights will be frozen and it will
+        If `model` is a `torch.nn.Module` then its weights will be frozen and it will
         be set to eval mode during the perturbation-solve phase.
 
     data : Tensor, shape-(N, ...)
@@ -276,7 +276,11 @@ def random_restart(
             # Save best loss for each data point
             if use_best:
                 best_loss, best_x = _replace_best(
-                    losses, best_loss, xadv, best_x, targeted
+                    loss=losses,
+                    best_loss=best_loss,
+                    data=xadv,
+                    best_data=best_x,
+                    min=targeted,
                 )
             else:
                 best_loss = losses
@@ -297,7 +301,7 @@ def _replace_best(
     best_data: Optional[Tensor],
     min: bool = True,
 ) -> Tuple[Tensor, Tensor]:
-    """Returns the data with the largest loss
+    """Returns the data with the smallest (or largest) loss
 
     Parameters
     ----------

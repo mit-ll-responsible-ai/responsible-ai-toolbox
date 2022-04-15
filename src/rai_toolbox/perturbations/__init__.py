@@ -3,6 +3,11 @@
 # SPDX-License-Identifier: MIT
 
 from .models import AdditivePerturbation, PerturbationModel
+from .init import (
+    uniform_like_l1_n_ball_,
+    uniform_like_l2_n_ball_,
+    uniform_like_linf_n_ball_,
+)
 from .solvers import gradient_ascent, random_restart
 
 __all__ = [
@@ -10,4 +15,7 @@ __all__ = [
     "PerturbationModel",
     "gradient_ascent",
     "random_restart",
+    "uniform_like_l1_n_ball_",
+    "uniform_like_l2_n_ball_",
+    "uniform_like_linf_n_ball_",
 ]

@@ -12,8 +12,32 @@ from rai_toolbox._typing import OptimParams
 from .lp_space import L1qNormedGradientOptim, L2NormedGradientOptim, SignedGradientOptim
 from .optimizer import GradientTransformerOptimizer
 
+__all__ = [
+    "FrankWolfe",
+    "L1FrankWolfe",
+    "L2FrankWolfe",
+    "L1qFrankWolfe",
+    "L1qNormedGradientOptim",
+]
+
 
 class FrankWolfe(Optimizer):
+    r"""Implements the Frank-Wolfe minimization algorithm [1]_.
+
+    .. math::
+        w_{k+1} = (1 - l_r) w_k + l_r * s_k
+
+    where :math:`s_k` is the linear minimization oracle (LMO).
+
+    It is critical to note that this optimizer assumes that the `.grad` attribute
+    of each parameter has been modified so as to store the *negative* of the LMO
+    for that parameter, and not the gradient itself.
+
+
+    References
+    ----------
+    .. [1] https://en.wikipedia.org/wiki/Frank%E2%80%93Wolfe_algorithm#Algorithm"""
+
     def __init__(
         self,
         params: OptimParams,
@@ -23,17 +47,7 @@ class FrankWolfe(Optimizer):
         use_default_lr_schedule: bool = True,
         div_by_zero_eps: float = torch.finfo(torch.float32).tiny,
     ):
-        r"""Implements the Frank-Wolfe minimization algorithm [1]_.
-
-        .. math::
-            w_{k+1} = (1 - l_r) w_k + l_r * s_k
-
-        where :math:`s_k` is the linear minimization oracle (LMO).
-
-        It is critical to note that this optimizer assumes that the `.grad` attribute
-        of each parameter has been modified so as to store the *negative* of the LMO
-        for that parameter, and not the gradient itself.
-
+        r"""
         Parameters
         ----------
         params : Iterable
@@ -56,9 +70,6 @@ class FrankWolfe(Optimizer):
         div_by_zero_eps : float
 
 
-        References
-        ----------
-        .. [1] https://en.wikipedia.org/wiki/Frank%E2%80%93Wolfe_algorithm#Algorithm
         """
         self._eps = div_by_zero_eps
         self._use_default_lr_schedule = use_default_lr_schedule
@@ -126,6 +137,13 @@ class L1qFrankWolfe(L1qNormedGradientOptim):
 
 
 class L1FrankWolfe(GradientTransformerOptimizer):
+    """Performs Franke Wolfe optimization [1] using an epsilon-sized L1 ball as
+    the constraint set.
+
+    References
+    ----------
+    .. [1] https://en.wikipedia.org/wiki/Frank%E2%80%93Wolfe_algorithm#Algorithm"""
+
     def __init__(
         self,
         params: OptimParams,
@@ -134,9 +152,7 @@ class L1FrankWolfe(GradientTransformerOptimizer):
         param_ndim: Optional[int] = -1,
         **inner_opt_kwargs,
     ):
-        """Performs Franke Wolfe optimization [1] using an epsilon-sized L1 ball as
-        the constraint set.
-
+        """
         Parameters
         ----------
         params : Iterable
@@ -150,11 +166,6 @@ class L1FrankWolfe(GradientTransformerOptimizer):
         -----
         The method ``L1FrankWolfe._inplace_grad_transform_`` is responsible for
         computing the *negative* LMO for a parameter and setting to ``param.grad``.
-
-        References
-        ----------
-        .. [1] https://en.wikipedia.org/wiki/Frank%E2%80%93Wolfe_algorithm#Algorithm
-
         """
         super().__init__(
             params,
@@ -176,6 +187,13 @@ class L1FrankWolfe(GradientTransformerOptimizer):
 
 
 class L2FrankWolfe(L2NormedGradientOptim):
+    """Performs Franke Wolfe optimization [1] using an epsilon-sized L2 ball as
+    the constraint set.
+
+    References
+    ----------
+    .. [1] https://en.wikipedia.org/wiki/Frank%E2%80%93Wolfe_algorithm#Algorithm"""
+
     def __init__(
         self,
         params: OptimParams,
@@ -184,9 +202,7 @@ class L2FrankWolfe(L2NormedGradientOptim):
         param_ndim: Optional[int] = -1,
         **inner_opt_kwargs,
     ):
-        """Performs Franke Wolfe optimization [1] using an epsilon-sized L2 ball as
-        the constraint set.
-
+        """
         Parameters
         ----------
         params : Iterable
@@ -200,10 +216,6 @@ class L2FrankWolfe(L2NormedGradientOptim):
         -----
         The method ``L2FrankWolfe._inplace_grad_transform_`` is responsible for
         computing the *negative* LMO for a parameter and setting to ``param.grad``.
-
-        References
-        ----------
-        .. [1] https://en.wikipedia.org/wiki/Frank%E2%80%93Wolfe_algorithm#Algorithm
         """
         super().__init__(
             params,
@@ -215,6 +227,13 @@ class L2FrankWolfe(L2NormedGradientOptim):
 
 
 class LinfFrankWolfe(SignedGradientOptim):
+    """Performs Franke Wolfe optimization [1] using an epsilon-sized L-inf ball as
+    the constraint set.
+
+    References
+    ----------
+    .. [1] https://en.wikipedia.org/wiki/Frank%E2%80%93Wolfe_algorithm#Algorithm"""
+
     def __init__(
         self,
         params: OptimParams,
@@ -223,9 +242,7 @@ class LinfFrankWolfe(SignedGradientOptim):
         param_ndim: Optional[int] = -1,
         **inner_opt_kwargs,
     ):
-        """Performs Franke Wolfe optimization [1] using an epsilon-sized L-inf ball as
-        the constraint set.
-
+        """
         Parameters
         ----------
         params : Iterable
@@ -239,10 +256,6 @@ class LinfFrankWolfe(SignedGradientOptim):
         -----
         The method ``LinfFrankWolfe._inplace_grad_transform_`` is responsible for
         computing the *negative* LMO for a parameter and setting to ``param.grad``.
-
-        References
-        ----------
-        .. [1] https://en.wikipedia.org/wiki/Frank%E2%80%93Wolfe_algorithm#Algorithm
         """
         super().__init__(
             params,
