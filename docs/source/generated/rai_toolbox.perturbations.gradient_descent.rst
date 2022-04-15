@@ -1,4 +1,4 @@
-﻿rai\_toolbox.perturbations.gradient\_descent
+rai\_toolbox.perturbations.gradient\_descent
 ============================================
 
 .. currentmodule:: rai_toolbox.perturbations

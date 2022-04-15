@@ -1,5 +1,5 @@
 .. meta::
-   :description: Reference documentation for hydra-zen.
+   :description: Reference documentation for the responsible AI toolbox (rAI-toolbox).
 
 .. _toolbox-reference:
 
@@ -12,16 +12,27 @@ Encyclopedia Responsibilia.
 All reference documentation includes detailed Examples sections. Please scroll to the 
 bottom of any given reference page to see the examples.
 
-*******
-Solvers
-*******
+DISCUSSION ABOUT MAIN MODULES OF TOOLBOX
 
-Moo
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
 
-.. currentmodule:: rai_toolbox.perturbations
+   ref_optim
+   ref_perturbation
+   ref_datasets
+   ref_augmentations
+   ref_losses
+
+*************************
+General PyTorch Utilities
+*************************
+.. currentmodule:: rai_toolbox
 
 .. autosummary::
    :toctree: generated/
 
-   gradient_descent
-
+   evaluating
+   freeze
+   frozen
+   negate
