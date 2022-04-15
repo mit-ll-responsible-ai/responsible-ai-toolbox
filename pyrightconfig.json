@@ -10,4 +10,5 @@
     ],
     "reportUnnecessaryTypeIgnoreComment": true,
     "reportUnnecessaryIsInstance": false,
+    "typeCheckingMode": "basic",
 }
