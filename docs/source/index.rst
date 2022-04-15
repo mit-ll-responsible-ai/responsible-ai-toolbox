@@ -17,10 +17,10 @@ adversarial training workflows solely in terms of the `torch.nn.Optimizer` and
 `torch.nn.Module` APIs. This makes it trivial to leverage other libraries and 
 frameworks from the PyTorch ecosystem to bolster your responsible AI R&D. For 
 instance, one can naturally leverage the rAI-toolbox together with
-[PyTorch Lightning](https://www.pytorchlightning.ai/) to perform distributed 
+`PyTorch Lightning <https://www.pytorchlightning.ai/>`_ to perform distributed 
 adversarial training.
 
-To see `rai_toolbox` in action, please refer to [`examples/`](https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox/tree/main/examples) and [`experiments/`](https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox/tree/main/experiments).
+To see `rai_toolbox` in action, please refer to the `examples/ <https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox/tree/main/examples>`_ and `experiments/ <https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox/tree/main/experiments>`_ sections of our repository..
 
 
 
