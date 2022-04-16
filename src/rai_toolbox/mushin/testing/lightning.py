@@ -48,8 +48,8 @@ class TestLightningModule(LightningModule):
     def training_step_end(self, training_step_outputs):
         return training_step_outputs
 
-    def training_epoch_end(self, outputs) -> None:
-        torch.stack([x["loss"] if isinstance(x, dict) else x for x in outputs]).mean()
+    def training_epoch_end(self, outputs: dict) -> None:
+        torch.stack([x["loss"] for x in outputs]).mean()
 
     def validation_step(self, batch, batch_idx):
         output = self(batch)
@@ -59,8 +59,8 @@ class TestLightningModule(LightningModule):
         self.log("Val Number Metric", 1.0)
         return {"x": loss}
 
-    def validation_epoch_end(self, outputs) -> None:
-        torch.stack([x["loss"] if isinstance(x, dict) else x for x in outputs]).mean()
+    def validation_epoch_end(self, outputs: dict) -> None:
+        torch.stack([x["x"] for x in outputs]).mean()
 
     def test_step(self, batch, batch_idx):
         output = self(batch)
@@ -70,8 +70,8 @@ class TestLightningModule(LightningModule):
         self.log("Number Metric", 1.0)
         return {"y": loss}
 
-    def test_epoch_end(self, outputs) -> None:
-        torch.stack([x["y"] if isinstance(x, dict) else x for x in outputs]).mean()
+    def test_epoch_end(self, outputs: dict) -> None:
+        torch.stack([x["y"] for x in outputs]).mean()
 
     def configure_optimizers(self):
         optimizer = torch.optim.SGD(self.layer.parameters(), lr=0.1)
