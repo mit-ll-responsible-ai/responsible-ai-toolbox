@@ -135,11 +135,11 @@ Scalar = Union[
 
 class _SupportsArray(Protocol):  # pragma: no cover
     @overload
-    def __array__(self, __dtype: Any = ...) -> np.ndarray:
+    def __array__(self, __dtype: Any = ...) -> np.ndarray:  # type: ignore
         ...
 
     @overload
-    def __array__(self, dtype: Any = ...) -> np.ndarray:
+    def __array__(self, dtype: Any = ...) -> np.ndarray:  # type: ignore
         ...
 
 
