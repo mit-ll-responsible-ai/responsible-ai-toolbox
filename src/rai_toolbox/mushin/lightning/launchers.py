@@ -72,6 +72,7 @@ if PL_VERSION >= Version(1, 6, 0):
         processes on setup of this function.  This will lead to issues if running multiple jobs
         in the notebook or trying to do `Trainer.fit` followed by `Trainer.test`.
 
+
         Examples
         --------
         >> trainer = Trainer(Trainer, accelerator="auto", devices=2, strategy=builds(HydraDDP))
@@ -96,6 +97,10 @@ if PL_VERSION >= Version(1, 6, 0):
             _teardown()
 
     class HydraDDPLauncher(_SubprocessScriptLauncher):
+        @property
+        def is_interactive_compatible(self) -> bool:
+            return True  # pragma: no cover
+
         def launch(
             self,
             function: Callable,
@@ -240,9 +245,9 @@ else:  # pragma: no cover
                 command += ["-cp", hydra_output, "-cn", "config.yaml"]
 
                 if trainer_fn == TrainerFn.FITTING:
-                    command += ["+pl_testing=false"]
+                    command += ["++pl_testing=false"]
                 else:
-                    command += ["+pl_testing=true"]
+                    command += ["++pl_testing=true"]
 
                 command += [
                     f"hydra.output_subdir=.pl_hydra_{local_rank}",

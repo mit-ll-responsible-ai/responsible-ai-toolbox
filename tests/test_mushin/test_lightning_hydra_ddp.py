@@ -8,8 +8,10 @@ from pathlib import Path
 import pytest
 import torch
 from hydra_zen import builds, instantiate, launch, load_from_yaml, make_config
+from omegaconf.errors import ConfigAttributeError
 from pytorch_lightning import Trainer
 
+from rai_toolbox.mushin.hydra import zen
 from rai_toolbox.mushin.lightning import HydraDDP
 from rai_toolbox.mushin.lightning._pl_main import task as pl_main_task
 from rai_toolbox.mushin.testing.lightning import TestLightningModule
@@ -36,8 +38,8 @@ def test_ddp_with_hydra_raises():
     )
     module = builds(TestLightningModule)
     Config = make_config(trainer=trainer, wrong_config_name=module, devices=2)
-    with pytest.raises(TypeError):
-        launch(Config, pl_main_task)
+    with pytest.raises(ConfigAttributeError):
+        launch(Config, zen(pl_main_task))
 
 
 @pytest.mark.skipif(
