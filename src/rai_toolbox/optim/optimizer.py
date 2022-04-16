@@ -214,7 +214,8 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
             iterable of parameters to optimize or dicts defining parameter groups
 
         InnerOpt: Type[Optimizer] | Partial[Optimizer], optional (default=SGD)
-            The optimizer to update parameters
+            The optimizer that updates the parameters after their gradients have
+            been transformed.
 
         param_ndim : Optional[int] = -1
             Controls how `_inplace_grad_transform_` is broadcast onto the gradient
