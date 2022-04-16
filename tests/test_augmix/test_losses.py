@@ -47,6 +47,13 @@ def test_jsd_symmetry(probs, data: st.DataObject):
     assert_allclose(jsd1, jsd2, atol=1e-5, rtol=1e-5)
 
 
+@given(probs=st.lists(prob_tensors, min_size=2), weight=st.floats(-10, 10))
+def test_jsd_scaled_by_weight(probs, weight: float):
+    jsd1 = jensen_shannon_divergence(*probs)
+    jsd2 = jensen_shannon_divergence(*probs, weight=weight)
+    assert_allclose(jsd1 * weight, jsd2, atol=1e-5, rtol=1e-5)
+
+
 @given(probs=st.lists(prob_tensors, min_size=2))
 def test_jsd_bounds(probs):
     jsd = float(jensen_shannon_divergence(*probs).item())
