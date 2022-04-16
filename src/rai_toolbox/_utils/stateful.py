@@ -92,11 +92,11 @@ def freeze(
 
 class ContextDecorator(metaclass=ABCMeta):
     @abstractmethod
-    def __enter__(self):
+    def __enter__(self):  # pragma: no cover
         raise NotImplementedError()
 
     @abstractmethod
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, type, value, traceback):  # pragma: no cover
         raise NotImplementedError()
 
     def __call__(self, func: T) -> T:
