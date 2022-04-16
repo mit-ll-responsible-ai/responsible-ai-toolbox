@@ -14,17 +14,11 @@ from numbers import Real
 from typing import Callable, Optional, Sequence, Tuple, TypeVar, Union
 
 import numpy as np
-
-try:
-    from torch import Tensor as _Tensor
-except ImportError:
-
-    class _Tensor(np.ndarray):
-        pass
+from rai_toolbox._typing import ArrayLike
 
 
 _T1 = TypeVar("_T1")
-_T2 = TypeVar("_T2", np.ndarray, _Tensor, float)
+_T2 = TypeVar("_T2", bound=ArrayLike)
 
 C1 = Callable[[_T1], _T2]
 C2 = Sequence[Callable[[_T1], _T1]]
