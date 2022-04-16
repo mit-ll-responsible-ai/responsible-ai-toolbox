@@ -223,7 +223,7 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
             batch-like style.
 
                - A positive number determines the dimensionality of the gradient that the transformation will act on.
-               - A negative number indicates the 'offset' from the dimensionality of the gradient.
+               - A negative number indicates the 'offset' from the dimensionality of the gradient (see "Notes" for examples)
                - `None` means that the transformation will be applied to the gradient without any broadcasting.
 
         defaults: Optional[dict]
@@ -355,7 +355,7 @@ class ProjectionMixin(metaclass=ABCMeta):
 
     Notes
     -----
-    'param_ndim' must be included in the optimizer's param groups, which describes
+    'param_ndim' can be included in the optimizer's param groups in order to describe
     how the projection should be applied to each parameter (i.e., whether or not
     it is broadcasted).
 
@@ -369,7 +369,32 @@ class ProjectionMixin(metaclass=ABCMeta):
 
     Examples
     --------
-    Let's 
+    Let's create a SGD-based optimizer that clamps each parameter's values to `[-1, 1]`
+    after performing it's gradient-based step on the parameter. 
+
+    >>> import torch as tr
+    >>> from rai_toolbox.optim import ProjectionMixin
+    >>> class ClampedSGD(tr.optim.SGD, ProjectionMixin):
+    ...     def _project_parameter_(self, param: tr.Tensor, optim_group: dict) -> None:
+    ...         param.clamp_(min=-1.0, max=1.0)  # note: projection operates in-place
+    ... 
+    ...     @tr.no_grad()
+    ...     def step(self, closure=None):
+    ...         loss = super().step(closure)
+    ...         self.project()
+    ...         return loss
+
+    >>> x = tr.tensor([-0.1, 0.1], requires_grad=True)
+    >>> optim = ClampedSGD([x], lr=1.0)
+    >>> loss = (10_000 * x).sum()
+    >>> loss.backward()
+    >>> optim.step()
+    >>> x
+    tensor([-1., -1.], requires_grad=True)
+
+    Note that this is a particularly simple projection function, which acts
+    elementwise on each parameter, and thus does not require us to include
+    `param_ndim` in the optimizer's param-groups.
     """
 
     param_groups: Iterable[DatumParamGroup]
