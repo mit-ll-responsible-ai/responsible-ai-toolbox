@@ -9,26 +9,17 @@ from time import sleep
 from typing import Any, Callable, Optional
 
 import numpy as np
-import torch
+from torch import distributed
 from hydra.core.hydra_config import HydraConfig
 from pytorch_lightning import Trainer
 from pytorch_lightning.trainer.states import TrainerFn
 
 from .._compatibility import PL_VERSION, Version
 
-if PL_VERSION >= Version(1, 6, 0):
-    from pytorch_lightning.strategies.ddp import DDPStrategy
-    from pytorch_lightning.strategies.launchers.subprocess_script import (
-        _SubprocessScriptLauncher,
-    )
-
-else:  # pragma: no cover
-    from pytorch_lightning.plugins.training_type.ddp import DDPPlugin
-
 
 def _setup_environment():
-    if torch.distributed.is_initialized():
-        torch.distributed.destroy_process_group()
+    if distributed.is_initialized():
+        distributed.destroy_process_group()
 
 
 def _teardown():
@@ -61,7 +52,12 @@ def _subprocess_call(local_rank: int, trainer):
         "rai_toolbox.mushin.lightning._pl_main",
     ]
     hydra_cfg = HydraConfig.get()
-    hydra_output = os.path.join(cwd, hydra_cfg.output_subdir)
+
+    hydra_output = (
+        os.path.join(cwd, hydra_cfg.output_subdir)
+        if hydra_cfg.output_subdir is not None
+        else cwd
+    )
 
     # create the command for CLI
     command += ["-cp", hydra_output, "-cn", "config.yaml"]
@@ -70,7 +66,9 @@ def _subprocess_call(local_rank: int, trainer):
         # TODO: See about having PL 1.6 fix this behavior so we know
         # which function is being called
         trainer_fn = trainer.state.fn
-        command += ["++pl_testing=" + ("false" if trainer_fn == TrainerFn.FITTING else "true")]
+        command += [
+            "++pl_testing=" + ("false" if trainer_fn == TrainerFn.FITTING else "true")
+        ]
 
     command += [
         f"hydra.output_subdir=.pl_hydra_{local_rank}",
@@ -81,8 +79,12 @@ def _subprocess_call(local_rank: int, trainer):
 
 
 if PL_VERSION >= Version(1, 6, 0):
+    from pytorch_lightning.strategies.ddp import DDPStrategy
+    from pytorch_lightning.strategies.launchers.subprocess_script import (
+        _SubprocessScriptLauncher,
+    )
 
-    class HydraDDP(DDPStrategy):
+    class HydraDDP(DDPStrategy):  # type: ignore
         """DDP Strategy that supports Hydra run and multirun jobs.
 
         This strategy assumes a `Trainer.fit` or `Trainer.test` has been configured
@@ -119,6 +121,9 @@ if PL_VERSION >= Version(1, 6, 0):
             super().setup_environment()
 
         def _configure_launcher(self) -> None:
+            if self.cluster_environment is None:  # pragma: no cover
+                raise TypeError("HydraDDP.cluster_environment is None")
+
             if not self.cluster_environment.creates_processes_externally:
                 self._launcher = HydraDDPLauncher(
                     self.cluster_environment, self.num_processes, self.num_nodes
@@ -178,6 +183,7 @@ if PL_VERSION >= Version(1, 6, 0):
                 sleep(delay)
 
 else:  # pragma: no cover
+    from pytorch_lightning.plugins.training_type.ddp import DDPPlugin
 
     class HydraDDP(DDPPlugin):
         """DDP plugin that supports Hydra run and multirun jobs.
@@ -214,12 +220,18 @@ else:  # pragma: no cover
             super().setup_environment()
 
         def _call_children_scripts(self):
+            if self.lightning_module is None:  # pragma: no cover
+                raise TypeError("HydraDDP.lightning_module is None")
+
+            if self.cluster_environment is None:  # pragma: no cover
+                raise TypeError("HydraDDP.cluster_environment is None")
+
             # bookkeeping of spawned processes
-            self._check_can_spawn_children()
+            self._check_can_spawn_children()  # type: ignore
 
             # DDP Environment variables
-            os.environ["MASTER_ADDR"] = self.cluster_environment.master_address()
-            os.environ["MASTER_PORT"] = str(self.cluster_environment.master_port())
+            os.environ["MASTER_ADDR"] = self.cluster_environment.master_address()  # type: ignore
+            os.environ["MASTER_PORT"] = str(self.cluster_environment.master_port())  # type: ignore
 
             # allow the user to pass the node rank
             os.environ["NODE_RANK"] = str(self.cluster_environment.node_rank())
