@@ -149,18 +149,51 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
     gradient of each parameter, before performing the gradient-based
     update on each parameter::
 
-       param = step(param, transformation(param.grad), ...)
+       param = step(param, transformation_(param.grad), ...)
 
     Notes
     -----
     `GradientTransformerOptimizer` is designed to be combined with other,
     standard gradient-based optimizers (e.g. Adam) via encapsulation, rather
     then through inheritance. I.e., `GradientTransformerOptimizer(InnerOpt=<...>)`
-    permits a standard optimizer to include an additional gradient-transformation
+    permits a standard optimizer to include an additional gradient-transformation.
+
+    If a closure is supplied to the `.step(...)` method, then the in-place
+    gradient transformation is applied after the closure call and prior to
+    the parameter steps.
 
     Methods
     -------
     _inplace_grad_transform_
+
+    Examples
+    --------
+    Let's create a gradient-transforming optimizer that replaces the gradient
+    of each parameter with the sign of the gradient (:math:`\pm 1`) prior to
+    performing the step of the inner optimizer:
+    
+    >>> import torch as tr
+    >>> from rai_toolbox.optim import GradientTransformerOptimizer
+    >>> class SignedGradientOptim(GradientTransformerOptimizer):
+    ...
+    ...     def _inplace_grad_transform_(self, param: tr.Tensor, **_kwds) -> None:
+    ...         if param.grad is None:
+    ...             return
+    ...         torch.sign(param.grad, out=param.grad)  # operates in-place
+
+    Now we'll use this optimizer – along with AdamW – to transform the gradient of each 
+    parameter prior to using AdamW to perform the actual gradient-based update that 
+    parameter.
+
+    >>> x = tr.tensor([-10.0, 10.0], requires_grad=True)
+    >>> optim = SignedGradientOptim([x], InnerOpt=tr.optim.Adam, lr=1.0)
+    
+    >>> loss = (10_000 * x).sum()
+    >>> loss.backward()
+    >>> optim.step()
+
+    >>> x
+    tensor([-10.9000,   8.9000], requires_grad=True)
     """
 
     param_groups: List[DatumParamGroup]
@@ -333,6 +366,10 @@ class ProjectionMixin(metaclass=ABCMeta):
     Methods
     -------
     _project_parameter_
+
+    Examples
+    --------
+    Let's 
     """
 
     param_groups: Iterable[DatumParamGroup]
