@@ -11,7 +11,7 @@ def uniform_like_l1_n_ball_(x: Tensor, epsilon: float = 1) -> None:
     """Uniform sampling of a n-ball for L_1-norm
 
     Parameters
-    -----------
+    ----------
     x: Tensor, shape-(N, D, ...)
         The tensor to generate a new random tensor from, i.e., returns a tensor of similar
         shape and on the same device.
@@ -69,7 +69,7 @@ def uniform_like_l2_n_ball_(x: Tensor, epsilon: float = 1) -> None:
     xflat = x.flatten(1)
     nbatch, ndim = xflat.shape
     z = xflat.new(nbatch, ndim + 2).normal_()
-    r = z.norm(p=2, dim=1, keepdim=True)
+    r = z.norm(p=2, dim=1, keepdim=True)  # type: ignore
     x.copy_(epsilon * (z / r)[:, :ndim].reshape(x.shape))
 
 

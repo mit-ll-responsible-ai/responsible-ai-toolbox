@@ -11,9 +11,26 @@ import torch as tr
 from torch.optim import SGD, Adam
 
 from rai_toolbox import negate
-from rai_toolbox._typing import *
+from rai_toolbox._typing import Partial, Optimizer, OptimizerType
 from rai_toolbox._utils.itertools import flatten_params
-from rai_toolbox.optim import *
+from rai_toolbox.optim import (
+    L2PGD,
+    L1FrankWolfe,
+    L1qFrankWolfe,
+    L2FrankWolfe,
+    LinfFrankWolfe,
+    FrankWolfe,
+    L1NormedGradientOptim,
+    L1qNormedGradientOptim,
+    L2NormedGradientOptim,
+    L2ProjectedOptim,
+    SignedGradientOptim,
+    LinfProjectedOptim,
+    GradientTransformerOptimizer,
+    L2PGD,
+    LinfPGD,
+    L1qFW,
+)
 
 
 def check_optim_interface():

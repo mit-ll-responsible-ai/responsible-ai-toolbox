@@ -4,6 +4,7 @@
 
 import os
 from pathlib import Path
+from typing import Any
 
 import pytest
 import torch
@@ -17,8 +18,8 @@ from rai_toolbox.mushin.lightning._pl_main import task as pl_main_task
 from rai_toolbox.mushin.testing.lightning import TestLightningModule
 
 
-def task_fn(cfg):
-    trainer = instantiate(cfg.trainer)
+def task_fn(cfg: Any):
+    trainer: Trainer = instantiate(cfg.trainer)
     module = instantiate(cfg.module)
     if "pl_testing" in cfg and cfg.pl_testing:
         trainer.test(module)

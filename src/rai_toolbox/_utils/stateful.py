@@ -109,6 +109,9 @@ class ContextDecorator(metaclass=ABCMeta):
 
 
 class frozen(ContextDecorator):
+    """A context manager/decorator for 'freezing' collections of tensors; i.e.
+    `requires_grad` is set to `False` for the tensors during the context."""
+
     def __init__(
         self,
         *items: Union[
@@ -119,45 +122,42 @@ class frozen(ContextDecorator):
             Iterable[Dict[str, Iterable[tr.Tensor]]],
         ],
     ) -> None:
+        """
+        Parameters
+        ----------
+        *items: tr.Tensor | tr.nn.Module | tr.optim.Optimizer | Iterable[tr.Tensor] | Iterable[Dict[str, Iterable[tr.Tensor]]]
+            Tensors, modules, optimizers, or param-groups to be frozen.
+
+        Examples
+        --------
+        >>> import torch as tr
+        >>> from rai_toolbox.utils._implementations import frozen
+
+        Demonstrating `frozen` as a context manager.
+
+        >>> x = tr.tensor(1.0, requires_grad=True)
+        >>> with frozen(x):
+        ...    print(x.requires_grad)
+        False
+        >>> x.requires_grad
+        True
+
+        Demonstrating `frozen` as a decorator.
+
+        >>> x = tr.tensor(1.0, requires_grad=True)
+        >>> @frozen(x)
+        ... def f():
+        ...     print("hello world")
+        ...     return x.requires_grad
+        >>> x.requires_grad # x isn't frozen until f is called
+        True
+        >>> f()
+        hello world
+        False
+        >>> x.requires_grad
+        True
+        """
         self._items = items
-
-    """A context manager/decorator for 'freezing' collections of tensors; i.e.
-    `requires_grad` is set to `False` for the tensors during the context.
-
-    Parameters
-    ----------
-    *items: tr.Tensor | tr.nn.Module | tr.optim.Optimizer | Iterable[tr.Tensor] | Iterable[Dict[str, Iterable[tr.Tensor]]]
-        Tensors, modules, optimizers, or param-groups to be frozen.
-
-    Examples
-    --------
-    >>> import torch as tr
-    >>> from rai_toolbox.utils._implementations import frozen
-
-    Demonstrating `frozen` as a context manager.
-
-    >>> x = tr.tensor(1.0, requires_grad=True)
-    >>> with frozen(x):
-    ...    print(x.requires_grad)
-    False
-    >>> x.requires_grad
-    True
-
-    Demonstrating `frozen` as a decorator.
-
-    >>> x = tr.tensor(1.0, requires_grad=True)
-    >>> @frozen(x)
-    ... def f():
-    ...     print("hello world")
-    ...     return x.requires_grad
-    >>> x.requires_grad # x isn't frozen until f is called
-    True
-    >>> f()
-    hello world
-    False
-    >>> x.requires_grad
-    True
-    """
 
     def __enter__(self):
         self._unfreeze = freeze(*self._items)
@@ -167,10 +167,11 @@ class frozen(ContextDecorator):
 
 
 class evaluating(ContextDecorator):
-    def __init__(self, *modules: tr.nn.Module) -> None:
-        """A context manager / decorator that temporarily places one
-        or more modules in eval mode during the context.
+    """A context manager / decorator that temporarily places one
+    or more modules in eval mode during the context."""
 
+    def __init__(self, *modules: tr.nn.Module) -> None:
+        """
         Parameters
         ----------
         *modules: tr.nn.Module

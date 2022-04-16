@@ -7,6 +7,7 @@
         "**/__pycache__",
         "src/rai_toolbox/_version.py",
         "**/project_tooling",
+        "./tests/test_augmentations/_old_implementation.py"
     ],
     "reportUnnecessaryTypeIgnoreComment": true,
     "reportUnnecessaryIsInstance": false,

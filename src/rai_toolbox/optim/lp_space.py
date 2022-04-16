@@ -2,7 +2,6 @@
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 
-import math
 from random import random
 from typing import Any, Dict, Optional, Union
 
@@ -18,6 +17,15 @@ from rai_toolbox._typing import OptimizerType, OptimParams, Partial
 
 from .optimizer import DatumParamGroup, GradientTransformerOptimizer, ProjectionMixin
 
+__all__ = [
+    "L1NormedGradientOptim",
+    "L2NormedGradientOptim",
+    "SignedGradientOptim",
+    "L2ProjectedOptim",
+    "LinfProjectedOptim",
+    "L1NormedGradientOptim",
+    "L1qNormedGradientOptim",
+]
 _TINY = torch.finfo(torch.float32).tiny
 
 
@@ -162,7 +170,8 @@ class LinfProjectedOptim(SignedGradientOptim, ProjectionMixin):
 
 
 class L1qNormedGradientOptim(GradientTransformerOptimizer):
-    r"""Sparse gradient step normalized by the :math:`\ell_1`-norm.
+    r"""Sparse gradient step normalized by the :math:`\ell_1`-norm and with updated parameters constrained within an epsilon-sized :math:`\ell_1` ball about their
+    original values.
 
     Given :math:`x` and :math:`\epsilon`, the constraint set is given by:
 

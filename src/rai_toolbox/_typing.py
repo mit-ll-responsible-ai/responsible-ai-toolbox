@@ -2,6 +2,7 @@
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 
+# pyright: strict
 import functools
 import inspect
 from typing import (
@@ -10,14 +11,15 @@ from typing import (
     Dict,
     Generic,
     Iterable,
-    Mapping,
     Optional,
     Sequence,
     Type,
     TypeVar,
     Union,
+    overload,
 )
 
+import numpy as np
 from torch import Tensor
 from typing_extensions import Protocol, TypeAlias, TypedDict, TypeGuard
 
@@ -32,6 +34,7 @@ __all__ = [
     "OptimizerType",
     "ParamGroup",
     "Partial",
+    "OptimParams",
 ]
 
 
@@ -42,16 +45,16 @@ class Partial(Protocol[T_co]):
 
 class Optimizer(Protocol):  # pragma: no cover
     defaults: Dict[str, Any]
-    state: dict
-    param_groups: Iterable[Mapping[Any, Any]]
+    state: Any
+    param_groups: Any
 
-    def __setstate__(self, state: dict) -> None:
+    def __setstate__(self, state: Any) -> None:
         ...
 
-    def state_dict(self) -> dict:
+    def state_dict(self) -> Any:
         ...
 
-    def load_state_dict(self, state_dict: dict) -> None:
+    def load_state_dict(self, state_dict: Any) -> None:
         ...
 
     def zero_grad(self, set_to_none: Optional[bool] = ...) -> None:
@@ -60,7 +63,7 @@ class Optimizer(Protocol):  # pragma: no cover
     def step(self, closure: Optional[Callable[[], Any]] = ...) -> Optional[Any]:
         ...
 
-    def add_param_group(self, param_group: dict) -> None:
+    def add_param_group(self, param_group: Any) -> None:
         ...
 
 
@@ -118,3 +121,32 @@ def instantiates_to(x: Any, co_var_type: Type[T]) -> TypeGuard[InstantiatesTo[T]
         if _is_protocol(co_var_type)
         else issubclass(obj, co_var_type)
     )
+
+
+Scalar = Union[
+    int,
+    float,
+    complex,
+    str,
+    bytes,
+    np.generic,
+]
+
+
+class _SupportsArray(Protocol):  # pragma: no cover
+    @overload
+    def __array__(self, __dtype: Any = ...) -> np.ndarray:
+        ...
+
+    @overload
+    def __array__(self, dtype: Any = ...) -> np.ndarray:
+        ...
+
+
+# mypy doesn't support recursive types
+ArrayLike = Union[
+    Scalar,
+    Sequence[Scalar],
+    Sequence[Sequence[Any]],
+    _SupportsArray,
+]

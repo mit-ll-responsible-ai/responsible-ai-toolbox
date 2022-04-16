@@ -13,7 +13,7 @@ from ._implementation import augment_and_mix
 _T1 = TypeVar("_T1")
 _T2 = TypeVar("_T2", np.ndarray, tr.Tensor, float)
 
-__all__ = ["AugMix", "Fork"]
+__all__ = ["AugMix", "Fork", "augment_and_mix"]
 
 
 def _check_non_neg_int(item, name):

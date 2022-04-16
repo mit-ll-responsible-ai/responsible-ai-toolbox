@@ -3,9 +3,10 @@
 # SPDX-License-Identifier: MIT
 
 import functools
-from typing import Any, Callable, Optional, Tuple, Union
+from typing import Any, Callable, List, Optional, Tuple, Union
 
-import torch
+import torch as tr
+
 from torch import Tensor
 from torch.nn import CrossEntropyLoss, Module
 
@@ -19,13 +20,14 @@ from rai_toolbox._typing import (
 )
 from rai_toolbox._utils.stateful import evaluating, frozen
 from rai_toolbox.perturbations import AdditivePerturbation, PerturbationModel
+from rai_toolbox._typing import ArrayLike
 
 
-def gradient_descent(
+def gradient_ascent(
     *,
     model: Callable[[Tensor], Tensor],
-    data: Tensor,
-    target: Tensor,
+    data: ArrayLike,
+    target: ArrayLike,
     optimizer: Union[OptimizerType, Partial[Optimizer]],
     steps: int,
     perturbation_model: Union[
@@ -34,21 +36,31 @@ def gradient_descent(
     targeted: bool = False,
     use_best: bool = False,
     criterion: Optional[Callable[[Tensor, Tensor], Tensor]] = None,
-    reduction_fn: Callable[[Tensor], Tensor] = torch.sum,
+    reduction_fn: Callable[[Tensor], Tensor] = tr.sum,
     **optim_kwargs: Any,
 ) -> Tuple[Tensor, Tensor]:
     """Solve for a set of perturbations for a given set of data and a model.
 
-    Note that, by default, this perturbs the data away from ``target`` (i.e.
-    this performs gradient *ascent*). See ``targeted`` to toggle this behavior.
+    This performs, for `steps` iterations, the following optimization::
+
+       optim = optimizer(perturbation_model.parameters)
+       pert_data = perturbation_model(data)
+       loss = criterion(model(pert_data), target)
+       loss = (1 if targeted else -1) * loss  # default: targeted=False
+       optim.step()
+
+    Note that, by default, this perturbs the data away from `target` (i.e. this performs
+    gradient *ascent*), given a standard loss function that seeks to minimize the
+    diffence between the model's output and the target. See `targeted` to toggle this
+    behavior.
 
     Parameters
     ----------
     model : Callable[[Tensor], Tensor]
-        Differentiable function that processes the (perturbed) data prior to computing 
-        the loss. 
-        
-        If `model` is a `torch.nn.Module` then its weights will be frozen and it will 
+        Differentiable function that processes the (perturbed) data prior to computing
+        the loss.
+
+        If `model` is a `torch.nn.Module` then its weights will be frozen and it will
         be set to eval mode during the perturbation-solve phase.
 
     data : Tensor, shape-(N, ...)
@@ -64,10 +76,11 @@ def gradient_descent(
     steps : int
         Number of projected gradient steps
 
-    perturbation_model : PerturbationModel | Type[PerturbationModel]
-        A `torch.nn.Module` whose parameters are the perturbations being solved for. Its
-        forward-pass applies the perturbation to the data. Default is
+    perturbation_model : PerturbationModel | Type[PerturbationModel], optional (default=AdditivePerturbation)
+        A `torch.nn.Module` whose parameters are updated by the solver. Its forward-pass applies the perturbation to the data. Default is
         `AdditivePerturbation`, which simply adds the perturbation to the data.
+
+        The perturbation model should not modify the data in-place.
 
         If `perturbation_model` is a type, then it will be instantiated as
         `perturbation_model(data)`.
@@ -85,7 +98,7 @@ def gradient_descent(
         The criterion to use for calculating the loss.  If `None` then
         `CrossEntropyLoss` is used.
 
-    reduction_fn : Callable[[Tensor], Tensor], optional (default=torch.sum)
+    reduction_fn : Callable[[Tensor], Tensor], optional (default=tr.sum)
         Used to reduce the shape-(N,) per-datum loss to a scalar.
 
     **optim_kwargs : Any
@@ -94,13 +107,59 @@ def gradient_descent(
     Returns
     -------
     xadv, losses : tuple[Tensor, Tensor], shape-(N, ...), shape-(N, ...)
-        The perturbed data, if `use_best==True` then this is the best perturbation based on the loss across all steps.
+        The perturbed data, if `use_best==True` then this is the best perturbation
+        based on the loss across all steps.
 
-        The loss for each perturbed data point, if `use_best==True` then this is the best loss across all steps.
+        The loss for each perturbed data point, if `use_best==True` then this is the
+        best loss across all steps.
+
+    Examples
+    --------
+    Let's perturb two data points, x=-1.0 and x=2.0, to maximize `L(x) = |x|`. We will
+    use five standard gradient steps, using a learning rate of 0.1. The default
+    perturbation model is simply additive: `x -> x + δ`.
+
+    This solver is refining `δ`, whose initial value is 0 by default, to maximize
+    `L(x) = |x|`. Thus we should find that our solved perturbations modify our data as:
+    `-1.0 -> -1.5` and `2.0 -> 2.5`, respectively.
+
+    >>> from rai_toolbox.perturbations import gradient_ascent
+    >>> from torch.optim import SGD
+
+    >>> identity_model = lambda data: data
+    >>> abs_diff = lambda model_out, target: (model_out - target).abs()
+
+    >>> perturbed_data, losses = gradient_ascent(
+    ...    data=[-1.0, 2.0],
+    ...    target=0.0,
+    ...    model=identity_model,
+    ...    criterion=abs_diff,
+    ...    optimizer=SGD,
+    ...    lr=0.1,
+    ...    steps=5,
+    ... )
+    >>> perturbed_data
+    tensor([-1.5000,  2.5000])
+
+    We can instead specify `targeted=True` and perform gradient *descent*.
+    Here, the perturbations we solve for should modify our data as:
+    -1.0 -> -0.5 and 2.0 -> 1.5, respectively.
+
+    >>> perturbed_data, losses = gradient_ascent(
+    ...    data=[-1.0, 2.0],
+    ...    target=0.0,
+    ...    model=identity_model,
+    ...    criterion=abs_diff,
+    ...    optimizer=SGD,
+    ...    lr=0.1,
+    ...    steps=5,
+    ...    targeted=True,
+    ... )
+    >>> perturbed_data
+    tensor([-0.5000,  1.5000])
     """
-    # Do not modify the input
-    data = data.detach().clone()
-    target = target.detach().clone()
+    data = tr.as_tensor(data)
+    target = tr.as_tensor(target)
 
     # Initialize
     best_loss = None
@@ -126,11 +185,16 @@ def gradient_descent(
 
     optim = optimizer(pmodel.parameters(), **optim_kwargs)
 
+    to_freeze: List[Any] = [data, target]
+
+    if isinstance(model, Module):
+        to_freeze.append(model)
+
     # don't pass non nn.Module to frozen/eval
     packed_model = (model,) if isinstance(model, Module) else ()
 
     # Projected Gradient Descent
-    with frozen(*packed_model), evaluating(*packed_model), torch.enable_grad():
+    with frozen(*to_freeze), evaluating(*packed_model), tr.enable_grad():
         for _ in range(steps):
             # Calculate the gradient of loss
             xadv = pmodel(data)
@@ -162,7 +226,7 @@ def gradient_descent(
         optim.zero_grad(set_to_none=True)
 
         # Final evalulation
-        with torch.no_grad():
+        with tr.no_grad():
             xadv = pmodel(data)
             logits = model(xadv)
             losses = criterion(logits, target)
@@ -170,6 +234,8 @@ def gradient_descent(
             if use_best:
                 losses, xadv = _replace_best(losses, best_loss, xadv, best_x)
 
+    if not targeted:
+        losses = -1 * losses
     return xadv.detach(), losses.detach()
 
 
@@ -210,7 +276,11 @@ def random_restart(
             # Save best loss for each data point
             if use_best:
                 best_loss, best_x = _replace_best(
-                    losses, best_loss, xadv, best_x, targeted
+                    loss=losses,
+                    best_loss=best_loss,
+                    data=xadv,
+                    best_data=best_x,
+                    min=targeted,
                 )
             else:
                 best_loss = losses
@@ -231,7 +301,7 @@ def _replace_best(
     best_data: Optional[Tensor],
     min: bool = True,
 ) -> Tuple[Tensor, Tensor]:
-    """Returns the data with the largest loss
+    """Returns the data with the smallest (or largest) loss
 
     Parameters
     ----------
