@@ -70,10 +70,7 @@ def _subprocess_call(local_rank: int, trainer):
         # TODO: See about having PL 1.6 fix this behavior so we know
         # which function is being called
         trainer_fn = trainer.state.fn
-        if trainer_fn == TrainerFn.FITTING:
-            command += ["++pl_testing=false"]
-        else:
-            command += ["++pl_testing=true"]
+        command += ["++pl_testing=" + ("false" if trainer_fn == TrainerFn.FITTING else "true")]
 
     command += [
         f"hydra.output_subdir=.pl_hydra_{local_rank}",
@@ -135,8 +132,8 @@ if PL_VERSION >= Version(1, 6, 0):
 
     class HydraDDPLauncher(_SubprocessScriptLauncher):
         @property
-        def is_interactive_compatible(self) -> bool:
-            return True  # pragma: no cover
+        def is_interactive_compatible(self) -> bool:  # pragma: no cover
+            return True
 
         def launch(
             self,
