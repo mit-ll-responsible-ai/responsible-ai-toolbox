@@ -199,4 +199,4 @@ jobs:
         python -m pip install --upgrade pip
         pip install --upgrade --upgrade-strategy eager -e .[mushin,tests]
     - name: Run pyright basic on src
-      run: pyright --lib tests/
+      run: pyright --lib tests/ src/rai_toolbox/mushin/
