@@ -195,7 +195,7 @@ the following base command:</p>
 processes on setup of this function.  This will lead to issues if running multiple jobs
 in the notebook or trying to do <code class="xref py py-obj docutils literal notranslate"><span class="pre">Trainer.fit</span></code> followed by <code class="xref py py-obj docutils literal notranslate"><span class="pre">Trainer.test</span></code>.</p>
 <p class="rubric">Examples</p>
-<p>&gt;&gt; trainer = Trainer(Trainer, accelerator=”auto”, devices=2, strategy=builds(HydraDDP))
+<p>&gt;&gt; trainer = Trainer(Trainer, accelerator=”auto”, devices=2, strategy=HydraDDP()))
 &gt;&gt; trainer.fit(module)</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="rai_toolbox.mushin.HydraDDP.__init__">
