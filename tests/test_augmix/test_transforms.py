@@ -1,15 +1,17 @@
 # Copyright 2022, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
+import pytest
 
 from typing import Tuple, Union
 
 import hypothesis.strategies as st
+from hypothesis import settings
 import numpy as np
 from hypothesis import given
 from numpy.testing import assert_allclose
 
-from rai_toolbox.augmentations.augmix import augment_and_mix
+from rai_toolbox.augmentations.augmix import augment_and_mix, AugMix, Fork
 
 
 @given(
@@ -77,3 +79,41 @@ def test_beta_param_no_augment_returns_datum(
         beta_params=(0.01, 100.0),
     )
     assert_allclose(preprocess(x), augmixed, rtol=1e-5, atol=1e-5)
+
+
+def identity1(x):
+    return x
+
+
+def identity2(x):
+    return x
+
+@settings(max_examples=10)
+@given(
+    augmentations=st.lists(
+        st.sampled_from([identity1, identity2]), min_size=0, max_size=3
+    )
+)
+def test_augmix_reprs(augmentations):
+    assert isinstance(repr(AugMix(identity1, augmentations=augmentations)), str)
+
+@settings(max_examples=10)
+@given(
+    functions=st.lists(st.sampled_from([identity1, identity2]), min_size=1, max_size=7)
+)
+def test_fork_repr(functions):
+    assert isinstance(repr(Fork(*functions)), str)
+
+@settings(max_examples=10)
+@given(bad_input=st.sampled_from([[], [1], [identity1, False], [True, identity1]]))
+def test_fork_raises_bad_functions(bad_input):
+    with pytest.raises((ValueError, TypeError)):
+        Fork(*bad_input)
+
+
+def test_fork():
+    two_fork = Fork(lambda x: x, lambda x: 2 * x)
+    assert two_fork(2) == (2, 4)
+
+    three_fork = Fork(lambda x: x, lambda x: 2 * x, lambda x: 0 * x)
+    assert three_fork(-1.0) == (-1.0, -2.0, -0.0)

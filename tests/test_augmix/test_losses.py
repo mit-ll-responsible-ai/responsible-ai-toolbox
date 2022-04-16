@@ -2,7 +2,9 @@
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 
+import pytest
 import hypothesis.strategies as st
+from hypothesis import settings
 import numpy as np
 import torch as tr
 from hypothesis import given
@@ -24,12 +26,32 @@ prob_tensors = arrays(
 ).map(lambda arr: tr.tensor(softmax(arr)))
 
 
+@settings(max_examples=10)
+@given(
+    st.lists(
+        st.sampled_from([tr.tensor(1.0), tr.tensor([1.0]), tr.tensor([[[1.0]]])]),
+        min_size=0,
+        max_size=4,
+    )
+)
+def test_jsd_validation(bad_input):
+    with pytest.raises(ValueError):
+        jensen_shannon_divergence(*bad_input)
+
+
 @given(probs=st.lists(prob_tensors, min_size=2), data=st.data())
 def test_jsd_symmetry(probs, data: st.DataObject):
     perm_probs = data.draw(st.permutations(probs))
     jsd1 = jensen_shannon_divergence(*probs)
     jsd2 = jensen_shannon_divergence(*perm_probs)
     assert_allclose(jsd1, jsd2, atol=1e-5, rtol=1e-5)
+
+
+@given(probs=st.lists(prob_tensors, min_size=2), weight=st.floats(-10, 10))
+def test_jsd_scaled_by_weight(probs, weight: float):
+    jsd1 = jensen_shannon_divergence(*probs)
+    jsd2 = jensen_shannon_divergence(*probs, weight=weight)
+    assert_allclose(jsd1 * weight, jsd2, atol=1e-5, rtol=1e-5)
 
 
 @given(probs=st.lists(prob_tensors, min_size=2))
