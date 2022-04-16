@@ -6,7 +6,7 @@ import os
 import subprocess
 import sys
 from time import sleep
-from typing import Any, Callable, Optional
+from typing import Any, Callable, TypeVar
 
 import numpy as np
 from torch import distributed
@@ -17,12 +17,14 @@ from pytorch_lightning.trainer.states import TrainerFn
 from .._compatibility import PL_VERSION, Version
 
 
-def _setup_environment():
+R = TypeVar("R")
+
+def _setup_environment() -> None:
     if distributed.is_initialized():
         distributed.destroy_process_group()
 
 
-def _teardown():
+def _teardown() -> None:
     # Remove PL environments so next multirun starts fresh
     envs = (
         "LOCAL_RANK",
@@ -37,7 +39,7 @@ def _teardown():
         os.environ.pop(name, None)
 
 
-def _subprocess_call(local_rank: int, trainer):
+def _subprocess_call(local_rank: int, trainer: Trainer) -> None:
     env_copy = os.environ.copy()
     env_copy["LOCAL_RANK"] = f"{local_rank}"
     # CWD is the Hydra working directory
@@ -88,19 +90,15 @@ if PL_VERSION >= Version(1, 6, 0):
         """DDP Strategy that supports Hydra run and multirun jobs.
 
         This strategy assumes a `Trainer.fit` or `Trainer.test` has been configured
-        to execute via Hydra.  It requires that Hydra saves a `config.yaml` in the current
-        working directory with the following keys/properties set:
+        to execute via Hydra.  It requires that Hydra saves a `config.yaml` in the current working directory with the following keys/properties set:
 
-            trainer: A `pytorch_lightning.Trainer` configuration
-            module: A `pytorch_lightning.LightningModule` configuration
-            pl_testing: A boolean: True for `Trainer.test` and False (default) `Trainer.fit`
+        - trainer: A `pytorch_lightning.Trainer` configuration
+        - module: A `pytorch_lightning.LightningModule` configuration
+        - pl_testing: A boolean: True for `Trainer.test` and False (default) `Trainer.fit`
 
-        This strategy will launch a child subprocesses for additional GPU beyond the first using
-        the following base command:
+        This strategy will launch a child subprocesses for additional GPU beyond the first using the following base command::
 
-        ```
-        python -m rai_toolbox.mushin.lightning._pl_main -cp <path to config.yaml> -cn config.yaml
-        ```
+           python -m rai_toolbox.mushin.lightning._pl_main -cp <path to config.yaml> -cn config.yaml
 
         Notes
         -----
@@ -111,9 +109,12 @@ if PL_VERSION >= Version(1, 6, 0):
 
         Examples
         --------
-        >> trainer = Trainer(Trainer, accelerator="auto", devices=2, strategy=HydraDDP()))
-        >> trainer.fit(module)
-
+        >>> from pytorch_lightning import Trainer
+        >>> from rai_toolbox.mushin import HydraDDP
+        >>> PLModule = # some LightningModule
+        
+        >>> trainer = Trainer(PLModule, accelerator="auto", devices=2, strategy=HydraDDP())
+        >>> trainer.fit(module)
         """
 
         def setup_environment(self) -> None:
@@ -142,26 +143,38 @@ if PL_VERSION >= Version(1, 6, 0):
 
         def launch(
             self,
-            function: Callable,
+            function: Callable[..., R],
             *args: Any,
-            trainer: Optional["Trainer"] = None,
+            trainer: Trainer,
             **kwargs: Any,
-        ) -> Any:
+        ) -> R:
             """Creates new processes, then calls the given function.
 
-            Arguments:
-                function: A callback function to execute after all processes have been created.
-                    It is up to the implementation of this function to synchronize the processes, e.g., with barriers.
-                *args: Optional positional arguments to be passed to the given function.
-                trainer: Optional reference to the :class:`~pytorch_lightning.trainer.trainer.Trainer`.
-                **kwargs: Optional keyword arguments to be passed to the given function.
+            Parameters
+            ----------
+            function : Callable[[...], ReturnType]
+                A callback function to execute after all processes have been created.
+                It is up to the implementation of this function to synchronize the processes, e.g., with barriers.
+            
+            *args : Any 
+                Optional positional arguments to be passed to the given function.
+            
+            trainer : pytorch_lightning.Trainer
+                Optional reference to the pytorch_lightning.Trainer`.
+            
+            **kwargs : Any 
+                Optional keyword arguments to be passed to the given function.
+            
+            Returns
+            -------
+            ReturnType
             """
             if not self.cluster_environment.creates_processes_externally:
                 self._call_children_scripts(trainer)
 
             return function(*args, **kwargs)
 
-        def _call_children_scripts(self, trainer):
+        def _call_children_scripts(self, trainer: Trainer):
             # bookkeeping of spawned processes
             self._check_can_spawn_children()
 
@@ -186,32 +199,35 @@ else:  # pragma: no cover
     from pytorch_lightning.plugins.training_type.ddp import DDPPlugin
 
     class HydraDDP(DDPPlugin):
-        """DDP plugin that supports Hydra run and multirun jobs.
+        """DDP Strategy that supports Hydra run and multirun jobs.
 
-        This plugin assumes a `Trainer.fit` or `Trainer.test` has been configured
-        to execute via Hydra.  It requires that Hydra saves a `config.yaml` in the current
-        working directory with the following keys/properties set:
+        This strategy assumes a `Trainer.fit` or `Trainer.test` has been configured
+        to execute via Hydra.  It requires that Hydra saves a `config.yaml` in the current working directory with the following keys/properties set:
 
-            trainer: A `pytorch_lightning.Trainer` configuration
-            module: A `pytorch_lightning.LightningModule` configuration
+        - trainer: A `pytorch_lightning.Trainer` configuration
+        - module: A `pytorch_lightning.LightningModule` configuration
+        - pl_testing: A boolean: True for `Trainer.test` and False (default) `Trainer.fit`
 
-        This plugin will launch a child subprocesses for additional GPU beyond the first using
-        the following base command:
+        This strategy will launch a child subprocesses for additional GPU beyond the first using the following base command::
 
-        ```
-        python -m rai_toolbox.mushin.lightning._pl_main -cp <path to config.yaml> -cn config.yaml
-        ```
+           python -m rai_toolbox.mushin.lightning._pl_main -cp <path to config.yaml> -cn config.yaml
+
 
         Notes
         -----
-        In order to execute a MULTIRUN Hydra job we must make sure to destroy an distributed
-        processes on setup of this function.  This will lead to issues if running multiple jobs
-        in the notebook or trying to do `Trainer.fit` followed by `Trainer.test`.
+        In order to execute a MULTIRUN Hydra job we must make sure to destroy an 
+        distributed processes on setup of this function.  This will lead to issues if 
+        running multiple jobs in the notebook or trying to do `Trainer.fit` followed by 
+        `Trainer.test`.
 
         Examples
         --------
-        >> trainer = Trainer(Trainer, accelerator="auto", devices=2, strategy=HydraDDP()))
-        >> trainer.fit(module)
+        >>> from pytorch_lightning import Trainer
+        >>> from rai_toolbox.mushin import HydraDDP
+        >>> PLModule = # some LightningModule
+        
+        >>> trainer = Trainer(PLModule, accelerator="auto", devices=2, strategy=HydraDDP())
+        >>> trainer.fit(module)
 
         """
 
@@ -222,6 +238,9 @@ else:  # pragma: no cover
         def _call_children_scripts(self):
             if self.lightning_module is None:  # pragma: no cover
                 raise TypeError("HydraDDP.lightning_module is None")
+
+            if self.lightning_module.trainer is None:  # pragma: no cover
+                raise TypeError("HydraDDP.lightning_module.trainer is None")
 
             if self.cluster_environment is None:  # pragma: no cover
                 raise TypeError("HydraDDP.cluster_environment is None")
