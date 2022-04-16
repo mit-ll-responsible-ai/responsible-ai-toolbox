@@ -415,7 +415,7 @@ class ProjectionMixin(metaclass=ABCMeta):
     def project(self) -> None:
         """Project each parameter in-place."""
         for group in self.param_groups:
-            param_ndim = group["param_ndim"]
+            param_ndim = group.get("param_ndim")
 
             for p in group["params"]:
                 p = _to_batch(p, param_ndim)
