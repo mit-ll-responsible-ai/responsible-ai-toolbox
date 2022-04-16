@@ -126,7 +126,7 @@ if PL_VERSION >= Version(1, 6, 0):
                 raise TypeError("HydraDDP.cluster_environment is None")
 
             if not self.cluster_environment.creates_processes_externally:
-                self._launcher = HydraDDPLauncher(
+                self._launcher = _HydraDDPLauncher(
                     self.cluster_environment, self.num_processes, self.num_nodes
                 )
                 self._rank_0_will_call_children_scripts = True
@@ -136,7 +136,7 @@ if PL_VERSION >= Version(1, 6, 0):
             super().teardown()
             _teardown()
 
-    class HydraDDPLauncher(_SubprocessScriptLauncher):
+    class _HydraDDPLauncher(_SubprocessScriptLauncher):
         @property
         def is_interactive_compatible(self) -> bool:  # pragma: no cover
             return True
