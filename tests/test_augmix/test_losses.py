@@ -2,7 +2,9 @@
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 
+import pytest
 import hypothesis.strategies as st
+from hypothesis import settings
 import numpy as np
 import torch as tr
 from hypothesis import given
@@ -22,6 +24,19 @@ prob_tensors = arrays(
     dtype="float",
     elements=st.floats(-1000, 1000),
 ).map(lambda arr: tr.tensor(softmax(arr)))
+
+
+@settings(max_examples=10)
+@given(
+    st.lists(
+        st.sampled_from([tr.tensor(1.0), tr.tensor([1.0]), tr.tensor([[[1.0]]])]),
+        min_size=0,
+        max_size=4,
+    )
+)
+def test_jsd_validation(bad_input):
+    with pytest.raises(ValueError):
+        jensen_shannon_divergence(*bad_input)
 
 
 @given(probs=st.lists(prob_tensors, min_size=2), data=st.data())
