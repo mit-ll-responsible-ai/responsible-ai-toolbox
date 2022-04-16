@@ -46,6 +46,40 @@ def _teardown():
         os.environ.pop(name, None)
 
 
+def _subprocess_call(local_rank: int, trainer):
+    env_copy = os.environ.copy()
+    env_copy["LOCAL_RANK"] = f"{local_rank}"
+    # CWD is the Hydra working directory
+    cwd = os.getcwd()
+    os_cwd = (
+        f'"{cwd}"'  # this is needed to handle characters like `=` in the directory name
+    )
+
+    command = [
+        sys.executable,
+        "-m",
+        "rai_toolbox.mushin.lightning._pl_main",
+    ]
+    hydra_cfg = HydraConfig.get()
+    hydra_output = os.path.join(cwd, hydra_cfg.output_subdir)
+
+    # create the command for CLI
+    command += ["-cp", hydra_output, "-cn", "config.yaml"]
+
+    if PL_VERSION < Version(1, 6, 0):
+        # TODO: See about having PL 1.6 fix this behavior so we know
+        # which function is being called
+        trainer_fn = trainer.state.fn
+        command += ["++pl_testing=" + ("false" if trainer_fn == TrainerFn.FITTING else "true")]
+
+    command += [
+        f"hydra.output_subdir=.pl_hydra_{local_rank}",
+        f"hydra.run.dir={os_cwd}",
+        f"hydra.job.name=train_ddp_process_{local_rank}",
+    ]
+    subprocess.Popen(command, env=env_copy, cwd=cwd)
+
+
 if PL_VERSION >= Version(1, 6, 0):
 
     class HydraDDP(DDPStrategy):
@@ -72,9 +106,10 @@ if PL_VERSION >= Version(1, 6, 0):
         processes on setup of this function.  This will lead to issues if running multiple jobs
         in the notebook or trying to do `Trainer.fit` followed by `Trainer.test`.
 
+
         Examples
         --------
-        >> trainer = Trainer(Trainer, accelerator="auto", devices=2, strategy=builds(HydraDDP))
+        >> trainer = Trainer(Trainer, accelerator="auto", devices=2, strategy=HydraDDP()))
         >> trainer.fit(module)
 
         """
@@ -96,6 +131,10 @@ if PL_VERSION >= Version(1, 6, 0):
             _teardown()
 
     class HydraDDPLauncher(_SubprocessScriptLauncher):
+        @property
+        def is_interactive_compatible(self) -> bool:  # pragma: no cover
+            return True
+
         def launch(
             self,
             function: Callable,
@@ -131,38 +170,7 @@ if PL_VERSION >= Version(1, 6, 0):
             os.environ["WORLD_SIZE"] = f"{self.num_processes * self.num_nodes}"
 
             for local_rank in range(1, self.num_processes):
-                env_copy = os.environ.copy()
-                env_copy["LOCAL_RANK"] = f"{local_rank}"
-
-                # CWD is the Hydra working directory
-                cwd = os.getcwd()
-                os_cwd = f'"{cwd}"'  # this is needed to handle characters like `=` in the directory name
-
-                command = [
-                    sys.executable,
-                    "-m",
-                    "rai_toolbox.mushin.lightning._pl_main",
-                ]
-                hydra_cfg = HydraConfig.get()
-                hydra_output = os.path.join(cwd, hydra_cfg.output_subdir)
-
-                # create the command for CLI
-                command += ["-cp", hydra_output, "-cn", "config.yaml"]
-
-                # TODO: See about having PL fix this behavior so we know
-                # which function is being called
-                # trainer_fn = trainer.state.fn
-                # if trainer_fn == TrainerFn.FITTING:
-                #     command += ["+_ddp_testing=false"]
-                # else:
-                #     command += ["+_ddp_testing=true"]
-
-                command += [
-                    f"hydra.output_subdir=.pl_hydra_{local_rank}",
-                    f"hydra.run.dir={os_cwd}",
-                    f"hydra.job.name=train_ddp_process_{local_rank}",
-                ]
-                subprocess.Popen(command, env=env_copy, cwd=cwd)
+                _subprocess_call(local_rank, trainer)
 
                 # starting all processes at once can cause issues
                 # with dataloaders delay between 1-10 seconds
@@ -196,7 +204,7 @@ else:  # pragma: no cover
 
         Examples
         --------
-        >> trainer = Trainer(Trainer, accelerator="auto", devices=2, strategy=builds(HydraDDP))
+        >> trainer = Trainer(Trainer, accelerator="auto", devices=2, strategy=HydraDDP()))
         >> trainer.fit(module)
 
         """
@@ -220,37 +228,7 @@ else:  # pragma: no cover
 
             self.interactive_ddp_procs = []
             for local_rank in range(1, self.num_processes):
-                env_copy = os.environ.copy()
-                env_copy["LOCAL_RANK"] = f"{local_rank}"
-
-                # CWD is the Hydra working directory
-                cwd = os.getcwd()
-                os_cwd = f'"{cwd}"'  # this is needed to handle characters like `=` in the directory name
-
-                trainer_fn = self.lightning_module.trainer.state.fn
-                command = [
-                    sys.executable,
-                    "-m",
-                    "rai_toolbox.mushin.lightning._pl_main",
-                ]
-                hydra_cfg = HydraConfig.get()
-                hydra_output = os.path.join(cwd, hydra_cfg.output_subdir)
-
-                # create the command for CLI
-                command += ["-cp", hydra_output, "-cn", "config.yaml"]
-
-                if trainer_fn == TrainerFn.FITTING:
-                    command += ["+pl_testing=false"]
-                else:
-                    command += ["+pl_testing=true"]
-
-                command += [
-                    f"hydra.output_subdir=.pl_hydra_{local_rank}",
-                    f"hydra.run.dir={os_cwd}",
-                    f"hydra.job.name=train_ddp_process_{local_rank}",
-                ]
-                proc = subprocess.Popen(command, env=env_copy, cwd=cwd)
-                self.interactive_ddp_procs.append(proc)
+                _subprocess_call(local_rank, self.lightning_module.trainer)
 
                 # starting all processes at once can cause issues
                 # with dataloaders delay between 1-10 seconds
