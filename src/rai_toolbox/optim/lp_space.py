@@ -147,7 +147,6 @@ class LinfProjectedOptim(SignedGradientOptim, ProjectionMixin):
     ):
 
         assert epsilon >= 0
-        self.div_by_zero_epsilon = epsilon
         defaults = dict(epsilon=epsilon)
 
         super().__init__(
