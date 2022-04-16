@@ -44,7 +44,7 @@ def _atleast_2d(x: Tensor):
 
 
 def _shares_memory(x: Tensor, y: Tensor):
-    return x.storage().data_ptr() == y.storage().data_ptr()  # type: ignore
+    return x.storage().data_ptr() == y.storage().data_ptr()
 
 
 def _to_batch(p: Tensor, param_ndim: Optional[int]) -> Tensor:
