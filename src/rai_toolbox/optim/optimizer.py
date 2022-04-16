@@ -156,7 +156,7 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
     `GradientTransformerOptimizer` is designed to be combined with other,
     standard gradient-based optimizers (e.g. Adam) via encapsulation, rather
     then through inheritance. I.e., `GradientTransformerOptimizer(InnerOpt=<...>)`
-    Permits a standard optimizer to include an additional gradient-transformation
+    permits a standard optimizer to include an additional gradient-transformation
 
     Methods
     -------
@@ -199,7 +199,7 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
         Notes
         -----
         Additional Explanation of `param_ndim`:
-        
+
         If the gradient has a shape (d0, d1, d2) and `param_ndim=1` then the
         transformation will be broadcast over each shape-(d2,) sub-tensor in the
         gradient (of which there are d0 * d1).
@@ -253,38 +253,39 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
         In the case where `param_ndim=0`, the tensor shapes will be (N, 1)."""
         raise NotImplementedError()
 
+    def _apply_gradient_transforms_(self):
+        for group in self.param_groups:
+            for p in group["params"]:
+                p: Tensor
+                orig_p = p
+                if p.grad is None:
+                    continue
+                assert orig_p.grad is not None
+
+                p = _to_batch(p, group["param_ndim"])
+
+                self._inplace_grad_transform_(p, optim_group=group)
+
+                if p.grad is None or not _shares_memory(orig_p.grad, p.grad):
+                    raise ValueError(
+                        f"`{type(self).__name__}._inplace_grad_transform_` did "
+                        " not modify the gradient of the parameter in-place."
+                        " \nNote that setting `p.grad` directly replaces the"
+                        " tensor, rather than writing to the tensor."
+                    )
+
     @torch.no_grad()
     def _create_gradient_transforming_closure(
-        self, closure: Optional[Callable[[], _T]] = None
+        self, closure: Callable[[], _T]
     ) -> Callable[[], Optional[_T]]:
-        def scaled_closure():
-            loss = None
-            if closure is not None:
-                with torch.enable_grad():
-                    loss = closure()
+        def grad_transforming_closure():
+            with torch.enable_grad():
+                loss = closure()
 
-            for group in self.param_groups:
-                for p in group["params"]:
-                    p: Tensor
-                    orig_p = p
-                    if p.grad is None:
-                        continue
-                    assert orig_p.grad is not None
-
-                    p = _to_batch(p, group["param_ndim"])
-
-                    self._inplace_grad_transform_(p, optim_group=group)
-
-                    if p.grad is None or not _shares_memory(orig_p.grad, p.grad):
-                        raise ValueError(
-                            f"`{type(self).__name__}._inplace_grad_transform_` did "
-                            " not modify the gradient of the parameter in-place."
-                            " \nNote that setting `p.grad` directly replaces the"
-                            " tensor, rather than writing to the tensor."
-                        )
+            self._apply_gradient_transforms_()
             return loss
 
-        return scaled_closure
+        return grad_transforming_closure
 
     @overload
     def step(self, closure: Callable[[], _T]) -> _T:  # pragma: no cover
@@ -303,9 +304,12 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
     @torch.no_grad()
     def step(self, closure=None):
         if closure is not None:
-            closure = torch.enable_grad()(closure)
-        closure = self._create_gradient_transforming_closure(closure)
-        loss = self.inner_opt.step(closure)
+            closure = self._create_gradient_transforming_closure(closure)
+            loss = self.inner_opt.step(closure)
+        else:
+            self._apply_gradient_transforms_()
+            self.inner_opt.step()
+            loss = None
         loss = cast(Optional[Union[float, Tensor]], loss)
         return loss
 
@@ -325,7 +329,7 @@ class ProjectionMixin(metaclass=ABCMeta):
         - A positive number determines the dimensionality of the tensor that the projection will act on.
         - A negative number indicates the 'offset' from the dimensionality of the tensor.
         - `None` means that the projection will be applied to the tensor without any broadcasting.
-    
+
     Methods
     -------
     _project_parameter_
