@@ -50,8 +50,7 @@ def test_ddp_with_hydra_raises():
 @pytest.mark.parametrize("subdir", [None, "dksa"])
 @pytest.mark.parametrize("num_jobs", [1, 2])
 @pytest.mark.parametrize("testing", [True, False])
-@pytest.mark.parametrize("global_seed", [None, 42])
-def test_ddp_with_hydra_runjob(subdir, num_jobs, testing, global_seed):
+def test_ddp_with_hydra_runjob(subdir, num_jobs, testing):
 
     overrides = [f"+pl_testing={testing}"]
 
@@ -69,9 +68,6 @@ def test_ddp_with_hydra_runjob(subdir, num_jobs, testing, global_seed):
                 fake_param += ","
 
         overrides += [fake_param]
-
-    if global_seed is not None:
-        os.environ["PL_GLOBAL_SEED"] = f"{global_seed}"
 
     trainer = builds(
         Trainer,
