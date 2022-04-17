@@ -156,7 +156,8 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
     `GradientTransformerOptimizer` is designed to be combined with other,
     standard gradient-based optimizers (e.g. Adam) via encapsulation, rather
     then through inheritance. I.e., `GradientTransformerOptimizer(InnerOpt=<...>)`
-    permits a standard optimizer to include an additional gradient-transformation.
+    will apply a in-place gradient transform on a parameter before using `InnerOpt.
+    step` to update said parameter.
 
     If a closure is supplied to the `.step(...)` method, then the in-place
     gradient transformation is applied after the closure call and prior to
@@ -179,14 +180,14 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
     ...     def _inplace_grad_transform_(self, param: tr.Tensor, **_kwds) -> None:
     ...         if param.grad is None:
     ...             return
-    ...         torch.sign(param.grad, out=param.grad)  # operates in-place
+    ...         tr.sign(param.grad, out=param.grad)  # operates in-place
 
     Now we'll use this optimizer – along with AdamW – to transform the gradient of each 
     parameter prior to using AdamW to perform the actual gradient-based update that 
     parameter.
 
     >>> x = tr.tensor([-10.0, 10.0], requires_grad=True)
-    >>> optim = SignedGradientOptim([x], InnerOpt=tr.optim.Adam, lr=1.0)
+    >>> optim = SignedGradientOptim([x], InnerOpt=tr.optim.AdamW, lr=0.1)
     
     >>> loss = (10_000 * x).sum()
     >>> loss.backward()
@@ -370,8 +371,8 @@ class ProjectionMixin(metaclass=ABCMeta):
 
     Examples
     --------
-    Let's create a SGD-based optimizer that clamps each parameter's values to `[-1, 1]`
-    after performing it's gradient-based step on the parameter. 
+    Let's create a SGD-based optimizer that clamps each parameter's values so that
+    they all fall within `[-1, 1]` after performing it's gradient-based step on the parameter. 
 
     >>> import torch as tr
     >>> from rai_toolbox.optim import ProjectionMixin
@@ -389,7 +390,7 @@ class ProjectionMixin(metaclass=ABCMeta):
     >>> optim = ClampedSGD([x], lr=1.0)
     >>> loss = (10_000 * x).sum()
     >>> loss.backward()
-    >>> optim.step()
+    >>> optim.step()  # parameters updated via SGD.step() and then clamped
     >>> x
     tensor([-1., -1.], requires_grad=True)
 
