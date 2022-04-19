@@ -35,6 +35,8 @@
     <script src="../_static/copybutton.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="rai_toolbox.evaluating" href="rai_toolbox.evaluating.html" />
+    <link rel="prev" title="rai_toolbox.mushin.MetricsCallback" href="rai_toolbox.mushin.MetricsCallback.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -87,7 +89,7 @@
  </a>
 </li>
 
-<li class="toctree-l1 nav-item">
+<li class="toctree-l1 current active nav-item">
  <a class="reference internal nav-link" href="../api_reference.html">
   Reference
  </a>
@@ -133,7 +135,83 @@
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
   <div class="bd-toc-item active">
-    
+    <p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Contents:
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../ref_optim.html">
+   Optimizers
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../ref_perturbation.html">
+   Perturbations
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../ref_datasets.html">
+   Datasets
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../ref_augmentations.html">
+   Augmentations
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../ref_losses.html">
+   Losses
+  </a>
+ </li>
+ <li class="toctree-l1 current active has-children">
+  <a class="reference internal" href="../ref_mushin.html">
+   Mushin
+  </a>
+  <input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul class="current">
+   <li class="toctree-l2">
+    <a class="reference internal" href="rai_toolbox.mushin.MetricsCallback.html">
+     rai_toolbox.mushin.MetricsCallback
+    </a>
+   </li>
+   <li class="toctree-l2 current active">
+    <a class="current reference internal" href="#">
+     rai_toolbox.mushin.HydraDDP
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="rai_toolbox.evaluating.html">
+   rai_toolbox.evaluating
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="rai_toolbox.freeze.html">
+   rai_toolbox.freeze
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="rai_toolbox.frozen.html">
+   rai_toolbox.frozen
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="rai_toolbox.negate.html">
+   rai_toolbox.negate
+  </a>
+ </li>
+</ul>
+
   </div>
 </nav>
               </div>
@@ -178,25 +256,30 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rai_toolbox.mushin.</span></span><span class="sig-name descname"><span class="pre">HydraDDP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">accelerator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parallel_devices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cluster_environment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">checkpoint_io</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precision_plugin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ddp_comm_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ddp_comm_hook</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ddp_comm_wrapper</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_averaging_period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">process_group_backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/mushin/lightning/launchers.html#HydraDDP"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.mushin.HydraDDP" title="Permalink to this definition">#</a></dt>
 <dd><p>DDP Strategy that supports Hydra run and multirun jobs.</p>
 <p>This strategy assumes a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Trainer.fit</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">Trainer.test</span></code> has been configured
-to execute via Hydra.  It requires that Hydra saves a <code class="xref py py-obj docutils literal notranslate"><span class="pre">config.yaml</span></code> in the current
-working directory with the following keys/properties set:</p>
-<blockquote>
-<div><p>trainer: A <code class="xref py py-obj docutils literal notranslate"><span class="pre">pytorch_lightning.Trainer</span></code> configuration
-module: A <code class="xref py py-obj docutils literal notranslate"><span class="pre">pytorch_lightning.LightningModule</span></code> configuration
-pl_testing: A boolean: True for <code class="xref py py-obj docutils literal notranslate"><span class="pre">Trainer.test</span></code> and False (default) <code class="xref py py-obj docutils literal notranslate"><span class="pre">Trainer.fit</span></code></p>
-</div></blockquote>
-<p>This strategy will launch a child subprocesses for additional GPU beyond the first using
-the following base command:</p>
-<p><code class="docutils literal notranslate"><span class="pre">`</span>
-<span class="pre">python</span> <span class="pre">-m</span> <span class="pre">rai_toolbox.mushin.lightning._pl_main</span> <span class="pre">-cp</span> <span class="pre">&lt;path</span> <span class="pre">to</span> <span class="pre">config.yaml&gt;</span> <span class="pre">-cn</span> <span class="pre">config.yaml</span>
-<span class="pre">`</span></code></p>
+to execute via Hydra.  It requires that Hydra saves a <code class="xref py py-obj docutils literal notranslate"><span class="pre">config.yaml</span></code> in the current working directory with the following keys/properties set:</p>
+<ul class="simple">
+<li><p>trainer: A <code class="xref py py-obj docutils literal notranslate"><span class="pre">pytorch_lightning.Trainer</span></code> configuration</p></li>
+<li><p>module: A <code class="xref py py-obj docutils literal notranslate"><span class="pre">pytorch_lightning.LightningModule</span></code> configuration</p></li>
+<li><p>pl_testing: A boolean: True for <code class="xref py py-obj docutils literal notranslate"><span class="pre">Trainer.test</span></code> and False (default) <code class="xref py py-obj docutils literal notranslate"><span class="pre">Trainer.fit</span></code></p></li>
+</ul>
+<p>This strategy will launch a child subprocesses for additional GPU beyond the first using the following base command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">rai_toolbox</span><span class="o">.</span><span class="n">mushin</span><span class="o">.</span><span class="n">lightning</span><span class="o">.</span><span class="n">_pl_main</span> <span class="o">-</span><span class="n">cp</span> <span class="o">&lt;</span><span class="n">path</span> <span class="n">to</span> <span class="n">config</span><span class="o">.</span><span class="n">yaml</span><span class="o">&gt;</span> <span class="o">-</span><span class="n">cn</span> <span class="n">config</span><span class="o">.</span><span class="n">yaml</span>
+</pre></div>
+</div>
 <p class="rubric">Notes</p>
 <p>In order to execute a MULTIRUN Hydra job we must make sure to destroy an distributed
 processes on setup of this function.  This will lead to issues if running multiple jobs
 in the notebook or trying to do <code class="xref py py-obj docutils literal notranslate"><span class="pre">Trainer.fit</span></code> followed by <code class="xref py py-obj docutils literal notranslate"><span class="pre">Trainer.test</span></code>.</p>
 <p class="rubric">Examples</p>
-<p>&gt;&gt; trainer = Trainer(Trainer, accelerator=”auto”, devices=2, strategy=HydraDDP()))
-&gt;&gt; trainer.fit(module)</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pytorch_lightning</span> <span class="kn">import</span> <span class="n">Trainer</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">rai_toolbox.mushin</span> <span class="kn">import</span> <span class="n">HydraDDP</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">PLModule</span> <span class="o">=</span> <span class="c1"># some LightningModule</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">trainer</span> <span class="o">=</span> <span class="n">Trainer</span><span class="p">(</span><span class="n">PLModule</span><span class="p">,</span> <span class="n">accelerator</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="n">devices</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">strategy</span><span class="o">=</span><span class="n">HydraDDP</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">trainer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
+</pre></div>
+</div>
 <dl class="py method">
 <dt class="sig sig-object py" id="rai_toolbox.mushin.HydraDDP.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">accelerator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parallel_devices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cluster_environment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">checkpoint_io</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precision_plugin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ddp_comm_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ddp_comm_hook</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ddp_comm_wrapper</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_averaging_period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">process_group_backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rai_toolbox.mushin.HydraDDP.__init__" title="Permalink to this definition">#</a></dt>
@@ -464,6 +547,20 @@ in the notebook or trying to do <code class="xref py py-obj docutils literal not
               
               <!-- Previous / next buttons -->
 <div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="rai_toolbox.mushin.MetricsCallback.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">rai_toolbox.mushin.MetricsCallback</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="rai_toolbox.evaluating.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">rai_toolbox.evaluating</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
 </div>
               
           </main>

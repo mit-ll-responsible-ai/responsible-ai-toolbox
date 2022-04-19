@@ -23,6 +23,7 @@ DISCUSSION ABOUT MAIN MODULES OF TOOLBOX
    ref_datasets
    ref_augmentations
    ref_losses
+   ref_mushin
 
 *************************
 General PyTorch Utilities

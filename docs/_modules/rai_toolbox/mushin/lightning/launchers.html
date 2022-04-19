@@ -166,32 +166,25 @@
 <span class="kn">import</span> <span class="nn">subprocess</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">sleep</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">TypeVar</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">distributed</span>
 <span class="kn">from</span> <span class="nn">hydra.core.hydra_config</span> <span class="kn">import</span> <span class="n">HydraConfig</span>
 <span class="kn">from</span> <span class="nn">pytorch_lightning</span> <span class="kn">import</span> <span class="n">Trainer</span>
 <span class="kn">from</span> <span class="nn">pytorch_lightning.trainer.states</span> <span class="kn">import</span> <span class="n">TrainerFn</span>
 
 <span class="kn">from</span> <span class="nn">.._compatibility</span> <span class="kn">import</span> <span class="n">PL_VERSION</span><span class="p">,</span> <span class="n">Version</span>
 
-<span class="k">if</span> <span class="n">PL_VERSION</span> <span class="o">&gt;=</span> <span class="n">Version</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
-    <span class="kn">from</span> <span class="nn">pytorch_lightning.strategies.ddp</span> <span class="kn">import</span> <span class="n">DDPStrategy</span>
-    <span class="kn">from</span> <span class="nn">pytorch_lightning.strategies.launchers.subprocess_script</span> <span class="kn">import</span> <span class="p">(</span>
-        <span class="n">_SubprocessScriptLauncher</span><span class="p">,</span>
-    <span class="p">)</span>
 
-<span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
-    <span class="kn">from</span> <span class="nn">pytorch_lightning.plugins.training_type.ddp</span> <span class="kn">import</span> <span class="n">DDPPlugin</span>
+<span class="n">R</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;R&quot;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">_setup_environment</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">distributed</span><span class="o">.</span><span class="n">is_initialized</span><span class="p">():</span>
+        <span class="n">distributed</span><span class="o">.</span><span class="n">destroy_process_group</span><span class="p">()</span>
 
 
-<span class="k">def</span> <span class="nf">_setup_environment</span><span class="p">():</span>
-    <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">distributed</span><span class="o">.</span><span class="n">is_initialized</span><span class="p">():</span>
-        <span class="n">torch</span><span class="o">.</span><span class="n">distributed</span><span class="o">.</span><span class="n">destroy_process_group</span><span class="p">()</span>
-
-
-<span class="k">def</span> <span class="nf">_teardown</span><span class="p">():</span>
+<span class="k">def</span> <span class="nf">_teardown</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="c1"># Remove PL environments so next multirun starts fresh</span>
     <span class="n">envs</span> <span class="o">=</span> <span class="p">(</span>
         <span class="s2">&quot;LOCAL_RANK&quot;</span><span class="p">,</span>
@@ -206,7 +199,7 @@
         <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_subprocess_call</span><span class="p">(</span><span class="n">local_rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">trainer</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_subprocess_call</span><span class="p">(</span><span class="n">local_rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">trainer</span><span class="p">:</span> <span class="n">Trainer</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="n">env_copy</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="n">env_copy</span><span class="p">[</span><span class="s2">&quot;LOCAL_RANK&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">local_rank</span><span class="si">}</span><span class="s2">&quot;</span>
     <span class="c1"># CWD is the Hydra working directory</span>
@@ -221,7 +214,12 @@
         <span class="s2">&quot;rai_toolbox.mushin.lightning._pl_main&quot;</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">hydra_cfg</span> <span class="o">=</span> <span class="n">HydraConfig</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
-    <span class="n">hydra_output</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cwd</span><span class="p">,</span> <span class="n">hydra_cfg</span><span class="o">.</span><span class="n">output_subdir</span><span class="p">)</span>
+
+    <span class="n">hydra_output</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cwd</span><span class="p">,</span> <span class="n">hydra_cfg</span><span class="o">.</span><span class="n">output_subdir</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">hydra_cfg</span><span class="o">.</span><span class="n">output_subdir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">else</span> <span class="n">cwd</span>
+    <span class="p">)</span>
 
     <span class="c1"># create the command for CLI</span>
     <span class="n">command</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">&quot;-cp&quot;</span><span class="p">,</span> <span class="n">hydra_output</span><span class="p">,</span> <span class="s2">&quot;-cn&quot;</span><span class="p">,</span> <span class="s2">&quot;config.yaml&quot;</span><span class="p">]</span>
@@ -230,7 +228,9 @@
         <span class="c1"># TODO: See about having PL 1.6 fix this behavior so we know</span>
         <span class="c1"># which function is being called</span>
         <span class="n">trainer_fn</span> <span class="o">=</span> <span class="n">trainer</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">fn</span>
-        <span class="n">command</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">&quot;++pl_testing=&quot;</span> <span class="o">+</span> <span class="p">(</span><span class="s2">&quot;false&quot;</span> <span class="k">if</span> <span class="n">trainer_fn</span> <span class="o">==</span> <span class="n">TrainerFn</span><span class="o">.</span><span class="n">FITTING</span> <span class="k">else</span> <span class="s2">&quot;true&quot;</span><span class="p">)]</span>
+        <span class="n">command</span> <span class="o">+=</span> <span class="p">[</span>
+            <span class="s2">&quot;++pl_testing=&quot;</span> <span class="o">+</span> <span class="p">(</span><span class="s2">&quot;false&quot;</span> <span class="k">if</span> <span class="n">trainer_fn</span> <span class="o">==</span> <span class="n">TrainerFn</span><span class="o">.</span><span class="n">FITTING</span> <span class="k">else</span> <span class="s2">&quot;true&quot;</span><span class="p">)</span>
+        <span class="p">]</span>
 
     <span class="n">command</span> <span class="o">+=</span> <span class="p">[</span>
         <span class="sa">f</span><span class="s2">&quot;hydra.output_subdir=.pl_hydra_</span><span class="si">{</span><span class="n">local_rank</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
@@ -241,24 +241,24 @@
 
 
 <span class="k">if</span> <span class="n">PL_VERSION</span> <span class="o">&gt;=</span> <span class="n">Version</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">pytorch_lightning.strategies.ddp</span> <span class="kn">import</span> <span class="n">DDPStrategy</span>
+    <span class="kn">from</span> <span class="nn">pytorch_lightning.strategies.launchers.subprocess_script</span> <span class="kn">import</span> <span class="p">(</span>
+        <span class="n">_SubprocessScriptLauncher</span><span class="p">,</span>
+    <span class="p">)</span>
 
-    <span class="k">class</span> <span class="nc">HydraDDP</span><span class="p">(</span><span class="n">DDPStrategy</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">HydraDDP</span><span class="p">(</span><span class="n">DDPStrategy</span><span class="p">):</span>  <span class="c1"># type: ignore</span>
         <span class="sd">&quot;&quot;&quot;DDP Strategy that supports Hydra run and multirun jobs.</span>
 
 <span class="sd">        This strategy assumes a `Trainer.fit` or `Trainer.test` has been configured</span>
-<span class="sd">        to execute via Hydra.  It requires that Hydra saves a `config.yaml` in the current</span>
-<span class="sd">        working directory with the following keys/properties set:</span>
+<span class="sd">        to execute via Hydra.  It requires that Hydra saves a `config.yaml` in the current working directory with the following keys/properties set:</span>
 
-<span class="sd">            trainer: A `pytorch_lightning.Trainer` configuration</span>
-<span class="sd">            module: A `pytorch_lightning.LightningModule` configuration</span>
-<span class="sd">            pl_testing: A boolean: True for `Trainer.test` and False (default) `Trainer.fit`</span>
+<span class="sd">        - trainer: A `pytorch_lightning.Trainer` configuration</span>
+<span class="sd">        - module: A `pytorch_lightning.LightningModule` configuration</span>
+<span class="sd">        - pl_testing: A boolean: True for `Trainer.test` and False (default) `Trainer.fit`</span>
 
-<span class="sd">        This strategy will launch a child subprocesses for additional GPU beyond the first using</span>
-<span class="sd">        the following base command:</span>
+<span class="sd">        This strategy will launch a child subprocesses for additional GPU beyond the first using the following base command::</span>
 
-<span class="sd">        ```</span>
-<span class="sd">        python -m rai_toolbox.mushin.lightning._pl_main -cp &lt;path to config.yaml&gt; -cn config.yaml</span>
-<span class="sd">        ```</span>
+<span class="sd">           python -m rai_toolbox.mushin.lightning._pl_main -cp &lt;path to config.yaml&gt; -cn config.yaml</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -269,9 +269,12 @@
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
-<span class="sd">        &gt;&gt; trainer = Trainer(Trainer, accelerator=&quot;auto&quot;, devices=2, strategy=HydraDDP()))</span>
-<span class="sd">        &gt;&gt; trainer.fit(module)</span>
-
+<span class="sd">        &gt;&gt;&gt; from pytorch_lightning import Trainer</span>
+<span class="sd">        &gt;&gt;&gt; from rai_toolbox.mushin import HydraDDP</span>
+<span class="sd">        &gt;&gt;&gt; PLModule = # some LightningModule</span>
+<span class="sd">        </span>
+<span class="sd">        &gt;&gt;&gt; trainer = Trainer(PLModule, accelerator=&quot;auto&quot;, devices=2, strategy=HydraDDP())</span>
+<span class="sd">        &gt;&gt;&gt; trainer.fit(module)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">def</span> <span class="nf">setup_environment</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -279,8 +282,11 @@
             <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setup_environment</span><span class="p">()</span>
 
         <span class="k">def</span> <span class="nf">_configure_launcher</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cluster_environment</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;HydraDDP.cluster_environment is None&quot;</span><span class="p">)</span>
+
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">cluster_environment</span><span class="o">.</span><span class="n">creates_processes_externally</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_launcher</span> <span class="o">=</span> <span class="n">HydraDDPLauncher</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_launcher</span> <span class="o">=</span> <span class="n">_HydraDDPLauncher</span><span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">cluster_environment</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_processes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_nodes</span>
                 <span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_rank_0_will_call_children_scripts</span> <span class="o">=</span> <span class="kc">True</span>
@@ -290,33 +296,45 @@
             <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">teardown</span><span class="p">()</span>
             <span class="n">_teardown</span><span class="p">()</span>
 
-    <span class="k">class</span> <span class="nc">HydraDDPLauncher</span><span class="p">(</span><span class="n">_SubprocessScriptLauncher</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">_HydraDDPLauncher</span><span class="p">(</span><span class="n">_SubprocessScriptLauncher</span><span class="p">):</span>
         <span class="nd">@property</span>
         <span class="k">def</span> <span class="nf">is_interactive_compatible</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
             <span class="k">return</span> <span class="kc">True</span>
 
         <span class="k">def</span> <span class="nf">launch</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
-            <span class="n">function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+            <span class="n">function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">R</span><span class="p">],</span>
             <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
-            <span class="n">trainer</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;Trainer&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">trainer</span><span class="p">:</span> <span class="n">Trainer</span><span class="p">,</span>
             <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
-        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">R</span><span class="p">:</span>
             <span class="sd">&quot;&quot;&quot;Creates new processes, then calls the given function.</span>
 
-<span class="sd">            Arguments:</span>
-<span class="sd">                function: A callback function to execute after all processes have been created.</span>
-<span class="sd">                    It is up to the implementation of this function to synchronize the processes, e.g., with barriers.</span>
-<span class="sd">                *args: Optional positional arguments to be passed to the given function.</span>
-<span class="sd">                trainer: Optional reference to the :class:`~pytorch_lightning.trainer.trainer.Trainer`.</span>
-<span class="sd">                **kwargs: Optional keyword arguments to be passed to the given function.</span>
+<span class="sd">            Parameters</span>
+<span class="sd">            ----------</span>
+<span class="sd">            function : Callable[[...], ReturnType]</span>
+<span class="sd">                A callback function to execute after all processes have been created.</span>
+<span class="sd">                It is up to the implementation of this function to synchronize the processes, e.g., with barriers.</span>
+<span class="sd">            </span>
+<span class="sd">            *args : Any </span>
+<span class="sd">                Optional positional arguments to be passed to the given function.</span>
+<span class="sd">            </span>
+<span class="sd">            trainer : pytorch_lightning.Trainer</span>
+<span class="sd">                Optional reference to the pytorch_lightning.Trainer`.</span>
+<span class="sd">            </span>
+<span class="sd">            **kwargs : Any </span>
+<span class="sd">                Optional keyword arguments to be passed to the given function.</span>
+<span class="sd">            </span>
+<span class="sd">            Returns</span>
+<span class="sd">            -------</span>
+<span class="sd">            ReturnType</span>
 <span class="sd">            &quot;&quot;&quot;</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">cluster_environment</span><span class="o">.</span><span class="n">creates_processes_externally</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_call_children_scripts</span><span class="p">(</span><span class="n">trainer</span><span class="p">)</span>
 
             <span class="k">return</span> <span class="n">function</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-        <span class="k">def</span> <span class="nf">_call_children_scripts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trainer</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">_call_children_scripts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trainer</span><span class="p">:</span> <span class="n">Trainer</span><span class="p">):</span>
             <span class="c1"># bookkeeping of spawned processes</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_check_can_spawn_children</span><span class="p">()</span>
 
@@ -338,34 +356,38 @@
                 <span class="n">sleep</span><span class="p">(</span><span class="n">delay</span><span class="p">)</span>
 
 <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+    <span class="kn">from</span> <span class="nn">pytorch_lightning.plugins.training_type.ddp</span> <span class="kn">import</span> <span class="n">DDPPlugin</span>
 
 <div class="viewcode-block" id="HydraDDP"><a class="viewcode-back" href="../../../../generated/rai_toolbox.mushin.HydraDDP.html#rai_toolbox.mushin.HydraDDP">[docs]</a>    <span class="k">class</span> <span class="nc">HydraDDP</span><span class="p">(</span><span class="n">DDPPlugin</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;DDP plugin that supports Hydra run and multirun jobs.</span>
+        <span class="sd">&quot;&quot;&quot;DDP Strategy that supports Hydra run and multirun jobs.</span>
 
-<span class="sd">        This plugin assumes a `Trainer.fit` or `Trainer.test` has been configured</span>
-<span class="sd">        to execute via Hydra.  It requires that Hydra saves a `config.yaml` in the current</span>
-<span class="sd">        working directory with the following keys/properties set:</span>
+<span class="sd">        This strategy assumes a `Trainer.fit` or `Trainer.test` has been configured</span>
+<span class="sd">        to execute via Hydra.  It requires that Hydra saves a `config.yaml` in the current working directory with the following keys/properties set:</span>
 
-<span class="sd">            trainer: A `pytorch_lightning.Trainer` configuration</span>
-<span class="sd">            module: A `pytorch_lightning.LightningModule` configuration</span>
+<span class="sd">        - trainer: A `pytorch_lightning.Trainer` configuration</span>
+<span class="sd">        - module: A `pytorch_lightning.LightningModule` configuration</span>
+<span class="sd">        - pl_testing: A boolean: True for `Trainer.test` and False (default) `Trainer.fit`</span>
 
-<span class="sd">        This plugin will launch a child subprocesses for additional GPU beyond the first using</span>
-<span class="sd">        the following base command:</span>
+<span class="sd">        This strategy will launch a child subprocesses for additional GPU beyond the first using the following base command::</span>
 
-<span class="sd">        ```</span>
-<span class="sd">        python -m rai_toolbox.mushin.lightning._pl_main -cp &lt;path to config.yaml&gt; -cn config.yaml</span>
-<span class="sd">        ```</span>
+<span class="sd">           python -m rai_toolbox.mushin.lightning._pl_main -cp &lt;path to config.yaml&gt; -cn config.yaml</span>
+
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
-<span class="sd">        In order to execute a MULTIRUN Hydra job we must make sure to destroy an distributed</span>
-<span class="sd">        processes on setup of this function.  This will lead to issues if running multiple jobs</span>
-<span class="sd">        in the notebook or trying to do `Trainer.fit` followed by `Trainer.test`.</span>
+<span class="sd">        In order to execute a MULTIRUN Hydra job we must make sure to destroy an </span>
+<span class="sd">        distributed processes on setup of this function.  This will lead to issues if </span>
+<span class="sd">        running multiple jobs in the notebook or trying to do `Trainer.fit` followed by </span>
+<span class="sd">        `Trainer.test`.</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
-<span class="sd">        &gt;&gt; trainer = Trainer(Trainer, accelerator=&quot;auto&quot;, devices=2, strategy=HydraDDP()))</span>
-<span class="sd">        &gt;&gt; trainer.fit(module)</span>
+<span class="sd">        &gt;&gt;&gt; from pytorch_lightning import Trainer</span>
+<span class="sd">        &gt;&gt;&gt; from rai_toolbox.mushin import HydraDDP</span>
+<span class="sd">        &gt;&gt;&gt; PLModule = # some LightningModule</span>
+<span class="sd">        </span>
+<span class="sd">        &gt;&gt;&gt; trainer = Trainer(PLModule, accelerator=&quot;auto&quot;, devices=2, strategy=HydraDDP())</span>
+<span class="sd">        &gt;&gt;&gt; trainer.fit(module)</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -374,12 +396,21 @@
             <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setup_environment</span><span class="p">()</span>
 
         <span class="k">def</span> <span class="nf">_call_children_scripts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lightning_module</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;HydraDDP.lightning_module is None&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lightning_module</span><span class="o">.</span><span class="n">trainer</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;HydraDDP.lightning_module.trainer is None&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cluster_environment</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;HydraDDP.cluster_environment is None&quot;</span><span class="p">)</span>
+
             <span class="c1"># bookkeeping of spawned processes</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_check_can_spawn_children</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_check_can_spawn_children</span><span class="p">()</span>  <span class="c1"># type: ignore</span>
 
             <span class="c1"># DDP Environment variables</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;MASTER_ADDR&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cluster_environment</span><span class="o">.</span><span class="n">master_address</span><span class="p">()</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;MASTER_PORT&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cluster_environment</span><span class="o">.</span><span class="n">master_port</span><span class="p">())</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;MASTER_ADDR&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cluster_environment</span><span class="o">.</span><span class="n">master_address</span><span class="p">()</span>  <span class="c1"># type: ignore</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;MASTER_PORT&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cluster_environment</span><span class="o">.</span><span class="n">master_port</span><span class="p">())</span>  <span class="c1"># type: ignore</span>
 
             <span class="c1"># allow the user to pass the node rank</span>
             <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;NODE_RANK&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cluster_environment</span><span class="o">.</span><span class="n">node_rank</span><span class="p">())</span>
