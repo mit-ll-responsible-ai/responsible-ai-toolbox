@@ -315,9 +315,9 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
                     continue
                 if p.ndim < abs(param_ndim):
                     raise ValueError(
-                        f"`param_ndim={param_ndim}` specified for parameter with "
-                        f"ndim={p.ndim} is not valid. `abs(param_ndim) <= ndim` must "
-                        f"hold."
+                        f"`param_ndim={param_ndim}` specified for parameter "
+                        f"with ndim={p.ndim} is not valid. `abs(param_ndim) <= "
+                        f"ndim` must hold."
                     )
 
     @abstractmethod
