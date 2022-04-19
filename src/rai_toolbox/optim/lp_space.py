@@ -141,13 +141,12 @@ class LinfProjectedOptim(SignedGradientOptim, ProjectionMixin):
         params: OptimParams,
         InnerOpt: Union[Partial[Opt], OptimizerType] = SGD,
         *,
-        param_ndim: Optional[int] = -1,
+        param_ndim=None,
         epsilon: float,
         **inner_opt_kwargs,
     ):
 
         assert epsilon >= 0
-        self.div_by_zero_epsilon = epsilon
         defaults = dict(epsilon=epsilon)
 
         super().__init__(

@@ -28,7 +28,6 @@ from torchmetrics import Metric
 
 from rai_toolbox import evaluating
 from rai_toolbox._utils import get_device
-from rai_toolbox._utils.tqdm import tqdm
 
 from ._fourier_basis import generate_fourier_bases
 
@@ -139,6 +138,8 @@ def create_heatmaps(
     row_col_coords: Optional[Iterable[Tuple[int, int]]] = None,
     factor_2pi_phase_shift: float = 0,
 ) -> Dict[str, List[HeatMapEntry]]:
+    from rai_toolbox._utils.tqdm import tqdm
+    
     _outer_total = (
         None if row_col_coords is not None else int(np.prod(image_height_width)) // 2
     )
