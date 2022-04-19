@@ -94,10 +94,82 @@ class SignedGradientOptim(GradientTransformerOptimizer):
 
 
 class L1NormedGradientOptim(_LpNormOptimizer):
+    r"""A gradient-tranforming  optimizer that normalizes the each gradient by 
+    its :math:`L^1`-norm prior to using `InnerOp.step` to update the 
+    corresponding parameter.
+
+
+    Examples
+    --------
+    Let's create an optimizer that normalizes all parameter gradients using
+    their :math:`L^1`-norm, prior to updating them via a standard
+    SGD-step with a learning rate of `1.0`.
+
+    >>> import torch as tr
+    >>> from rai_toolbox.optim import L1NormedGradientOptim
+
+    Creating a parameter for our optimizer to update, and our optimizer. We 
+    want the norm to be computed over the entire gradient tensor – without 
+    broadcasting – so we specify `param_ndim=None`.
+
+    >>> x = tr.tensor([-1.0, 1.0], requires_grad=True)
+    >>> optim = L1NormedGradientOptim([x], param_ndim=None, InnerOpt=tr.optim.SGD, lr=1.0)
+
+    Performing a simple calculation with `x` and performing backprop to create 
+    a gradient.
+
+    >>> (tr.tensor([2.0, 2.0]) * x).sum().backward()
+    >>> x.grad # the un-normed gradient
+    tensor([2., 2.])
+    
+    Performing a step with our optimizer transforms the gradient in-place, and then updates the parameter using `SGD([x], lr=1.0).step()`.
+
+    >>> optim.step()
+    >>> x.grad # the normalized gradient
+    tensor([0.5000, 0.5000])
+    >>> x  # the updated parameter
+    tensor([-1.5000,  0.5000], requires_grad=True)
+    """
     _p: Final = 1
 
 
 class L2NormedGradientOptim(_LpNormOptimizer):
+    r"""A gradient-tranforming  optimizer that normalizes the each gradient by 
+    its :math:`L^2`-norm prior to using `InnerOp.step` to update the 
+    corresponding parameter.
+
+
+    Examples
+    --------
+    Let's create an optimizer that normalizes all parameter gradients using
+    their :math:`L^2`-norm, prior to updating them via a standard
+    SGD-step with a learning rate of `1.0`.
+
+    >>> import torch as tr
+    >>> from rai_toolbox.optim import L2NormedGradientOptim
+
+    Creating a parameter for our optimizer to update, and our optimizer. We 
+    want the norm to be computed over the entire gradient tensor – without 
+    broadcasting – so we specify `param_ndim=None`.
+
+    >>> x = tr.tensor([-1.0, 1.0], requires_grad=True)
+    >>> optim = L2NormedGradientOptim([x], param_ndim=None, InnerOpt=tr.optim.SGD, lr=1.0)
+
+    Performing a simple calculation with `x` and performing backprop to create 
+    a gradient.
+
+    >>> (tr.tensor([2.0, 2.0]) * x).sum().backward()
+    >>> x.grad # the un-normed gradient
+    tensor([[2., 2.]])
+    
+    Performing a step with our optimizer transforms the gradient in-place, and then updates the parameter using `SGD([x], lr=1.0).step()`.
+
+    >>> optim.step()
+    >>> x.grad # the normalized gradient
+    tensor([0.7071, 0.7071])
+    >>> x  # the updated parameter
+    tensor([-1.7071,  0.2929], requires_grad=True) 
+    """
     _p: Final = 2
 
 
