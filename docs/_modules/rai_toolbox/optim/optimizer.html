@@ -295,7 +295,7 @@
 
 
 <div class="viewcode-block" id="GradientTransformerOptimizer"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.GradientTransformerOptimizer.html#rai_toolbox.optim.GradientTransformerOptimizer">[docs]</a><span class="k">class</span> <span class="nc">GradientTransformerOptimizer</span><span class="p">(</span><span class="n">Optimizer</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;An optimizer that performs an in-place transformation to the</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;An optimizer that performs an in-place transformation to the</span>
 <span class="sd">    gradient of each parameter, before performing the gradient-based</span>
 <span class="sd">    update on each parameter::</span>
 
@@ -383,7 +383,7 @@
 <span class="sd">    ...     loss = (x * x).sum()</span>
 <span class="sd">    ...     loss.backward()</span>
 <span class="sd">    ...     optim.step()</span>
-<span class="sd">    ...     print(f&quot;param_ndim: {param_ndim}, normed grad:\n{x.grad}\n..&quot;)</span>
+<span class="sd">    ...     print(&quot;param_ndim: {param_ndim}, normed grad:\n{x.grad}\n..&quot;)</span>
 <span class="sd">    ...     optim.zero_grad()</span>
 <span class="sd">    param_ndim: 0, normed grad:</span>
 <span class="sd">    tensor([[1., 1.],</span>

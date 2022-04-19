@@ -33,6 +33,7 @@
     <script src="../_static/doctools.js"></script>
     <script src="../_static/clipboard.min.js"></script>
     <script src="../_static/copybutton.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="rai_toolbox.optim.ProjectionMixin" href="rai_toolbox.optim.ProjectionMixin.html" />
@@ -319,14 +320,12 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="rai_toolbox.optim.GradientTransformerOptimizer">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rai_toolbox.optim.</span></span><span class="sig-name descname"><span class="pre">GradientTransformerOptimizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">InnerOpt=&lt;class</span> <span class="pre">'torch.optim.sgd.SGD'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_ndim=-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defaults=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**inner_opt_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/optim/optimizer.html#GradientTransformerOptimizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.optim.GradientTransformerOptimizer" title="Permalink to this definition">#</a></dt>
-<dd><dl>
-<dt>An optimizer that performs an in-place transformation to the</dt><dd><p>gradient of each parameter, before performing the gradient-based
+<dd><p>An optimizer that performs an in-place transformation to the
+gradient of each parameter, before performing the gradient-based
 update on each parameter:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">param</span> <span class="o">=</span> <span class="n">step</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="n">transformation_</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">grad</span><span class="p">),</span> <span class="o">...</span><span class="p">)</span>
 </pre></div>
 </div>
-</dd>
-</dl>
 <p class="rubric">Notes</p>
 <p><a class="reference internal" href="#rai_toolbox.optim.GradientTransformerOptimizer" title="rai_toolbox.optim.GradientTransformerOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GradientTransformerOptimizer</span></code></a> is designed to be combined with other,
 standard gradient-based optimizers (e.g. Adam) via encapsulation, rather
@@ -336,29 +335,87 @@ will apply a in-place gradient transform on a parameter, before using <code clas
 <p>If a closure is supplied to the <code class="xref py py-obj docutils literal notranslate"><span class="pre">step(...)</span></code> method, then the in-place
 gradient transformation is applied after the closure call and prior to
 the parameter steps.</p>
-<p>{x.grad}
-..”)</p>
-<blockquote>
-<div><p>…     optim.zero_grad()
-param_ndim: 0, normed grad:
-tensor([[1., 1.],</p>
-<blockquote>
-<div><p>[1., 1.]])</p>
-</div></blockquote>
-<p>param_ndim: 1, normed grad:
-tensor([[0.5000, 1.0000],</p>
-<blockquote>
-<div><p>[1.0000, 0.5000]])</p>
-</div></blockquote>
-<p>param_ndim: 2, normed grad:
-tensor([[0.0500, 0.1000],</p>
-<blockquote>
-<div><p>[1.0000, 0.5000]])</p>
-</div></blockquote>
+<p class="rubric">Examples</p>
+<p>Let’s create a gradient-transforming optimizer that replaces the gradient
+of each parameter with the sign of the gradient (<span class="math notranslate nohighlight">\(\pm 1\)</span>) prior to
+performing the step of the inner optimizer:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">torch</span> <span class="k">as</span> <span class="nn">tr</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">rai_toolbox.optim</span> <span class="kn">import</span> <span class="n">GradientTransformerOptimizer</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">SignedGradientOptim</span><span class="p">(</span><span class="n">GradientTransformerOptimizer</span><span class="p">):</span>
+<span class="gp">...</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">_inplace_grad_transform_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">:</span> <span class="n">tr</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="o">**</span><span class="n">_kwds</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="gp">... </span>        <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">grad</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<span class="gp">... </span>            <span class="k">return</span>
+<span class="gp">... </span>        <span class="n">tr</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">grad</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">param</span><span class="o">.</span><span class="n">grad</span><span class="p">)</span>  <span class="c1"># operates in-place</span>
+</pre></div>
+</div>
+<p>Now we’ll use this optimizer – along with AdamW – to transform the gradient of each
+parameter prior to using AdamW to perform the actual gradient-based update that
+parameter.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="o">-</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">],</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">optim</span> <span class="o">=</span> <span class="n">SignedGradientOptim</span><span class="p">([</span><span class="n">x</span><span class="p">],</span> <span class="n">InnerOpt</span><span class="o">=</span><span class="n">tr</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">AdamW</span><span class="p">,</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">loss</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10_000</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">optim</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span>
+<span class="go">tensor([-10.9000,   8.9000], requires_grad=True)</span>
+</pre></div>
+</div>
+<p>To understand the role of <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim</span></code>, let’s design an optimizer that normalizes a
+gradient by its max value – along some user-specified dimension – prior to
+performing the gradient-based update to its parameter.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">MaxNormedGradientOptim</span><span class="p">(</span><span class="n">GradientTransformerOptimizer</span><span class="p">):</span>
+<span class="gp">...</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">_inplace_grad_transform_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">:</span> <span class="n">tr</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="o">**</span><span class="n">_kwds</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="gp">... </span>        <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">grad</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<span class="gp">... </span>            <span class="k">return</span>
+<span class="gp">...</span>
+<span class="gp">... </span>        <span class="n">g</span> <span class="o">=</span> <span class="n">param</span><span class="o">.</span><span class="n">grad</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># (N, d1, ..., dm) -&gt; (N, d1 * ... * dm)</span>
+<span class="gp">... </span>        <span class="n">max_norms</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
+<span class="gp">... </span>        <span class="n">max_norms</span> <span class="o">=</span> <span class="n">max_norms</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">*</span><span class="p">([</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">ndim</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)))</span>  <span class="c1"># reshape to have dimenionality-m</span>
+<span class="gp">... </span>        <span class="n">param</span><span class="o">.</span><span class="n">grad</span> <span class="o">/=</span> <span class="n">tr</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="n">max_norms</span><span class="p">,</span> <span class="mf">1e-20</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>  <span class="c1"># clamp to prevent div by 0</span>
+</pre></div>
+</div>
+<p>Note that we design <code class="xref py py-obj docutils literal notranslate"><span class="pre">_inplace_grad_transform_</span></code> to operate in-place on the gradient
+and that treat the gradient as if it has a shape <code class="xref py py-obj docutils literal notranslate"><span class="pre">(N,</span> <span class="pre">d1,</span> <span class="pre">...,</span> <span class="pre">dm)</span></code>, where we
+want to compute the max over each of the N sub-tensors of shape-(d1, …, dm).</p>
+<p>Now we will create a shape-(2, 2) parameter and see how <code class="xref py py-obj docutils literal notranslate"><span class="pre">MaxNormedGradientOptim</span></code>
+can be instructed to compute the max-norm over various dimensions of the parameter.
+Let’s print out the transformed gradient when we use each of <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim=</span></code> 0, 1, or
+2.</p>
+<p>Here, we are interested in seeing how the parameter’s gradient is being transformed,
+so we will use a learning rate of 0.0 so that the parameter itself is not modified
+during this example.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">],</span>
+<span class="gp">... </span>               <span class="p">[</span><span class="mf">20.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">]],</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">param_ndim</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]:</span>
+<span class="gp">... </span>    <span class="n">optim</span> <span class="o">=</span> <span class="n">MaxNormedGradientOptim</span><span class="p">([</span><span class="n">x</span><span class="p">],</span> <span class="n">param_ndim</span><span class="o">=</span><span class="n">param_ndim</span><span class="p">,</span> <span class="n">InnerOpt</span><span class="o">=</span><span class="n">tr</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">,</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">... </span>    <span class="n">loss</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="n">optim</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;param_ndim: </span><span class="si">{param_ndim}</span><span class="s2">, normed grad:</span><span class="se">\n</span><span class="si">{x.grad}</span><span class="se">\n</span><span class="s2">..&quot;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">optim</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+<span class="go">param_ndim: 0, normed grad:</span>
+<span class="go">tensor([[1., 1.],</span>
+<span class="go">        [1., 1.]])</span>
+<span class="go">..</span>
+<span class="go">param_ndim: 1, normed grad:</span>
+<span class="go">tensor([[0.5000, 1.0000],</span>
+<span class="go">        [1.0000, 0.5000]])</span>
+<span class="go">..</span>
+<span class="go">param_ndim: 2, normed grad:</span>
+<span class="go">tensor([[0.0500, 0.1000],</span>
+<span class="go">        [1.0000, 0.5000]])</span>
+</pre></div>
+</div>
 <p>See that <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim=0</span></code> applies the max-norm elementwise, whereas <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim=1</span></code>
 applied the max-norm to each 1D row of the gradient, and <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim=2</span></code> applies
 the max-norm over the entire 2D gradient.</p>
-</div></blockquote>
 <p class="rubric">Methods</p>
 <table class="autosummary longtable table autosummary">
 <colgroup>
