@@ -4,8 +4,8 @@
 
 import torch
 from pytorch_lightning import LightningModule
-from torch.utils.data import DataLoader, Dataset
 from torch.nn import functional as fnn
+from torch.utils.data import DataLoader, Dataset
 
 
 class RandomDataset(Dataset):
@@ -31,11 +31,6 @@ class TestLightningModule(LightningModule):
     def loss(self, batch, prediction):
         # An arbitrary loss to have a loss that updates the model weights during `Trainer.fit` calls
         return fnn.mse_loss(prediction, torch.ones_like(prediction))
-
-    def step(self, x):
-        x = self(x)
-        out = fnn.mse_loss(x, torch.ones_like(x))
-        return out
 
     def training_step(self, batch, batch_idx):
         output = self(batch)
@@ -85,7 +80,4 @@ class TestLightningModule(LightningModule):
         return DataLoader(RandomDataset(32, 64))
 
     def test_dataloader(self):
-        return DataLoader(RandomDataset(32, 64))
-
-    def predict_dataloader(self):
         return DataLoader(RandomDataset(32, 64))

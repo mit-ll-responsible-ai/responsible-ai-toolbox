@@ -21,7 +21,7 @@ from rai_toolbox.mushin.testing.lightning import TestLightningModule
 def task_fn(cfg: Any):
     trainer: Trainer = instantiate(cfg.trainer)
     module = instantiate(cfg.module)
-    if "pl_testing" in cfg and cfg.pl_testing:
+    if "run_test" in cfg and cfg.run_test:
         trainer.test(module)
     else:
         trainer.fit(module)
@@ -52,7 +52,7 @@ def test_ddp_with_hydra_raises():
 @pytest.mark.parametrize("testing", [True, False])
 def test_ddp_with_hydra_runjob(subdir, num_jobs, testing):
 
-    overrides = [f"+pl_testing={testing}"]
+    overrides = [f"+run_test={testing}"]
 
     if subdir is not None:
         overrides += [f"hydra.output_subdir={subdir}"]
