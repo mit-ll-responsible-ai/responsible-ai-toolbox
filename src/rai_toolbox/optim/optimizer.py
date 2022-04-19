@@ -34,7 +34,7 @@ class DatumParamGroup(ParamGroup):
 
 
 def _shares_memory(x: Tensor, y: Tensor) -> bool:
-    return x.storage().data_ptr() == y.storage().data_ptr()  # type: ignore
+    return x.storage().data_ptr() == y.storage().data_ptr()
 
 
 def _reshape_to_batch(x: Tensor, param_ndim: Optional[int]) -> Tensor:
