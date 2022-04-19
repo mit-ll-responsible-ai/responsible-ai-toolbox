@@ -5,6 +5,7 @@
 import torch
 from pytorch_lightning import LightningModule
 from torch.utils.data import DataLoader, Dataset
+from torch.nn import functional as fnn
 
 
 class RandomDataset(Dataset):
@@ -29,11 +30,11 @@ class TestLightningModule(LightningModule):
 
     def loss(self, batch, prediction):
         # An arbitrary loss to have a loss that updates the model weights during `Trainer.fit` calls
-        return torch.nn.functional.mse_loss(prediction, torch.ones_like(prediction))
+        return fnn.mse_loss(prediction, torch.ones_like(prediction))
 
     def step(self, x):
         x = self(x)
-        out = torch.nn.functional.mse_loss(x, torch.ones_like(x))
+        out = fnn.mse_loss(x, torch.ones_like(x))
         return out
 
     def training_step(self, batch, batch_idx):
@@ -47,7 +48,7 @@ class TestLightningModule(LightningModule):
     def training_step_end(self, training_step_outputs):
         return training_step_outputs
 
-    def training_epoch_end(self, outputs) -> None:
+    def training_epoch_end(self, outputs: dict) -> None:
         torch.stack([x["loss"] for x in outputs]).mean()
 
     def validation_step(self, batch, batch_idx):
@@ -58,7 +59,7 @@ class TestLightningModule(LightningModule):
         self.log("Val Number Metric", 1.0)
         return {"x": loss}
 
-    def validation_epoch_end(self, outputs) -> None:
+    def validation_epoch_end(self, outputs: dict) -> None:
         torch.stack([x["x"] for x in outputs]).mean()
 
     def test_step(self, batch, batch_idx):
@@ -69,7 +70,7 @@ class TestLightningModule(LightningModule):
         self.log("Number Metric", 1.0)
         return {"y": loss}
 
-    def test_epoch_end(self, outputs) -> None:
+    def test_epoch_end(self, outputs: dict) -> None:
         torch.stack([x["y"] for x in outputs]).mean()
 
     def configure_optimizers(self):

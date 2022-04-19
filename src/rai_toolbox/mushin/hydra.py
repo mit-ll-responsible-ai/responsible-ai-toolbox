@@ -29,9 +29,7 @@ from hydra.types import HydraContext, RunMode
 from hydra_zen import instantiate
 from hydra_zen.typing._implementations import DataClass_
 from omegaconf import OmegaConf
-from typing_extensions import Literal, ParamSpec
-
-P = ParamSpec("P")
+from typing_extensions import Literal
 
 
 def is_config(cfg: Any) -> bool:
@@ -134,7 +132,7 @@ T1 = TypeVar("T1")
 #       - zen should interface with a singelton that "recognizes"
 #         the configs that it interacts with
 class zen(Generic[T1]):
-    def __init__(self, func: Callable[P, T1]) -> None:
+    def __init__(self, func: Callable[..., T1]) -> None:
         self.func = func
         self.parameters = signature(self.func).parameters
 
