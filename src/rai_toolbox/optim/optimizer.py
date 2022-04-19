@@ -5,7 +5,8 @@
 from abc import ABCMeta, abstractmethod
 from typing import (
     Any,
-    Callable, Dict,
+    Callable,
+    Dict,
     Iterable,
     List,
     Mapping,
@@ -15,7 +16,6 @@ from typing import (
     cast,
     overload,
 )
-
 
 import torch
 from torch import Tensor
@@ -249,7 +249,7 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
         params: OptimParams,
         InnerOpt: Union[Partial[Opt], OptimizerType] = SGD,
         *,
-        param_ndim: Optional[int] = -1,
+        param_ndim: Union[int, None] = -1,
         defaults: Optional[Dict[str, Any]] = None,
         **inner_opt_kwargs,
     ) -> None:
@@ -263,7 +263,7 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
             The optimizer that updates the parameters after their gradients have
             been transformed.
 
-        param_ndim : int | NoneType, optional (default=-1)
+        param_ndim : int | None, optional (default=-1)
             Controls how `_inplace_grad_transform_` is broadcast onto the gradient
             of a given parameter. This can be specified per param-group. By default,
             the gradient transformation broadcasts over the first dimension in a
@@ -288,8 +288,8 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
         gradient (of which there are `d0 * d1`).
 
         If a gradient has a shape `(d0, d1, d2, d3)`, and if `param_ndim=-1`,
-        then the transformation will broadcast over each shape-`(d1, d2, d3)` 
-        sub-tensor in the gradient (of which there are d0). This is equivalent 
+        then the transformation will broadcast over each shape-`(d1, d2, d3)`
+        sub-tensor in the gradient (of which there are d0). This is equivalent
         to `param_ndim=3`.
 
         If `param_ndim=0` then the transformation is applied elementwise to the
