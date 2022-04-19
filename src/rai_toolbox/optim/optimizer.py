@@ -37,7 +37,9 @@ def _shares_memory(x: Tensor, y: Tensor) -> bool:
     return x.storage().data_ptr() == y.storage().data_ptr()  # type: ignore
 
 
-def _reshape(x: Tensor, param_ndim: Optional[int]) -> Tensor:
+def _reshape_to_batch(x: Tensor, param_ndim: Optional[int]) -> Tensor:
+    """Reshapes to a shape-`(N, d1, ..., dm)`, where `(d1, ..., dm)` has `param_ndim`
+    dimensions. Dimensions will be added or consolidated to achieve this."""
     if param_ndim is None:
         param_ndim = x.ndim
 
@@ -119,10 +121,10 @@ def _to_batch(p: Tensor, param_ndim: Optional[int]) -> Tensor:
     """
 
     # atleast_2d needed for case where p was scalar
-    vp = _reshape(p, param_ndim=param_ndim)
+    vp = _reshape_to_batch(p, param_ndim=param_ndim)
 
     if p.grad is not None:
-        vp.grad = _reshape(p.grad, param_ndim=param_ndim)
+        vp.grad = _reshape_to_batch(p.grad, param_ndim=param_ndim)
 
     # vp (vp.grad) must be a view of p (p.grad). There is
     # not a simple way to assert this.
