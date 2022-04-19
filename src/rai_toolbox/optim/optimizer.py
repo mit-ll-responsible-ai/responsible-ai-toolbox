@@ -5,7 +5,7 @@
 from abc import ABCMeta, abstractmethod
 from typing import (
     Any,
-    Callable,
+    Callable, Dict,
     Iterable,
     List,
     Mapping,
@@ -250,7 +250,7 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
         InnerOpt: Union[Partial[Opt], OptimizerType] = SGD,
         *,
         param_ndim: Optional[int] = -1,
-        defaults: Optional[dict] = None,
+        defaults: Optional[Dict[str, Any]] = None,
         **inner_opt_kwargs,
     ) -> None:
         """
@@ -273,20 +273,24 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
             - A negative number indicates the 'offset' from the dimensionality of the gradient (see "Notes" for examples).
             - `None` means that the transformation will be applied directly to the gradient without any broadcasting.
 
-        defaults: Optional[dict]
+        defaults: Optional[Dict[str, Any]]
             Specifies default parameters for all parameter groups.
+
+        **inner_opt_kwargs : Any
+            Named arguments used to initialize `InnerOpt`.
 
         Notes
         -----
         Additional Explanation of `param_ndim`:
 
-        If the gradient has a shape (d0, d1, d2) and `param_ndim=1` then the
+        If the gradient has a shape `(d0, d1, d2)` and `param_ndim=1` then the
         transformation will be broadcast over each shape-(d2,) sub-tensor in the
-        gradient (of which there are d0 * d1).
+        gradient (of which there are `d0 * d1`).
 
-        If a gradient has a shape (d0, d1, d2, d3), and if `param_ndim=-1`,
-        then the transformation will broadcast over each shape-(d1, d2, d3) sub-tensor
-        in the gradient (of which there are d0). This is equivalent to `param_ndim=3`.
+        If a gradient has a shape `(d0, d1, d2, d3)`, and if `param_ndim=-1`,
+        then the transformation will broadcast over each shape-`(d1, d2, d3)` 
+        sub-tensor in the gradient (of which there are d0). This is equivalent 
+        to `param_ndim=3`.
 
         If `param_ndim=0` then the transformation is applied elementwise to the
         gradient by temporarily reshaping the gradient to a shape-(T, 1) tensor.
