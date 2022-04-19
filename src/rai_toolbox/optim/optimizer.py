@@ -16,6 +16,7 @@ from typing import (
     overload,
 )
 
+
 import torch
 from torch import Tensor
 from torch.optim import SGD, Optimizer
@@ -32,19 +33,40 @@ class DatumParamGroup(ParamGroup):
     param_ndim: Optional[int]
 
 
-def _identity(x: _T) -> _T:
-    return x
-
-
-def _atleast_2d(x: Tensor) -> Tensor:
-    if x.ndim < 2:
-        # (N,) -> (N, 1)
-        return x.view(*x.shape, *(1,) * (2 - x.ndim))
-    return x
-
-
 def _shares_memory(x: Tensor, y: Tensor) -> bool:
     return x.storage().data_ptr() == y.storage().data_ptr()  # type: ignore
+
+
+def _reshape(x: Tensor, param_ndim: Optional[int]) -> Tensor:
+    if param_ndim is None:
+        param_ndim = x.ndim
+
+    if param_ndim < 0:
+        param_ndim += x.ndim
+
+    # `1 + param_ndim` is the required dimensionality
+    # for a shape-(N, d0, d1, ...) tensor, where (d0, d1, ...)
+    # is the shape of the param_ndim-dimension tensor.
+    #
+    # We compute `ndim_delta` to determine if we need to add
+    # or consolidate dimensions to create the shape-(N, d0, d1, ...)
+    # tensor.
+    ndim_delta = (1 + param_ndim) - x.ndim
+
+    if ndim_delta > 0:
+        # E.g.:
+        #   p.shape: (d0, )
+        #   desired shape: (N=1, d0)
+        x = x[ndim_delta * (None,)]
+    elif ndim_delta < 0:
+        # E.g.:
+        #   p.shape: (d0, d1, d2, d3)
+        #   desired shape: (N=d0*d1, d2, d3)
+        x = x.view(-1, *x.shape[x.ndim - param_ndim :])
+    if x.ndim < 2:  # make at least 2D
+        # (N,) -> (N, 1)
+        x = x.view(*x.shape, *(1,) * (2 - x.ndim))
+    return x
 
 
 def _to_batch(p: Tensor, param_ndim: Optional[int]) -> Tensor:
@@ -95,46 +117,12 @@ def _to_batch(p: Tensor, param_ndim: Optional[int]) -> Tensor:
     >>> _to_batch(x, -3).shape
     torch.Size([30, 1])
     """
-    if param_ndim is None:
-        param_ndim = p.ndim
-
-    assert p.ndim >= abs(param_ndim)
-
-    if param_ndim < 0:
-        param_ndim += p.ndim
-
-    # `1 + param_ndim` is the required dimensionality
-    # for a shape-(N, d0, d1, ...) tensor, where (d0, d1, ...)
-    # is the shape of the param_ndim-dimension tensor.
-    #
-    # We compute `ndim_delta` to determine if we need to add
-    # or consolidate dimensions to create the shape-(N, d0, d1, ...)
-    # tensor.
-    ndim_delta = (1 + param_ndim) - p.ndim
-
-    reshape = _identity  # type: ignore
-
-    if ndim_delta > 0:
-        # E.g.:
-        #   p.shape: (d0, )
-        #   desired shape: (N=1, d0)
-        def reshape(x):
-            return x[ndim_delta * (None,)]
-
-    elif ndim_delta < 0:
-        # E.g.:
-        #   p.shape: (d0, d1, d2, d3)
-        #   desired shape: (N=d0*d1, d2, d3)
-        param_shape = p.shape[p.ndim - param_ndim :]
-
-        def reshape(x):
-            return x.view(-1, *param_shape)
 
     # atleast_2d needed for case where p was scalar
-    vp = _atleast_2d(reshape(p))
+    vp = _reshape(p, param_ndim=param_ndim)
 
     if p.grad is not None:
-        vp.grad = _atleast_2d(reshape(p.grad))
+        vp.grad = _reshape(p.grad, param_ndim=param_ndim)
 
     # vp (vp.grad) must be a view of p (p.grad). There is
     # not a simple way to assert this.
