@@ -223,16 +223,16 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
     ...     loss = (x * x).sum()
     ...     loss.backward()
     ...     optim.step()
-    ...     print(f"param_ndim: {param_ndim}, normed grad:\n{x.grad}\n--")
+    ...     print(f"param_ndim: {param_ndim}, normed grad:\n{x.grad}\n..")
     ...     optim.zero_grad()
     param_ndim: 0, normed grad:
     tensor([[1., 1.],
             [1., 1.]])
-    --
+    ..
     param_ndim: 1, normed grad:
     tensor([[0.5000, 1.0000],
             [1.0000, 0.5000]])
-    --
+    ..
     param_ndim: 2, normed grad:
     tensor([[0.0500, 0.1000],
             [1.0000, 0.5000]])
