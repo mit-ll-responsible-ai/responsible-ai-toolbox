@@ -319,17 +319,48 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="rai_toolbox.optim.GradientTransformerOptimizer">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rai_toolbox.optim.</span></span><span class="sig-name descname"><span class="pre">GradientTransformerOptimizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">InnerOpt=&lt;class</span> <span class="pre">'torch.optim.sgd.SGD'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_ndim=-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defaults=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**inner_opt_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/optim/optimizer.html#GradientTransformerOptimizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.optim.GradientTransformerOptimizer" title="Permalink to this definition">#</a></dt>
-<dd><p>An optimizer that performs an in-place transformation to the
-gradient of each parameter, before performing the gradient-based
+<dd><dl>
+<dt>An optimizer that performs an in-place transformation to the</dt><dd><p>gradient of each parameter, before performing the gradient-based
 update on each parameter:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">param</span> <span class="o">=</span> <span class="n">step</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="n">transformation</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">grad</span><span class="p">),</span> <span class="o">...</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">param</span> <span class="o">=</span> <span class="n">step</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="n">transformation_</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">grad</span><span class="p">),</span> <span class="o">...</span><span class="p">)</span>
 </pre></div>
 </div>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p><a class="reference internal" href="#rai_toolbox.optim.GradientTransformerOptimizer" title="rai_toolbox.optim.GradientTransformerOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GradientTransformerOptimizer</span></code></a> is designed to be combined with other,
 standard gradient-based optimizers (e.g. Adam) via encapsulation, rather
 then through inheritance. I.e., <code class="xref py py-obj docutils literal notranslate"><span class="pre">GradientTransformerOptimizer(InnerOpt=&lt;...&gt;)</span></code>
-Permits a standard optimizer to include an additional gradient-transformation</p>
+will apply a in-place gradient transform on a parameter, before using <code class="xref py py-obj docutils literal notranslate"><span class="pre">InnerOpt.</span>
+<span class="pre">step</span></code> to update said parameter.</p>
+<p>If a closure is supplied to the <code class="xref py py-obj docutils literal notranslate"><span class="pre">step(...)</span></code> method, then the in-place
+gradient transformation is applied after the closure call and prior to
+the parameter steps.</p>
+<p>{x.grad}
+–“)</p>
+<blockquote>
+<div><p>…     optim.zero_grad()
+param_ndim: 0, normed grad:
+tensor([[1., 1.],</p>
+<blockquote>
+<div><p>[1., 1.]])</p>
+</div></blockquote>
+<p>–
+param_ndim: 1, normed grad:
+tensor([[0.5000, 1.0000],</p>
+<blockquote>
+<div><p>[1.0000, 0.5000]])</p>
+</div></blockquote>
+<p>–
+param_ndim: 2, normed grad:
+tensor([[0.0500, 0.1000],</p>
+<blockquote>
+<div><p>[1.0000, 0.5000]])</p>
+</div></blockquote>
+<p>See that <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim=0</span></code> applies the max-norm elementwise, whereas <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim=1</span></code>
+applied the max-norm to each 1D row of the gradient, and <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim=2</span></code> applies
+the max-norm over the entire 2D gradient.</p>
+</div></blockquote>
 <p class="rubric">Methods</p>
 <table class="autosummary longtable table autosummary">
 <colgroup>
@@ -345,24 +376,23 @@ Permits a standard optimizer to include an additional gradient-transformation</p
 <dl class="py method">
 <dt class="sig sig-object py" id="rai_toolbox.optim.GradientTransformerOptimizer.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">InnerOpt=&lt;class</span> <span class="pre">'torch.optim.sgd.SGD'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_ndim=-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defaults=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**inner_opt_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/optim/optimizer.html#GradientTransformerOptimizer.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.optim.GradientTransformerOptimizer.__init__" title="Permalink to this definition">#</a></dt>
-<dd><dl class="field-list">
+<dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl>
+<dd class="field-odd"><dl class="simple">
 <dt><strong>params: Iterable</strong></dt><dd><p>iterable of parameters to optimize or dicts defining parameter groups</p>
 </dd>
-<dt><strong>InnerOpt: Type[Optimizer] | Partial[Optimizer], optional (default=SGD)</strong></dt><dd><p>The optimizer to update parameters</p>
+<dt><strong>InnerOpt: Type[Optimizer] | Partial[Optimizer], optional (default=`torch.nn.optim.SGD`)</strong></dt><dd><p>The optimizer that updates the parameters after their gradients have
+been transformed.</p>
 </dd>
-<dt><strong>param_ndim</strong><span class="classifier">Optional[int] = -1</span></dt><dd><p>Controls how <code class="xref py py-obj docutils literal notranslate"><span class="pre">_inplace_grad_transform_</span></code> is broadcast onto the gradient
+<dt><strong>param_ndim</strong><span class="classifier">int | NoneType, optional (default=-1)</span></dt><dd><p>Controls how <code class="xref py py-obj docutils literal notranslate"><span class="pre">_inplace_grad_transform_</span></code> is broadcast onto the gradient
 of a given parameter. This can be specified per param-group. By default,
 the gradient transformation broadcasts over the first dimension in a
 batch-like style.</p>
-<blockquote>
-<div><ul class="simple">
+<ul class="simple">
 <li><p>A positive number determines the dimensionality of the gradient that the transformation will act on.</p></li>
-<li><p>A negative number indicates the ‘offset’ from the dimensionality of the gradient.</p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> means that the transformation will be applied to the gradient without any broadcasting.</p></li>
+<li><p>A negative number indicates the ‘offset’ from the dimensionality of the gradient (see “Notes” for examples).</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> means that the transformation will be applied directly to the gradient without any broadcasting.</p></li>
 </ul>
-</div></blockquote>
 </dd>
 <dt><strong>defaults: Optional[dict]</strong></dt><dd><p>Specifies default parameters for all parameter groups.</p>
 </dd>
@@ -374,9 +404,11 @@ batch-like style.</p>
 <p>If the gradient has a shape (d0, d1, d2) and <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim=1</span></code> then the
 transformation will be broadcast over each shape-(d2,) sub-tensor in the
 gradient (of which there are d0 * d1).</p>
-<p>E.g. if a gradient has a shape (d0, d1, d2, d3), and if <code class="xref py py-obj docutils literal notranslate"><span class="pre">delta_ndim=-1</span></code>,
+<p>If a gradient has a shape (d0, d1, d2, d3), and if <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim=-1</span></code>,
 then the transformation will broadcast over each shape-(d1, d2, d3) sub-tensor
-in the gradient (of which there are d0).</p>
+in the gradient (of which there are d0). This is equivalent to <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim=3</span></code>.</p>
+<p>If <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim=0</span></code> then the transformation is applied elementwise to the
+gradient by temporarily reshaping the gradient to a shape-(T, 1) tensor.</p>
 </dd></dl>
 
 <p class="rubric">Methods</p>

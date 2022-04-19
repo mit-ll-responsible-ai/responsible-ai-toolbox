@@ -301,13 +301,12 @@
         <span class="n">params</span><span class="p">:</span> <span class="n">OptimParams</span><span class="p">,</span>
         <span class="n">InnerOpt</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Partial</span><span class="p">[</span><span class="n">Opt</span><span class="p">],</span> <span class="n">OptimizerType</span><span class="p">]</span> <span class="o">=</span> <span class="n">SGD</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">param_ndim</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">param_ndim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">epsilon</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="o">**</span><span class="n">inner_opt_kwargs</span><span class="p">,</span>
     <span class="p">):</span>
 
         <span class="k">assert</span> <span class="n">epsilon</span> <span class="o">&gt;=</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">div_by_zero_epsilon</span> <span class="o">=</span> <span class="n">epsilon</span>
         <span class="n">defaults</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">epsilon</span><span class="o">=</span><span class="n">epsilon</span><span class="p">)</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>

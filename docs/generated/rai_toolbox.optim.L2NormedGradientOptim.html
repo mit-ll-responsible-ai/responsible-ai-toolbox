@@ -322,24 +322,23 @@
 <dd><dl class="py method">
 <dt class="sig sig-object py" id="rai_toolbox.optim.L2NormedGradientOptim.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">InnerOpt=&lt;class</span> <span class="pre">'torch.optim.sgd.SGD'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_ndim=-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">div_by_zero_eps=1.1754943508222875e-38</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rai_toolbox.optim.L2NormedGradientOptim.__init__" title="Permalink to this definition">#</a></dt>
-<dd><dl class="field-list">
+<dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl>
+<dd class="field-odd"><dl class="simple">
 <dt><strong>params: Iterable</strong></dt><dd><p>iterable of parameters to optimize or dicts defining parameter groups</p>
 </dd>
-<dt><strong>InnerOpt: Type[Optimizer] | Partial[Optimizer], optional (default=SGD)</strong></dt><dd><p>The optimizer to update parameters</p>
+<dt><strong>InnerOpt: Type[Optimizer] | Partial[Optimizer], optional (default=`torch.nn.optim.SGD`)</strong></dt><dd><p>The optimizer that updates the parameters after their gradients have
+been transformed.</p>
 </dd>
-<dt><strong>param_ndim</strong><span class="classifier">Optional[int] = -1</span></dt><dd><p>Controls how <code class="xref py py-obj docutils literal notranslate"><span class="pre">_inplace_grad_transform_</span></code> is broadcast onto the gradient
+<dt><strong>param_ndim</strong><span class="classifier">int | NoneType, optional (default=-1)</span></dt><dd><p>Controls how <code class="xref py py-obj docutils literal notranslate"><span class="pre">_inplace_grad_transform_</span></code> is broadcast onto the gradient
 of a given parameter. This can be specified per param-group. By default,
 the gradient transformation broadcasts over the first dimension in a
 batch-like style.</p>
-<blockquote>
-<div><ul class="simple">
+<ul class="simple">
 <li><p>A positive number determines the dimensionality of the gradient that the transformation will act on.</p></li>
-<li><p>A negative number indicates the ‘offset’ from the dimensionality of the gradient.</p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> means that the transformation will be applied to the gradient without any broadcasting.</p></li>
+<li><p>A negative number indicates the ‘offset’ from the dimensionality of the gradient (see “Notes” for examples).</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> means that the transformation will be applied directly to the gradient without any broadcasting.</p></li>
 </ul>
-</div></blockquote>
 </dd>
 <dt><strong>defaults: Optional[dict]</strong></dt><dd><p>Specifies default parameters for all parameter groups.</p>
 </dd>
@@ -351,9 +350,11 @@ batch-like style.</p>
 <p>If the gradient has a shape (d0, d1, d2) and <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim=1</span></code> then the
 transformation will be broadcast over each shape-(d2,) sub-tensor in the
 gradient (of which there are d0 * d1).</p>
-<p>E.g. if a gradient has a shape (d0, d1, d2, d3), and if <code class="xref py py-obj docutils literal notranslate"><span class="pre">delta_ndim=-1</span></code>,
+<p>If a gradient has a shape (d0, d1, d2, d3), and if <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim=-1</span></code>,
 then the transformation will broadcast over each shape-(d1, d2, d3) sub-tensor
-in the gradient (of which there are d0).</p>
+in the gradient (of which there are d0). This is equivalent to <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim=3</span></code>.</p>
+<p>If <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim=0</span></code> then the transformation is applied elementwise to the
+gradient by temporarily reshaping the gradient to a shape-(T, 1) tensor.</p>
 </dd></dl>
 
 <p class="rubric">Methods</p>

@@ -323,7 +323,7 @@
 <p>Calling <code class="xref py py-obj docutils literal notranslate"><span class="pre">project()</span></code> will apply the in-place projection on each parameter
 stored by the optimizer.</p>
 <p class="rubric">Notes</p>
-<p>‘param_ndim’ must be included in the optimizer’s param groups, which describes
+<p>‘param_ndim’ can be included in the optimizer’s param groups in order to describe
 how the projection should be applied to each parameter (i.e., whether or not
 it is broadcasted).</p>
 <blockquote>
@@ -333,6 +333,34 @@ it is broadcasted).</p>
 <li><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> means that the projection will be applied to the tensor without any broadcasting.</p></li>
 </ul>
 </div></blockquote>
+<p class="rubric">Examples</p>
+<p>Let’s create a SGD-based optimizer that clamps each parameter’s values so that
+they all fall within <code class="xref py py-obj docutils literal notranslate"><span class="pre">[-1,</span> <span class="pre">1]</span></code> after performing it’s gradient-based step on the parameter.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">torch</span> <span class="k">as</span> <span class="nn">tr</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">rai_toolbox.optim</span> <span class="kn">import</span> <span class="n">ProjectionMixin</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">ClampedSGD</span><span class="p">(</span><span class="n">tr</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">,</span> <span class="n">ProjectionMixin</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">_project_parameter_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">:</span> <span class="n">tr</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">optim_group</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="gp">... </span>        <span class="n">param</span><span class="o">.</span><span class="n">clamp_</span><span class="p">(</span><span class="nb">min</span><span class="o">=-</span><span class="mf">1.0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>  <span class="c1"># note: projection operates in-place</span>
+<span class="gp">...</span>
+<span class="gp">... </span>    <span class="nd">@tr</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">closure</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="n">loss</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">closure</span><span class="p">)</span>
+<span class="gp">... </span>        <span class="bp">self</span><span class="o">.</span><span class="n">project</span><span class="p">()</span>
+<span class="gp">... </span>        <span class="k">return</span> <span class="n">loss</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="o">-</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">],</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">optim</span> <span class="o">=</span> <span class="n">ClampedSGD</span><span class="p">([</span><span class="n">x</span><span class="p">],</span> <span class="n">lr</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">loss</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10_000</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">optim</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>  <span class="c1"># parameters updated via SGD.step() and then clamped</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span>
+<span class="go">tensor([-1., -1.], requires_grad=True)</span>
+</pre></div>
+</div>
+<p>Note that this is a particularly simple projection function, which acts
+elementwise on each parameter, and thus does not require us to include
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim</span></code> in the optimizer’s param-groups.</p>
 <p class="rubric">Methods</p>
 <table class="autosummary longtable table autosummary">
 <colgroup>
