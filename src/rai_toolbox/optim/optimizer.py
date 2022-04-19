@@ -415,9 +415,9 @@ class ProjectionMixin(metaclass=ABCMeta):
     how the projection should be applied to each parameter (i.e., whether or not
     it is broadcasted).
 
-        - A positive number determines the dimensionality of the tensor that the projection will act on.
-        - A negative number indicates the 'offset' from the dimensionality of the tensor.
-        - `None` means that the projection will be applied to the tensor without any broadcasting.
+    - A positive number determines the dimensionality of the tensor that the projection will act on.
+    - A negative number indicates the 'offset' from the dimensionality of the tensor.
+    - `None` means that the projection will be applied to the tensor without any broadcasting.
 
     Methods
     -------
