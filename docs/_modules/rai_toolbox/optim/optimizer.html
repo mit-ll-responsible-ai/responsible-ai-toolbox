@@ -383,16 +383,16 @@
 <span class="sd">    ...     loss = (x * x).sum()</span>
 <span class="sd">    ...     loss.backward()</span>
 <span class="sd">    ...     optim.step()</span>
-<span class="sd">    ...     print(f&quot;param_ndim: {param_ndim}, normed grad:\n{x.grad}\n--&quot;)</span>
+<span class="sd">    ...     print(f&quot;param_ndim: {param_ndim}, normed grad:\n{x.grad}\n..&quot;)</span>
 <span class="sd">    ...     optim.zero_grad()</span>
 <span class="sd">    param_ndim: 0, normed grad:</span>
 <span class="sd">    tensor([[1., 1.],</span>
 <span class="sd">            [1., 1.]])</span>
-<span class="sd">    --</span>
+<span class="sd">    ..</span>
 <span class="sd">    param_ndim: 1, normed grad:</span>
 <span class="sd">    tensor([[0.5000, 1.0000],</span>
 <span class="sd">            [1.0000, 0.5000]])</span>
-<span class="sd">    --</span>
+<span class="sd">    ..</span>
 <span class="sd">    param_ndim: 2, normed grad:</span>
 <span class="sd">    tensor([[0.0500, 0.1000],</span>
 <span class="sd">            [1.0000, 0.5000]])</span>

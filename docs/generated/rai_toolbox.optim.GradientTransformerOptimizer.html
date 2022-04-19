@@ -337,7 +337,7 @@ will apply a in-place gradient transform on a parameter, before using <code clas
 gradient transformation is applied after the closure call and prior to
 the parameter steps.</p>
 <p>{x.grad}
-–“)</p>
+..”)</p>
 <blockquote>
 <div><p>…     optim.zero_grad()
 param_ndim: 0, normed grad:
@@ -345,14 +345,12 @@ tensor([[1., 1.],</p>
 <blockquote>
 <div><p>[1., 1.]])</p>
 </div></blockquote>
-<p>–
-param_ndim: 1, normed grad:
+<p>param_ndim: 1, normed grad:
 tensor([[0.5000, 1.0000],</p>
 <blockquote>
 <div><p>[1.0000, 0.5000]])</p>
 </div></blockquote>
-<p>–
-param_ndim: 2, normed grad:
+<p>param_ndim: 2, normed grad:
 tensor([[0.0500, 0.1000],</p>
 <blockquote>
 <div><p>[1.0000, 0.5000]])</p>
