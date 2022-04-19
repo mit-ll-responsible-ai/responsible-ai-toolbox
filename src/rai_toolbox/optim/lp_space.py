@@ -141,6 +141,7 @@ class LinfProjectedOptim(SignedGradientOptim, ProjectionMixin):
         params: OptimParams,
         InnerOpt: Union[Partial[Opt], OptimizerType] = SGD,
         *,
+        param_ndim=None,
         epsilon: float,
         **inner_opt_kwargs,
     ):
@@ -152,7 +153,7 @@ class LinfProjectedOptim(SignedGradientOptim, ProjectionMixin):
             params,
             InnerOpt=InnerOpt,
             defaults=defaults,
-            param_ndim=None,
+            param_ndim=param_ndim,
             **inner_opt_kwargs,
         )
 
