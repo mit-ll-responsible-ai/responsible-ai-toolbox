@@ -125,9 +125,58 @@ class SignedGradientOptim(GradientTransformerOptimizer):
         InnerOpt: Union[Partial[Opt], OptimizerType] = SGD,
         *,
         param_ndim: Optional[int] = None,
+        defaults: Optional[Dict[str, Any]] = None,
         **inner_opt_kwargs,
     ) -> None:
-        super().__init__(params, InnerOpt, param_ndim=param_ndim, **inner_opt_kwargs)
+        """
+        Parameters
+        ----------
+        params: Iterable
+            iterable of parameters to optimize or dicts defining parameter groups
+
+        InnerOpt: Type[Optimizer] | Partial[Optimizer], optional (default=`torch.nn.optim.SGD`)
+            The optimizer that updates the parameters after their gradients have
+            been transformed.
+
+        param_ndim : Optional[int]
+            Controls how `_inplace_grad_transform_` is broadcast onto the gradient
+            of a given parameter. This can be specified per param-group. By default,
+            the gradient transformation broadcasts over the first dimension in a
+            batch-like style.
+
+            - A positive number determines the dimensionality of the gradient that the transformation will act on.
+            - A negative number indicates the 'offset' from the dimensionality of the gradient (see "Notes" for examples).
+            - `None` means that the transformation will be applied directly to the gradient without any broadcasting.
+
+        defaults: Optional[Dict[str, Any]]
+            Specifies default parameters for all parameter groups.
+
+        **inner_opt_kwargs : Any
+            Named arguments used to initialize `InnerOpt`.
+
+        Notes
+        -----
+        Additional Explanation of `param_ndim`:
+
+        If the gradient has a shape `(d0, d1, d2)` and `param_ndim=1` then the
+        transformation will be broadcast over each shape-(d2,) sub-tensor in the
+        gradient (of which there are `d0 * d1`).
+
+        If a gradient has a shape `(d0, d1, d2, d3)`, and if `param_ndim=-1`,
+        then the transformation will broadcast over each shape-`(d1, d2, d3)`
+        sub-tensor in the gradient (of which there are d0). This is equivalent
+        to `param_ndim=3`.
+
+        If `param_ndim=0` then the transformation is applied elementwise to the
+        gradient by temporarily reshaping the gradient to a shape-(T, 1) tensor.
+        """
+        super().__init__(
+            params,
+            InnerOpt,
+            param_ndim=param_ndim,
+            defaults=defaults,
+            **inner_opt_kwargs,
+        )
 
     def _inplace_grad_transform_(self, param: Tensor, **_unused_kwargs) -> None:
         if param.grad is None:  # pragma: no cover
@@ -220,7 +269,7 @@ class L2ProjectedOptim(L2NormedGradientOptim, ProjectionMixin):
         params: OptimParams,
         InnerOpt: Union[Partial[Opt], OptimizerType] = SGD,
         *,
-        param_ndim: Optional[int] = -1,
+        param_ndim: Union[int, None] = -1,
         epsilon: float,
         **inner_opt_kwargs,
     ):
