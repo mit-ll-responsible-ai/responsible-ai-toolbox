@@ -9,15 +9,15 @@ from time import sleep
 from typing import Any, Callable, TypeVar
 
 import numpy as np
-from torch import distributed
 from hydra.core.hydra_config import HydraConfig
 from pytorch_lightning import Trainer
 from pytorch_lightning.trainer.states import TrainerFn
+from torch import distributed
 
 from .._compatibility import PL_VERSION, Version
 
-
 R = TypeVar("R")
+
 
 def _setup_environment() -> None:
     if distributed.is_initialized():
@@ -39,7 +39,7 @@ def _teardown() -> None:
         os.environ.pop(name, None)
 
 
-def _subprocess_call(local_rank: int, trainer: Trainer) -> None:
+def _subprocess_call(local_rank: int, testing: bool) -> None:
     env_copy = os.environ.copy()
     env_copy["LOCAL_RANK"] = f"{local_rank}"
     # CWD is the Hydra working directory
@@ -64,13 +64,8 @@ def _subprocess_call(local_rank: int, trainer: Trainer) -> None:
     # create the command for CLI
     command += ["-cp", hydra_output, "-cn", "config.yaml"]
 
-    if PL_VERSION < Version(1, 6, 0):
-        # TODO: See about having PL 1.6 fix this behavior so we know
-        # which function is being called
-        trainer_fn = trainer.state.fn
-        command += [
-            "++pl_testing=" + ("false" if trainer_fn == TrainerFn.FITTING else "true")
-        ]
+    # Set flag to run Trainer.fit or Trainer.test in `_pl_main.py`
+    command += ["++pl_testing=" + ("false" if not testing else "true")]
 
     command += [
         f"hydra.output_subdir=.pl_hydra_{local_rank}",
@@ -112,7 +107,7 @@ if PL_VERSION >= Version(1, 6, 0):
         >>> from pytorch_lightning import Trainer
         >>> from rai_toolbox.mushin import HydraDDP
         >>> PLModule = # some LightningModule
-        
+
         >>> trainer = Trainer(PLModule, accelerator="auto", devices=2, strategy=HydraDDP())
         >>> trainer.fit(module)
         """
@@ -155,26 +150,27 @@ if PL_VERSION >= Version(1, 6, 0):
             function : Callable[[...], ReturnType]
                 A callback function to execute after all processes have been created.
                 It is up to the implementation of this function to synchronize the processes, e.g., with barriers.
-            
-            *args : Any 
+
+            *args : Any
                 Optional positional arguments to be passed to the given function.
-            
+
             trainer : pytorch_lightning.Trainer
                 Optional reference to the pytorch_lightning.Trainer`.
-            
-            **kwargs : Any 
+
+            **kwargs : Any
                 Optional keyword arguments to be passed to the given function.
-            
+
             Returns
             -------
             ReturnType
             """
             if not self.cluster_environment.creates_processes_externally:
-                self._call_children_scripts(trainer)
+                testing = function.__name__ == "_test_impl"
+                self._call_children_scripts(testing=testing)
 
             return function(*args, **kwargs)
 
-        def _call_children_scripts(self, trainer: Trainer):
+        def _call_children_scripts(self, testing: bool):
             # bookkeeping of spawned processes
             self._check_can_spawn_children()
 
@@ -188,7 +184,7 @@ if PL_VERSION >= Version(1, 6, 0):
             os.environ["WORLD_SIZE"] = f"{self.num_processes * self.num_nodes}"
 
             for local_rank in range(1, self.num_processes):
-                _subprocess_call(local_rank, trainer)
+                _subprocess_call(local_rank, testing)
 
                 # starting all processes at once can cause issues
                 # with dataloaders delay between 1-10 seconds
@@ -215,9 +211,9 @@ else:  # pragma: no cover
 
         Notes
         -----
-        In order to execute a MULTIRUN Hydra job we must make sure to destroy an 
-        distributed processes on setup of this function.  This will lead to issues if 
-        running multiple jobs in the notebook or trying to do `Trainer.fit` followed by 
+        In order to execute a MULTIRUN Hydra job we must make sure to destroy an
+        distributed processes on setup of this function.  This will lead to issues if
+        running multiple jobs in the notebook or trying to do `Trainer.fit` followed by
         `Trainer.test`.
 
         Examples
@@ -225,7 +221,7 @@ else:  # pragma: no cover
         >>> from pytorch_lightning import Trainer
         >>> from rai_toolbox.mushin import HydraDDP
         >>> PLModule = # some LightningModule
-        
+
         >>> trainer = Trainer(PLModule, accelerator="auto", devices=2, strategy=HydraDDP())
         >>> trainer.fit(module)
 
@@ -259,7 +255,8 @@ else:  # pragma: no cover
 
             self.interactive_ddp_procs = []
             for local_rank in range(1, self.num_processes):
-                _subprocess_call(local_rank, self.lightning_module.trainer)
+                testing = self.lightning_module.trainer.state.fn == TrainerFn.TESTING
+                _subprocess_call(local_rank, testing=testing)
 
                 # starting all processes at once can cause issues
                 # with dataloaders delay between 1-10 seconds
