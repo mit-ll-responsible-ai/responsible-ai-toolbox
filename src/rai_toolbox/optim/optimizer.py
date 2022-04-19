@@ -135,7 +135,7 @@ def _to_batch(p: Tensor, param_ndim: Optional[int]) -> Tensor:
 
 
 class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
-    """An optimizer that performs an in-place transformation to the
+    r"""An optimizer that performs an in-place transformation to the
     gradient of each parameter, before performing the gradient-based
     update on each parameter::
 
@@ -223,7 +223,7 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
     ...     loss = (x * x).sum()
     ...     loss.backward()
     ...     optim.step()
-    ...     print(f"param_ndim: {param_ndim}, normed grad:\n{x.grad}\n..")
+    ...     print("param_ndim: {param_ndim}, normed grad:\n{x.grad}\n..")
     ...     optim.zero_grad()
     param_ndim: 0, normed grad:
     tensor([[1., 1.],
