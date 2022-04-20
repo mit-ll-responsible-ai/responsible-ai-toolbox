@@ -256,7 +256,7 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
         """
         Parameters
         ----------
-        params: Iterable
+        params: Sequence[Tensor] | Iterable[ParamGroup]
             iterable of parameters to optimize or dicts defining parameter groups
 
         InnerOpt: Type[Optimizer] | Partial[Optimizer], optional (default=`torch.nn.optim.SGD`)

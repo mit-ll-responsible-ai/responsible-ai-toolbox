@@ -83,7 +83,7 @@ class _LpNormOptimizer(GradientTransformerOptimizer):
 
 
 class SignedGradientOptim(GradientTransformerOptimizer):
-    r"""A gradient-tranforming  optimizer that takes the elementwise sign
+    r"""A gradient-tranforming optimizer that takes the elementwise sign
     of a parameter's gradient prior to using `InnerOp.step` to update the
     corresponding parameter.
 
@@ -137,7 +137,7 @@ class SignedGradientOptim(GradientTransformerOptimizer):
         """
         Parameters
         ----------
-        params: Iterable
+        params: Sequence[Tensor] | Iterable[ParamGroup]
             iterable of parameters to optimize or dicts defining parameter groups
 
         InnerOpt: Type[Optimizer] | Partial[Optimizer], optional (default=`torch.nn.optim.SGD`)
@@ -284,7 +284,10 @@ class L2NormedGradientOptim(_LpNormOptimizer):
 
 
 class L2ProjectedOptim(L2NormedGradientOptim, ProjectionMixin):
-    r"""A gradient-tranforming  optimizer that normalizes the each gradient by
+    r"""A gradient-tranforming optimizer that constrains the updated parameters
+    to lie within an epsilon-sized ball in :math:`L^2` space centered on the origin.
+
+    A step with this optimizer normalizes the each gradient by
     its :math:`L^2`-norm prior to using `InnerOp.step` to update the
     corresponding parameter. Each parameter is then projected into an epsilon-sized
     ball in :math:`L^2` space centered on the origin.
@@ -347,7 +350,7 @@ class L2ProjectedOptim(L2NormedGradientOptim, ProjectionMixin):
         """
         Parameters
         ----------
-        params: Iterable
+        params: Sequence[Tensor] | Iterable[ParamGroup]
             iterable of parameters to optimize or dicts defining parameter groups
 
         InnerOpt: Type[Optimizer] | Partial[Optimizer], optional (default=`torch.nn.optim.SGD`)
@@ -417,6 +420,51 @@ class L2ProjectedOptim(L2NormedGradientOptim, ProjectionMixin):
 
 
 class LinfProjectedOptim(SignedGradientOptim, ProjectionMixin):
+    r"""A gradient-tranforming optimizer that constrains the updated parameter values to fall within :math:`[-\epsilon, \epsilon]`.
+
+    A step with this optimizer takes the elementwise sign of a parameter's gradient
+    prior to using `InnerOp.step` to update the corresponding parameter. The updated
+    parameter is then clamped elementwise to :math:`[-\epsilon, \epsilon]`.
+
+    See Also
+    --------
+    L2NormedGradientOptim
+    LinfProjectedOptim
+    ProjectionMixin
+    GradientTransformerOptimizer
+
+    Examples
+    --------
+    Let's use `LinfProjectedOptim` along with a standard SGD-step with a learning rate
+    of `1.0`. After the step, each parameter will have its values clamped to :math:`[-1.8, 1.8]`.
+
+    >>> import torch as tr
+    >>> from rai_toolbox.optim import L2ProjectedOptim
+
+    Creating a parameter for our optimizer to update, and our optimizer. We
+    specify `epsilon=1.8` so that the parameters are projected to the desired domain.
+
+    >>> x = tr.tensor([-1.0, 0.5], requires_grad=True)
+    >>> optim = LinfProjectedOptim([x], epsilon=1.8, InnerOpt=tr.optim.SGD, lr=1.0)
+
+    Performing a simple calculation with `x` and performing backprop to create
+    a gradient.
+
+    >>> (tr.tensor([2.0, -2.0]) * x).sum().backward()
+    >>> x.grad # the un-normed gradient
+    tensor([2., -2.])
+
+    Performing a step with our optimizer transforms the gradient in-place, updates the
+    parameter using `SGD([x], lr=1.0).step()`, and then projects the parameter into
+    the constraint set.
+
+    >>> optim.step()
+    >>> x.grad # the normalized gradient
+    tensor([1.0, -1.0])
+    >>> x  # the updated parameter
+    tensor([-1.8000,  1.5000], requires_grad=True)
+    """
+
     def __init__(
         self,
         params: OptimParams,
@@ -426,7 +474,45 @@ class LinfProjectedOptim(SignedGradientOptim, ProjectionMixin):
         epsilon: float,
         **inner_opt_kwargs,
     ):
+        """
+        Parameters
+        ----------
+        params: Sequence[Tensor] | Iterable[ParamGroup]
+            iterable of parameters to optimize or dicts defining parameter groups
 
+        InnerOpt: Type[Optimizer] | Partial[Optimizer], optional (default=`torch.nn.optim.SGD`)
+            The optimizer that updates the parameters after their gradients have
+            been transformed.
+
+        epsilon: float
+            Specifies the size of the L2-space ball that all parameters will be
+            projected into, post optimization step.
+
+        defaults: Optional[Dict[str, Any]]
+            Specifies default parameters for all parameter groups.
+
+        param_ndim : Optional[int]
+            Clamp is performed elementwise, and thus `param_ndim` need not be adjusted.
+
+        **inner_opt_kwargs : Any
+            Named arguments used to initialize `InnerOpt`.
+
+        Notes
+        -----
+        Additional Explanation of `param_ndim`:
+
+        If the gradient has a shape `(d0, d1, d2)` and `param_ndim=1` then the
+        transformation will be broadcast over each shape-(d2,) sub-tensor in the
+        gradient (of which there are `d0 * d1`).
+
+        If a gradient has a shape `(d0, d1, d2, d3)`, and if `param_ndim=-1`,
+        then the transformation will broadcast over each shape-`(d1, d2, d3)`
+        sub-tensor in the gradient (of which there are d0). This is equivalent
+        to `param_ndim=3`.
+
+        If `param_ndim=0` then the transformation is applied elementwise to the
+        gradient by temporarily reshaping the gradient to a shape-(T, 1) tensor.
+        """
         assert epsilon >= 0
         defaults = dict(epsilon=epsilon)
 
@@ -475,7 +561,7 @@ class L1qNormedGradientOptim(GradientTransformerOptimizer):
         """
         Parameters
         ----------
-        params: Iterable
+        params: Sequence[Tensor] | Iterable[ParamGroup]
             iterable of parameters to optimize or dicts defining parameter groups
 
         InnerOpt: Type[Optimizer]
