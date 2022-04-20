@@ -486,8 +486,6 @@ class L2ProjectedOptim(L2NormedGradientOptim, ProjectionMixin):
         If `param_ndim=0` then the transformation is applied elementwise to the
         tensor by temporarily reshaping the gradient to a shape-(T, 1) tensor.
         """
-        assert epsilon >= 0
-        self.div_by_zero_epsilon = epsilon
 
         if defaults is None:
             defaults = {}
@@ -784,8 +782,6 @@ class L1qNormedGradientOptim(GradientTransformerOptimizer):
         If `param_ndim=0` then the transformation is applied elementwise to the
         tensor by temporarily reshaping the gradient to a shape-(T, 1) tensor.
         """
-        self.div_by_zero_epsilon = div_by_zero_eps
-
         super().__init__(
             params,
             InnerOpt=InnerOpt,
