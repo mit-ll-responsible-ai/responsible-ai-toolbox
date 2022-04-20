@@ -87,6 +87,12 @@ class SignedGradientOptim(GradientTransformerOptimizer):
     of a parameter's gradient prior to using `InnerOp.step` to update the
     corresponding parameter.
 
+    See Also
+    --------
+    L1NormedGradientOptim
+    L2NormedGradientOptim
+    ProjectionMixin
+    GradientTransformerOptimizer
 
     Examples
     --------
@@ -190,6 +196,13 @@ class L1NormedGradientOptim(_LpNormOptimizer):
     its :math:`L^1`-norm prior to using `InnerOp.step` to update the
     corresponding parameter.
 
+    See Also
+    --------
+    L2NormedGradientOptim
+    SignedGradientOptim
+    ProjectionMixin
+    GradientTransformerOptimizer
+
     Examples
     --------
     Let's create an optimizer that normalizes all parameter gradients using
@@ -228,6 +241,13 @@ class L2NormedGradientOptim(_LpNormOptimizer):
     r"""A gradient-tranforming  optimizer that normalizes the each gradient by
     its :math:`L^2`-norm prior to using `InnerOp.step` to update the
     corresponding parameter.
+
+    See Also
+    --------
+    L1NormedGradientOptim
+    SignedGradientOptim
+    ProjectionMixin
+    GradientTransformerOptimizer
 
     Examples
     --------
@@ -272,6 +292,7 @@ class L2ProjectedOptim(L2NormedGradientOptim, ProjectionMixin):
     See Also
     --------
     L2NormedGradientOptim
+    LinfProjectedOptim
     ProjectionMixin
     GradientTransformerOptimizer
 
@@ -287,7 +308,8 @@ class L2ProjectedOptim(L2NormedGradientOptim, ProjectionMixin):
 
     Creating a parameter for our optimizer to update, and our optimizer. We
     want the norm to be computed over the entire gradient tensor – without
-    broadcasting – so we specify `param_ndim=None`.
+    broadcasting – so we specify `param_ndim=None`. This also controls the
+    projection behavior.
 
     >>> x = tr.tensor([-1.0, 1.0], requires_grad=True)
     >>> optim = L2ProjectedOptim([x], param_ndim=None, InnerOpt=tr.optim.SGD, lr=1.0, epsilon=0.8)
