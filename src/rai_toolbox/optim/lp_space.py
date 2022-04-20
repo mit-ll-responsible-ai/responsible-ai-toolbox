@@ -662,15 +662,14 @@ class L1qNormedGradientOptim(GradientTransformerOptimizer):
     Examples
     --------
     Let's use `L1qNormedGradientOptim` along with a standard SGD-step with a learning
-    rate of `1.0`. We'll sparsify the gradient to retain signs of the top 70% elements
-    of the tensor, and we'll normalize the sparse gradient to have a :math:`L^1`-norm
-    of `1.8`.
+    rate of `1.0`. We'll sparsify the gradient to retain the top 70% elements of the
+    tensor, and we'll normalize the sparse gradient to have a :math:`L^1`-norm of `1.8`.
 
     >>> import torch as tr
     >>> from rai_toolbox.optim import L1qNormedGradientOptim
 
     Creating a parameter for our optimizer to update, and our optimizer. We
-    specify `param_ndim` so that the sparsification/normalization occurs on the
+    specify `param_ndim=None` so that the sparsification/normalization occurs on the
     gradient without any broadcasting.
 
     >>> x = tr.tensor([1.0, 1.0, 1.0], requires_grad=True)
@@ -693,9 +692,9 @@ class L1qNormedGradientOptim(GradientTransformerOptimizer):
     Performing a step with our optimizer sparsifies and normalizes the gradient in-place, and then updates the parameter using `SGD([x], lr=1.0).step()`.
 
     >>> optim.step()
-    >>> x.grad # the sparsified, normalized gradient
+    >>> x.grad # the signed, sparsified, and normalized gradient
     tensor([0.0000, 0.9000, 0.9000])
-    >>> print(x)  # the updated parameter
+    >>> x  # the updated parameter
     tensor([1.0000, 0.1000, 0.1000], requires_grad=True)
     """
 

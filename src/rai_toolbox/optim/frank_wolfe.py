@@ -12,6 +12,8 @@ from rai_toolbox._typing import OptimParams
 from .lp_space import L1qNormedGradientOptim, L2NormedGradientOptim, SignedGradientOptim
 from .optimizer import GradientTransformerOptimizer
 
+_TINY = torch.finfo(torch.float32).tiny
+
 __all__ = [
     "FrankWolfe",
     "L1FrankWolfe",
@@ -115,16 +117,130 @@ class FrankWolfe(Optimizer):
 
 
 class L1qFrankWolfe(L1qNormedGradientOptim):
+    r"""A Frank-Wolfe [1]_ optimizer that, when computing the LMO, sparsifies a
+    parameter's gradient. Each updated parameter is constrained to fall within an
+    :math:`\epsilon`-sized ball in :math:`L^1` space, centered on the origin.
+
+    The sparsification process retains only the signs (i.e. :math:`\pm 1`) of the
+    gradient's elements. The transformation is applied to the gradient in accordance
+    with `param_ndim`.
+
+    See Also
+    --------
+    FrankWolfe
+
+    References
+    ----------
+    .. [1] https://en.wikipedia.org/wiki/Frank%E2%80%93Wolfe_algorithm#Algorithm
+
+    Examples
+    --------
+    Using `L1qFrankWolfe`, we'll sparsify the parameter's gradient to retain signs of
+    the top 70% elements, and we'll constrain the updated parameter to fall within a
+    :math:`L^1`-ball of radius `1.8`.
+
+    >>> import torch as tr
+    >>> from rai_toolbox.optim import L1qFrankWolfe
+
+    Creating a parameter for our optimizer to update, and our optimizer. We
+    specify `param_ndim=None` so that the sparsification/normalization occurs on the
+    gradient without any broadcasting.
+
+    >>> x = tr.tensor([1.0, 1.0, 1.0], requires_grad=True)
+    >>> optim = L1qFrankWolfe(
+    ...     [x],
+    ...     q=0.30,
+    ...     epsilon=1.8,
+    ...     param_ndim=None,
+    ... )
+
+    Performing a simple calculation with `x` and performing backprop to create
+    a gradient.
+
+    >>> (tr.tensor([0.0, 1.0, 2.0]) * x).sum().backward()
+
+    Performing a step with our optimizer uses the Frank Wolfe algorithm to update
+    its parameters; the resulting parameter was updated with a LMO based on a
+    sparsified, sign-only gradient. Note that the parameter falls within/on the
+    L1-ball of radius `1.8`.
+
+    >>> optim.step()
+    >>> x  # the updated parameter; has a L1-norm of 1.8
+    tensor([ 0.0000, -0.9000, -0.9000], requires_grad=True)
+    """
+
     def __init__(
         self,
         params: OptimParams,
         *,
-        epsilon: float,
         q: float,
+        epsilon: float,
         dq: float = 0.0,
         param_ndim: Optional[int] = -1,
-        **inner_opt_kwargs,
+        div_by_zero_eps: float = _TINY,
+        generator: torch.Generator = torch.default_generator,
+        **frankwolfe_kwargs,
     ):
+        r"""
+        Parameters
+        ----------
+        params : Sequence[Tensor] | Iterable[Mapping[str, Any]]
+            Iterable of parameters or dicts defining parameter groups.
+
+        q : float
+            Specifies the (fractional) percentile of absolute-largest gradient elements
+            to retain when sparsifying the gradient. E.g `q=0.9`means that only the
+            gradient elements within the 90th-percentile will be retained.
+
+            Must be within `[0.0, 1.0]`. The sparsification is applied to the gradient
+            in accordance to `param_ndim`.
+
+        epsilon : float
+            Specifies the size of the L1-space ball that all parameters will be
+            projected into, post optimization step.
+
+        dq : float, optional (default=0.0)
+            If specified, the sparsity factor for each gradient transformation will
+            be drawn from a uniform distribution over :math:`[q - dq, q + dq] \in [0.0, 1.0]`.
+
+        param_ndim : Union[int, None], optional (default=-1)
+            Controls how `_inplace_grad_transform_` is broadcast onto the gradient
+            of a given parameter. This can be specified per param-group. By default,
+            the gradient transformation broadcasts over the first dimension in a
+            batch-like style.
+
+            - A positive number determines the dimensionality of the gradient that the transformation will act on.
+            - A negative number indicates the 'offset' from the dimensionality of the gradient (see "Notes" for examples).
+            - `None` means that the transformation will be applied directly to the gradient without any broadcasting.
+
+        defaults : Optional[Dict[str, Any]]
+            Specifies default parameters for all parameter groups.
+
+        div_by_zero_eps : float, optional (default=`torch.finfo(torch.float32).tiny`)
+            A lower bound used to clamp the normalization factor to prevent div-by-zero.
+
+        generator : torch.Generator, optional (default=`torch.default_generator`)
+            Controls the RNG source.
+
+        **frankwolfe_kwargs : Any
+            Named arguments used to initialize `FrankWolfe`.
+
+        Notes
+        -----
+        Additional Explanation of `param_ndim`:
+
+        If the tensor has a shape `(d0, d1, d2)` and `param_ndim=1` then the
+        transformation will be broadcast over each shape-(d2,) sub-tensor in the
+        gradient (of which there are `d0 * d1`).
+
+        If the tensor has a shape `(d0, d1, d2, d3)`, and if `param_ndim=-1`,
+        then the transformation will broadcast over each shape-`(d1, d2, d3)`
+        sub-tensor in the gradient (of which there are d0). This is equivalent
+        to `param_ndim=3`.
+
+        If `param_ndim=0` then the transformation is applied elementwise to the
+        tensor by temporarily reshaping the gradient to a shape-(T, 1) tensor.
+        """
         super().__init__(
             params,
             InnerOpt=FrankWolfe,
@@ -132,7 +248,9 @@ class L1qFrankWolfe(L1qNormedGradientOptim):
             q=q,
             dq=dq,
             param_ndim=param_ndim,
-            **inner_opt_kwargs,
+            div_by_zero_eps=div_by_zero_eps,
+            generator=generator,
+            **frankwolfe_kwargs,
         )
 
 
