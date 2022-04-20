@@ -2,7 +2,6 @@
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 
-from random import random
 from typing import Any, Dict, Optional, Union
 
 import numpy as np
@@ -614,7 +613,6 @@ class L1qNormedGradientOptim(GradientTransformerOptimizer):
         *,
         epsilon: float,
         q: float,
-        pert_q: float,
         param_ndim: Union[int, None] = -1,
         div_by_zero_eps: float = _TINY,
         defaults: Optional[Dict[str, Any]] = None,
@@ -635,8 +633,8 @@ class L1qNormedGradientOptim(GradientTransformerOptimizer):
             projected into, post optimization step.
 
         q : float
-
-        pert_q : float
+            Specifies the fraction of absolute-largest gradient elements to retain
+            when sparsifying the gradient. Must be within `[0.0, 1.0]`.
 
         param_ndim : Union[int, None], optional (default=-1)
             Clamp is performed elementwise, and thus `param_ndim` need not be adjusted.
@@ -683,10 +681,6 @@ class L1qNormedGradientOptim(GradientTransformerOptimizer):
 
         self.div_by_zero_eps = div_by_zero_eps
         self.q = q
-        self.q0, self.q1 = q, q
-        if pert_q:
-            self.q0 = max(0.0, q - pert_q)
-            self.q1 = min(1.0, q + pert_q)
 
     def _inplace_grad_transform_(
         self, param: Tensor, optim_group: Dict[str, Any]
@@ -695,17 +689,13 @@ class L1qNormedGradientOptim(GradientTransformerOptimizer):
             return
 
         epsilon = optim_group["epsilon"]
-        q = self.q
-        if self.q0 < q or self.q1 > q:
-            # TODO: refactor RNG
-            q = (self.q1 - self.q0) * random() + self.q0
 
         # Convert percent to number of pixels
         shp = param.grad.shape
         nb = shp[0]
 
         num_pix = np.prod(shp[1:])
-        num_q = 1.0 - q
+        num_q = 1.0 - self.q
         num_q = max(1, int(num_q * num_pix))
 
         g = param.grad.flatten(1)
