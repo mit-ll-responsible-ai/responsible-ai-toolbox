@@ -65,8 +65,9 @@ ImageNetModel = builds(
 #####
 # PGD
 #####
-L1q = pbuilds(L1qFrankWolfe, lr=1.0, epsilon=1.0, q=0.975, pert_q=0.05)
-L1FW = pbuilds(gradient_ascent,
+L1q = pbuilds(L1qFrankWolfe, lr=1.0, epsilon=1.0, q=0.975, dq=0.05)
+L1FW = pbuilds(
+    gradient_ascent,
     perturbation_model=pbuilds(AdditivePerturbation),
     optimizer=L1q,
     steps=45,
