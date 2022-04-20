@@ -51,6 +51,8 @@ class _LpNormOptimizer(GradientTransformerOptimizer):
         *,
         param_ndim: Optional[int] = -1,
         defaults: Optional[Dict[str, Any]] = None,
+        grad_scale: float = 1.0,
+        grad_bias: float = 0.0,
         div_by_zero_eps: float = _TINY,
         **kwargs,
     ):
@@ -73,6 +75,14 @@ class _LpNormOptimizer(GradientTransformerOptimizer):
             - A positive number determines the dimensionality of the gradient that the transformation will act on.
             - A negative number indicates the 'offset' from the dimensionality of the gradient (see "Notes" for examples).
             - `None` means that the transformation will be applied directly to the gradient without any broadcasting.
+
+        grad_scale : float, optional (default=1.0)
+            Multiplies each gradient in-place after the in-place transformation is
+            performed. This can be specified per param-group.
+
+        grad_bias : float, optional (default=0.0)
+            Added to each gradient in-place after the in-place transformation is
+            performed. This can be specified per param-group.
 
         defaults : Optional[Dict[str, Any]]
             Specifies default parameters for all parameter groups.
@@ -107,13 +117,13 @@ class _LpNormOptimizer(GradientTransformerOptimizer):
                     f"{type(self).__name__}.p must be an int or float, got {self.p}"
                 )
 
-        if defaults is None:
-            defaults = {}
         super().__init__(
             params,
             InnerOpt=InnerOpt,
             param_ndim=param_ndim,
             defaults=defaults,
+            grad_scale=grad_scale,
+            grad_bias=grad_bias,
             **kwargs,
         )
         self.div_by_zero_eps = div_by_zero_eps
@@ -183,6 +193,8 @@ class SignedGradientOptim(GradientTransformerOptimizer):
         InnerOpt: Union[Partial[Opt], OptimizerType] = SGD,
         *,
         param_ndim: Optional[int] = None,
+        grad_scale: float = 1.0,
+        grad_bias: float = 0.0,
         defaults: Optional[Dict[str, Any]] = None,
         **inner_opt_kwargs,
     ) -> None:
@@ -205,6 +217,14 @@ class SignedGradientOptim(GradientTransformerOptimizer):
             - A positive number determines the dimensionality of the gradient that the transformation will act on.
             - A negative number indicates the 'offset' from the dimensionality of the gradient (see "Notes" for examples).
             - `None` means that the transformation will be applied directly to the gradient without any broadcasting.
+
+        grad_scale : float, optional (default=1.0)
+            Multiplies each gradient in-place after the in-place transformation is
+            performed. This can be specified per param-group.
+
+        grad_bias : float, optional (default=0.0)
+            Added to each gradient in-place after the in-place transformation is
+            performed. This can be specified per param-group.
 
         defaults : Optional[Dict[str, Any]]
             Specifies default parameters for all parameter groups.
@@ -232,6 +252,8 @@ class SignedGradientOptim(GradientTransformerOptimizer):
             params,
             InnerOpt,
             param_ndim=param_ndim,
+            grad_scale=grad_scale,
+            grad_bias=grad_bias,
             defaults=defaults,
             **inner_opt_kwargs,
         )
@@ -401,6 +423,8 @@ class L2ProjectedOptim(L2NormedGradientOptim, ProjectionMixin):
         *,
         epsilon: float,
         param_ndim: Union[int, None] = -1,
+        grad_scale: float = 1.0,
+        grad_bias: float = 0.0,
         defaults: Optional[Dict[str, Any]] = None,
         div_by_zero_eps: float = _TINY,
         **inner_opt_kwargs,
@@ -428,6 +452,14 @@ class L2ProjectedOptim(L2NormedGradientOptim, ProjectionMixin):
             - A positive number determines the dimensionality of the gradient that the transformation will act on.
             - A negative number indicates the 'offset' from the dimensionality of the gradient (see "Notes" for examples).
             - `None` means that the transformation will be applied directly to the gradient without any broadcasting.
+
+        grad_scale : float, optional (default=1.0)
+            Multiplies each gradient in-place after the in-place transformation is
+            performed. This can be specified per param-group.
+
+        grad_bias : float, optional (default=0.0)
+            Added to each gradient in-place after the in-place transformation is
+            performed. This can be specified per param-group.
 
         defaults : Optional[Dict[str, Any]]
             Specifies default parameters for all parameter groups.
@@ -459,13 +491,15 @@ class L2ProjectedOptim(L2NormedGradientOptim, ProjectionMixin):
 
         if defaults is None:
             defaults = {}
-        defaults["epsilon"] = epsilon
+        defaults["epsilon"] = defaults.get("epsilon", epsilon)
 
         super().__init__(
             params,
             InnerOpt=InnerOpt,
             defaults=defaults,
             param_ndim=param_ndim,
+            grad_scale=grad_scale,
+            grad_bias=grad_bias,
             div_by_zero_eps=div_by_zero_eps,
             **inner_opt_kwargs,
         )
@@ -532,8 +566,10 @@ class LinfProjectedOptim(SignedGradientOptim, ProjectionMixin):
         params: OptimParams,
         InnerOpt: Union[Partial[Opt], OptimizerType] = SGD,
         *,
-        param_ndim=None,
         epsilon: float,
+        param_ndim=None,
+        grad_scale: float = 1.0,
+        grad_bias: float = 0.0,
         defaults: Optional[Dict[str, Any]] = None,
         **inner_opt_kwargs,
     ):
@@ -553,6 +589,14 @@ class LinfProjectedOptim(SignedGradientOptim, ProjectionMixin):
 
         param_ndim : Optional[int]
             Clamp is performed elementwise, and thus `param_ndim` need not be adjusted.
+
+        grad_scale : float, optional (default=1.0)
+            Multiplies each gradient in-place after the in-place transformation is
+            performed. This can be specified per param-group.
+
+        grad_bias : float, optional (default=0.0)
+            Added to each gradient in-place after the in-place transformation is
+            performed. This can be specified per param-group.
 
         defaults : Optional[Dict[str, Any]]
             Specifies default parameters for all parameter groups.
@@ -579,13 +623,15 @@ class LinfProjectedOptim(SignedGradientOptim, ProjectionMixin):
         assert epsilon >= 0
         if defaults is None:
             defaults = {}
-        defaults["epsilon"] = epsilon
+        defaults["epsilon"] = defaults.get("epsilon", epsilon)
 
         super().__init__(
             params,
             InnerOpt=InnerOpt,
             defaults=defaults,
             param_ndim=param_ndim,
+            grad_scale=grad_scale,
+            grad_bias=grad_bias,
             **inner_opt_kwargs,
         )
 
@@ -623,7 +669,7 @@ class L1qNormedGradientOptim(GradientTransformerOptimizer):
     gradient without any broadcasting.
 
     >>> x = tr.tensor([1.0, 1.0, 1.0], requires_grad=True)
-    >>> optim = L1qNormedGradientOptim([x], q=0.30, epsilon=1.8, InnerOpt=tr.optim.SGD, lr=1.0, param_ndim=None)
+    >>> optim = L1qNormedGradientOptim([x], q=0.30, grad_scale=1.8, InnerOpt=tr.optim.SGD, lr=1.0, param_ndim=None)
 
     Performing a simple calculation with `x` and performing backprop to create
     a gradient.
@@ -646,10 +692,11 @@ class L1qNormedGradientOptim(GradientTransformerOptimizer):
         params: OptimParams,
         InnerOpt: Union[Partial[Opt], OptimizerType] = SGD,
         *,
-        epsilon: float,
         q: float,
         dq: float = 0.0,
         param_ndim: Union[int, None] = -1,
+        grad_scale: float = 1.0,
+        grad_bias: float = 0.0,
         defaults: Optional[Dict[str, Any]] = None,
         div_by_zero_eps: float = _TINY,
         generator: Generator = default_generator,
@@ -664,10 +711,6 @@ class L1qNormedGradientOptim(GradientTransformerOptimizer):
         InnerOpt : Type[Optimizer] | Partial[Optimizer], optional (default=`torch.nn.optim.SGD`)
             The optimizer that updates the parameters after their gradients have
             been transformed.
-
-        epsilon : float
-            The L1-norm ball of each transformed gradient, where the normalization
-            is applied according to `param_ndim`.
 
         q : float
             Specifies the (fractional) percentile of absolute-largest gradient elements
@@ -690,6 +733,14 @@ class L1qNormedGradientOptim(GradientTransformerOptimizer):
             - A positive number determines the dimensionality of the gradient that the transformation will act on.
             - A negative number indicates the 'offset' from the dimensionality of the gradient (see "Notes" for examples).
             - `None` means that the transformation will be applied directly to the gradient without any broadcasting.
+
+        grad_scale : float, optional (default=1.0)
+            Multiplies each gradient in-place after the in-place transformation is
+            performed. This can be specified per param-group.
+
+        grad_bias : float, optional (default=0.0)
+            Added to each gradient in-place after the in-place transformation is
+            performed. This can be specified per param-group.
 
         defaults : Optional[Dict[str, Any]]
             Specifies default parameters for all parameter groups.
@@ -719,18 +770,15 @@ class L1qNormedGradientOptim(GradientTransformerOptimizer):
         If `param_ndim=0` then the transformation is applied elementwise to the
         tensor by temporarily reshaping the gradient to a shape-(T, 1) tensor.
         """
-        assert epsilon >= 0
         self.div_by_zero_epsilon = div_by_zero_eps
-
-        if defaults is None:
-            defaults = {}
-        defaults["epsilon"] = epsilon
 
         super().__init__(
             params,
             InnerOpt=InnerOpt,
             defaults=defaults,
             param_ndim=param_ndim,
+            grad_scale=grad_scale,
+            grad_bias=grad_bias,
             **inner_opt_kwargs,
         )
 
@@ -745,6 +793,8 @@ class L1qNormedGradientOptim(GradientTransformerOptimizer):
     def _inplace_grad_transform_(
         self, param: Tensor, optim_group: Dict[str, Any]
     ) -> None:
+        del optim_group
+
         if param.grad is None:  # pragma: no cover
             return
 
@@ -754,8 +804,6 @@ class L1qNormedGradientOptim(GradientTransformerOptimizer):
             if self.dq and (self._qlow < self.q or self._qhigh > self.q)
             else self.q
         )
-
-        epsilon = optim_group["epsilon"]
 
         # Convert percent to number of pixels
         shp = param.grad.shape
@@ -775,6 +823,5 @@ class L1qNormedGradientOptim(GradientTransformerOptimizer):
 
         s_norm = torch.norm(s, dim=1, p=1, keepdim=True)  # type: ignore
         s /= torch.clamp(s_norm, self.div_by_zero_eps, None)
-        s *= epsilon
 
         param.grad[...] = s.view(shp)  # type: ignore

@@ -31,6 +31,8 @@ __all__ = ["GradientTransformerOptimizer", "ProjectionMixin"]
 
 class DatumParamGroup(ParamGroup):
     param_ndim: Optional[int]
+    grad_scale: float
+    grad_bias: float
 
 
 def _shares_memory(x: Tensor, y: Tensor) -> bool:
@@ -250,6 +252,8 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
         InnerOpt: Union[Partial[Opt], OptimizerType] = SGD,
         *,
         param_ndim: Union[int, None] = -1,
+        grad_scale: float = 1.0,
+        grad_bias: float = 0.0,
         defaults: Optional[Dict[str, Any]] = None,
         **inner_opt_kwargs,
     ) -> None:
@@ -272,6 +276,14 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
             - A positive number determines the dimensionality of the gradient that the transformation will act on.
             - A negative number indicates the 'offset' from the dimensionality of the gradient (see "Notes" for examples).
             - `None` means that the transformation will be applied directly to the gradient without any broadcasting.
+
+        grad_scale : float, optional (default=1.0)
+            Multiplies each gradient in-place after the in-place transformation is
+            performed. This can be specified per param-group.
+
+        grad_bias : float, optional (default=0.0)
+            Added to each gradient in-place after the in-place transformation is
+            performed. This can be specified per param-group.
 
         defaults : Optional[Dict[str, Any]]
             Specifies default parameters for all parameter groups.
@@ -297,7 +309,9 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
         """
         if defaults is None:
             defaults = {}
-        defaults["param_ndim"] = param_ndim
+        defaults["param_ndim"] = defaults.get("param_ndim", param_ndim)
+        defaults["grad_scale"] = defaults.get("grad_scale", grad_scale)
+        defaults["grad_bias"] = defaults.get("grad_bias", grad_bias)
 
         super().__init__(params, defaults)  # type: ignore
         self.inner_opt = InnerOpt(self.param_groups, **inner_opt_kwargs)
@@ -352,8 +366,15 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
                 assert orig_p.grad is not None
 
                 p = _to_batch(p, group["param_ndim"])
+                assert p.grad is not None
 
                 self._inplace_grad_transform_(p, optim_group=group)
+
+                if group["grad_scale"] != 1.0:
+                    p.grad *= group["grad_scale"]
+
+                if group["grad_bias"] != 0.0:
+                    p.grad += group["grad_bias"]
 
                 if p.grad is None or not _shares_memory(orig_p.grad, p.grad):
                     raise ValueError(
