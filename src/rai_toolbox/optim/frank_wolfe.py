@@ -121,7 +121,7 @@ class L1qFrankWolfe(L1qNormedGradientOptim):
         *,
         epsilon: float,
         q: float,
-        pert_q: float,
+        dq: float = 0.0,
         param_ndim: Optional[int] = -1,
         **inner_opt_kwargs,
     ):
@@ -130,7 +130,7 @@ class L1qFrankWolfe(L1qNormedGradientOptim):
             InnerOpt=FrankWolfe,
             epsilon=epsilon,
             q=q,
-            pert_q=pert_q,
+            dq=dq,
             param_ndim=param_ndim,
             **inner_opt_kwargs,
         )

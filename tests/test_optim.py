@@ -4,7 +4,7 @@
 
 import math
 from functools import partial
-from typing import Callable, Tuple, Type
+from typing import Callable, Optional, Tuple, Type
 
 import numpy as np
 import pytest
@@ -16,6 +16,7 @@ from torch import Tensor
 from torch.optim import SGD, Adam
 from torch.testing import assert_allclose
 
+from rai_toolbox._typing import Partial
 from rai_toolbox.optim import (
     FrankWolfe,
     GradientTransformerOptimizer,
@@ -32,7 +33,7 @@ from rai_toolbox.optim import (
 )
 from rai_toolbox.optim.lp_space import _LpNormOptimizer
 from rai_toolbox.optim.optimizer import _to_batch
-from rai_toolbox._typing import Partial
+
 simple_arrays = hnp.arrays(
     shape=hnp.array_shapes(min_dims=2, max_dims=4),
     dtype=np.float64,
@@ -61,8 +62,8 @@ simple_tensors = simple_arrays.map(lambda x: tr.tensor(x, requires_grad=True))
         partial(SignedGradientOptim, lr=0.0),
         partial(L2ProjectedOptim, lr=0.0, epsilon=1),
         partial(LinfProjectedOptim, lr=0.0, epsilon=1),
-        partial(L1qNormedGradientOptim, lr=0.0, epsilon=1, q=0.3, pert_q=0.05),
-        partial(L1qFrankWolfe, lr=0.0, epsilon=1, q=0.3, pert_q=0.05),
+        partial(L1qNormedGradientOptim, lr=0.0, epsilon=1, q=0.3),
+        partial(L1qFrankWolfe, lr=0.0, epsilon=1, q=0.3),
         partial(L1FrankWolfe, epsilon=1.0, lr=0.0),
         partial(L2FrankWolfe, epsilon=1.0, lr=0.0),
         partial(LinfFrankWolfe, epsilon=1.0, lr=0.0),
@@ -99,8 +100,8 @@ def test_closure_is_called_by_step(
         partial(SignedGradientOptim, lr=0.01),
         partial(L2ProjectedOptim, lr=0.01, epsilon=1),
         partial(LinfProjectedOptim, lr=0.01, epsilon=1),
-        partial(L1qNormedGradientOptim, lr=0.01, epsilon=1, q=0.3, pert_q=0.05),
-        partial(L1qFrankWolfe, lr=0.5, epsilon=1, q=0.3, pert_q=0.05),
+        partial(L1qNormedGradientOptim, lr=0.01, epsilon=1, q=0.3),
+        partial(L1qFrankWolfe, lr=0.5, epsilon=1, q=0.3),
         partial(L1FrankWolfe, epsilon=1.0, lr=0.5),
         partial(L2FrankWolfe, epsilon=1.0, lr=0.5),
         partial(LinfFrankWolfe, epsilon=1.0, lr=0.5),
@@ -123,7 +124,7 @@ def test_optimizers_descend_quadratic_curve(
 
     def closure():
         optimizer.zero_grad()
-        (x ** 2).backward()
+        (x**2).backward()
 
     assert abs(x.item()) == 1.0
     assert x.grad is None
@@ -325,7 +326,7 @@ def test_l1q():
     x = tr.randn(10, 10)
     grad = tr.rand(10, 10)
 
-    step_fn = L1qNormedGradientOptim([x], SGD, epsilon=0.1, lr=0.5, q=0.3, pert_q=0.05)
+    step_fn = L1qNormedGradientOptim([x], SGD, epsilon=0.1, lr=0.5, q=0.3)
     x.grad = grad.clone()
     step_fn.step()
 
@@ -416,7 +417,7 @@ def test_fw_lr_disabled_lr_sched(start: float, n: int, epsilon: float):
     collect = []
     for _ in range(n):
         optim.zero_grad()
-        (x ** 2).sum().backward()
+        (x**2).sum().backward()
         optim.step()
         collect.append(x.item())
 
@@ -452,7 +453,7 @@ def test_lp_fw_constraint_sets(
     x = tr.tensor(start, requires_grad=True)
     optim = Optim([x], epsilon=epsilon)
 
-    (-(x ** 2)).sum().backward()
+    (-(x**2)).sum().backward()
     optim.step()
 
     orig = tr.tensor(start)
@@ -466,13 +467,13 @@ def test_lp_fw_constraint_sets(
     "Optimizer",
     [
         partial(L1NormedGradientOptim, lr=0.5),
-        partial(L1qNormedGradientOptim, epsilon=1.0, lr=0.5, pert_q=0.0, q=0.1),
+        partial(L1qNormedGradientOptim, epsilon=1.0, lr=0.5, q=0.1),
         partial(L2NormedGradientOptim, lr=0.5),
         partial(SignedGradientOptim, lr=0.5),
         partial(L2ProjectedOptim, lr=0.5, epsilon=1.5),
         partial(LinfProjectedOptim, lr=0.5, epsilon=1.5),
         partial(L1FrankWolfe, lr=0.5, epsilon=1.5),
-        partial(L1qFrankWolfe, lr=0.5, epsilon=1.5, pert_q=0.0, q=0.1),
+        partial(L1qFrankWolfe, lr=0.5, epsilon=1.5, q=0.1),
         partial(L2FrankWolfe, lr=0.5, epsilon=1.5),
         partial(LinfFrankWolfe, lr=0.5, epsilon=1.5),
     ],
@@ -496,8 +497,8 @@ def test_grad_transform_optim_param_ndim_equivalence(Optimizer, param):
         [{"params": t1, "param_ndim": -1}, {"params": t2, "param_ndim": None}]
     )
 
-    (t1 ** 2).sum().backward()
-    (t2 ** 2).sum().backward()
+    (t1**2).sum().backward()
+    (t2**2).sum().backward()
     optim.step()
 
     assert t2.ndim == tr.tensor(param).ndim
@@ -524,7 +525,7 @@ def test_l2_normed_grad_for_arbitrary_param_ndim(param, data: st.DataObject):
     param_ndim = data.draw(st.none() | st.integers(-x.ndim, x.ndim), label="param_ndim")
     optimizer = L2NormedGradientOptim([x], lr=1.0, param_ndim=param_ndim)
 
-    (x ** 2).sum().backward()
+    (x**2).sum().backward()
     optimizer.step()
 
     if param_ndim is None or param_ndim == x.ndim:
@@ -610,7 +611,7 @@ def test_gradient_transform_that_overwrites_grad_raises():
     "Optimizer",
     [
         partial(L1NormedGradientOptim, lr=0.5),
-        partial(L1qNormedGradientOptim, epsilon=1.0, lr=0.5, pert_q=0.0, q=0.1),
+        partial(L1qNormedGradientOptim, epsilon=1.0, lr=0.5, q=0.1),
         partial(L2NormedGradientOptim, lr=0.5),
         partial(SignedGradientOptim, lr=0.5),
         partial(L2ProjectedOptim, lr=0.5, epsilon=1.5),
@@ -626,3 +627,37 @@ def test_inner_opt_is_set_as_expected(Optimizer, InnerOpt):
     opt = Optimizer([t1], InnerOpt=InnerOpt)
     assert isinstance(opt.inner_opt, InnerOpt)
     assert opt.inner_opt.param_groups[0]["params"][0] is t1
+
+
+@settings(max_examples=10)
+@given(seed=st.none() | st.integers(10_000, 20_000))
+def test_l1q_with_dq_draws_from_user_provided_rng(seed: Optional[int]):
+    # Providing a seeded generator should always produce the same results
+    saved_grads = set()
+    base_gen = tr.Generator().manual_seed(0)
+
+    for _ in range(100):
+        # if seed is not None, then the rng in the step should
+        #
+        gen = tr.Generator().manual_seed(seed) if seed else base_gen
+
+        x = tr.tensor([1.0, 1.0, 1.0, 1.0], requires_grad=True)
+        optim = L1qNormedGradientOptim(
+            [x],
+            InnerOpt=tr.optim.SGD,
+            q=0.50,
+            dq=1.0,
+            lr=1.0,
+            epsilon=1.8,
+            param_ndim=None,
+            generator=gen,
+        )
+
+        (tr.tensor([0.0, 1.0, 2.0, 3.0]) * x).sum().backward()
+        optim.step()
+        assert x.grad is not None
+        saved_grads.add(tuple(x.grad.tolist()))
+    if seed:
+        assert len(saved_grads) == 1
+    else:
+        assert len(saved_grads) == 3

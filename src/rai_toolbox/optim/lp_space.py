@@ -605,7 +605,40 @@ class L1qNormedGradientOptim(GradientTransformerOptimizer):
     normalizes the gradient to have an :math:`L^1`-norm of :math:`\epsilon`, prior to
     updating the parameter using `InnerOpt.step`.
 
+    The sparsification process retains only the signs of the gradient's elements.
     The transformation is applied to the gradient in accordance with `param_ndim`.
+
+    Examples
+    --------
+    Let's use `L1qNormedGradientOptim` along with a standard SGD-step with a learning
+    rate of `1.0`. We'll sparsify the gradient to retain signs (`:math:\pm 1`) of the
+    top 70% elements of the tensor, and we'll normalize the sparse gradient to have a
+    :math:`L^1`-norm of `1.8`.
+
+    >>> import torch as tr
+    >>> from rai_toolbox.optim import L1qNormedGradientOptim
+
+    Creating a parameter for our optimizer to update, and our optimizer. We
+    specify `param_ndim` so that the sparsification/normalization occurs on the
+    gradient without any broadcasting.
+
+    >>> x = tr.tensor([1.0, 1.0, 1.0], requires_grad=True)
+    >>> optim = L1qNormedGradientOptim([x], q=0.30, epsilon=1.8, InnerOpt=tr.optim.SGD, lr=1.0, param_ndim=None)
+
+    Performing a simple calculation with `x` and performing backprop to create
+    a gradient.
+
+    >>> (tr.tensor([0.0, 1.0, 2.0]) * x).sum().backward()
+    >>> x.grad # the original gradient
+    tensor([0., 1., 2.])
+
+    Performing a step with our optimizer sparsifies and normalizes the gradient in-place, and then updates the parameter using `SGD([x], lr=1.0).step()`.
+
+    >>> optim.step()
+    >>> x.grad # the sparsified, normalized gradient
+    tensor([0.0000, 0.9000, 0.9000])
+    >>> print(x)  # the updated parameter
+    tensor([1.0000, 0.1000, 0.1000], requires_grad=True)
     """
 
     def __init__(
@@ -619,7 +652,7 @@ class L1qNormedGradientOptim(GradientTransformerOptimizer):
         param_ndim: Union[int, None] = -1,
         defaults: Optional[Dict[str, Any]] = None,
         div_by_zero_eps: float = _TINY,
-        rng_source: Generator = default_generator,
+        generator: Generator = default_generator,
         **inner_opt_kwargs,
     ):
         r"""
@@ -637,9 +670,12 @@ class L1qNormedGradientOptim(GradientTransformerOptimizer):
             is applied according to `param_ndim`.
 
         q : float
-            Specifies the fraction of absolute-largest gradient elements to retain
-            when sparsifying the gradient. Must be within `[0.0, 1.0]`. The
-            sparsification is applied to the gradient in accordance to `param_ndim`.
+            Specifies the (fractional) percentile of absolute-largest gradient elements
+            to retain when sparsifying the gradient. E.g `q=0.9`means that only the
+            gradient elements within the 90th-percentile will be retained.
+
+            Must be within `[0.0, 1.0]`. The sparsification is applied to the gradient
+            in accordance to `param_ndim`.
 
         dq : float, optional (default=0.0)
             If specified, the sparsity factor for each gradient transformation will
@@ -661,7 +697,7 @@ class L1qNormedGradientOptim(GradientTransformerOptimizer):
         div_by_zero_eps : float, optional (default=`torch.finfo(torch.float32).tiny`)
             A lower bound used to clamp the normalization factor to prevent div-by-zero.
 
-        rng_source : torch.Generator, optional (default=`torch.default_generator`)
+        generator : torch.Generator, optional (default=`torch.default_generator`)
             Controls the RNG source.
 
         **inner_opt_kwargs : Any
@@ -701,10 +737,10 @@ class L1qNormedGradientOptim(GradientTransformerOptimizer):
         self.div_by_zero_eps = div_by_zero_eps
         self.q = q
         self.dq = dq
-        self._generator = rng_source
-        if dq:
-            self._qlow = max(0.0, q - dq)
-            self._qhigh = min(1.0, q + dq)
+        self._generator = generator
+
+        self._qlow = max(0.0, q - dq)
+        self._qhigh = min(1.0, q + dq)
 
     def _inplace_grad_transform_(
         self, param: Tensor, optim_group: Dict[str, Any]
@@ -713,9 +749,9 @@ class L1qNormedGradientOptim(GradientTransformerOptimizer):
             return
 
         q = (
-            (self._qhigh - self._qlow) * torch.rand(generator=self._generator)
+            (self._qhigh - self._qlow) * torch.rand(1, generator=self._generator)
             + self._qlow
-            if (self._qlow < self.q or self._qhigh > self.q)
+            if self.dq and (self._qlow < self.q or self._qhigh > self.q)
             else self.q
         )
 
