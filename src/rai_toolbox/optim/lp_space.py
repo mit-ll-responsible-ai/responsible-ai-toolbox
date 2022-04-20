@@ -58,7 +58,7 @@ class _LpNormOptimizer(GradientTransformerOptimizer):
         Parameters
         ----------
         params : Sequence[Tensor] | Iterable[ParamGroup]
-            iterable of parameters to optimize or dicts defining parameter groups
+            Iterable of parameters or dicts defining parameter groups.
 
         InnerOpt : Type[Optimizer] | Partial[Optimizer], optional (default=`torch.nn.optim.SGD`)
             The optimizer that updates the parameters after their gradients have
@@ -190,7 +190,7 @@ class SignedGradientOptim(GradientTransformerOptimizer):
         Parameters
         ----------
         params : Sequence[Tensor] | Iterable[ParamGroup]
-            iterable of parameters to optimize or dicts defining parameter groups
+            Iterable of parameters or dicts defining parameter groups.
 
         InnerOpt : Type[Optimizer] | Partial[Optimizer], optional (default=`torch.nn.optim.SGD`)
             The optimizer that updates the parameters after their gradients have
@@ -404,7 +404,7 @@ class L2ProjectedOptim(L2NormedGradientOptim, ProjectionMixin):
         Parameters
         ----------
         params : Sequence[Tensor] | Iterable[ParamGroup]
-            iterable of parameters to optimize or dicts defining parameter groups
+            Iterable of parameters or dicts defining parameter groups.
 
         InnerOpt : Type[Optimizer] | Partial[Optimizer], optional (default=`torch.nn.optim.SGD`)
             The optimizer that updates the parameters after their gradients have
@@ -536,7 +536,7 @@ class LinfProjectedOptim(SignedGradientOptim, ProjectionMixin):
         Parameters
         ----------
         params : Sequence[Tensor] | Iterable[ParamGroup]
-            iterable of parameters to optimize or dicts defining parameter groups
+            Iterable of parameters or dicts defining parameter groups.
 
         InnerOpt : Type[Optimizer] | Partial[Optimizer], optional (default=`torch.nn.optim.SGD`)
             The optimizer that updates the parameters after their gradients have
@@ -596,14 +596,9 @@ class LinfProjectedOptim(SignedGradientOptim, ProjectionMixin):
 
 
 class L1qNormedGradientOptim(GradientTransformerOptimizer):
-    r"""Sparse gradient step normalized by the :math:`L^1`-norm and with updated parameters constrained within an epsilon-sized :math:`L^1` ball about their
-    original values.
-
-    Given :math:`x` and :math:`\epsilon`, the constraint set is given by:
-
-    .. math::
-
-       S = \{x | \|x\|_1 \leq \epsilon\}
+    r"""A gradient-transforming optimizer that sparsifies a parameter's gradient and
+    normalizes the gradient to have an :math:`L^1`-norm of :math:`\epsilon`, prior to
+    updating the parameter using `InnerOpt.step`.
     """
 
     def __init__(
@@ -614,30 +609,38 @@ class L1qNormedGradientOptim(GradientTransformerOptimizer):
         epsilon: float,
         q: float,
         param_ndim: Union[int, None] = -1,
-        div_by_zero_eps: float = _TINY,
         defaults: Optional[Dict[str, Any]] = None,
+        div_by_zero_eps: float = _TINY,
         **inner_opt_kwargs,
     ):
         """
         Parameters
         ----------
         params : Sequence[Tensor] | Iterable[ParamGroup]
-            iterable of parameters to optimize or dicts defining parameter groups
+            Iterable of parameters or dicts defining parameter groups.
 
         InnerOpt : Type[Optimizer] | Partial[Optimizer], optional (default=`torch.nn.optim.SGD`)
             The optimizer that updates the parameters after their gradients have
             been transformed.
 
         epsilon : float
-            Specifies the size of the L2-space ball that all parameters will be
-            projected into, post optimization step.
+            The L1-norm ball of each transformed gradient, where the normalization
+            is applied according to `param_ndim`.
 
         q : float
             Specifies the fraction of absolute-largest gradient elements to retain
-            when sparsifying the gradient. Must be within `[0.0, 1.0]`.
+            when sparsifying the gradient. Must be within `[0.0, 1.0]`. The
+            sparsification is applied to the gradient in accordance to `param_ndim`.
 
         param_ndim : Union[int, None], optional (default=-1)
-            Clamp is performed elementwise, and thus `param_ndim` need not be adjusted.
+            Controls how `_inplace_grad_transform_` is broadcast onto the gradient
+            of a given parameter. This can be specified per param-group. By default,
+            the gradient transformation broadcasts over the first dimension in a
+            batch-like style.
+
+            - A positive number determines the dimensionality of the gradient that the transformation will act on.
+            - A negative number indicates the 'offset' from the dimensionality of the gradient (see "Notes" for examples).
+            - `None` means that the transformation will be applied directly to the gradient without any broadcasting.
 
         defaults : Optional[Dict[str, Any]]
             Specifies default parameters for all parameter groups.
