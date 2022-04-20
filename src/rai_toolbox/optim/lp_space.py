@@ -6,7 +6,7 @@ from typing import Any, Dict, Optional, Union
 
 import numpy as np
 import torch
-from torch import Tensor
+from torch import Generator, Tensor, default_generator
 from torch.optim import SGD
 from typing_extensions import Final
 
@@ -87,17 +87,17 @@ class _LpNormOptimizer(GradientTransformerOptimizer):
         -----
         Additional Explanation of `param_ndim`:
 
-        If the gradient has a shape `(d0, d1, d2)` and `param_ndim=1` then the
+        If the tensor has a shape `(d0, d1, d2)` and `param_ndim=1` then the
         transformation will be broadcast over each shape-(d2,) sub-tensor in the
         gradient (of which there are `d0 * d1`).
 
-        If a gradient has a shape `(d0, d1, d2, d3)`, and if `param_ndim=-1`,
+        If the tensor has a shape `(d0, d1, d2, d3)`, and if `param_ndim=-1`,
         then the transformation will broadcast over each shape-`(d1, d2, d3)`
         sub-tensor in the gradient (of which there are d0). This is equivalent
         to `param_ndim=3`.
 
         If `param_ndim=0` then the transformation is applied elementwise to the
-        gradient by temporarily reshaping the gradient to a shape-(T, 1) tensor.
+        tensor by temporarily reshaping the gradient to a shape-(T, 1) tensor.
         """
         if not hasattr(self, "_p"):
             raise TypeError(f"{type(self).__name__} must have the attribute `_p` set.")
@@ -216,17 +216,17 @@ class SignedGradientOptim(GradientTransformerOptimizer):
         -----
         Additional Explanation of `param_ndim`:
 
-        If the gradient has a shape `(d0, d1, d2)` and `param_ndim=1` then the
+        If the tensor has a shape `(d0, d1, d2)` and `param_ndim=1` then the
         transformation will be broadcast over each shape-(d2,) sub-tensor in the
         gradient (of which there are `d0 * d1`).
 
-        If a gradient has a shape `(d0, d1, d2, d3)`, and if `param_ndim=-1`,
+        If the tensor has a shape `(d0, d1, d2, d3)`, and if `param_ndim=-1`,
         then the transformation will broadcast over each shape-`(d1, d2, d3)`
         sub-tensor in the gradient (of which there are d0). This is equivalent
         to `param_ndim=3`.
 
         If `param_ndim=0` then the transformation is applied elementwise to the
-        gradient by temporarily reshaping the gradient to a shape-(T, 1) tensor.
+        tensor by temporarily reshaping the gradient to a shape-(T, 1) tensor.
         """
         super().__init__(
             params,
@@ -294,6 +294,8 @@ class L2NormedGradientOptim(_LpNormOptimizer):
     its :math:`L^2`-norm prior to using `InnerOp.step` to update the
     corresponding parameter.
 
+    The transformation is applied to the gradient in accordance with `param_ndim`.
+
     See Also
     --------
     L1NormedGradientOptim
@@ -343,6 +345,9 @@ class L2ProjectedOptim(L2NormedGradientOptim, ProjectionMixin):
     its :math:`L^2`-norm prior to using `InnerOp.step` to update the
     corresponding parameter. Each parameter is then projected into an epsilon-sized
     ball in :math:`L^2` space centered on the origin.
+
+    The transformation/projection is applied to the gradient/parameter in accordance
+    with `param_ndim`.
 
     See Also
     --------
@@ -437,17 +442,17 @@ class L2ProjectedOptim(L2NormedGradientOptim, ProjectionMixin):
         -----
         Additional Explanation of `param_ndim`:
 
-        If the gradient has a shape `(d0, d1, d2)` and `param_ndim=1` then the
+        If the tensor has a shape `(d0, d1, d2)` and `param_ndim=1` then the
         transformation will be broadcast over each shape-(d2,) sub-tensor in the
         gradient (of which there are `d0 * d1`).
 
-        If a gradient has a shape `(d0, d1, d2, d3)`, and if `param_ndim=-1`,
+        If the tensor has a shape `(d0, d1, d2, d3)`, and if `param_ndim=-1`,
         then the transformation will broadcast over each shape-`(d1, d2, d3)`
         sub-tensor in the gradient (of which there are d0). This is equivalent
         to `param_ndim=3`.
 
         If `param_ndim=0` then the transformation is applied elementwise to the
-        gradient by temporarily reshaping the gradient to a shape-(T, 1) tensor.
+        tensor by temporarily reshaping the gradient to a shape-(T, 1) tensor.
         """
         assert epsilon >= 0
         self.div_by_zero_epsilon = epsilon
@@ -559,17 +564,17 @@ class LinfProjectedOptim(SignedGradientOptim, ProjectionMixin):
         -----
         Additional Explanation of `param_ndim`:
 
-        If the gradient has a shape `(d0, d1, d2)` and `param_ndim=1` then the
+        If the tensor has a shape `(d0, d1, d2)` and `param_ndim=1` then the
         transformation will be broadcast over each shape-(d2,) sub-tensor in the
         gradient (of which there are `d0 * d1`).
 
-        If a gradient has a shape `(d0, d1, d2, d3)`, and if `param_ndim=-1`,
+        If the tensor has a shape `(d0, d1, d2, d3)`, and if `param_ndim=-1`,
         then the transformation will broadcast over each shape-`(d1, d2, d3)`
         sub-tensor in the gradient (of which there are d0). This is equivalent
         to `param_ndim=3`.
 
         If `param_ndim=0` then the transformation is applied elementwise to the
-        gradient by temporarily reshaping the gradient to a shape-(T, 1) tensor.
+        tensor by temporarily reshaping the gradient to a shape-(T, 1) tensor.
         """
         assert epsilon >= 0
         if defaults is None:
@@ -599,6 +604,8 @@ class L1qNormedGradientOptim(GradientTransformerOptimizer):
     r"""A gradient-transforming optimizer that sparsifies a parameter's gradient and
     normalizes the gradient to have an :math:`L^1`-norm of :math:`\epsilon`, prior to
     updating the parameter using `InnerOpt.step`.
+
+    The transformation is applied to the gradient in accordance with `param_ndim`.
     """
 
     def __init__(
@@ -608,12 +615,14 @@ class L1qNormedGradientOptim(GradientTransformerOptimizer):
         *,
         epsilon: float,
         q: float,
+        dq: float = 0.0,
         param_ndim: Union[int, None] = -1,
         defaults: Optional[Dict[str, Any]] = None,
         div_by_zero_eps: float = _TINY,
+        rng_source: Generator = default_generator,
         **inner_opt_kwargs,
     ):
-        """
+        r"""
         Parameters
         ----------
         params : Sequence[Tensor] | Iterable[ParamGroup]
@@ -632,6 +641,10 @@ class L1qNormedGradientOptim(GradientTransformerOptimizer):
             when sparsifying the gradient. Must be within `[0.0, 1.0]`. The
             sparsification is applied to the gradient in accordance to `param_ndim`.
 
+        dq : float, optional (default=0.0)
+            If specified, the sparsity factor for each gradient transformation will
+            be drawn from a uniform distribution over :math:`[q - dq, q + dq] \in [0.0, 1.0]`.
+
         param_ndim : Union[int, None], optional (default=-1)
             Controls how `_inplace_grad_transform_` is broadcast onto the gradient
             of a given parameter. This can be specified per param-group. By default,
@@ -648,6 +661,9 @@ class L1qNormedGradientOptim(GradientTransformerOptimizer):
         div_by_zero_eps : float, optional (default=`torch.finfo(torch.float32).tiny`)
             A lower bound used to clamp the normalization factor to prevent div-by-zero.
 
+        rng_source : torch.Generator, optional (default=`torch.default_generator`)
+            Controls the RNG source.
+
         **inner_opt_kwargs : Any
             Named arguments used to initialize `InnerOpt`.
 
@@ -655,17 +671,17 @@ class L1qNormedGradientOptim(GradientTransformerOptimizer):
         -----
         Additional Explanation of `param_ndim`:
 
-        If the gradient has a shape `(d0, d1, d2)` and `param_ndim=1` then the
+        If the tensor has a shape `(d0, d1, d2)` and `param_ndim=1` then the
         transformation will be broadcast over each shape-(d2,) sub-tensor in the
         gradient (of which there are `d0 * d1`).
 
-        If a gradient has a shape `(d0, d1, d2, d3)`, and if `param_ndim=-1`,
+        If the tensor has a shape `(d0, d1, d2, d3)`, and if `param_ndim=-1`,
         then the transformation will broadcast over each shape-`(d1, d2, d3)`
         sub-tensor in the gradient (of which there are d0). This is equivalent
         to `param_ndim=3`.
 
         If `param_ndim=0` then the transformation is applied elementwise to the
-        gradient by temporarily reshaping the gradient to a shape-(T, 1) tensor.
+        tensor by temporarily reshaping the gradient to a shape-(T, 1) tensor.
         """
         assert epsilon >= 0
         self.div_by_zero_epsilon = epsilon
@@ -684,12 +700,24 @@ class L1qNormedGradientOptim(GradientTransformerOptimizer):
 
         self.div_by_zero_eps = div_by_zero_eps
         self.q = q
+        self.dq = dq
+        self._generator = rng_source
+        if dq:
+            self._qlow = max(0.0, q - dq)
+            self._qhigh = min(1.0, q + dq)
 
     def _inplace_grad_transform_(
         self, param: Tensor, optim_group: Dict[str, Any]
     ) -> None:
         if param.grad is None:  # pragma: no cover
             return
+
+        q = (
+            (self._qhigh - self._qlow) * torch.rand(generator=self._generator)
+            + self._qlow
+            if (self._qlow < self.q or self._qhigh > self.q)
+            else self.q
+        )
 
         epsilon = optim_group["epsilon"]
 
@@ -698,7 +726,7 @@ class L1qNormedGradientOptim(GradientTransformerOptimizer):
         nb = shp[0]
 
         num_pix = np.prod(shp[1:])
-        num_q = 1.0 - self.q
+        num_q = 1.0 - q
         num_q = max(1, int(num_q * num_pix))
 
         g = param.grad.flatten(1)
