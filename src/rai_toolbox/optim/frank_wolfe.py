@@ -128,7 +128,7 @@ class L1qFrankWolfe(L1qNormedGradientOptim):
         super().__init__(
             params,
             InnerOpt=FrankWolfe,
-            epsilon=epsilon,
+            lmo_scaling_factor=epsilon,
             q=q,
             dq=dq,
             param_ndim=param_ndim,
