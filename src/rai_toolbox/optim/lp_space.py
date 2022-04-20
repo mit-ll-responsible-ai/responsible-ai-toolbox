@@ -59,7 +59,7 @@ class _LpNormOptimizer(GradientTransformerOptimizer):
         """
         Parameters
         ----------
-        params : Sequence[Tensor] | Iterable[ParamGroup]
+        params : Sequence[Tensor] | Iterable[Mapping[str, Any]]
             Iterable of parameters or dicts defining parameter groups.
 
         InnerOpt : Type[Optimizer] | Partial[Optimizer], optional (default=`torch.nn.optim.SGD`)
@@ -201,7 +201,7 @@ class SignedGradientOptim(GradientTransformerOptimizer):
         """
         Parameters
         ----------
-        params : Sequence[Tensor] | Iterable[ParamGroup]
+        params : Sequence[Tensor] | Iterable[Mapping[str, Any]]
             Iterable of parameters or dicts defining parameter groups.
 
         InnerOpt : Type[Optimizer] | Partial[Optimizer], optional (default=`torch.nn.optim.SGD`)
@@ -361,12 +361,12 @@ class L2NormedGradientOptim(_LpNormOptimizer):
 
 class L2ProjectedOptim(L2NormedGradientOptim, ProjectionMixin):
     r"""A gradient-tranforming optimizer that constrains the updated parameters
-    to lie within an epsilon-sized ball in :math:`L^2` space centered on the origin.
+    to lie within an :math:`\epsilon`-sized ball in :math:`L^2` space centered on the
+    origin.
 
-    A step with this optimizer normalizes the each gradient by
-    its :math:`L^2`-norm prior to using `InnerOp.step` to update the
-    corresponding parameter. Each parameter is then projected into an epsilon-sized
-    ball in :math:`L^2` space centered on the origin.
+    A step with this optimizer normalizes the each gradient by its :math:`L^2`-norm
+    prior to using `InnerOp.step` to update the corresponding parameter. Each parameter
+    is then projected into the constraint set.
 
     The transformation/projection is applied to the gradient/parameter in accordance
     with `param_ndim`.
@@ -432,7 +432,7 @@ class L2ProjectedOptim(L2NormedGradientOptim, ProjectionMixin):
         """
         Parameters
         ----------
-        params : Sequence[Tensor] | Iterable[ParamGroup]
+        params : Sequence[Tensor] | Iterable[Mapping[str, Any]]
             Iterable of parameters or dicts defining parameter groups.
 
         InnerOpt : Type[Optimizer] | Partial[Optimizer], optional (default=`torch.nn.optim.SGD`)
@@ -576,7 +576,7 @@ class LinfProjectedOptim(SignedGradientOptim, ProjectionMixin):
         """
         Parameters
         ----------
-        params : Sequence[Tensor] | Iterable[ParamGroup]
+        params : Sequence[Tensor] | Iterable[Mapping[str, Any]]
             Iterable of parameters or dicts defining parameter groups.
 
         InnerOpt : Type[Optimizer] | Partial[Optimizer], optional (default=`torch.nn.optim.SGD`)
@@ -648,18 +648,25 @@ class LinfProjectedOptim(SignedGradientOptim, ProjectionMixin):
 
 class L1qNormedGradientOptim(GradientTransformerOptimizer):
     r"""A gradient-transforming optimizer that sparsifies a parameter's gradient and
-    normalizes the gradient to have an :math:`L^1`-norm of :math:`\epsilon`, prior to
+    normalizes the gradient to have an :math:`L^1`-norm of `grad_scale`, prior to
     updating the parameter using `InnerOpt.step`.
 
-    The sparsification process retains only the signs of the gradient's elements.
-    The transformation is applied to the gradient in accordance with `param_ndim`.
+    The sparsification process retains only the signs (i.e. :math:`\pm 1`) of the
+    gradient's elements. The transformation is applied to the gradient in accordance
+    with `param_ndim`.
+
+    See Also
+    --------
+    L1NormedGradientOptim
+    L2NormedGradientOptim
+    GradientTransformerOptimizer
 
     Examples
     --------
     Let's use `L1qNormedGradientOptim` along with a standard SGD-step with a learning
-    rate of `1.0`. We'll sparsify the gradient to retain signs (`:math:\pm 1`) of the
-    top 70% elements of the tensor, and we'll normalize the sparse gradient to have a
-    :math:`L^1`-norm of `1.8`.
+    rate of `1.0`. We'll sparsify the gradient to retain signs of the top 70% elements
+    of the tensor, and we'll normalize the sparse gradient to have a :math:`L^1`-norm
+    of `1.8`.
 
     >>> import torch as tr
     >>> from rai_toolbox.optim import L1qNormedGradientOptim
@@ -669,7 +676,14 @@ class L1qNormedGradientOptim(GradientTransformerOptimizer):
     gradient without any broadcasting.
 
     >>> x = tr.tensor([1.0, 1.0, 1.0], requires_grad=True)
-    >>> optim = L1qNormedGradientOptim([x], q=0.30, grad_scale=1.8, InnerOpt=tr.optim.SGD, lr=1.0, param_ndim=None)
+    >>> optim = L1qNormedGradientOptim(
+    ...     [x],
+    ...     q=0.30,
+    ...     grad_scale=1.8,
+    ...     InnerOpt=tr.optim.SGD,
+    ...     lr=1.0,
+    ...     param_ndim=None,
+    ... )
 
     Performing a simple calculation with `x` and performing backprop to create
     a gradient.
@@ -705,7 +719,7 @@ class L1qNormedGradientOptim(GradientTransformerOptimizer):
         r"""
         Parameters
         ----------
-        params : Sequence[Tensor] | Iterable[ParamGroup]
+        params : Sequence[Tensor] | Iterable[Mapping[str, Any]]
             Iterable of parameters or dicts defining parameter groups.
 
         InnerOpt : Type[Optimizer] | Partial[Optimizer], optional (default=`torch.nn.optim.SGD`)

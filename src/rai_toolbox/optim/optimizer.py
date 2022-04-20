@@ -148,8 +148,7 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
     `GradientTransformerOptimizer` is designed to be combined with other,
     standard gradient-based optimizers (e.g. Adam) via encapsulation, rather
     then through inheritance. I.e., `GradientTransformerOptimizer(InnerOpt=<...>)`
-    will apply a in-place gradient transform on a parameter, before using `InnerOpt.
-    step` to update said parameter.
+    will apply a in-place gradient transform on a parameter, before using `InnerOpt.step(...)` to update said parameter.
 
     If a closure is supplied to the `.step(...)` method, then the in-place
     gradient transformation is applied after the closure call and prior to
@@ -162,7 +161,7 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
     Examples
     --------
     Let's create a gradient-transforming optimizer that replaces the gradient
-    of each parameter with the sign of the gradient (:math:`\pm 1`) prior to
+    of each parameter with the elementwise sign of the gradient (:math:`\pm 1`) prior to
     performing the step of the inner optimizer:
 
     >>> import torch as tr
@@ -174,21 +173,28 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
     ...             return
     ...         tr.sign(param.grad, out=param.grad)  # operates in-place
 
-    Now we'll use this optimizer – along with AdamW – to transform the gradient of each
-    parameter prior to using AdamW to perform the actual gradient-based update that
-    parameter.
+    Now we'll use this optimizer – with `torch.nn.optim.AdamW` providing the actual
+    parameter-update functionality – to update the parameter.
 
     >>> x = tr.tensor([-10.0, 10.0], requires_grad=True)
     >>> optim = SignedGradientOptim([x], InnerOpt=tr.optim.AdamW, lr=0.1)
 
-    >>> loss = (10_000 * x).sum()
-    >>> loss.backward()
-    >>> optim.step()
+    Using `x` in a calculation and compute an associated gradient for it:
 
+    >>> (10_000 * x).sum().backward()
+
+    Updating `x` using our grad-sign + AdamW optimizer:
+
+    >>> optim.step()
     >>> x
     tensor([-10.9000,   8.9000], requires_grad=True)
 
-    To understand the role of `param_ndim`, let's design an optimizer that normalizes a
+    This was a simple optimizer which did not involve any broadcasting in the gradient
+    transformation; the next example will involve broadcasting.
+
+    **Controlling the gradient transformation with param_ndim**
+
+    To understand the role of `param_ndim` let's design an optimizer that normalizes a
     gradient by its max value – along some user-specified dimension – prior to
     performing the gradient-based update to its parameter.
 
@@ -206,16 +212,12 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
 
     Note that we design `_inplace_grad_transform_` to operate in-place on the gradient
     and that treat the gradient as if it has a shape `(N, d1, ..., dm)`, where we
-    want to compute the max over each of the N sub-tensors of shape-(d1, ..., dm).
+    want to compute the max over each of the `N` sub-tensors of shape-`(d1, ..., dm)`.
 
-    Now we will create a shape-(2, 2) parameter and see how `MaxNormedGradientOptim`
+    Now we will create a shape-(2, 2) parameter to see how `MaxNormedGradientOptim`
     can be instructed to compute the max-norm over various dimensions of the parameter.
-    Let's print out the transformed gradient when we use each of `param_ndim=` 0, 1, or
+    Let's print out the transformed gradient when we use each of `param_ndim`: 0, 1, or
     2.
-
-    Here, we are interested in seeing how the parameter's gradient is being transformed,
-    so we will use a learning rate of 0.0 so that the parameter itself is not modified
-    during this example.
 
     >>> x = tr.tensor([[1.0, 2.0],
     ...                [20.0, 10.0]], requires_grad=True)
@@ -332,6 +334,15 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
                         f"`param_ndim={param_ndim}` specified for parameter "
                         f"with ndim={p.ndim} is not valid. `abs(param_ndim) <= "
                         f"ndim` must hold."
+                    )
+                if not isinstance(group["grad_scale"], (float, int)):
+                    raise TypeError(
+                        f"grad_scale must be a float, got {group['grad_scale']}"
+                    )
+
+                if not isinstance(group["grad_bias"], (float, int)):
+                    raise TypeError(
+                        f"grad_bias must be a float, got {group['grad_bias']}"
                     )
 
     @abstractmethod
