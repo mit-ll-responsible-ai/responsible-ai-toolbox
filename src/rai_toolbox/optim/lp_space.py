@@ -51,6 +51,7 @@ class _LpNormOptimizer(GradientTransformerOptimizer):
         InnerOpt: Union[Partial[Opt], OptimizerType] = SGD,
         *,
         param_ndim: Optional[int] = -1,
+        defaults: Optional[Dict[str, Any]] = None,
         div_by_zero_eps: float = _TINY,
         **kwargs,
     ):
@@ -77,7 +78,8 @@ class _LpNormOptimizer(GradientTransformerOptimizer):
         defaults : Optional[Dict[str, Any]]
             Specifies default parameters for all parameter groups.
 
-        div_by_zero_eps : float
+        div_by_zero_eps : float, optional (default=`torch.finfo(torch.float32).tiny`)
+            A lower bound used to clamp the normalization factor to prevent div-by-zero.
 
         **inner_opt_kwargs : Any
             Named arguments used to initialize `InnerOpt`.
@@ -106,7 +108,15 @@ class _LpNormOptimizer(GradientTransformerOptimizer):
                     f"{type(self).__name__}.p must be an int or float, got {self.p}"
                 )
 
-        super().__init__(params, InnerOpt=InnerOpt, param_ndim=param_ndim, **kwargs)
+        if defaults is None:
+            defaults = {}
+        super().__init__(
+            params,
+            InnerOpt=InnerOpt,
+            param_ndim=param_ndim,
+            defaults=defaults,
+            **kwargs,
+        )
         self.div_by_zero_eps = div_by_zero_eps
 
     @property
@@ -388,6 +398,7 @@ class L2ProjectedOptim(L2NormedGradientOptim, ProjectionMixin):
         epsilon: float,
         param_ndim: Union[int, None] = -1,
         defaults: Optional[Dict[str, Any]] = None,
+        div_by_zero_eps: float = _TINY,
         **inner_opt_kwargs,
     ):
         """
@@ -416,6 +427,9 @@ class L2ProjectedOptim(L2NormedGradientOptim, ProjectionMixin):
 
         defaults : Optional[Dict[str, Any]]
             Specifies default parameters for all parameter groups.
+
+        div_by_zero_eps : float, optional (default=`torch.finfo(torch.float32).tiny`)
+            A lower bound used to clamp the normalization factor to prevent div-by-zero.
 
         **inner_opt_kwargs : Any
             Named arguments used to initialize `InnerOpt`.
@@ -448,6 +462,7 @@ class L2ProjectedOptim(L2NormedGradientOptim, ProjectionMixin):
             InnerOpt=InnerOpt,
             defaults=defaults,
             param_ndim=param_ndim,
+            div_by_zero_eps=div_by_zero_eps,
             **inner_opt_kwargs,
         )
 
@@ -515,6 +530,7 @@ class LinfProjectedOptim(SignedGradientOptim, ProjectionMixin):
         *,
         param_ndim=None,
         epsilon: float,
+        defaults: Optional[Dict[str, Any]] = None,
         **inner_opt_kwargs,
     ):
         """
@@ -531,11 +547,11 @@ class LinfProjectedOptim(SignedGradientOptim, ProjectionMixin):
             Specifies the size of the L2-space ball that all parameters will be
             projected into, post optimization step.
 
-        defaults : Optional[Dict[str, Any]]
-            Specifies default parameters for all parameter groups.
-
         param_ndim : Optional[int]
             Clamp is performed elementwise, and thus `param_ndim` need not be adjusted.
+
+        defaults : Optional[Dict[str, Any]]
+            Specifies default parameters for all parameter groups.
 
         **inner_opt_kwargs : Any
             Named arguments used to initialize `InnerOpt`.
@@ -557,7 +573,9 @@ class LinfProjectedOptim(SignedGradientOptim, ProjectionMixin):
         gradient by temporarily reshaping the gradient to a shape-(T, 1) tensor.
         """
         assert epsilon >= 0
-        defaults = dict(epsilon=epsilon)
+        if defaults is None:
+            defaults = {}
+        defaults["epsilon"] = epsilon
 
         super().__init__(
             params,
@@ -594,28 +612,67 @@ class L1qNormedGradientOptim(GradientTransformerOptimizer):
         params: OptimParams,
         InnerOpt: Union[Partial[Opt], OptimizerType] = SGD,
         *,
-        param_ndim: Optional[int] = -1,
         epsilon: float,
         q: float,
         pert_q: float,
+        param_ndim: Union[int, None] = -1,
         div_by_zero_eps: float = _TINY,
+        defaults: Optional[Dict[str, Any]] = None,
         **inner_opt_kwargs,
     ):
         """
         Parameters
         ----------
-        params: Sequence[Tensor] | Iterable[ParamGroup]
+        params : Sequence[Tensor] | Iterable[ParamGroup]
             iterable of parameters to optimize or dicts defining parameter groups
 
-        InnerOpt: Type[Optimizer]
-            The optimizer to update parameters
+        InnerOpt : Type[Optimizer] | Partial[Optimizer], optional (default=`torch.nn.optim.SGD`)
+            The optimizer that updates the parameters after their gradients have
+            been transformed.
 
-        epsilon:  float
-            The Linf constraint
+        epsilon : float
+            Specifies the size of the L2-space ball that all parameters will be
+            projected into, post optimization step.
+
+        q : float
+
+        pert_q : float
+
+        param_ndim : Union[int, None], optional (default=-1)
+            Clamp is performed elementwise, and thus `param_ndim` need not be adjusted.
+
+        defaults : Optional[Dict[str, Any]]
+            Specifies default parameters for all parameter groups.
+
+        div_by_zero_eps : float, optional (default=`torch.finfo(torch.float32).tiny`)
+            A lower bound used to clamp the normalization factor to prevent div-by-zero.
+
+        **inner_opt_kwargs : Any
+            Named arguments used to initialize `InnerOpt`.
+
+        Notes
+        -----
+        Additional Explanation of `param_ndim`:
+
+        If the gradient has a shape `(d0, d1, d2)` and `param_ndim=1` then the
+        transformation will be broadcast over each shape-(d2,) sub-tensor in the
+        gradient (of which there are `d0 * d1`).
+
+        If a gradient has a shape `(d0, d1, d2, d3)`, and if `param_ndim=-1`,
+        then the transformation will broadcast over each shape-`(d1, d2, d3)`
+        sub-tensor in the gradient (of which there are d0). This is equivalent
+        to `param_ndim=3`.
+
+        If `param_ndim=0` then the transformation is applied elementwise to the
+        gradient by temporarily reshaping the gradient to a shape-(T, 1) tensor.
         """
         assert epsilon >= 0
         self.div_by_zero_epsilon = epsilon
-        defaults = dict(epsilon=epsilon)
+
+        if defaults is None:
+            defaults = {}
+        defaults["epsilon"] = epsilon
+
         super().__init__(
             params,
             InnerOpt=InnerOpt,
