@@ -720,7 +720,7 @@ class L1qNormedGradientOptim(GradientTransformerOptimizer):
         tensor by temporarily reshaping the gradient to a shape-(T, 1) tensor.
         """
         assert epsilon >= 0
-        self.div_by_zero_epsilon = epsilon
+        self.div_by_zero_epsilon = div_by_zero_eps
 
         if defaults is None:
             defaults = {}
