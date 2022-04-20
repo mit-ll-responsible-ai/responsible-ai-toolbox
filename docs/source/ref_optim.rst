@@ -31,7 +31,6 @@ Optimizers with Normed Gradients
    L1NormedGradientOptim
    L2NormedGradientOptim
    SignedGradientOptim
-   L1NormedGradientOptim
    L1qNormedGradientOptim
 
 
