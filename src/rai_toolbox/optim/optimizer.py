@@ -80,7 +80,7 @@ def _to_batch(p: Tensor, param_ndim: Optional[int]) -> Tensor:
 
     Parameters
     ----------
-    p: Tensor
+    p : Tensor
 
     param_ndim: Optional[int]
         Determines the shape of the resulting parameter
@@ -256,10 +256,10 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
         """
         Parameters
         ----------
-        params: Sequence[Tensor] | Iterable[ParamGroup]
+        params : Sequence[Tensor] | Iterable[ParamGroup]
             iterable of parameters to optimize or dicts defining parameter groups
 
-        InnerOpt: Type[Optimizer] | Partial[Optimizer], optional (default=`torch.nn.optim.SGD`)
+        InnerOpt : Type[Optimizer] | Partial[Optimizer], optional (default=`torch.nn.optim.SGD`)
             The optimizer that updates the parameters after their gradients have
             been transformed.
 
@@ -273,7 +273,7 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
             - A negative number indicates the 'offset' from the dimensionality of the gradient (see "Notes" for examples).
             - `None` means that the transformation will be applied directly to the gradient without any broadcasting.
 
-        defaults: Optional[Dict[str, Any]]
+        defaults : Optional[Dict[str, Any]]
             Specifies default parameters for all parameter groups.
 
         **inner_opt_kwargs : Any

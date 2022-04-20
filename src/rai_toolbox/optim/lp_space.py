@@ -54,7 +54,50 @@ class _LpNormOptimizer(GradientTransformerOptimizer):
         div_by_zero_eps: float = _TINY,
         **kwargs,
     ):
+        """
+        Parameters
+        ----------
+        params : Sequence[Tensor] | Iterable[ParamGroup]
+            iterable of parameters to optimize or dicts defining parameter groups
 
+        InnerOpt : Type[Optimizer] | Partial[Optimizer], optional (default=`torch.nn.optim.SGD`)
+            The optimizer that updates the parameters after their gradients have
+            been transformed.
+
+        param_ndim : Optional[int]
+            Controls how `_inplace_grad_transform_` is broadcast onto the gradient
+            of a given parameter. This can be specified per param-group. By default,
+            the gradient transformation broadcasts over the first dimension in a
+            batch-like style.
+
+            - A positive number determines the dimensionality of the gradient that the transformation will act on.
+            - A negative number indicates the 'offset' from the dimensionality of the gradient (see "Notes" for examples).
+            - `None` means that the transformation will be applied directly to the gradient without any broadcasting.
+
+        defaults : Optional[Dict[str, Any]]
+            Specifies default parameters for all parameter groups.
+
+        div_by_zero_eps : float
+
+        **inner_opt_kwargs : Any
+            Named arguments used to initialize `InnerOpt`.
+
+        Notes
+        -----
+        Additional Explanation of `param_ndim`:
+
+        If the gradient has a shape `(d0, d1, d2)` and `param_ndim=1` then the
+        transformation will be broadcast over each shape-(d2,) sub-tensor in the
+        gradient (of which there are `d0 * d1`).
+
+        If a gradient has a shape `(d0, d1, d2, d3)`, and if `param_ndim=-1`,
+        then the transformation will broadcast over each shape-`(d1, d2, d3)`
+        sub-tensor in the gradient (of which there are d0). This is equivalent
+        to `param_ndim=3`.
+
+        If `param_ndim=0` then the transformation is applied elementwise to the
+        gradient by temporarily reshaping the gradient to a shape-(T, 1) tensor.
+        """
         if not hasattr(self, "_p"):
             raise TypeError(f"{type(self).__name__} must have the attribute `_p` set.")
         else:
@@ -137,10 +180,10 @@ class SignedGradientOptim(GradientTransformerOptimizer):
         """
         Parameters
         ----------
-        params: Sequence[Tensor] | Iterable[ParamGroup]
+        params : Sequence[Tensor] | Iterable[ParamGroup]
             iterable of parameters to optimize or dicts defining parameter groups
 
-        InnerOpt: Type[Optimizer] | Partial[Optimizer], optional (default=`torch.nn.optim.SGD`)
+        InnerOpt : Type[Optimizer] | Partial[Optimizer], optional (default=`torch.nn.optim.SGD`)
             The optimizer that updates the parameters after their gradients have
             been transformed.
 
@@ -154,7 +197,7 @@ class SignedGradientOptim(GradientTransformerOptimizer):
             - A negative number indicates the 'offset' from the dimensionality of the gradient (see "Notes" for examples).
             - `None` means that the transformation will be applied directly to the gradient without any broadcasting.
 
-        defaults: Optional[Dict[str, Any]]
+        defaults : Optional[Dict[str, Any]]
             Specifies default parameters for all parameter groups.
 
         **inner_opt_kwargs : Any
@@ -350,14 +393,14 @@ class L2ProjectedOptim(L2NormedGradientOptim, ProjectionMixin):
         """
         Parameters
         ----------
-        params: Sequence[Tensor] | Iterable[ParamGroup]
+        params : Sequence[Tensor] | Iterable[ParamGroup]
             iterable of parameters to optimize or dicts defining parameter groups
 
-        InnerOpt: Type[Optimizer] | Partial[Optimizer], optional (default=`torch.nn.optim.SGD`)
+        InnerOpt : Type[Optimizer] | Partial[Optimizer], optional (default=`torch.nn.optim.SGD`)
             The optimizer that updates the parameters after their gradients have
             been transformed.
 
-        epsilon: float
+        epsilon : float
             Specifies the size of the L2-space ball that all parameters will be
             projected into, post optimization step.
 
@@ -371,7 +414,7 @@ class L2ProjectedOptim(L2NormedGradientOptim, ProjectionMixin):
             - A negative number indicates the 'offset' from the dimensionality of the gradient (see "Notes" for examples).
             - `None` means that the transformation will be applied directly to the gradient without any broadcasting.
 
-        defaults: Optional[Dict[str, Any]]
+        defaults : Optional[Dict[str, Any]]
             Specifies default parameters for all parameter groups.
 
         **inner_opt_kwargs : Any
@@ -477,18 +520,18 @@ class LinfProjectedOptim(SignedGradientOptim, ProjectionMixin):
         """
         Parameters
         ----------
-        params: Sequence[Tensor] | Iterable[ParamGroup]
+        params : Sequence[Tensor] | Iterable[ParamGroup]
             iterable of parameters to optimize or dicts defining parameter groups
 
-        InnerOpt: Type[Optimizer] | Partial[Optimizer], optional (default=`torch.nn.optim.SGD`)
+        InnerOpt : Type[Optimizer] | Partial[Optimizer], optional (default=`torch.nn.optim.SGD`)
             The optimizer that updates the parameters after their gradients have
             been transformed.
 
-        epsilon: float
+        epsilon : float
             Specifies the size of the L2-space ball that all parameters will be
             projected into, post optimization step.
 
-        defaults: Optional[Dict[str, Any]]
+        defaults : Optional[Dict[str, Any]]
             Specifies default parameters for all parameter groups.
 
         param_ndim : Optional[int]
@@ -536,7 +579,7 @@ class LinfProjectedOptim(SignedGradientOptim, ProjectionMixin):
 
 
 class L1qNormedGradientOptim(GradientTransformerOptimizer):
-    r"""Sparse gradient step normalized by the :math:`\ell_1`-norm and with updated parameters constrained within an epsilon-sized :math:`\ell_1` ball about their
+    r"""Sparse gradient step normalized by the :math:`L^1`-norm and with updated parameters constrained within an epsilon-sized :math:`L^1` ball about their
     original values.
 
     Given :math:`x` and :math:`\epsilon`, the constraint set is given by:
