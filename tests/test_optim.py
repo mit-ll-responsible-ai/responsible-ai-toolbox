@@ -423,6 +423,7 @@ def test_fw_lr_disabled_lr_sched(start: float, n: int, epsilon: float):
     "Optim, p",
     [
         (L1FrankWolfe, 1),
+        (partial(L1qFrankWolfe, q=1.0), 1),
         (L2FrankWolfe, 2),
         (LinfFrankWolfe, float("inf")),
     ],
