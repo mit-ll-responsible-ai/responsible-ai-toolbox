@@ -78,15 +78,18 @@ class FrankWolfe(Optimizer):
             "use_default_lr_schedule", use_default_lr_schedule, type_=bool
         )
 
-        if not self._use_default_lr_schedule and not (0 <= lr <= 1):
-            raise ValueError("`lr` must reside in the domain [0, 1]")
-
         defaults = dict(lr=lr, lmo_scaling_factor=lmo_scaling_factor)
 
         super().__init__(params, defaults)  # type: ignore
 
         check_param_group_value("lmo_scaling_factor", self.param_groups)
-        check_param_group_value("lr", self.param_groups, min_=0.0)
+
+        check_param_group_value(
+            "lr",
+            self.param_groups,
+            min_=0.0,
+            max_=1.0 if not self._use_default_lr_schedule else None,
+        )
 
     @torch.no_grad()
     def step(self, closure=None):
