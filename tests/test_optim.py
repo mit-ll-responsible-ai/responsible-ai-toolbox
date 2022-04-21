@@ -738,7 +738,7 @@ _params = [tr.tensor(1.0, requires_grad=True)]
                 L2NormedGradientOptim,
                 [{"params": _params, "grad_scale": 1.0}],
             ),
-            marks=pytest.mark.xfail(reason="valid input"),
+            marks=pytest.mark.xfail(reason="valid input", strict=True),
         ),
         partial(
             L2NormedGradientOptim,
@@ -756,7 +756,7 @@ _params = [tr.tensor(1.0, requires_grad=True)]
         partial(L2NormedGradientOptim, _params, grad_bias="apple"),
         pytest.param(
             partial(L2NormedGradientOptim, _params, grad_bias=2.0),
-            marks=pytest.mark.xfail(reason="valid input"),
+            marks=pytest.mark.xfail(reason="valid input", strict=True),
         ),
     ],
 )
