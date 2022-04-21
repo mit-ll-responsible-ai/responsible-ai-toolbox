@@ -2,9 +2,11 @@
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 from numbers import Real
-from typing import Any, Optional, Tuple, Union
+from typing import Any, Iterable, Mapping, Optional, Tuple, TypeVar, Union
 
 import torch as tr
+
+T = TypeVar("T", bound=Any)
 
 
 class Unsatisfiable(AssertionError):  # pragma: no cover
@@ -30,14 +32,14 @@ def _safe_name(x: Any) -> str:
 
 def value_check(
     name: str,
-    value: Any,
+    value: T,
     *,
     type_: Union[type, Tuple[type, ...]] = Real,
     min_: Optional[Union[int, float]] = None,
     max_: Optional[Union[int, float]] = None,
     incl_min: bool = True,
     incl_max: bool = True,
-) -> None:
+) -> T:
     """
     For internal use only.
 
@@ -55,7 +57,9 @@ def value_check(
     ValueError: `x` must satisfy 1 < x  Got: 1
 
     >>> value_check("x", 1, min_=1, incl_min=True) # ok
+    1
     >>> value_check("x", 0.0, min_=-10, max_=10)  # ok
+    0.0
 
     Raises
     ------
@@ -103,3 +107,26 @@ def value_check(
         err_msg += f"  Got: {value}"
 
         raise ValueError(err_msg)
+    return value
+
+
+def check_param_group_value(
+    name: str,
+    param_groups: Iterable[Mapping[str, Any]],
+    *,
+    type_: Union[type, Tuple[type, ...]] = Real,
+    min_: Optional[Union[int, float]] = None,
+    max_: Optional[Union[int, float]] = None,
+    incl_min: bool = True,
+    incl_max: bool = True,
+) -> None:
+    for group in param_groups:
+        value_check(
+            name,
+            group[name],
+            type_=type_,
+            max_=max_,
+            min_=min_,
+            incl_min=incl_min,
+            incl_max=incl_max,
+        )
