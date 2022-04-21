@@ -2,7 +2,7 @@
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 
-from typing import Optional
+from typing import Union
 
 import torch
 from torch.optim import Optimizer
@@ -178,10 +178,11 @@ class L1qFrankWolfe(L1qNormedGradientOptim):
         q: float,
         epsilon: float,
         dq: float = 0.0,
-        param_ndim: Optional[int] = -1,
+        lr: float = 2.0,
+        use_default_lr_schedule: bool = True,
+        param_ndim: Union[int, None] = -1,
         div_by_zero_eps: float = _TINY,
         generator: torch.Generator = torch.default_generator,
-        **frankwolfe_kwargs,
     ):
         r"""
         Parameters
@@ -204,6 +205,17 @@ class L1qFrankWolfe(L1qNormedGradientOptim):
         dq : float, optional (default=0.0)
             If specified, the sparsity factor for each gradient transformation will
             be drawn from a uniform distribution over :math:`[q - dq, q + dq] \in [0.0, 1.0]`.
+
+        lr :  float, optional (default=2.0)
+            Indicates the weight with which the LMO contributes to the parameter
+            update. See `use_default_lr_schedule` for additional details. If
+            `use_default_lr_schedule=False` then `lr` must be be in the
+            domain `[0, 1]`.
+
+        use_default_lr_schedule : bool, optional (default=True)
+            If ``True``, then the per-parameter "learning rate" is scaled
+            by :math:`\hat{l_r} = l_r / (l_r + k)` where k is the update index
+            for that parameter, which starts at 0.
 
         param_ndim : Union[int, None], optional (default=-1)
             Controls how `_inplace_grad_transform_` is broadcast onto the gradient
@@ -238,13 +250,20 @@ class L1qFrankWolfe(L1qNormedGradientOptim):
             param_ndim=param_ndim,
             div_by_zero_eps=div_by_zero_eps,
             generator=generator,
-            **frankwolfe_kwargs,
+            lr=lr,
+            use_default_lr_schedule=use_default_lr_schedule,
         )
 
 
 class L1FrankWolfe(GradientTransformerOptimizer):
     r"""A Frank-Wolfe [1]_ optimizer that constrains each updated parameter to fall
     within an :math:`\epsilon`-sized ball in :math:`L^1` space, centered on the origin.
+
+    Notes
+    -----
+    The method `L1NormedGradientOptim._inplace_grad_transform_` is responsible for
+    computing the *negative* linear minimization oracle for a parameter and storing it
+    on `param.grad`.
 
     See Also
     --------
@@ -290,30 +309,52 @@ class L1FrankWolfe(GradientTransformerOptimizer):
         params: OptimParams,
         *,
         epsilon: float,
-        param_ndim: Optional[int] = -1,
-        **inner_opt_kwargs,
+        lr: float = 2.0,
+        use_default_lr_schedule: bool = True,
+        param_ndim: Union[int, None] = -1,
+        div_by_zero_eps: float = _TINY,
     ):
-        """
+        r"""
         Parameters
         ----------
-        params : Iterable
-            Iterable of tensor parameters to optimize or dicts defining parameter
-            groups.
+        params : Sequence[Tensor] | Iterable[Mapping[str, Any]]
+            Iterable of parameters or dicts defining parameter groups.
 
         epsilon : float
-            The radius of the of the L1 ball. Can be specified per parameter-group.
+            The radius of the of the L1 ball to which each updated parameter will be
+            constrained. Can be specified per parameter-group.
 
-        Notes
-        -----
-        The method ``L1FrankWolfe._inplace_grad_transform_`` is responsible for
-        computing the *negative* LMO for a parameter and setting to ``param.grad``.
+        lr :  float, optional (default=2.0)
+            Indicates the weight with which the LMO contributes to the parameter
+            update. See `use_default_lr_schedule` for additional details. If
+            `use_default_lr_schedule=False` then `lr` must be be in the
+            domain `[0, 1]`.
+
+        use_default_lr_schedule : bool, optional (default=True)
+            If ``True``, then the per-parameter "learning rate" is scaled
+            by :math:`\hat{l_r} = l_r / (l_r + k)` where k is the update index
+            for that parameter, which starts at 0.
+
+        param_ndim : Union[int, None], optional (default=-1)
+            Controls how `_inplace_grad_transform_` is broadcast onto the gradient
+            of a given parameter. This can be specified per param-group. By default,
+            the gradient transformation broadcasts over the first dimension in a
+            batch-like style.
+
+            - A positive number determines the dimensionality of the gradient that the transformation will act on.
+            - A negative number indicates the 'offset' from the dimensionality of the gradient. E.g. `-1` leads to batch-style broadcasting.
+            - `None` means that the transformation will be applied directly to the gradient without any broadcasting.
+
+            See `GradientTransformerOptimizer` for more details and examples.
         """
         super().__init__(
             params,
             InnerOpt=FrankWolfe,
             lmo_scaling_factor=epsilon,
+            lr=lr,
+            use_default_lr_schedule=use_default_lr_schedule,
             param_ndim=param_ndim,
-            **inner_opt_kwargs,
+            div_by_zero_eps=div_by_zero_eps,
         )
 
     def _inplace_grad_transform_(self, param: torch.Tensor, **_unused_kwargs) -> None:
@@ -340,7 +381,7 @@ class L2FrankWolfe(L2NormedGradientOptim):
     See Also
     --------
     FrankWolfe
-    L2FrankWolfe
+    L1FrankWolfe
     LinfFrankWolfe
     L1qFrankWolfe
 
@@ -383,7 +424,7 @@ class L2FrankWolfe(L2NormedGradientOptim):
         epsilon: float,
         lr: float = 2.0,
         use_default_lr_schedule: bool = True,
-        param_ndim: Optional[int] = -1,
+        param_ndim: Union[int, None] = -1,
         div_by_zero_eps: float = _TINY,
     ):
         r"""
@@ -401,9 +442,6 @@ class L2FrankWolfe(L2NormedGradientOptim):
             update. See `use_default_lr_schedule` for additional details. If
             `use_default_lr_schedule=False` then `lr` must be be in the
             domain `[0, 1]`.
-
-        lmo_scaling_factor : float, optional (default=1.0)
-            A scaling factor applied to :math:`s_k` prior to each step.
 
         use_default_lr_schedule : bool, optional (default=True)
             If ``True``, then the per-parameter "learning rate" is scaled
@@ -434,40 +472,103 @@ class L2FrankWolfe(L2NormedGradientOptim):
 
 
 class LinfFrankWolfe(SignedGradientOptim):
-    """Performs Franke Wolfe optimization [1] using an epsilon-sized L-inf ball as
-    the constraint set.
+    r"""A Frank-Wolfe [1]_ optimizer that constrains each updated parameter to fall
+    within an :math:`\epsilon`-sized ball in :math:`L^\infty` space, centered on the origin.
+
+    Notes
+    -----
+    The method `SignedGradientOptim._inplace_grad_transform_` is responsible for
+    computing the *negative* linear minimization oracle for a parameter and storing it
+    on `param.grad`.
+
+    See Also
+    --------
+    FrankWolfe
+    L1FrankWolfe
+    L2FrankWolfe
+    L1qFrankWolfe
 
     References
     ----------
-    .. [1] https://en.wikipedia.org/wiki/Frank%E2%80%93Wolfe_algorithm#Algorithm"""
+    .. [1] https://en.wikipedia.org/wiki/Frank%E2%80%93Wolfe_algorithm#Algorithm
+
+    Examples
+    --------
+    Using `LinfFrankWolfe`, we'll constrain the updated parameter to fall within a
+    :math:`L^infty`-ball of radius `1.8`.
+
+    >>> import torch as tr
+    >>> from rai_toolbox.optim import LinfFrankWolfe
+
+    Creating a parameter for our optimizer to update, and our optimizer. We
+    specify `param_ndim=None` so that the constrain occurs on the parameter without any
+    broadcasting.
+
+    >>> x = tr.tensor([1.0, 1.0], requires_grad=True)
+    >>> optim = L2FrankWolfe([x], epsilon=1.8, param_ndim=None)
+
+    Performing a simple calculation with `x` and performing backprop to create
+    a gradient.
+
+    >>> (tr.tensor([1.0, 2.0]) * x).sum().backward()
+
+    Performing a step with our optimizer uses the Frank Wolfe algorithm to update
+    its parameters. Note that the updated parameter falls within/on the
+    :math:`L^\infty`-ball of radius `1.8`.
+
+    >>> optim.step()
+    >>> x
+    tensor([-1.8000, -1.8000], requires_grad=True)"""
 
     def __init__(
         self,
         params: OptimParams,
         *,
         epsilon: float,
-        param_ndim: Optional[int] = -1,
-        **inner_opt_kwargs,
+        lr: float = 2.0,
+        use_default_lr_schedule: bool = True,
+        param_ndim: Union[int, None] = -1,
+        div_by_zero_eps: float = _TINY,
     ):
-        """
+        r"""
         Parameters
         ----------
-        params : Iterable
-            Iterable of tensor parameters to optimize or dicts defining parameter
-            groups.
+        params : Sequence[Tensor] | Iterable[Mapping[str, Any]]
+            Iterable of parameters or dicts defining parameter groups.
 
         epsilon : float
-            The radius of the of the L-inf ball. Can be specified per parameter-group.
+            The radius of the of the L-inf ball to which each updated parameter will be
+            constrained. Can be specified per parameter-group.
 
-        Notes
-        -----
-        The method ``LinfFrankWolfe._inplace_grad_transform_`` is responsible for
-        computing the *negative* LMO for a parameter and setting to ``param.grad``.
+        lr :  float, optional (default=2.0)
+            Indicates the weight with which the LMO contributes to the parameter
+            update. See `use_default_lr_schedule` for additional details. If
+            `use_default_lr_schedule=False` then `lr` must be be in the
+            domain `[0, 1]`.
+
+        use_default_lr_schedule : bool, optional (default=True)
+            If ``True``, then the per-parameter "learning rate" is scaled
+            by :math:`\hat{l_r} = l_r / (l_r + k)` where k is the update index
+            for that parameter, which starts at 0.
+
+        param_ndim : Union[int, None], optional (default=-1)
+            Controls how `_inplace_grad_transform_` is broadcast onto the gradient
+            of a given parameter. This can be specified per param-group. By default,
+            the gradient transformation broadcasts over the first dimension in a
+            batch-like style.
+
+            - A positive number determines the dimensionality of the gradient that the transformation will act on.
+            - A negative number indicates the 'offset' from the dimensionality of the gradient. E.g. `-1` leads to batch-style broadcasting.
+            - `None` means that the transformation will be applied directly to the gradient without any broadcasting.
+
+            See `GradientTransformerOptimizer` for more details and examples.
         """
         super().__init__(
             params,
             InnerOpt=FrankWolfe,
             lmo_scaling_factor=epsilon,
+            lr=lr,
+            use_default_lr_schedule=use_default_lr_schedule,
             param_ndim=param_ndim,
-            **inner_opt_kwargs,
+            div_by_zero_eps=div_by_zero_eps,
         )
