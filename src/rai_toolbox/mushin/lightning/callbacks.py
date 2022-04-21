@@ -15,16 +15,17 @@ class MetricsCallback(Callback):
 
     Parameters
     ----------
-    save_dir: str (default: ".")
-    filename: str (default: "metrics.pt")
-        The base filename used to store metrics.  For `FITTING` the file is prepended with "fit_" and
-        and for `TESTING` the file is prepended with `test_`.
+    save_dir : str, optional (default=".")
+
+    filename : str, optional (default="metrics.pt")
+        The base filename used to store metrics.  For `FITTING` the file is prepended
+        with "fit_" and and for `TESTING` the file is prepended with `test_`.
 
     Notes
     -----
-    No metrics will be saved during `FITTING` if no validation metrics are calculated.  This is a limitation
-    of PyTorch Lightning. Future versions will save the training step metrics when no validation metrics
-    are calculated.
+    No metrics will be saved during `FITTING` if no validation metrics are calculated.
+    This is a limitation of PyTorch Lightning. Future versions will save the training
+    step metrics when no validation metrics are calculated.
 
     Examples
     --------

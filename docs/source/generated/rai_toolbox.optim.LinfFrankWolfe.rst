@@ -14,20 +14,6 @@ rai\_toolbox.optim.LinfFrankWolfe
    .. autosummary::
    
       ~LinfFrankWolfe.__init__
-      ~LinfFrankWolfe.add_param_group
-      ~LinfFrankWolfe.load_state_dict
-      ~LinfFrankWolfe.state_dict
-      ~LinfFrankWolfe.step
-      ~LinfFrankWolfe.zero_grad
-   
-   
 
-   
-   
-   .. rubric:: Attributes
-
-   .. autosummary::
-   
-      ~LinfFrankWolfe.param_groups
    
    

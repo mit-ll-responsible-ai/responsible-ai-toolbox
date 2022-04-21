@@ -213,7 +213,7 @@ class L1qFrankWolfe(L1qNormedGradientOptim):
             domain `[0, 1]`.
 
         use_default_lr_schedule : bool, optional (default=True)
-            If ``True``, then the per-parameter "learning rate" is scaled
+            If `True`, then the per-parameter "learning rate" is scaled
             by :math:`\hat{l_r} = l_r / (l_r + k)` where k is the update index
             for that parameter, which starts at 0.
 
@@ -237,9 +237,6 @@ class L1qFrankWolfe(L1qNormedGradientOptim):
 
         generator : torch.Generator, optional (default=`torch.default_generator`)
             Controls the RNG source.
-
-        **frankwolfe_kwargs : Any
-            Named arguments used to initialize `FrankWolfe`.
         """
         super().__init__(
             params,
@@ -346,6 +343,9 @@ class L1FrankWolfe(GradientTransformerOptimizer):
             - `None` means that the transformation will be applied directly to the gradient without any broadcasting.
 
             See `GradientTransformerOptimizer` for more details and examples.
+
+        div_by_zero_eps : float, optional (default=`torch.finfo(torch.float32).tiny`)
+            Prevents div-by-zero error in learning rate schedule.
         """
         super().__init__(
             params,
@@ -459,6 +459,9 @@ class L2FrankWolfe(L2NormedGradientOptim):
             - `None` means that the transformation will be applied directly to the gradient without any broadcasting.
 
             See `GradientTransformerOptimizer` for more details and examples.
+
+        div_by_zero_eps : float, optional (default=`torch.finfo(torch.float32).tiny`)
+            Prevents div-by-zero error in learning rate schedule.
         """
         super().__init__(
             params,
@@ -562,6 +565,9 @@ class LinfFrankWolfe(SignedGradientOptim):
             - `None` means that the transformation will be applied directly to the gradient without any broadcasting.
 
             See `GradientTransformerOptimizer` for more details and examples.
+
+        div_by_zero_eps : float, optional (default=`torch.finfo(torch.float32).tiny`)
+            Prevents div-by-zero error in learning rate schedule.
         """
         super().__init__(
             params,

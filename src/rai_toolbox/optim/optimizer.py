@@ -360,7 +360,7 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
         assumed to have the shape-(N, d0, ...) and the transformation should be
         applied - in-place - to each shape-(d0, ...) sub-tensor.
 
-        Prior to calling `_in_place_grad_transform`, `GradientTransformerOptimizer`
+        Prior to calling `_in_place_grad_transform_`, `GradientTransformerOptimizer`
         will temporarily reshape each parameter and its gradient to have the appropriate
         shape, in accordance with the value specified for `param_ndim` such that the
         shape (d0, ...) contains `param_ndim` entries.

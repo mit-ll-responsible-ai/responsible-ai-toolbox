@@ -13,8 +13,8 @@ def uniform_like_l1_n_ball_(x: Tensor, epsilon: float = 1) -> None:
     Parameters
     ----------
     x: Tensor, shape-(N, D, ...)
-        The tensor to generate a new random tensor from, i.e., returns a tensor of similar
-        shape and on the same device.
+        The tensor to generate a new random tensor from, i.e., returns a tensor of
+        similar shape and on the same device.
 
     Returns
     -------
@@ -23,10 +23,9 @@ def uniform_like_l1_n_ball_(x: Tensor, epsilon: float = 1) -> None:
 
     References
     ----------
-    .. [rauber2017foolboxnative] Rauber et al., 2020, Foolbox Native: Fast adversarial attacks to
-       benchmark the robustness of machine learning models in PyTorch, TensorFlow, and JAX
-       https://doi.org/10.21105/joss.02607
-    .. https://mathoverflow.net/a/9188
+    .. [1] Rauber et al., 2020, Foolbox Native: Fast adversarial attacks to benchmark the robustness of machine learning models in PyTorch, TensorFlow, and JAX https://doi.org/10.21105/joss.02607
+
+    .. [2] https://mathoverflow.net/a/9188
     """
     xflat = x.flatten(1)
     nbatch, ndim = xflat.shape
@@ -46,7 +45,8 @@ def uniform_like_l2_n_ball_(x: Tensor, epsilon: float = 1) -> None:
     Parameters
     ----------
     x: Tensor, shape-(N, D, ...)
-        The tensor to generate a new random tensor from, i.e., returns a tensor of similar shape and on the same device.
+        The tensor to generate a new random tensor from, i.e., returns a tensor of
+        similar shape and on the same device.
 
     Returns
     -------
@@ -55,16 +55,11 @@ def uniform_like_l2_n_ball_(x: Tensor, epsilon: float = 1) -> None:
 
     References
     ----------
-    .. [rauber2017foolboxnative] Rauber et al., 2020, Foolbox Native: Fast adversarial attacks
-       to benchmark the robustness of machine learning models in PyTorch, TensorFlow, and JAX
-       https://doi.org/10.21105/joss.02607
+    .. [1] Rauber et al., 2020, Foolbox Native: Fast adversarial attacks to benchmark the robustness of machine learning models in PyTorch, TensorFlow, and JAX https://doi.org/10.21105/joss.02607
 
-    .. [#Voel17] Voelker et al., 2017, Efficiently sampling vectors and coordinates
-       from the n-sphere and n-ball
-       http://compneuro.uwaterloo.ca/files/publications/voelker.2017.pdf
+    .. [2] Voelker et al., 2017, Efficiently sampling vectors and coordinates from the n-sphere and n-ball http://compneuro.uwaterloo.ca/files/publications/voelker.2017.pdf
 
-    .. [#Roberts20] Roberts, Martin, 2020, How to generate uniformly random points on n-spheres and in n-balls
-       http://extremelearning.com.au/how-to-generate-uniformly-random-points-on-n-spheres-and-n-balls/
+    .. [3] Roberts, Martin, 2020, How to generate uniformly random points on n-spheres and in n-balls http://extremelearning.com.au/how-to-generate-uniformly-random-points-on-n-spheres-and-n-balls/
     """
     xflat = x.flatten(1)
     nbatch, ndim = xflat.shape

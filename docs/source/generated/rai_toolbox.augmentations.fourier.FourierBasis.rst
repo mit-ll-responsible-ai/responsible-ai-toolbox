@@ -14,20 +14,5 @@ rai\_toolbox.augmentations.fourier.FourierBasis
    .. autosummary::
    
       ~FourierBasis.__init__
-      ~FourierBasis.count
-      ~FourierBasis.index
-   
-   
 
-   
-   
-   .. rubric:: Attributes
-
-   .. autosummary::
-   
-      ~FourierBasis.basis
-      ~FourierBasis.phase_shift
-      ~FourierBasis.position
-      ~FourierBasis.sym_position
-   
    

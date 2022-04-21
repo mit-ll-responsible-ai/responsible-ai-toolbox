@@ -14,11 +14,7 @@ rai\_toolbox.optim.FrankWolfe
    .. autosummary::
    
       ~FrankWolfe.__init__
-      ~FrankWolfe.add_param_group
-      ~FrankWolfe.load_state_dict
-      ~FrankWolfe.state_dict
-      ~FrankWolfe.step
-      ~FrankWolfe.zero_grad
+
    
    
 
