@@ -76,6 +76,8 @@ class _LpNormOptimizer(GradientTransformerOptimizer):
             - A negative number indicates the 'offset' from the dimensionality of the gradient (see "Notes" for examples).
             - `None` means that the transformation will be applied directly to the gradient without any broadcasting.
 
+            See `GradientTransformerOptimizer` for more details and examples.
+
         grad_scale : float, optional (default=1.0)
             Multiplies each gradient in-place after the in-place transformation is
             performed. This can be specified per param-group.
@@ -92,22 +94,6 @@ class _LpNormOptimizer(GradientTransformerOptimizer):
 
         **inner_opt_kwargs : Any
             Named arguments used to initialize `InnerOpt`.
-
-        Notes
-        -----
-        Additional Explanation of `param_ndim`:
-
-        If the tensor has a shape `(d0, d1, d2)` and `param_ndim=1` then the
-        transformation will be broadcast over each shape-(d2,) sub-tensor in the
-        gradient (of which there are `d0 * d1`).
-
-        If the tensor has a shape `(d0, d1, d2, d3)`, and if `param_ndim=-1`,
-        then the transformation will broadcast over each shape-`(d1, d2, d3)`
-        sub-tensor in the gradient (of which there are d0). This is equivalent
-        to `param_ndim=3`.
-
-        If `param_ndim=0` then the transformation is applied elementwise to the
-        tensor by temporarily reshaping the gradient to a shape-(T, 1) tensor.
         """
         if not hasattr(self, "_p"):
             raise TypeError(f"{type(self).__name__} must have the attribute `_p` set.")
@@ -215,8 +201,10 @@ class SignedGradientOptim(GradientTransformerOptimizer):
             batch-like style.
 
             - A positive number determines the dimensionality of the gradient that the transformation will act on.
-            - A negative number indicates the 'offset' from the dimensionality of the gradient (see "Notes" for examples).
+            - A negative number indicates the 'offset' from the dimensionality of the gradient. E.g. `-1` leads to batch-style broadcasting.
             - `None` means that the transformation will be applied directly to the gradient without any broadcasting.
+
+            See `GradientTransformerOptimizer` for more details and examples
 
         grad_scale : float, optional (default=1.0)
             Multiplies each gradient in-place after the in-place transformation is
@@ -231,22 +219,6 @@ class SignedGradientOptim(GradientTransformerOptimizer):
 
         **inner_opt_kwargs : Any
             Named arguments used to initialize `InnerOpt`.
-
-        Notes
-        -----
-        Additional Explanation of `param_ndim`:
-
-        If the tensor has a shape `(d0, d1, d2)` and `param_ndim=1` then the
-        transformation will be broadcast over each shape-(d2,) sub-tensor in the
-        gradient (of which there are `d0 * d1`).
-
-        If the tensor has a shape `(d0, d1, d2, d3)`, and if `param_ndim=-1`,
-        then the transformation will broadcast over each shape-`(d1, d2, d3)`
-        sub-tensor in the gradient (of which there are d0). This is equivalent
-        to `param_ndim=3`.
-
-        If `param_ndim=0` then the transformation is applied elementwise to the
-        tensor by temporarily reshaping the gradient to a shape-(T, 1) tensor.
         """
         super().__init__(
             params,
@@ -450,8 +422,11 @@ class L2ProjectedOptim(L2NormedGradientOptim, ProjectionMixin):
             batch-like style.
 
             - A positive number determines the dimensionality of the gradient that the transformation will act on.
-            - A negative number indicates the 'offset' from the dimensionality of the gradient (see "Notes" for examples).
+            - A negative number indicates the 'offset' from the dimensionality of the gradient. E.g. `-1` leads to batch-style broadcasting.
             - `None` means that the transformation will be applied directly to the gradient without any broadcasting.
+
+            See `GradientTransformerOptimizer` for more details and examples
+
 
         grad_scale : float, optional (default=1.0)
             Multiplies each gradient in-place after the in-place transformation is
@@ -469,22 +444,6 @@ class L2ProjectedOptim(L2NormedGradientOptim, ProjectionMixin):
 
         **inner_opt_kwargs : Any
             Named arguments used to initialize `InnerOpt`.
-
-        Notes
-        -----
-        Additional Explanation of `param_ndim`:
-
-        If the tensor has a shape `(d0, d1, d2)` and `param_ndim=1` then the
-        transformation will be broadcast over each shape-(d2,) sub-tensor in the
-        gradient (of which there are `d0 * d1`).
-
-        If the tensor has a shape `(d0, d1, d2, d3)`, and if `param_ndim=-1`,
-        then the transformation will broadcast over each shape-`(d1, d2, d3)`
-        sub-tensor in the gradient (of which there are d0). This is equivalent
-        to `param_ndim=3`.
-
-        If `param_ndim=0` then the transformation is applied elementwise to the
-        tensor by temporarily reshaping the gradient to a shape-(T, 1) tensor.
         """
 
         if defaults is None:
@@ -601,22 +560,6 @@ class LinfProjectedOptim(SignedGradientOptim, ProjectionMixin):
 
         **inner_opt_kwargs : Any
             Named arguments used to initialize `InnerOpt`.
-
-        Notes
-        -----
-        Additional Explanation of `param_ndim`:
-
-        If the tensor has a shape `(d0, d1, d2)` and `param_ndim=1` then the
-        transformation will be broadcast over each shape-(d2,) sub-tensor in the
-        gradient (of which there are `d0 * d1`).
-
-        If the tensor has a shape `(d0, d1, d2, d3)`, and if `param_ndim=-1`,
-        then the transformation will broadcast over each shape-`(d1, d2, d3)`
-        sub-tensor in the gradient (of which there are d0). This is equivalent
-        to `param_ndim=3`.
-
-        If `param_ndim=0` then the transformation is applied elementwise to the
-        tensor by temporarily reshaping the gradient to a shape-(T, 1) tensor.
         """
         assert epsilon >= 0
         if defaults is None:
@@ -742,8 +685,11 @@ class L1qNormedGradientOptim(GradientTransformerOptimizer):
             batch-like style.
 
             - A positive number determines the dimensionality of the gradient that the transformation will act on.
-            - A negative number indicates the 'offset' from the dimensionality of the gradient (see "Notes" for examples).
+            - A negative number indicates the 'offset' from the dimensionality of the gradient. E.g. `-1` leads to batch-style broadcasting.
             - `None` means that the transformation will be applied directly to the gradient without any broadcasting.
+
+            See `GradientTransformerOptimizer` for more details and examples
+
 
         grad_scale : float, optional (default=1.0)
             Multiplies each gradient in-place after the in-place transformation is
@@ -764,22 +710,6 @@ class L1qNormedGradientOptim(GradientTransformerOptimizer):
 
         **inner_opt_kwargs : Any
             Named arguments used to initialize `InnerOpt`.
-
-        Notes
-        -----
-        Additional Explanation of `param_ndim`:
-
-        If the tensor has a shape `(d0, d1, d2)` and `param_ndim=1` then the
-        transformation will be broadcast over each shape-(d2,) sub-tensor in the
-        gradient (of which there are `d0 * d1`).
-
-        If the tensor has a shape `(d0, d1, d2, d3)`, and if `param_ndim=-1`,
-        then the transformation will broadcast over each shape-`(d1, d2, d3)`
-        sub-tensor in the gradient (of which there are d0). This is equivalent
-        to `param_ndim=3`.
-
-        If `param_ndim=0` then the transformation is applied elementwise to the
-        tensor by temporarily reshaping the gradient to a shape-(T, 1) tensor.
         """
         super().__init__(
             params,
