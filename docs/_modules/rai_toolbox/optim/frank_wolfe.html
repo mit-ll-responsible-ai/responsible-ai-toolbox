@@ -168,6 +168,7 @@
 <span class="kn">from</span> <span class="nn">torch.optim</span> <span class="kn">import</span> <span class="n">Optimizer</span>
 
 <span class="kn">from</span> <span class="nn">rai_toolbox._typing</span> <span class="kn">import</span> <span class="n">OptimParams</span>
+<span class="kn">from</span> <span class="nn">rai_toolbox._utils</span> <span class="kn">import</span> <span class="n">check_param_group_value</span><span class="p">,</span> <span class="n">value_check</span>
 
 <span class="kn">from</span> <span class="nn">.lp_space</span> <span class="kn">import</span> <span class="n">L1qNormedGradientOptim</span><span class="p">,</span> <span class="n">L2NormedGradientOptim</span><span class="p">,</span> <span class="n">SignedGradientOptim</span>
 <span class="kn">from</span> <span class="nn">.optimizer</span> <span class="kn">import</span> <span class="n">GradientTransformerOptimizer</span>
@@ -232,15 +233,23 @@
 <span class="sd">        div_by_zero_eps : float, optional (default=`torch.finfo(torch.float32).tiny`)</span>
 <span class="sd">            Prevents div-by-zero error in learning rate schedule.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_eps</span> <span class="o">=</span> <span class="n">div_by_zero_eps</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_use_default_lr_schedule</span> <span class="o">=</span> <span class="n">use_default_lr_schedule</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_use_default_lr_schedule</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">lr</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`lr` must reside in the domain [0, 1]&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_eps</span> <span class="o">=</span> <span class="n">value_check</span><span class="p">(</span><span class="s2">&quot;div_by_zero_eps&quot;</span><span class="p">,</span> <span class="n">div_by_zero_eps</span><span class="p">,</span> <span class="n">min_</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_use_default_lr_schedule</span> <span class="o">=</span> <span class="n">value_check</span><span class="p">(</span>
+            <span class="s2">&quot;use_default_lr_schedule&quot;</span><span class="p">,</span> <span class="n">use_default_lr_schedule</span><span class="p">,</span> <span class="n">type_</span><span class="o">=</span><span class="nb">bool</span>
+        <span class="p">)</span>
 
         <span class="n">defaults</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">lr</span><span class="o">=</span><span class="n">lr</span><span class="p">,</span> <span class="n">lmo_scaling_factor</span><span class="o">=</span><span class="n">lmo_scaling_factor</span><span class="p">)</span>
 
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">defaults</span><span class="p">)</span>  <span class="c1"># type: ignore</span></div>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">defaults</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+
+        <span class="n">check_param_group_value</span><span class="p">(</span><span class="s2">&quot;lmo_scaling_factor&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_groups</span><span class="p">)</span>
+
+        <span class="n">check_param_group_value</span><span class="p">(</span>
+            <span class="s2">&quot;lr&quot;</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">param_groups</span><span class="p">,</span>
+            <span class="n">min_</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+            <span class="n">max_</span><span class="o">=</span><span class="mf">1.0</span> <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_use_default_lr_schedule</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="p">)</span></div>
 
     <span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
     <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">closure</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>

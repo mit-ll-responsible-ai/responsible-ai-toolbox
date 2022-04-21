@@ -324,6 +324,7 @@
 <span class="sd">            -------</span>
 <span class="sd">            ReturnType</span>
 <span class="sd">            &quot;&quot;&quot;</span>
+            <span class="k">del</span> <span class="n">trainer</span>  <span class="c1"># unused</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">cluster_environment</span><span class="o">.</span><span class="n">creates_processes_externally</span><span class="p">:</span>
                 <span class="n">testing</span> <span class="o">=</span> <span class="n">function</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;_test_impl&quot;</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_call_children_scripts</span><span class="p">(</span><span class="n">testing</span><span class="o">=</span><span class="n">testing</span><span class="p">)</span>

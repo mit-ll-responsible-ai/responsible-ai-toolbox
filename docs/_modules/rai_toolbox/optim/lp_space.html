@@ -172,6 +172,7 @@
 
 <span class="kn">from</span> <span class="nn">rai_toolbox._typing</span> <span class="kn">import</span> <span class="n">Optimizer</span> <span class="k">as</span> <span class="n">Opt</span>
 <span class="kn">from</span> <span class="nn">rai_toolbox._typing</span> <span class="kn">import</span> <span class="n">OptimizerType</span><span class="p">,</span> <span class="n">OptimParams</span><span class="p">,</span> <span class="n">Partial</span>
+<span class="kn">from</span> <span class="nn">rai_toolbox._utils</span> <span class="kn">import</span> <span class="n">check_param_group_value</span><span class="p">,</span> <span class="n">value_check</span>
 
 <span class="kn">from</span> <span class="nn">.optimizer</span> <span class="kn">import</span> <span class="n">DatumParamGroup</span><span class="p">,</span> <span class="n">GradientTransformerOptimizer</span><span class="p">,</span> <span class="n">ProjectionMixin</span>
 
@@ -272,7 +273,8 @@
             <span class="n">grad_bias</span><span class="o">=</span><span class="n">grad_bias</span><span class="p">,</span>
             <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">div_by_zero_eps</span> <span class="o">=</span> <span class="n">div_by_zero_eps</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">div_by_zero_eps</span> <span class="o">=</span> <span class="n">value_check</span><span class="p">(</span><span class="s2">&quot;div_by_zero_eps&quot;</span><span class="p">,</span> <span class="n">div_by_zero_eps</span><span class="p">,</span> <span class="n">min_</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">p</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
@@ -619,7 +621,8 @@
             <span class="n">grad_bias</span><span class="o">=</span><span class="n">grad_bias</span><span class="p">,</span>
             <span class="n">div_by_zero_eps</span><span class="o">=</span><span class="n">div_by_zero_eps</span><span class="p">,</span>
             <span class="o">**</span><span class="n">inner_opt_kwargs</span><span class="p">,</span>
-        <span class="p">)</span></div>
+        <span class="p">)</span>
+        <span class="n">check_param_group_value</span><span class="p">(</span><span class="s2">&quot;epsilon&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_groups</span><span class="p">,</span> <span class="n">min_</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_project_parameter_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">optim_group</span><span class="p">:</span> <span class="n">_HasEpsilon</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Applies an in-place projection on the given parameter&quot;&quot;&quot;</span>
@@ -734,7 +737,9 @@
             <span class="n">grad_scale</span><span class="o">=</span><span class="n">grad_scale</span><span class="p">,</span>
             <span class="n">grad_bias</span><span class="o">=</span><span class="n">grad_bias</span><span class="p">,</span>
             <span class="o">**</span><span class="n">inner_opt_kwargs</span><span class="p">,</span>
-        <span class="p">)</span></div>
+        <span class="p">)</span>
+
+        <span class="n">check_param_group_value</span><span class="p">(</span><span class="s2">&quot;epsilon&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_groups</span><span class="p">,</span> <span class="n">min_</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_project_parameter_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">optim_group</span><span class="p">:</span> <span class="n">_HasEpsilon</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">epsilon</span> <span class="o">=</span> <span class="n">optim_group</span><span class="p">[</span><span class="s2">&quot;epsilon&quot;</span><span class="p">]</span>
@@ -881,10 +886,10 @@
             <span class="o">**</span><span class="n">inner_opt_kwargs</span><span class="p">,</span>
         <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">div_by_zero_eps</span> <span class="o">=</span> <span class="n">div_by_zero_eps</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">q</span> <span class="o">=</span> <span class="n">q</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dq</span> <span class="o">=</span> <span class="n">dq</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_generator</span> <span class="o">=</span> <span class="n">generator</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">div_by_zero_eps</span> <span class="o">=</span> <span class="n">value_check</span><span class="p">(</span><span class="s2">&quot;div_by_zero_eps&quot;</span><span class="p">,</span> <span class="n">div_by_zero_eps</span><span class="p">,</span> <span class="n">min_</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">q</span> <span class="o">=</span> <span class="n">value_check</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">min_</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">max_</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dq</span> <span class="o">=</span> <span class="n">value_check</span><span class="p">(</span><span class="s2">&quot;dq&quot;</span><span class="p">,</span> <span class="n">dq</span><span class="p">,</span> <span class="n">min_</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">max_</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_generator</span> <span class="o">=</span> <span class="n">value_check</span><span class="p">(</span><span class="s2">&quot;generator&quot;</span><span class="p">,</span> <span class="n">generator</span><span class="p">,</span> <span class="n">type_</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">Generator</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_qlow</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">q</span> <span class="o">-</span> <span class="n">dq</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_qhigh</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">q</span> <span class="o">+</span> <span class="n">dq</span><span class="p">)</span></div>
