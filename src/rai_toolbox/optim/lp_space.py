@@ -12,6 +12,7 @@ from typing_extensions import Final
 
 from rai_toolbox._typing import Optimizer as Opt
 from rai_toolbox._typing import OptimizerType, OptimParams, Partial
+from rai_toolbox._utils import check_param_group_value, value_check
 
 from .optimizer import DatumParamGroup, GradientTransformerOptimizer, ProjectionMixin
 
@@ -112,7 +113,8 @@ class _LpNormOptimizer(GradientTransformerOptimizer):
             grad_bias=grad_bias,
             **kwargs,
         )
-        self.div_by_zero_eps = div_by_zero_eps
+
+        self.div_by_zero_eps = value_check("div_by_zero_eps", div_by_zero_eps, min_=0.0)
 
     @property
     def p(self) -> Union[float, int]:
@@ -460,6 +462,7 @@ class L2ProjectedOptim(L2NormedGradientOptim, ProjectionMixin):
             div_by_zero_eps=div_by_zero_eps,
             **inner_opt_kwargs,
         )
+        check_param_group_value("epsilon", self.param_groups, min_=0.0)
 
     def _project_parameter_(self, param: Tensor, optim_group: _HasEpsilon) -> None:
         """Applies an in-place projection on the given parameter"""
@@ -575,6 +578,8 @@ class LinfProjectedOptim(SignedGradientOptim, ProjectionMixin):
             grad_bias=grad_bias,
             **inner_opt_kwargs,
         )
+
+        check_param_group_value("epsilon", self.param_groups, min_=0.0)
 
     def _project_parameter_(self, param: Tensor, optim_group: _HasEpsilon) -> None:
         epsilon = optim_group["epsilon"]
@@ -721,10 +726,10 @@ class L1qNormedGradientOptim(GradientTransformerOptimizer):
             **inner_opt_kwargs,
         )
 
-        self.div_by_zero_eps = div_by_zero_eps
-        self.q = q
-        self.dq = dq
-        self._generator = generator
+        self.div_by_zero_eps = value_check("div_by_zero_eps", div_by_zero_eps, min_=0.0)
+        self.q = value_check("q", q, min_=0.0, max_=1.0)
+        self.dq = value_check("dq", dq, min_=0.0, max_=1.0)
+        self._generator = value_check("generator", generator, type_=torch.Generator)
 
         self._qlow = max(0.0, q - dq)
         self._qhigh = min(1.0, q + dq)

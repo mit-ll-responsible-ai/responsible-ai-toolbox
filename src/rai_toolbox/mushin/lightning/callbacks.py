@@ -9,6 +9,8 @@ from typing import Union
 import torch
 from pytorch_lightning import Callback
 
+from rai_toolbox._utils import value_check
+
 
 class MetricsCallback(Callback):
     """Saves validation and test metrics stored in `trainer.callback_metrics`.
@@ -39,14 +41,14 @@ class MetricsCallback(Callback):
         filename: Union[Path, str] = "metrics.pt",
     ):
         super().__init__()
-        self.save_dir = save_dir
-        self.filename = filename
+        self.save_dir = Path(save_dir)
+        self.filename = value_check("filename", filename, type_=(str, Path))
         self.train_metrics = defaultdict(list)
         self.val_metrics = defaultdict(list)
         self.test_metrics = defaultdict(list)
 
     def _get_filename(self, stage: str):
-        return Path(self.save_dir) / f"{stage}_{self.filename}"
+        return self.save_dir / f"{stage}_{self.filename}"
 
     def _process_metrics(self, stored_metrics, metrics):
         for k, v in metrics.items():

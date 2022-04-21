@@ -31,22 +31,22 @@ INSTALL_REQUIRES = [
 ]
 TESTS_REQUIRE = [
     "pytest >= 3.8",
-    "hypothesis >= 6.28.0",
+    "hypothesis >= 6.41.0",
     "mygrad >= 2.0.0",
     "omegaconf >= 2.1.1",
 ]
 
 DESCRIPTION = "PyTorch-centric library for evaluating and enhancing the robustness of AI technologies"
 LONG_DESCRIPTION = """
-The rAI-toolbox is designed to enable methods for evaluating and enhancing both the 
-robustness and the explainability of AI models in a way that is scalable and that 
+The rAI-toolbox is designed to enable methods for evaluating and enhancing both the
+robustness and the explainability of AI models in a way that is scalable and that
 composes naturally with other popular ML frameworks.
 
-A key design principle of the rAI-toolbox is that it adheres strictly to the APIs 
-specified by the PyTorch machine learning framework. For example, the rAI-toolbox frames 
-adversarial training workflows solely in terms of the `torch.nn.Optimizer` and 
-`torch.nn.Module` APIs. This makes it trivial to leverage other libraries and 
-frameworks from the PyTorch ecosystem to bolster your responsible AI R&D. For 
+A key design principle of the rAI-toolbox is that it adheres strictly to the APIs
+specified by the PyTorch machine learning framework. For example, the rAI-toolbox frames
+adversarial training workflows solely in terms of the `torch.nn.Optimizer` and
+`torch.nn.Module` APIs. This makes it trivial to leverage other libraries and
+frameworks from the PyTorch ecosystem to bolster your responsible AI R&D. For
 instance, one can naturally leverage the rAI-toolbox together with
 PyTorch Lightning to perform distributed adversarial training.
 """

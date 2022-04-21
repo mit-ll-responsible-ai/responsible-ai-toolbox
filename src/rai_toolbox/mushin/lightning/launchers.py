@@ -164,6 +164,7 @@ if PL_VERSION >= Version(1, 6, 0):
             -------
             ReturnType
             """
+            del trainer  # unused
             if not self.cluster_environment.creates_processes_externally:
                 testing = function.__name__ == "_test_impl"
                 self._call_children_scripts(testing=testing)
