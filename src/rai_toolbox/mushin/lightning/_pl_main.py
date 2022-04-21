@@ -6,16 +6,22 @@
 This script is called from `rai_toolbox.mushin.lightning.launchers.HydraDDP
 """
 
+import logging
+
 import hydra
 from pytorch_lightning import LightningModule, Trainer
 
 from ..hydra import zen
 
+log = logging.getLogger(__name__)
+
 
 def task(trainer: Trainer, module: LightningModule, pl_testing: bool) -> None:
     if pl_testing:
+        log.info("Launching child process using Training.test")
         trainer.test(module)
     else:
+        log.info("Launching child process using Training.fit")
         trainer.fit(module)
 
 

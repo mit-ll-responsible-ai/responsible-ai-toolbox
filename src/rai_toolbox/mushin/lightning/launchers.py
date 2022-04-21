@@ -67,11 +67,7 @@ def _subprocess_call(local_rank: int, testing: bool) -> None:
     # Set flag to run Trainer.fit or Trainer.test in `_pl_main.py`
     command += ["++pl_testing=" + ("false" if not testing else "true")]
 
-    command += [
-        f"hydra.output_subdir=.pl_hydra_{local_rank}",
-        f"hydra.run.dir={os_cwd}",
-        f"hydra.job.name=train_ddp_process_{local_rank}",
-    ]
+    command += [f"hydra.run.dir={os_cwd}", f"hydra.job.name={hydra_cfg.job.name}"]
     subprocess.Popen(command, env=env_copy, cwd=cwd)
 
 
@@ -89,18 +85,10 @@ if PL_VERSION >= Version(1, 6, 0):
 
         - trainer: A `pytorch_lightning.Trainer` configuration
         - module: A `pytorch_lightning.LightningModule` configuration
-        - pl_testing: A boolean: True for `Trainer.test` and False (default) `Trainer.fit`
 
         This strategy will launch a child subprocesses for additional GPU beyond the first using the following base command::
 
            python -m rai_toolbox.mushin.lightning._pl_main -cp <path to config.yaml> -cn config.yaml
-
-        Notes
-        -----
-        In order to execute a MULTIRUN Hydra job we must make sure to destroy an distributed
-        processes on setup of this function.  This will lead to issues if running multiple jobs
-        in the notebook or trying to do `Trainer.fit` followed by `Trainer.test`.
-
 
         Examples
         --------
@@ -202,19 +190,11 @@ else:  # pragma: no cover
 
         - trainer: A `pytorch_lightning.Trainer` configuration
         - module: A `pytorch_lightning.LightningModule` configuration
-        - pl_testing: A boolean: True for `Trainer.test` and False (default) `Trainer.fit`
 
         This strategy will launch a child subprocesses for additional GPU beyond the first using the following base command::
 
            python -m rai_toolbox.mushin.lightning._pl_main -cp <path to config.yaml> -cn config.yaml
 
-
-        Notes
-        -----
-        In order to execute a MULTIRUN Hydra job we must make sure to destroy an
-        distributed processes on setup of this function.  This will lead to issues if
-        running multiple jobs in the notebook or trying to do `Trainer.fit` followed by
-        `Trainer.test`.
 
         Examples
         --------
