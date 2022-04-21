@@ -31,7 +31,7 @@ Optimizers with Normed Gradients
    L1NormedGradientOptim
    L2NormedGradientOptim
    SignedGradientOptim
-   L1NormedGradientOptim
+   L1qNormedGradientOptim
 
 
 ************************************************
@@ -44,7 +44,6 @@ Optimizers with Projections Onto Constraint Sets
 
    L2ProjectedOptim
    LinfProjectedOptim
-   L1qNormedGradientOptim
 
 
 **********************

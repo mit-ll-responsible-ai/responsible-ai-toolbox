@@ -11,6 +11,7 @@ from typing import (
     Dict,
     Generic,
     Iterable,
+    Mapping,
     Optional,
     Sequence,
     Type,
@@ -21,7 +22,7 @@ from typing import (
 
 import numpy as np
 from torch import Tensor
-from typing_extensions import Protocol, TypeAlias, TypedDict, TypeGuard
+from typing_extensions import Protocol, TypeAlias, TypeGuard
 
 T = TypeVar("T")
 T_co = TypeVar("T_co", covariant=True)
@@ -67,9 +68,7 @@ class Optimizer(Protocol):  # pragma: no cover
         ...
 
 
-class ParamGroup(TypedDict):
-    params: Iterable[Tensor]
-
+ParamGroup = Mapping[str, Any]
 
 # Needed instead of Type[Optimizer] to deal with __init__ sig mismatch
 OptimizerType: TypeAlias = Callable[..., Optimizer]

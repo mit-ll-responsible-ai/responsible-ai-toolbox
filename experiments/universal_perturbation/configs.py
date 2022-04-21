@@ -93,7 +93,6 @@ L1qFWOpt = pbuilds(
     L1qFrankWolfe,
     q=0.975,
     lr=1.0,
-    gamma=0.004,
     epsilon="${epsilon}",
     param_ndim=None,  # ensure grad transformation doesn't broadcast
 )

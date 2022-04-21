@@ -23,7 +23,6 @@ from rai_toolbox.perturbations.solvers import (
     random_restart,
 )
 
-
 simple_arrays = hnp.arrays(
     shape=hnp.array_shapes(min_dims=2, max_dims=2),
     dtype=np.float64,
@@ -141,30 +140,6 @@ def test_random_restart_repeats(Optim, x, use_best, repeats):
                 use_best=use_best,
             )
             assert torch.all(loss_adv >= loss)
-
-
-@given(x=tensors(), eps=st.floats(-1, 1))
-def test_epsilon_check(x, eps):
-    model, x, y = pytorch_simple_model(x)
-    optimizer = partial(L2ProjectedOptim, lr=1, epsilon=eps)
-
-    if eps < 0:
-        with pytest.raises(AssertionError):
-            gradient_ascent(
-                model=model,
-                steps=10,
-                data=x,
-                target=y,
-                optimizer=optimizer,
-            )
-    else:
-        gradient_ascent(
-            model=model,
-            steps=10,
-            data=x,
-            target=y,
-            optimizer=optimizer,
-        )
 
 
 @given(x=tensors(), eps=st.floats(0, 1))
@@ -348,16 +323,17 @@ def test_various_forms_of_pert_model(pert_model, x: float):
 
     assert torch.allclose(adv, 3 * data)
 
+
 def test_solve_with_fn_as_model():
     adv, _ = gradient_ascent(
-        model=lambda x: x ** 2,
+        model=lambda x: x**2,
         data=torch.tensor([2.0]),
         target=torch.tensor([0.0]),
         optimizer=SGD,
         steps=1,
         lr=1,
         criterion=lambda pred, _: pred,
-        targeted=True
+        targeted=True,
     )
     assert adv.item() == -2.0
 
@@ -365,13 +341,13 @@ def test_solve_with_fn_as_model():
 def test_solve_works_within_no_grad():
     with torch.no_grad():
         adv, _ = gradient_ascent(
-            model=lambda x: x ** 2,
+            model=lambda x: x**2,
             data=torch.tensor([2.0]),
             target=torch.tensor([0.0]),
             optimizer=SGD,
             steps=1,
             lr=1,
             criterion=lambda pred, _: pred,
-            targeted=True
+            targeted=True,
         )
     assert adv.item() == -2.0

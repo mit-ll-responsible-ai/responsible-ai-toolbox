@@ -6,6 +6,7 @@ from abc import ABCMeta, abstractmethod
 from typing import (
     Any,
     Callable,
+    Dict,
     Iterable,
     List,
     Mapping,
@@ -15,7 +16,6 @@ from typing import (
     cast,
     overload,
 )
-
 
 import torch
 from torch import Tensor
@@ -31,10 +31,12 @@ __all__ = ["GradientTransformerOptimizer", "ProjectionMixin"]
 
 class DatumParamGroup(ParamGroup):
     param_ndim: Optional[int]
+    grad_scale: float
+    grad_bias: float
 
 
 def _shares_memory(x: Tensor, y: Tensor) -> bool:
-    return x.storage().data_ptr() == y.storage().data_ptr()  # type: ignore
+    return x.storage().data_ptr() == y.storage().data_ptr()
 
 
 def _reshape_to_batch(x: Tensor, param_ndim: Optional[int]) -> Tensor:
@@ -80,7 +82,7 @@ def _to_batch(p: Tensor, param_ndim: Optional[int]) -> Tensor:
 
     Parameters
     ----------
-    p: Tensor
+    p : Tensor
 
     param_ndim: Optional[int]
         Determines the shape of the resulting parameter
@@ -146,8 +148,7 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
     `GradientTransformerOptimizer` is designed to be combined with other,
     standard gradient-based optimizers (e.g. Adam) via encapsulation, rather
     then through inheritance. I.e., `GradientTransformerOptimizer(InnerOpt=<...>)`
-    will apply a in-place gradient transform on a parameter, before using `InnerOpt.
-    step` to update said parameter.
+    will apply a in-place gradient transform on a parameter, before using `InnerOpt.step(...)` to update said parameter.
 
     If a closure is supplied to the `.step(...)` method, then the in-place
     gradient transformation is applied after the closure call and prior to
@@ -160,7 +161,7 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
     Examples
     --------
     Let's create a gradient-transforming optimizer that replaces the gradient
-    of each parameter with the sign of the gradient (:math:`\pm 1`) prior to
+    of each parameter with the elementwise sign of the gradient (:math:`\pm 1`) prior to
     performing the step of the inner optimizer:
 
     >>> import torch as tr
@@ -172,21 +173,28 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
     ...             return
     ...         tr.sign(param.grad, out=param.grad)  # operates in-place
 
-    Now we'll use this optimizer – along with AdamW – to transform the gradient of each
-    parameter prior to using AdamW to perform the actual gradient-based update that
-    parameter.
+    Now we'll use this optimizer – with `torch.nn.optim.AdamW` providing the actual
+    parameter-update functionality – to update the parameter.
 
     >>> x = tr.tensor([-10.0, 10.0], requires_grad=True)
     >>> optim = SignedGradientOptim([x], InnerOpt=tr.optim.AdamW, lr=0.1)
 
-    >>> loss = (10_000 * x).sum()
-    >>> loss.backward()
-    >>> optim.step()
+    Using `x` in a calculation and compute an associated gradient for it:
 
+    >>> (10_000 * x).sum().backward()
+
+    Updating `x` using our grad-sign + AdamW optimizer:
+
+    >>> optim.step()
     >>> x
     tensor([-10.9000,   8.9000], requires_grad=True)
 
-    To understand the role of `param_ndim`, let's design an optimizer that normalizes a
+    This was a simple optimizer which did not involve any broadcasting in the gradient
+    transformation; the next example will involve broadcasting.
+
+    **Controlling the gradient transformation with param_ndim**
+
+    To understand the role of `param_ndim` let's design an optimizer that normalizes a
     gradient by its max value – along some user-specified dimension – prior to
     performing the gradient-based update to its parameter.
 
@@ -204,16 +212,15 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
 
     Note that we design `_inplace_grad_transform_` to operate in-place on the gradient
     and that treat the gradient as if it has a shape `(N, d1, ..., dm)`, where we
-    want to compute the max over each of the N sub-tensors of shape-(d1, ..., dm).
+    want to compute the max over each of the `N` sub-tensors of shape-`(d1, ..., dm)`.
 
-    Now we will create a shape-(2, 2) parameter and see how `MaxNormedGradientOptim`
-    can be instructed to compute the max-norm over various dimensions of the parameter.
-    Let's print out the transformed gradient when we use each of `param_ndim=` 0, 1, or
-    2.
+    Critically, we did not use `param_ndim` at all in this method;
+    `GradientTransformerOptimizer` assumes that we designed this method to broadcast in
+    a batch-style, as we did, and automatically leverages `param_ndim` accordingly.
 
-    Here, we are interested in seeing how the parameter's gradient is being transformed,
-    so we will use a learning rate of 0.0 so that the parameter itself is not modified
-    during this example.
+    Now we will create a shape-(2, 2) parameter to see how `MaxNormedGradientOptim`
+    can compute the max-norm over various dimensions of the parameter. Let's print out
+    the transformed gradient when we use each of `param_ndim`: `0`, `1`, or `2`.
 
     >>> x = tr.tensor([[1.0, 2.0],
     ...                [20.0, 10.0]], requires_grad=True)
@@ -249,21 +256,23 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
         params: OptimParams,
         InnerOpt: Union[Partial[Opt], OptimizerType] = SGD,
         *,
-        param_ndim: Optional[int] = -1,
-        defaults: Optional[dict] = None,
+        param_ndim: Union[int, None] = -1,
+        grad_scale: float = 1.0,
+        grad_bias: float = 0.0,
+        defaults: Optional[Dict[str, Any]] = None,
         **inner_opt_kwargs,
     ) -> None:
         """
         Parameters
         ----------
-        params: Iterable
+        params : Sequence[Tensor] | Iterable[ParamGroup]
             iterable of parameters to optimize or dicts defining parameter groups
 
-        InnerOpt: Type[Optimizer] | Partial[Optimizer], optional (default=`torch.nn.optim.SGD`)
+        InnerOpt : Type[Optimizer] | Partial[Optimizer], optional (default=`torch.nn.optim.SGD`)
             The optimizer that updates the parameters after their gradients have
             been transformed.
 
-        param_ndim : int | NoneType, optional (default=-1)
+        param_ndim : int | None, optional (default=-1)
             Controls how `_inplace_grad_transform_` is broadcast onto the gradient
             of a given parameter. This can be specified per param-group. By default,
             the gradient transformation broadcasts over the first dimension in a
@@ -273,27 +282,41 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
             - A negative number indicates the 'offset' from the dimensionality of the gradient (see "Notes" for examples).
             - `None` means that the transformation will be applied directly to the gradient without any broadcasting.
 
-        defaults: Optional[dict]
+        grad_scale : float, optional (default=1.0)
+            Multiplies each gradient in-place after the in-place transformation is
+            performed. This can be specified per param-group.
+
+        grad_bias : float, optional (default=0.0)
+            Added to each gradient in-place after the in-place transformation is
+            performed. This can be specified per param-group.
+
+        defaults : Optional[Dict[str, Any]]
             Specifies default parameters for all parameter groups.
+
+        **inner_opt_kwargs : Any
+            Named arguments used to initialize `InnerOpt`.
 
         Notes
         -----
         Additional Explanation of `param_ndim`:
 
-        If the gradient has a shape (d0, d1, d2) and `param_ndim=1` then the
+        If the gradient has a shape `(d0, d1, d2)` and `param_ndim=1` then the
         transformation will be broadcast over each shape-(d2,) sub-tensor in the
-        gradient (of which there are d0 * d1).
+        gradient (of which there are `d0 * d1`).
 
-        If a gradient has a shape (d0, d1, d2, d3), and if `param_ndim=-1`,
-        then the transformation will broadcast over each shape-(d1, d2, d3) sub-tensor
-        in the gradient (of which there are d0). This is equivalent to `param_ndim=3`.
+        If a gradient has a shape `(d0, d1, d2, d3)`, and if `param_ndim=-1`,
+        then the transformation will broadcast over each shape-`(d1, d2, d3)`
+        sub-tensor in the gradient (of which there are d0). This is equivalent
+        to `param_ndim=3`.
 
         If `param_ndim=0` then the transformation is applied elementwise to the
         gradient by temporarily reshaping the gradient to a shape-(T, 1) tensor.
         """
         if defaults is None:
             defaults = {}
-        defaults["param_ndim"] = param_ndim
+        defaults["param_ndim"] = defaults.get("param_ndim", param_ndim)
+        defaults["grad_scale"] = defaults.get("grad_scale", grad_scale)
+        defaults["grad_bias"] = defaults.get("grad_bias", grad_bias)
 
         super().__init__(params, defaults)  # type: ignore
         self.inner_opt = InnerOpt(self.param_groups, **inner_opt_kwargs)
@@ -305,15 +328,21 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
                     f"`param_ndim` must be an int or None, got: {param_ndim}"
                 )
 
+            if not isinstance(group["grad_scale"], (float, int)):
+                raise TypeError(
+                    f"grad_scale must be a float, got {group['grad_scale']}"
+                )
+
+            if not isinstance(group["grad_bias"], (float, int)):
+                raise TypeError(f"grad_bias must be a float, got {group['grad_bias']}")
+
             for p in group["params"]:
                 p: Tensor
-                if param_ndim is None:
-                    continue
-                if p.ndim < abs(param_ndim):
+                if param_ndim is not None and p.ndim < abs(param_ndim):
                     raise ValueError(
-                        f"`param_ndim={param_ndim}` specified for parameter with "
-                        f"ndim={p.ndim} is not valid. `abs(param_ndim) <= ndim` must "
-                        f"hold."
+                        f"`param_ndim={param_ndim}` specified for parameter "
+                        f"with ndim={p.ndim} is not valid. `abs(param_ndim) <= "
+                        f"ndim` must hold."
                     )
 
     @abstractmethod
@@ -328,7 +357,7 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
         assumed to have the shape-(N, d0, ...) and the transformation should be
         applied - in-place - to each shape-(d0, ...) sub-tensor.
 
-        Prior to calling `_in_place_grad_transform`, `GradientTransformerOptimizer`
+        Prior to calling `_in_place_grad_transform_`, `GradientTransformerOptimizer`
         will temporarily reshape each parameter and its gradient to have the appropriate
         shape, in accordance with the value specified for `param_ndim` such that the
         shape (d0, ...) contains `param_ndim` entries.
@@ -348,8 +377,15 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
                 assert orig_p.grad is not None
 
                 p = _to_batch(p, group["param_ndim"])
+                assert p.grad is not None
 
                 self._inplace_grad_transform_(p, optim_group=group)
+
+                if group["grad_scale"] != 1.0:
+                    p.grad *= group["grad_scale"]
+
+                if group["grad_bias"] != 0.0:
+                    p.grad += group["grad_bias"]
 
                 if p.grad is None or not _shares_memory(orig_p.grad, p.grad):
                     raise ValueError(
@@ -411,9 +447,9 @@ class ProjectionMixin(metaclass=ABCMeta):
     how the projection should be applied to each parameter (i.e., whether or not
     it is broadcasted).
 
-        - A positive number determines the dimensionality of the tensor that the projection will act on.
-        - A negative number indicates the 'offset' from the dimensionality of the tensor.
-        - `None` means that the projection will be applied to the tensor without any broadcasting.
+    - A positive number determines the dimensionality of the tensor that the projection will act on.
+    - A negative number indicates the 'offset' from the dimensionality of the tensor.
+    - `None` means that the projection will be applied to the tensor without any broadcasting.
 
     Methods
     -------

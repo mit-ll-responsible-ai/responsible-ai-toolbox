@@ -53,7 +53,7 @@ copybutton_prompt_is_regexp = True
 default_role = "py:obj"
 
 autodoc_typehints = "none"
-numpydoc_show_class_members = False 
+numpydoc_show_class_members = False
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
@@ -67,6 +67,8 @@ intersphinx_mapping = {
     "python": ("https://docs.python.org/3/", None),
     "numpy": ("https://numpy.org/doc/stable/", None),
 }
+
+autosummary_generate = False
 
 # https://www.sphinx-doc.org/en/master/usage/extensions/extlinks.html
 # A dictionary of external sites
@@ -96,7 +98,7 @@ html_theme_options = {
     "icon_links": [
         {
             "name": "GitHub",
-            "url":  _repo,
+            "url": _repo,
             "icon": "fab fa-github-square",
         },
     ],
