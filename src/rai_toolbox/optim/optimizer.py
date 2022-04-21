@@ -214,10 +214,13 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
     and that treat the gradient as if it has a shape `(N, d1, ..., dm)`, where we
     want to compute the max over each of the `N` sub-tensors of shape-`(d1, ..., dm)`.
 
+    Critically, we did not use `param_ndim` at all in this method;
+    `GradientTransformerOptimizer` assumes that we designed this method to broadcast in
+    a batch-style, as we did, and automatically leverages `param_ndim` accordingly.
+
     Now we will create a shape-(2, 2) parameter to see how `MaxNormedGradientOptim`
-    can be instructed to compute the max-norm over various dimensions of the parameter.
-    Let's print out the transformed gradient when we use each of `param_ndim`: 0, 1, or
-    2.
+    can compute the max-norm over various dimensions of the parameter. Let's print out
+    the transformed gradient when we use each of `param_ndim`: `0`, `1`, or `2`.
 
     >>> x = tr.tensor([[1.0, 2.0],
     ...                [20.0, 10.0]], requires_grad=True)
