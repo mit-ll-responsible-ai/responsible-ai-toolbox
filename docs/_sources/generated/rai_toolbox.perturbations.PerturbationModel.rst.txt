@@ -14,7 +14,6 @@ rai\_toolbox.perturbations.PerturbationModel
    .. autosummary::
    
       ~PerturbationModel.__init__
-      ~PerturbationModel.parameters
    
    
 

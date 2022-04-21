@@ -175,16 +175,17 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    save_dir: str (default: &quot;.&quot;)</span>
-<span class="sd">    filename: str (default: &quot;metrics.pt&quot;)</span>
-<span class="sd">        The base filename used to store metrics.  For `FITTING` the file is prepended with &quot;fit_&quot; and</span>
-<span class="sd">        and for `TESTING` the file is prepended with `test_`.</span>
+<span class="sd">    save_dir : str, optional (default=&quot;.&quot;)</span>
+
+<span class="sd">    filename : str, optional (default=&quot;metrics.pt&quot;)</span>
+<span class="sd">        The base filename used to store metrics.  For `FITTING` the file is prepended</span>
+<span class="sd">        with &quot;fit_&quot; and and for `TESTING` the file is prepended with `test_`.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
-<span class="sd">    No metrics will be saved during `FITTING` if no validation metrics are calculated.  This is a limitation</span>
-<span class="sd">    of PyTorch Lightning. Future versions will save the training step metrics when no validation metrics</span>
-<span class="sd">    are calculated.</span>
+<span class="sd">    No metrics will be saved during `FITTING` if no validation metrics are calculated.</span>
+<span class="sd">    This is a limitation of PyTorch Lightning. Future versions will save the training</span>
+<span class="sd">    step metrics when no validation metrics are calculated.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>

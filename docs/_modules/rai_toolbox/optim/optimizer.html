@@ -166,6 +166,7 @@
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">Any</span><span class="p">,</span>
     <span class="n">Callable</span><span class="p">,</span>
+    <span class="n">Dict</span><span class="p">,</span>
     <span class="n">Iterable</span><span class="p">,</span>
     <span class="n">List</span><span class="p">,</span>
     <span class="n">Mapping</span><span class="p">,</span>
@@ -175,7 +176,6 @@
     <span class="n">cast</span><span class="p">,</span>
     <span class="n">overload</span><span class="p">,</span>
 <span class="p">)</span>
-
 
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
@@ -191,10 +191,12 @@
 
 <span class="k">class</span> <span class="nc">DatumParamGroup</span><span class="p">(</span><span class="n">ParamGroup</span><span class="p">):</span>
     <span class="n">param_ndim</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+    <span class="n">grad_scale</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">grad_bias</span><span class="p">:</span> <span class="nb">float</span>
 
 
 <span class="k">def</span> <span class="nf">_shares_memory</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-    <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">storage</span><span class="p">()</span><span class="o">.</span><span class="n">data_ptr</span><span class="p">()</span> <span class="o">==</span> <span class="n">y</span><span class="o">.</span><span class="n">storage</span><span class="p">()</span><span class="o">.</span><span class="n">data_ptr</span><span class="p">()</span>  <span class="c1"># type: ignore</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">storage</span><span class="p">()</span><span class="o">.</span><span class="n">data_ptr</span><span class="p">()</span> <span class="o">==</span> <span class="n">y</span><span class="o">.</span><span class="n">storage</span><span class="p">()</span><span class="o">.</span><span class="n">data_ptr</span><span class="p">()</span>
 
 
 <span class="k">def</span> <span class="nf">_reshape_to_batch</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">param_ndim</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
@@ -240,7 +242,7 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    p: Tensor</span>
+<span class="sd">    p : Tensor</span>
 
 <span class="sd">    param_ndim: Optional[int]</span>
 <span class="sd">        Determines the shape of the resulting parameter</span>
@@ -306,8 +308,7 @@
 <span class="sd">    `GradientTransformerOptimizer` is designed to be combined with other,</span>
 <span class="sd">    standard gradient-based optimizers (e.g. Adam) via encapsulation, rather</span>
 <span class="sd">    then through inheritance. I.e., `GradientTransformerOptimizer(InnerOpt=&lt;...&gt;)`</span>
-<span class="sd">    will apply a in-place gradient transform on a parameter, before using `InnerOpt.</span>
-<span class="sd">    step` to update said parameter.</span>
+<span class="sd">    will apply a in-place gradient transform on a parameter, before using `InnerOpt.step(...)` to update said parameter.</span>
 
 <span class="sd">    If a closure is supplied to the `.step(...)` method, then the in-place</span>
 <span class="sd">    gradient transformation is applied after the closure call and prior to</span>
@@ -320,7 +321,7 @@
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    Let&#39;s create a gradient-transforming optimizer that replaces the gradient</span>
-<span class="sd">    of each parameter with the sign of the gradient (:math:`\pm 1`) prior to</span>
+<span class="sd">    of each parameter with the elementwise sign of the gradient (:math:`\pm 1`) prior to</span>
 <span class="sd">    performing the step of the inner optimizer:</span>
 
 <span class="sd">    &gt;&gt;&gt; import torch as tr</span>
@@ -332,21 +333,28 @@
 <span class="sd">    ...             return</span>
 <span class="sd">    ...         tr.sign(param.grad, out=param.grad)  # operates in-place</span>
 
-<span class="sd">    Now we&#39;ll use this optimizer – along with AdamW – to transform the gradient of each</span>
-<span class="sd">    parameter prior to using AdamW to perform the actual gradient-based update that</span>
-<span class="sd">    parameter.</span>
+<span class="sd">    Now we&#39;ll use this optimizer – with `torch.nn.optim.AdamW` providing the actual</span>
+<span class="sd">    parameter-update functionality – to update the parameter.</span>
 
 <span class="sd">    &gt;&gt;&gt; x = tr.tensor([-10.0, 10.0], requires_grad=True)</span>
 <span class="sd">    &gt;&gt;&gt; optim = SignedGradientOptim([x], InnerOpt=tr.optim.AdamW, lr=0.1)</span>
 
-<span class="sd">    &gt;&gt;&gt; loss = (10_000 * x).sum()</span>
-<span class="sd">    &gt;&gt;&gt; loss.backward()</span>
-<span class="sd">    &gt;&gt;&gt; optim.step()</span>
+<span class="sd">    Using `x` in a calculation and compute an associated gradient for it:</span>
 
+<span class="sd">    &gt;&gt;&gt; (10_000 * x).sum().backward()</span>
+
+<span class="sd">    Updating `x` using our grad-sign + AdamW optimizer:</span>
+
+<span class="sd">    &gt;&gt;&gt; optim.step()</span>
 <span class="sd">    &gt;&gt;&gt; x</span>
 <span class="sd">    tensor([-10.9000,   8.9000], requires_grad=True)</span>
 
-<span class="sd">    To understand the role of `param_ndim`, let&#39;s design an optimizer that normalizes a</span>
+<span class="sd">    This was a simple optimizer which did not involve any broadcasting in the gradient</span>
+<span class="sd">    transformation; the next example will involve broadcasting.</span>
+
+<span class="sd">    **Controlling the gradient transformation with param_ndim**</span>
+
+<span class="sd">    To understand the role of `param_ndim` let&#39;s design an optimizer that normalizes a</span>
 <span class="sd">    gradient by its max value – along some user-specified dimension – prior to</span>
 <span class="sd">    performing the gradient-based update to its parameter.</span>
 
@@ -364,16 +372,15 @@
 
 <span class="sd">    Note that we design `_inplace_grad_transform_` to operate in-place on the gradient</span>
 <span class="sd">    and that treat the gradient as if it has a shape `(N, d1, ..., dm)`, where we</span>
-<span class="sd">    want to compute the max over each of the N sub-tensors of shape-(d1, ..., dm).</span>
+<span class="sd">    want to compute the max over each of the `N` sub-tensors of shape-`(d1, ..., dm)`.</span>
 
-<span class="sd">    Now we will create a shape-(2, 2) parameter and see how `MaxNormedGradientOptim`</span>
-<span class="sd">    can be instructed to compute the max-norm over various dimensions of the parameter.</span>
-<span class="sd">    Let&#39;s print out the transformed gradient when we use each of `param_ndim=` 0, 1, or</span>
-<span class="sd">    2.</span>
+<span class="sd">    Critically, we did not use `param_ndim` at all in this method;</span>
+<span class="sd">    `GradientTransformerOptimizer` assumes that we designed this method to broadcast in</span>
+<span class="sd">    a batch-style, as we did, and automatically leverages `param_ndim` accordingly.</span>
 
-<span class="sd">    Here, we are interested in seeing how the parameter&#39;s gradient is being transformed,</span>
-<span class="sd">    so we will use a learning rate of 0.0 so that the parameter itself is not modified</span>
-<span class="sd">    during this example.</span>
+<span class="sd">    Now we will create a shape-(2, 2) parameter to see how `MaxNormedGradientOptim`</span>
+<span class="sd">    can compute the max-norm over various dimensions of the parameter. Let&#39;s print out</span>
+<span class="sd">    the transformed gradient when we use each of `param_ndim`: `0`, `1`, or `2`.</span>
 
 <span class="sd">    &gt;&gt;&gt; x = tr.tensor([[1.0, 2.0],</span>
 <span class="sd">    ...                [20.0, 10.0]], requires_grad=True)</span>
@@ -409,21 +416,23 @@
         <span class="n">params</span><span class="p">:</span> <span class="n">OptimParams</span><span class="p">,</span>
         <span class="n">InnerOpt</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Partial</span><span class="p">[</span><span class="n">Opt</span><span class="p">],</span> <span class="n">OptimizerType</span><span class="p">]</span> <span class="o">=</span> <span class="n">SGD</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">param_ndim</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
-        <span class="n">defaults</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">param_ndim</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">grad_scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">grad_bias</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">defaults</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">**</span><span class="n">inner_opt_kwargs</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        params: Iterable</span>
+<span class="sd">        params : Sequence[Tensor] | Iterable[ParamGroup]</span>
 <span class="sd">            iterable of parameters to optimize or dicts defining parameter groups</span>
 
-<span class="sd">        InnerOpt: Type[Optimizer] | Partial[Optimizer], optional (default=`torch.nn.optim.SGD`)</span>
+<span class="sd">        InnerOpt : Type[Optimizer] | Partial[Optimizer], optional (default=`torch.nn.optim.SGD`)</span>
 <span class="sd">            The optimizer that updates the parameters after their gradients have</span>
 <span class="sd">            been transformed.</span>
 
-<span class="sd">        param_ndim : int | NoneType, optional (default=-1)</span>
+<span class="sd">        param_ndim : int | None, optional (default=-1)</span>
 <span class="sd">            Controls how `_inplace_grad_transform_` is broadcast onto the gradient</span>
 <span class="sd">            of a given parameter. This can be specified per param-group. By default,</span>
 <span class="sd">            the gradient transformation broadcasts over the first dimension in a</span>
@@ -433,27 +442,41 @@
 <span class="sd">            - A negative number indicates the &#39;offset&#39; from the dimensionality of the gradient (see &quot;Notes&quot; for examples).</span>
 <span class="sd">            - `None` means that the transformation will be applied directly to the gradient without any broadcasting.</span>
 
-<span class="sd">        defaults: Optional[dict]</span>
+<span class="sd">        grad_scale : float, optional (default=1.0)</span>
+<span class="sd">            Multiplies each gradient in-place after the in-place transformation is</span>
+<span class="sd">            performed. This can be specified per param-group.</span>
+
+<span class="sd">        grad_bias : float, optional (default=0.0)</span>
+<span class="sd">            Added to each gradient in-place after the in-place transformation is</span>
+<span class="sd">            performed. This can be specified per param-group.</span>
+
+<span class="sd">        defaults : Optional[Dict[str, Any]]</span>
 <span class="sd">            Specifies default parameters for all parameter groups.</span>
+
+<span class="sd">        **inner_opt_kwargs : Any</span>
+<span class="sd">            Named arguments used to initialize `InnerOpt`.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        Additional Explanation of `param_ndim`:</span>
 
-<span class="sd">        If the gradient has a shape (d0, d1, d2) and `param_ndim=1` then the</span>
+<span class="sd">        If the gradient has a shape `(d0, d1, d2)` and `param_ndim=1` then the</span>
 <span class="sd">        transformation will be broadcast over each shape-(d2,) sub-tensor in the</span>
-<span class="sd">        gradient (of which there are d0 * d1).</span>
+<span class="sd">        gradient (of which there are `d0 * d1`).</span>
 
-<span class="sd">        If a gradient has a shape (d0, d1, d2, d3), and if `param_ndim=-1`,</span>
-<span class="sd">        then the transformation will broadcast over each shape-(d1, d2, d3) sub-tensor</span>
-<span class="sd">        in the gradient (of which there are d0). This is equivalent to `param_ndim=3`.</span>
+<span class="sd">        If a gradient has a shape `(d0, d1, d2, d3)`, and if `param_ndim=-1`,</span>
+<span class="sd">        then the transformation will broadcast over each shape-`(d1, d2, d3)`</span>
+<span class="sd">        sub-tensor in the gradient (of which there are d0). This is equivalent</span>
+<span class="sd">        to `param_ndim=3`.</span>
 
 <span class="sd">        If `param_ndim=0` then the transformation is applied elementwise to the</span>
 <span class="sd">        gradient by temporarily reshaping the gradient to a shape-(T, 1) tensor.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">defaults</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">defaults</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;param_ndim&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">param_ndim</span>
+        <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;param_ndim&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">defaults</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;param_ndim&quot;</span><span class="p">,</span> <span class="n">param_ndim</span><span class="p">)</span>
+        <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;grad_scale&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">defaults</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;grad_scale&quot;</span><span class="p">,</span> <span class="n">grad_scale</span><span class="p">)</span>
+        <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;grad_bias&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">defaults</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;grad_bias&quot;</span><span class="p">,</span> <span class="n">grad_bias</span><span class="p">)</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">defaults</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">inner_opt</span> <span class="o">=</span> <span class="n">InnerOpt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">param_groups</span><span class="p">,</span> <span class="o">**</span><span class="n">inner_opt_kwargs</span><span class="p">)</span>
@@ -465,18 +488,24 @@
                     <span class="sa">f</span><span class="s2">&quot;`param_ndim` must be an int or None, got: </span><span class="si">{</span><span class="n">param_ndim</span><span class="si">}</span><span class="s2">&quot;</span>
                 <span class="p">)</span>
 
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">group</span><span class="p">[</span><span class="s2">&quot;grad_scale&quot;</span><span class="p">],</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">)):</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;grad_scale must be a float, got </span><span class="si">{</span><span class="n">group</span><span class="p">[</span><span class="s1">&#39;grad_scale&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">group</span><span class="p">[</span><span class="s2">&quot;grad_bias&quot;</span><span class="p">],</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">)):</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;grad_bias must be a float, got </span><span class="si">{</span><span class="n">group</span><span class="p">[</span><span class="s1">&#39;grad_bias&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
             <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">group</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">]:</span>
                 <span class="n">p</span><span class="p">:</span> <span class="n">Tensor</span>
-                <span class="k">if</span> <span class="n">param_ndim</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="k">continue</span>
-                <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&lt;</span> <span class="nb">abs</span><span class="p">(</span><span class="n">param_ndim</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">param_ndim</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">p</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&lt;</span> <span class="nb">abs</span><span class="p">(</span><span class="n">param_ndim</span><span class="p">):</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                        <span class="sa">f</span><span class="s2">&quot;`param_ndim=</span><span class="si">{</span><span class="n">param_ndim</span><span class="si">}</span><span class="s2">` specified for parameter with &quot;</span>
-                        <span class="sa">f</span><span class="s2">&quot;ndim=</span><span class="si">{</span><span class="n">p</span><span class="o">.</span><span class="n">ndim</span><span class="si">}</span><span class="s2"> is not valid. `abs(param_ndim) &lt;= ndim` must &quot;</span>
-                        <span class="sa">f</span><span class="s2">&quot;hold.&quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;`param_ndim=</span><span class="si">{</span><span class="n">param_ndim</span><span class="si">}</span><span class="s2">` specified for parameter &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;with ndim=</span><span class="si">{</span><span class="n">p</span><span class="o">.</span><span class="n">ndim</span><span class="si">}</span><span class="s2"> is not valid. `abs(param_ndim) &lt;= &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;ndim` must hold.&quot;</span>
                     <span class="p">)</span></div>
 
-    <span class="nd">@abstractmethod</span>
+<div class="viewcode-block" id="GradientTransformerOptimizer._inplace_grad_transform_"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.GradientTransformerOptimizer.html#rai_toolbox.optim.GradientTransformerOptimizer._inplace_grad_transform_">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">_inplace_grad_transform_</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">optim_group</span><span class="p">:</span> <span class="n">DatumParamGroup</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
@@ -488,7 +517,7 @@
 <span class="sd">        assumed to have the shape-(N, d0, ...) and the transformation should be</span>
 <span class="sd">        applied - in-place - to each shape-(d0, ...) sub-tensor.</span>
 
-<span class="sd">        Prior to calling `_in_place_grad_transform`, `GradientTransformerOptimizer`</span>
+<span class="sd">        Prior to calling `_in_place_grad_transform_`, `GradientTransformerOptimizer`</span>
 <span class="sd">        will temporarily reshape each parameter and its gradient to have the appropriate</span>
 <span class="sd">        shape, in accordance with the value specified for `param_ndim` such that the</span>
 <span class="sd">        shape (d0, ...) contains `param_ndim` entries.</span>
@@ -496,7 +525,7 @@
 <span class="sd">        In the case where `param_ndim=0`, the transformation will be applied to a</span>
 <span class="sd">        shape-(T, 1) tensor, where `T` corresponds to the total number of elements</span>
 <span class="sd">        in the tensor.&quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
 
     <span class="k">def</span> <span class="nf">_apply_gradient_transforms_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_groups</span><span class="p">:</span>
@@ -508,8 +537,15 @@
                 <span class="k">assert</span> <span class="n">orig_p</span><span class="o">.</span><span class="n">grad</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 
                 <span class="n">p</span> <span class="o">=</span> <span class="n">_to_batch</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">group</span><span class="p">[</span><span class="s2">&quot;param_ndim&quot;</span><span class="p">])</span>
+                <span class="k">assert</span> <span class="n">p</span><span class="o">.</span><span class="n">grad</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 
                 <span class="bp">self</span><span class="o">.</span><span class="n">_inplace_grad_transform_</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">optim_group</span><span class="o">=</span><span class="n">group</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">group</span><span class="p">[</span><span class="s2">&quot;grad_scale&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="mf">1.0</span><span class="p">:</span>
+                    <span class="n">p</span><span class="o">.</span><span class="n">grad</span> <span class="o">*=</span> <span class="n">group</span><span class="p">[</span><span class="s2">&quot;grad_scale&quot;</span><span class="p">]</span>
+
+                <span class="k">if</span> <span class="n">group</span><span class="p">[</span><span class="s2">&quot;grad_bias&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="mf">0.0</span><span class="p">:</span>
+                    <span class="n">p</span><span class="o">.</span><span class="n">grad</span> <span class="o">+=</span> <span class="n">group</span><span class="p">[</span><span class="s2">&quot;grad_bias&quot;</span><span class="p">]</span>
 
                 <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">grad</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">_shares_memory</span><span class="p">(</span><span class="n">orig_p</span><span class="o">.</span><span class="n">grad</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">grad</span><span class="p">):</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -571,9 +607,9 @@
 <span class="sd">    how the projection should be applied to each parameter (i.e., whether or not</span>
 <span class="sd">    it is broadcasted).</span>
 
-<span class="sd">        - A positive number determines the dimensionality of the tensor that the projection will act on.</span>
-<span class="sd">        - A negative number indicates the &#39;offset&#39; from the dimensionality of the tensor.</span>
-<span class="sd">        - `None` means that the projection will be applied to the tensor without any broadcasting.</span>
+<span class="sd">    - A positive number determines the dimensionality of the tensor that the projection will act on.</span>
+<span class="sd">    - A negative number indicates the &#39;offset&#39; from the dimensionality of the tensor.</span>
+<span class="sd">    - `None` means that the projection will be applied to the tensor without any broadcasting.</span>
 
 <span class="sd">    Methods</span>
 <span class="sd">    -------</span>
@@ -623,7 +659,7 @@
 <span class="sd">        in-place - to each shape-(d0, ...) sub-tensor.&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
 
-    <span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
+<div class="viewcode-block" id="ProjectionMixin.project"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.ProjectionMixin.html#rai_toolbox.optim.ProjectionMixin.project">[docs]</a>    <span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
     <span class="k">def</span> <span class="nf">project</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Project each parameter in-place.&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_groups</span><span class="p">:</span>
@@ -631,7 +667,7 @@
 
             <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">group</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">]:</span>
                 <span class="n">p</span> <span class="o">=</span> <span class="n">_to_batch</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">param_ndim</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_project_parameter_</span><span class="p">(</span><span class="n">param</span><span class="o">=</span><span class="n">p</span><span class="p">,</span> <span class="n">optim_group</span><span class="o">=</span><span class="n">group</span><span class="p">)</span></div>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_project_parameter_</span><span class="p">(</span><span class="n">param</span><span class="o">=</span><span class="n">p</span><span class="p">,</span> <span class="n">optim_group</span><span class="o">=</span><span class="n">group</span><span class="p">)</span></div></div>
 </pre></div>
 
               </div>

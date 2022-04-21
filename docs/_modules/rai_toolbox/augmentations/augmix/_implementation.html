@@ -174,8 +174,8 @@
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">rai_toolbox._typing</span> <span class="kn">import</span> <span class="n">ArrayLike</span>
 
+<span class="kn">from</span> <span class="nn">rai_toolbox._typing</span> <span class="kn">import</span> <span class="n">ArrayLike</span>
 
 <span class="n">_T1</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;_T1&quot;</span><span class="p">)</span>
 <span class="n">_T2</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;_T2&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">ArrayLike</span><span class="p">)</span>
@@ -217,10 +217,8 @@
 <span class="sd">        will be sampled for each augmentation chain.</span>
 
 <span class="sd">        E.g.</span>
-<span class="sd">        - `mixture_depth=2` means that each augmentation chain will consist of two (randomly sampled)</span>
-<span class="sd">          augmentations composed together.</span>
-<span class="sd">        - `aug_chain_depth=(1, 4)` means depth of any given augmentation chain is uniformly sampled</span>
-<span class="sd">          from [1, 4).</span>
+<span class="sd">        - `mixture_depth=2` means that each augmentation chain will consist of two (randomly sampled) augmentations composed together.</span>
+<span class="sd">        - `aug_chain_depth=(1, 4)` means depth of any given augmentation chain is uniformly sampled from [1, 4).</span>
 
 <span class="sd">    process_fn : Callable[[T1], T2]</span>
 <span class="sd">        The preprocessing function applied to the both clean and augmixed datums before</span>
@@ -232,7 +230,8 @@
 <span class="sd">        chain.</span>
 
 <span class="sd">    beta_params : Tuple[float, float]</span>
-<span class="sd">        The Beta distribution parameters to draw m, which weights that convex combination:</span>
+<span class="sd">        The Beta distribution parameters to draw m, which weights that convex combination::</span>
+
 <span class="sd">                (1 - m) * img_process_fn(datum) + m * img_process_fn(augment(datum))</span>
 
 <span class="sd">        If a single value is specified, it is used as both parameters for the distribution.</span>
@@ -253,19 +252,20 @@
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
 <span class="sd">    The following depicts AugMix with N augmentation chains. Each `augchain(...)` consists of</span>
-<span class="sd">    composed augmentations, where the composition depth is determined by `mixture_depth`:</span>
+<span class="sd">    composed augmentations, where the composition depth is determined by `mixture_depth`::</span>
 
 <span class="sd">        (1 - m) * process_fn(img) + m * (w1 * (process_fn ∘ augchain1)(img) + ... + wN * (process_fn ∘ augchainN)(img))</span>
 
-<span class="sd">    with..</span>
-<span class="sd">       - m ~ Beta</span>
-<span class="sd">       - [w1, ..., wN] ~ Dirichlet</span>
+<span class="sd">    with</span>
 
-<span class="sd">    Random values are drawn via NumPy&#39;s global random number generator. Thus `numpy.random.seed` must</span>
-<span class="sd">    be set in order to obtain reproducible results. Note that, until PyTorch 1.9.0, there was an issue</span>
-<span class="sd">    with using NumPy&#39;s global RNG in conjunction with DataLoaders that used multiple workers, where</span>
-<span class="sd">    identical seeds were being used across workers and the same seed was being set at the outset of</span>
-<span class="sd">    each epoch.</span>
+<span class="sd">    - m ~ Beta</span>
+<span class="sd">    - [w1, ..., wN] ~ Dirichlet</span>
+
+<span class="sd">    Random values are drawn via NumPy&#39;s global random number generator. Thus `numpy.</span>
+<span class="sd">    random.seed` must be set in order to obtain reproducible results. Note that, until</span>
+<span class="sd">    PyTorch 1.9.0, there was an issue with using NumPy&#39;s global RNG in conjunction with</span>
+<span class="sd">    DataLoaders that used multiple workers, where identical seeds were being used</span>
+<span class="sd">    across workers and the same seed was being set at the outset of each epoch.</span>
 
 <span class="sd">    https://github.com/pytorch/pytorch/pull/56488</span>
 

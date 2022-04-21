@@ -177,8 +177,8 @@
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="rai_toolbox.optim.L1NormedGradientOptim.html">
-     rai_toolbox.optim.L1NormedGradientOptim
+    <a class="reference internal" href="rai_toolbox.optim.L1qNormedGradientOptim.html">
+     rai_toolbox.optim.L1qNormedGradientOptim
     </a>
    </li>
    <li class="toctree-l2">
@@ -189,11 +189,6 @@
    <li class="toctree-l2">
     <a class="reference internal" href="rai_toolbox.optim.LinfProjectedOptim.html">
      rai_toolbox.optim.LinfProjectedOptim
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="rai_toolbox.optim.L1qNormedGradientOptim.html">
-     rai_toolbox.optim.L1qNormedGradientOptim
     </a>
    </li>
    <li class="toctree-l2">
@@ -320,19 +315,17 @@
 <dt class="sig sig-object py" id="rai_toolbox.optim.ProjectionMixin">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rai_toolbox.optim.</span></span><span class="sig-name descname"><span class="pre">ProjectionMixin</span></span><a class="reference internal" href="../_modules/rai_toolbox/optim/optimizer.html#ProjectionMixin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.optim.ProjectionMixin" title="Permalink to this definition">#</a></dt>
 <dd><p>A mixin that adds a parameter-projection method to an optimizer.</p>
-<p>Calling <code class="xref py py-obj docutils literal notranslate"><span class="pre">project()</span></code> will apply the in-place projection on each parameter
+<p>Calling <a class="reference internal" href="#rai_toolbox.optim.ProjectionMixin.project" title="rai_toolbox.optim.ProjectionMixin.project"><code class="xref py py-obj docutils literal notranslate"><span class="pre">project()</span></code></a> will apply the in-place projection on each parameter
 stored by the optimizer.</p>
 <p class="rubric">Notes</p>
 <p>‘param_ndim’ can be included in the optimizer’s param groups in order to describe
 how the projection should be applied to each parameter (i.e., whether or not
 it is broadcasted).</p>
-<blockquote>
-<div><ul class="simple">
+<ul class="simple">
 <li><p>A positive number determines the dimensionality of the tensor that the projection will act on.</p></li>
 <li><p>A negative number indicates the ‘offset’ from the dimensionality of the tensor.</p></li>
 <li><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> means that the projection will be applied to the tensor without any broadcasting.</p></li>
 </ul>
-</div></blockquote>
 <p class="rubric">Examples</p>
 <p>Let’s create a SGD-based optimizer that clamps each parameter’s values so that
 they all fall within <code class="xref py py-obj docutils literal notranslate"><span class="pre">[-1,</span> <span class="pre">1]</span></code> after performing it’s gradient-based step on the parameter.</p>
@@ -378,6 +371,12 @@ elementwise on each parameter, and thus does not require us to include
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rai_toolbox.optim.ProjectionMixin.__init__" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="rai_toolbox.optim.ProjectionMixin.project">
+<span class="sig-name descname"><span class="pre">project</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/optim/optimizer.html#ProjectionMixin.project"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.optim.ProjectionMixin.project" title="Permalink to this definition">#</a></dt>
+<dd><p>Project each parameter in-place.</p>
+</dd></dl>
+
 <p class="rubric">Methods</p>
 <table class="autosummary longtable table autosummary">
 <colgroup>
@@ -388,20 +387,8 @@ elementwise on each parameter, and thus does not require us to include
 <tr class="row-odd"><td><p><a class="reference internal" href="#rai_toolbox.optim.ProjectionMixin.__init__" title="rai_toolbox.optim.ProjectionMixin.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(*args, **kwargs)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">project</span></code>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#rai_toolbox.optim.ProjectionMixin.project" title="rai_toolbox.optim.ProjectionMixin.project"><code class="xref py py-obj docutils literal notranslate"><span class="pre">project</span></code></a>()</p></td>
 <td><p>Project each parameter in-place.</p></td>
-</tr>
-</tbody>
-</table>
-<p class="rubric">Attributes</p>
-<table class="autosummary longtable table autosummary">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">param_groups</span></code></p></td>
-<td><p></p></td>
 </tr>
 </tbody>
 </table>

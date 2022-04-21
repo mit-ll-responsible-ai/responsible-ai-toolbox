@@ -7,6 +7,7 @@ rai\_toolbox.optim.ProjectionMixin
 
    
    .. automethod:: __init__
+   .. automethod:: project
 
    
    .. rubric:: Methods
@@ -15,15 +16,5 @@ rai\_toolbox.optim.ProjectionMixin
    
       ~ProjectionMixin.__init__
       ~ProjectionMixin.project
-   
-   
-
-   
-   
-   .. rubric:: Attributes
-
-   .. autosummary::
-   
-      ~ProjectionMixin.param_groups
    
    

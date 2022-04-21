@@ -7,27 +7,11 @@ rai\_toolbox.optim.GradientTransformerOptimizer
 
    
    .. automethod:: __init__
-
+   .. automethod:: _inplace_grad_transform_
    
    .. rubric:: Methods
 
    .. autosummary::
    
       ~GradientTransformerOptimizer.__init__
-      ~GradientTransformerOptimizer.add_param_group
-      ~GradientTransformerOptimizer.load_state_dict
-      ~GradientTransformerOptimizer.state_dict
-      ~GradientTransformerOptimizer.step
-      ~GradientTransformerOptimizer.zero_grad
-   
-   
-
-   
-   
-   .. rubric:: Attributes
-
-   .. autosummary::
-   
-      ~GradientTransformerOptimizer.param_groups
-   
-   
+      ~GradientTransformerOptimizer._inplace_grad_transform_

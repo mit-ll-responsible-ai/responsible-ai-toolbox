@@ -7,14 +7,14 @@ rai\_toolbox.datasets.ImageNet
 
    
    .. automethod:: __init__
-
+   .. automethod:: find_classes
+   .. automethod:: make_dataset
    
    .. rubric:: Methods
 
    .. autosummary::
    
       ~ImageNet.__init__
-      ~ImageNet.extra_repr
       ~ImageNet.find_classes
       ~ImageNet.make_dataset
    

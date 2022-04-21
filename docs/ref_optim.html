@@ -179,8 +179,8 @@
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="generated/rai_toolbox.optim.L1NormedGradientOptim.html">
-     rai_toolbox.optim.L1NormedGradientOptim
+    <a class="reference internal" href="generated/rai_toolbox.optim.L1qNormedGradientOptim.html">
+     rai_toolbox.optim.L1qNormedGradientOptim
     </a>
    </li>
    <li class="toctree-l2">
@@ -191,11 +191,6 @@
    <li class="toctree-l2">
     <a class="reference internal" href="generated/rai_toolbox.optim.LinfProjectedOptim.html">
      rai_toolbox.optim.LinfProjectedOptim
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="generated/rai_toolbox.optim.L1qNormedGradientOptim.html">
-     rai_toolbox.optim.L1qNormedGradientOptim
     </a>
    </li>
    <li class="toctree-l2">
@@ -370,16 +365,16 @@
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/rai_toolbox.optim.L1NormedGradientOptim.html#rai_toolbox.optim.L1NormedGradientOptim" title="rai_toolbox.optim.L1NormedGradientOptim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">L1NormedGradientOptim</span></code></a>(params[, InnerOpt, ...])</p></td>
-<td><p></p></td>
+<td><p>A gradient-tranforming  optimizer that normalizes the each gradient by its <span class="math notranslate nohighlight">\(L^1\)</span>-norm prior to using <code class="xref py py-obj docutils literal notranslate"><span class="pre">InnerOp.step</span></code> to update the corresponding parameter.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/rai_toolbox.optim.L2NormedGradientOptim.html#rai_toolbox.optim.L2NormedGradientOptim" title="rai_toolbox.optim.L2NormedGradientOptim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">L2NormedGradientOptim</span></code></a>(params[, InnerOpt, ...])</p></td>
-<td><p></p></td>
+<td><p>A gradient-tranforming  optimizer that normalizes the each gradient by its <span class="math notranslate nohighlight">\(L^2\)</span>-norm prior to using <code class="xref py py-obj docutils literal notranslate"><span class="pre">InnerOp.step</span></code> to update the corresponding parameter.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/rai_toolbox.optim.SignedGradientOptim.html#rai_toolbox.optim.SignedGradientOptim" title="rai_toolbox.optim.SignedGradientOptim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SignedGradientOptim</span></code></a>(param, sign)</p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/rai_toolbox.optim.SignedGradientOptim.html#rai_toolbox.optim.SignedGradientOptim" title="rai_toolbox.optim.SignedGradientOptim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SignedGradientOptim</span></code></a>(params[, InnerOpt, ...])</p></td>
+<td><p>A gradient-tranforming optimizer that takes the elementwise sign of a parameter's gradient prior to using <code class="xref py py-obj docutils literal notranslate"><span class="pre">InnerOp.step</span></code> to update the corresponding parameter.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/rai_toolbox.optim.L1NormedGradientOptim.html#rai_toolbox.optim.L1NormedGradientOptim" title="rai_toolbox.optim.L1NormedGradientOptim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">L1NormedGradientOptim</span></code></a>(params[, InnerOpt, ...])</p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/rai_toolbox.optim.L1qNormedGradientOptim.html#rai_toolbox.optim.L1qNormedGradientOptim" title="rai_toolbox.optim.L1qNormedGradientOptim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">L1qNormedGradientOptim</span></code></a>(params[, InnerOpt, ...])</p></td>
+<td><p>A gradient-transforming optimizer that sparsifies a parameter's gradient and normalizes the gradient to have an <span class="math notranslate nohighlight">\(L^1\)</span>-norm of <code class="xref py py-obj docutils literal notranslate"><span class="pre">grad_scale</span></code>, prior to updating the parameter using <code class="xref py py-obj docutils literal notranslate"><span class="pre">InnerOpt.step</span></code>.</p></td>
 </tr>
 </tbody>
 </table>
@@ -392,14 +387,11 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/rai_toolbox.optim.L2ProjectedOptim.html#rai_toolbox.optim.L2ProjectedOptim" title="rai_toolbox.optim.L2ProjectedOptim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">L2ProjectedOptim</span></code></a>(params[, InnerOpt, param_ndim])</p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/rai_toolbox.optim.L2ProjectedOptim.html#rai_toolbox.optim.L2ProjectedOptim" title="rai_toolbox.optim.L2ProjectedOptim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">L2ProjectedOptim</span></code></a>(params[, InnerOpt, ...])</p></td>
+<td><p>A gradient-tranforming optimizer that constrains the updated parameters to lie within an <span class="math notranslate nohighlight">\(\epsilon\)</span>-sized ball in <span class="math notranslate nohighlight">\(L^2\)</span> space centered on the origin.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/rai_toolbox.optim.LinfProjectedOptim.html#rai_toolbox.optim.LinfProjectedOptim" title="rai_toolbox.optim.LinfProjectedOptim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LinfProjectedOptim</span></code></a>(param, sign)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/rai_toolbox.optim.L1qNormedGradientOptim.html#rai_toolbox.optim.L1qNormedGradientOptim" title="rai_toolbox.optim.L1qNormedGradientOptim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">L1qNormedGradientOptim</span></code></a>(params[, InnerOpt, ...])</p></td>
-<td><p>Sparse gradient step normalized by the <span class="math notranslate nohighlight">\(\ell_1\)</span>-norm and with updated parameters constrained within an epsilon-sized <span class="math notranslate nohighlight">\(\ell_1\)</span> ball about their original values.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/rai_toolbox.optim.LinfProjectedOptim.html#rai_toolbox.optim.LinfProjectedOptim" title="rai_toolbox.optim.LinfProjectedOptim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LinfProjectedOptim</span></code></a>(params[, InnerOpt, ...])</p></td>
+<td><p>A gradient-tranforming optimizer that constrains the updated parameter values to fall within <span class="math notranslate nohighlight">\([-\epsilon, \epsilon]\)</span>.</p></td>
 </tr>
 </tbody>
 </table>
@@ -415,20 +407,20 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/rai_toolbox.optim.FrankWolfe.html#rai_toolbox.optim.FrankWolfe" title="rai_toolbox.optim.FrankWolfe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FrankWolfe</span></code></a>(params, *[, lr, ...])</p></td>
 <td><p>Implements the Frank-Wolfe minimization algorithm <a class="reference internal" href="generated/rai_toolbox.optim.FrankWolfe.html#r708bf7dd73fb-1" id="id1"><span>[R708bf7dd73fb-1]</span></a>.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/rai_toolbox.optim.L1FrankWolfe.html#rai_toolbox.optim.L1FrankWolfe" title="rai_toolbox.optim.L1FrankWolfe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">L1FrankWolfe</span></code></a>(params, *, epsilon[, param_ndim])</p></td>
-<td><p>Performs Franke Wolfe optimization [1] using an epsilon-sized L1 ball as the constraint set.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/rai_toolbox.optim.L1FrankWolfe.html#rai_toolbox.optim.L1FrankWolfe" title="rai_toolbox.optim.L1FrankWolfe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">L1FrankWolfe</span></code></a>(params, *, epsilon[, lr, ...])</p></td>
+<td><p>A Frank-Wolfe <a class="reference internal" href="generated/rai_toolbox.optim.L1FrankWolfe.html#r7f744f42992b-1" id="id2"><span>[R7f744f42992b-1]</span></a> optimizer that constrains each updated parameter to fall within an <span class="math notranslate nohighlight">\(\epsilon\)</span>-sized ball in <span class="math notranslate nohighlight">\(L^1\)</span> space, centered on the origin.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/rai_toolbox.optim.L2FrankWolfe.html#rai_toolbox.optim.L2FrankWolfe" title="rai_toolbox.optim.L2FrankWolfe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">L2FrankWolfe</span></code></a>(params, *, epsilon[, param_ndim])</p></td>
-<td><p>Performs Franke Wolfe optimization [1] using an epsilon-sized L2 ball as the constraint set.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/rai_toolbox.optim.L2FrankWolfe.html#rai_toolbox.optim.L2FrankWolfe" title="rai_toolbox.optim.L2FrankWolfe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">L2FrankWolfe</span></code></a>(params, *, epsilon[, lr, ...])</p></td>
+<td><p>A Frank-Wolfe <a class="reference internal" href="generated/rai_toolbox.optim.L2FrankWolfe.html#ra856166c660b-1" id="id3"><span>[Ra856166c660b-1]</span></a> optimizer that constrains each updated parameter to fall within an <span class="math notranslate nohighlight">\(\epsilon\)</span>-sized ball in <span class="math notranslate nohighlight">\(L^2\)</span> space, centered on the origin.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/rai_toolbox.optim.LinfFrankWolfe.html#rai_toolbox.optim.LinfFrankWolfe" title="rai_toolbox.optim.LinfFrankWolfe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LinfFrankWolfe</span></code></a>(params, *, epsilon[, param_ndim])</p></td>
-<td><p>Performs Franke Wolfe optimization [1] using an epsilon-sized L-inf ball as the constraint set.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/rai_toolbox.optim.LinfFrankWolfe.html#rai_toolbox.optim.LinfFrankWolfe" title="rai_toolbox.optim.LinfFrankWolfe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LinfFrankWolfe</span></code></a>(params, *, epsilon[, lr, ...])</p></td>
+<td><p>A Frank-Wolfe <a class="reference internal" href="generated/rai_toolbox.optim.LinfFrankWolfe.html#r313614fd02b0-1" id="id4"><span>[R313614fd02b0-1]</span></a> optimizer that constrains each updated parameter to fall within an <span class="math notranslate nohighlight">\(\epsilon\)</span>-sized ball in <span class="math notranslate nohighlight">\(L^\infty\)</span> space, centered on the origin.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/rai_toolbox.optim.L1qFrankWolfe.html#rai_toolbox.optim.L1qFrankWolfe" title="rai_toolbox.optim.L1qFrankWolfe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">L1qFrankWolfe</span></code></a>(params, *, epsilon, q, pert_q)</p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/rai_toolbox.optim.L1qFrankWolfe.html#rai_toolbox.optim.L1qFrankWolfe" title="rai_toolbox.optim.L1qFrankWolfe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">L1qFrankWolfe</span></code></a>(params, *, q, epsilon[, dq, ...])</p></td>
+<td><p>A Frank-Wolfe <a class="reference internal" href="generated/rai_toolbox.optim.L1qFrankWolfe.html#rd25ad1f7d854-1" id="id5"><span>[Rd25ad1f7d854-1]</span></a> optimizer that, when computing the LMO, sparsifies a parameter's gradient.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/rai_toolbox.optim.L1qNormedGradientOptim.html#rai_toolbox.optim.L1qNormedGradientOptim" title="rai_toolbox.optim.L1qNormedGradientOptim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">L1qNormedGradientOptim</span></code></a>(params[, InnerOpt, ...])</p></td>
-<td><p>Sparse gradient step normalized by the <span class="math notranslate nohighlight">\(\ell_1\)</span>-norm and with updated parameters constrained within an epsilon-sized <span class="math notranslate nohighlight">\(\ell_1\)</span> ball about their original values.</p></td>
+<td><p>A gradient-transforming optimizer that sparsifies a parameter's gradient and normalizes the gradient to have an <span class="math notranslate nohighlight">\(L^1\)</span>-norm of <code class="xref py py-obj docutils literal notranslate"><span class="pre">grad_scale</span></code>, prior to updating the parameter using <code class="xref py py-obj docutils literal notranslate"><span class="pre">InnerOpt.step</span></code>.</p></td>
 </tr>
 </tbody>
 </table>

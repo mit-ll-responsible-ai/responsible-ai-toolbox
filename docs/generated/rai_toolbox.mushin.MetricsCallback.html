@@ -258,17 +258,17 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>save_dir: str (default: “.”)</strong></dt><dd></dd>
-<dt><strong>filename: str (default: “metrics.pt”)</strong></dt><dd><p>The base filename used to store metrics.  For <code class="xref py py-obj docutils literal notranslate"><span class="pre">FITTING</span></code> the file is prepended with “<a href="#id1"><span class="problematic" id="id2">fit_</span></a>” and
-and for <code class="xref py py-obj docutils literal notranslate"><span class="pre">TESTING</span></code> the file is prepended with <code class="xref py py-obj docutils literal notranslate"><span class="pre">test_</span></code>.</p>
+<dt><strong>save_dir</strong><span class="classifier">str, optional (default=”.”)</span></dt><dd></dd>
+<dt><strong>filename</strong><span class="classifier">str, optional (default=”metrics.pt”)</span></dt><dd><p>The base filename used to store metrics.  For <code class="xref py py-obj docutils literal notranslate"><span class="pre">FITTING</span></code> the file is prepended
+with “<a href="#id1"><span class="problematic" id="id2">fit_</span></a>” and and for <code class="xref py py-obj docutils literal notranslate"><span class="pre">TESTING</span></code> the file is prepended with <code class="xref py py-obj docutils literal notranslate"><span class="pre">test_</span></code>.</p>
 </dd>
 </dl>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
-<p>No metrics will be saved during <code class="xref py py-obj docutils literal notranslate"><span class="pre">FITTING</span></code> if no validation metrics are calculated.  This is a limitation
-of PyTorch Lightning. Future versions will save the training step metrics when no validation metrics
-are calculated.</p>
+<p>No metrics will be saved during <code class="xref py py-obj docutils literal notranslate"><span class="pre">FITTING</span></code> if no validation metrics are calculated.
+This is a limitation of PyTorch Lightning. Future versions will save the training
+step metrics when no validation metrics are calculated.</p>
 <p class="rubric">Examples</p>
 <p>&gt;&gt; metrics_callback = MetricsCallback()
 &gt;&gt; trainer = Trainer(callbacks=[metrics_callback])</p>
@@ -286,201 +286,6 @@ are calculated.</p>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#rai_toolbox.mushin.MetricsCallback.__init__" title="rai_toolbox.mushin.MetricsCallback.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>([save_dir, filename])</p></td>
 <td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_state_dict</span></code>(state_dict)</p></td>
-<td><p>Called when loading a checkpoint, implement to reload callback state given callback's <code class="docutils literal notranslate"><span class="pre">state_dict</span></code>.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">on_after_backward</span></code>(trainer, pl_module)</p></td>
-<td><p>Called after <code class="docutils literal notranslate"><span class="pre">loss.backward()</span></code> and before optimizers are stepped.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">on_batch_end</span></code>(trainer, pl_module)</p></td>
-<td><p><div class="deprecated">
-<p><span class="versionmodified deprecated">Deprecated since version v1.6.</span></p>
-</div>
-</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">on_batch_start</span></code>(trainer, pl_module)</p></td>
-<td><p><div class="deprecated">
-<p><span class="versionmodified deprecated">Deprecated since version v1.6.</span></p>
-</div>
-</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">on_before_accelerator_backend_setup</span></code>(trainer, ...)</p></td>
-<td><p><div class="deprecated">
-<p><span class="versionmodified deprecated">Deprecated since version v1.6.</span></p>
-</div>
-</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">on_before_backward</span></code>(trainer, pl_module, loss)</p></td>
-<td><p>Called before <code class="docutils literal notranslate"><span class="pre">loss.backward()</span></code>.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">on_before_optimizer_step</span></code>(trainer, pl_module, ...)</p></td>
-<td><p>Called before <code class="docutils literal notranslate"><span class="pre">optimizer.step()</span></code>.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">on_before_zero_grad</span></code>(trainer, pl_module, ...)</p></td>
-<td><p>Called before <code class="docutils literal notranslate"><span class="pre">optimizer.zero_grad()</span></code>.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">on_configure_sharded_model</span></code>(trainer, pl_module)</p></td>
-<td><p><div class="deprecated">
-<p><span class="versionmodified deprecated">Deprecated since version v1.6.</span></p>
-</div>
-</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">on_epoch_end</span></code>(trainer, pl_module)</p></td>
-<td><p><div class="deprecated">
-<p><span class="versionmodified deprecated">Deprecated since version v1.6.</span></p>
-</div>
-</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">on_epoch_start</span></code>(trainer, pl_module)</p></td>
-<td><p><div class="deprecated">
-<p><span class="versionmodified deprecated">Deprecated since version v1.6.</span></p>
-</div>
-</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">on_exception</span></code>(trainer, pl_module, exception)</p></td>
-<td><p>Called when any trainer execution is interrupted by an exception.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">on_fit_end</span></code>(trainer, pl_module)</p></td>
-<td><p>Called when fit ends.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">on_fit_start</span></code>(trainer, pl_module)</p></td>
-<td><p>Called when fit begins.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">on_init_end</span></code>(trainer)</p></td>
-<td><p><div class="deprecated">
-<p><span class="versionmodified deprecated">Deprecated since version v1.6.</span></p>
-</div>
-</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">on_init_start</span></code>(trainer)</p></td>
-<td><p><div class="deprecated">
-<p><span class="versionmodified deprecated">Deprecated since version v1.6.</span></p>
-</div>
-</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">on_keyboard_interrupt</span></code>(trainer, pl_module)</p></td>
-<td><p><div class="deprecated">
-<p><span class="versionmodified deprecated">Deprecated since version v1.5.</span></p>
-</div>
-</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">on_load_checkpoint</span></code>(trainer, pl_module, ...)</p></td>
-<td><p>Called when loading a model checkpoint, use to reload state.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">on_predict_batch_end</span></code>(trainer, pl_module, ...)</p></td>
-<td><p>Called when the predict batch ends.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">on_predict_batch_start</span></code>(trainer, pl_module, ...)</p></td>
-<td><p>Called when the predict batch begins.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">on_predict_end</span></code>(trainer, pl_module)</p></td>
-<td><p>Called when predict ends.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">on_predict_epoch_end</span></code>(trainer, pl_module, outputs)</p></td>
-<td><p>Called when the predict epoch ends.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">on_predict_epoch_start</span></code>(trainer, pl_module)</p></td>
-<td><p>Called when the predict epoch begins.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">on_predict_start</span></code>(trainer, pl_module)</p></td>
-<td><p>Called when the predict begins.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">on_pretrain_routine_end</span></code>(trainer, pl_module)</p></td>
-<td><p><div class="deprecated">
-<p><span class="versionmodified deprecated">Deprecated since version v1.6.</span></p>
-</div>
-</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">on_pretrain_routine_start</span></code>(trainer, pl_module)</p></td>
-<td><p><div class="deprecated">
-<p><span class="versionmodified deprecated">Deprecated since version v1.6.</span></p>
-</div>
-</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">on_sanity_check_end</span></code>(trainer, pl_module)</p></td>
-<td><p>Called when the validation sanity check ends.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">on_sanity_check_start</span></code>(trainer, pl_module)</p></td>
-<td><p>Called when the validation sanity check starts.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">on_save_checkpoint</span></code>(trainer, pl_module, ...)</p></td>
-<td><p>Called when saving a checkpoint to give you a chance to store anything else you might want to save.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">on_test_batch_end</span></code>(trainer, pl_module, ...)</p></td>
-<td><p>Called when the test batch ends.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">on_test_batch_start</span></code>(trainer, pl_module, ...)</p></td>
-<td><p>Called when the test batch begins.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">on_test_end</span></code>(trainer, pl_module)</p></td>
-<td><p>Called when the test ends.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">on_test_epoch_end</span></code>(trainer, pl_module)</p></td>
-<td><p>Called when the test epoch ends.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">on_test_epoch_start</span></code>(trainer, pl_module)</p></td>
-<td><p>Called when the test epoch begins.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">on_test_start</span></code>(trainer, pl_module)</p></td>
-<td><p>Called when the test begins.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">on_train_batch_end</span></code>(trainer, pl_module, ...)</p></td>
-<td><p>Called when the train batch ends.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">on_train_batch_start</span></code>(trainer, pl_module, ...)</p></td>
-<td><p>Called when the train batch begins.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">on_train_end</span></code>(trainer, pl_module)</p></td>
-<td><p>Called when the train ends.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">on_train_epoch_end</span></code>(trainer, pl_module)</p></td>
-<td><p>Called when the train epoch ends.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">on_train_epoch_start</span></code>(trainer, pl_module)</p></td>
-<td><p>Called when the train epoch begins.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">on_train_start</span></code>(trainer, pl_module)</p></td>
-<td><p>Called when the train begins.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">on_validation_batch_end</span></code>(trainer, pl_module, ...)</p></td>
-<td><p>Called when the validation batch ends.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">on_validation_batch_start</span></code>(trainer, ...)</p></td>
-<td><p>Called when the validation batch begins.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">on_validation_end</span></code>(trainer, pl_module)</p></td>
-<td><p>Called when the validation loop ends.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">on_validation_epoch_end</span></code>(trainer, pl_module)</p></td>
-<td><p>Called when the val epoch ends.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">on_validation_epoch_start</span></code>(trainer, pl_module)</p></td>
-<td><p>Called when the val epoch begins.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">on_validation_start</span></code>(trainer, pl_module)</p></td>
-<td><p>Called when the validation loop begins.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">setup</span></code>(trainer, pl_module[, stage])</p></td>
-<td><p>Called when fit, validate, test, predict, or tune begins.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">state_dict</span></code>()</p></td>
-<td><p>Called when saving a checkpoint, implement to generate callback's <code class="docutils literal notranslate"><span class="pre">state_dict</span></code>.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">teardown</span></code>(trainer, pl_module[, stage])</p></td>
-<td><p>Called when fit, validate, test, predict, or tune ends.</p></td>
-</tr>
-</tbody>
-</table>
-<p class="rubric">Attributes</p>
-<table class="autosummary longtable table autosummary">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">state_key</span></code></p></td>
-<td><p>Identifier for the state of the callback.</p></td>
 </tr>
 </tbody>
 </table>

@@ -33,6 +33,7 @@
     <script src="../_static/doctools.js"></script>
     <script src="../_static/clipboard.min.js"></script>
     <script src="../_static/copybutton.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="rai_toolbox.optim.L2NormedGradientOptim" href="rai_toolbox.optim.L2NormedGradientOptim.html" />
@@ -176,9 +177,9 @@
      rai_toolbox.optim.SignedGradientOptim
     </a>
    </li>
-   <li class="toctree-l2 current active">
-    <a class="current reference internal" href="#">
-     rai_toolbox.optim.L1NormedGradientOptim
+   <li class="toctree-l2">
+    <a class="reference internal" href="rai_toolbox.optim.L1qNormedGradientOptim.html">
+     rai_toolbox.optim.L1qNormedGradientOptim
     </a>
    </li>
    <li class="toctree-l2">
@@ -189,11 +190,6 @@
    <li class="toctree-l2">
     <a class="reference internal" href="rai_toolbox.optim.LinfProjectedOptim.html">
      rai_toolbox.optim.LinfProjectedOptim
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="rai_toolbox.optim.L1qNormedGradientOptim.html">
-     rai_toolbox.optim.L1qNormedGradientOptim
     </a>
    </li>
    <li class="toctree-l2">
@@ -318,19 +314,61 @@
 <h1>rai_toolbox.optim.L1NormedGradientOptim<a class="headerlink" href="#rai-toolbox-optim-l1normedgradientoptim" title="Permalink to this headline">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="rai_toolbox.optim.L1NormedGradientOptim">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rai_toolbox.optim.</span></span><span class="sig-name descname"><span class="pre">L1NormedGradientOptim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">InnerOpt=&lt;class</span> <span class="pre">'torch.optim.sgd.SGD'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_ndim=-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">div_by_zero_eps=1.1754943508222875e-38</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/optim/lp_space.html#L1NormedGradientOptim"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.optim.L1NormedGradientOptim" title="Permalink to this definition">#</a></dt>
-<dd><dl class="py method">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rai_toolbox.optim.</span></span><span class="sig-name descname"><span class="pre">L1NormedGradientOptim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">InnerOpt=&lt;class</span> <span class="pre">'torch.optim.sgd.SGD'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_ndim=-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defaults=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grad_scale=1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grad_bias=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">div_by_zero_eps=1.1754943508222875e-38</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/optim/lp_space.html#L1NormedGradientOptim"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.optim.L1NormedGradientOptim" title="Permalink to this definition">#</a></dt>
+<dd><p>A gradient-tranforming  optimizer that normalizes the each gradient by
+its <span class="math notranslate nohighlight">\(L^1\)</span>-norm prior to using <code class="xref py py-obj docutils literal notranslate"><span class="pre">InnerOp.step</span></code> to update the
+corresponding parameter.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="rai_toolbox.optim.L2NormedGradientOptim.html#rai_toolbox.optim.L2NormedGradientOptim" title="rai_toolbox.optim.L2NormedGradientOptim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">L2NormedGradientOptim</span></code></a></dt><dd></dd>
+<dt><a class="reference internal" href="rai_toolbox.optim.SignedGradientOptim.html#rai_toolbox.optim.SignedGradientOptim" title="rai_toolbox.optim.SignedGradientOptim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SignedGradientOptim</span></code></a></dt><dd></dd>
+<dt><a class="reference internal" href="rai_toolbox.optim.ProjectionMixin.html#rai_toolbox.optim.ProjectionMixin" title="rai_toolbox.optim.ProjectionMixin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProjectionMixin</span></code></a></dt><dd></dd>
+<dt><a class="reference internal" href="rai_toolbox.optim.GradientTransformerOptimizer.html#rai_toolbox.optim.GradientTransformerOptimizer" title="rai_toolbox.optim.GradientTransformerOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GradientTransformerOptimizer</span></code></a></dt><dd></dd>
+</dl>
+</div>
+<p class="rubric">Examples</p>
+<p>Let’s create an optimizer that normalizes all parameter gradients using
+their <span class="math notranslate nohighlight">\(L^1\)</span>-norm, and then updates the parameters with a standard
+SGD-step with a learning rate of <code class="xref py py-obj docutils literal notranslate"><span class="pre">1.0</span></code>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">torch</span> <span class="k">as</span> <span class="nn">tr</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">rai_toolbox.optim</span> <span class="kn">import</span> <span class="n">L1NormedGradientOptim</span>
+</pre></div>
+</div>
+<p>Creating a parameter for our optimizer to update, and our optimizer. We
+want the norm to be computed over the entire gradient tensor – without
+broadcasting – so we specify <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim=None</span></code>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">optim</span> <span class="o">=</span> <span class="n">L1NormedGradientOptim</span><span class="p">([</span><span class="n">x</span><span class="p">],</span> <span class="n">param_ndim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">InnerOpt</span><span class="o">=</span><span class="n">tr</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">,</span> <span class="n">lr</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Performing a simple calculation with <code class="xref py py-obj docutils literal notranslate"><span class="pre">x</span></code> and performing backprop to create
+a gradient.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">tr</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">])</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="o">.</span><span class="n">grad</span> <span class="c1"># the un-normed gradient</span>
+<span class="go">tensor([2., 2.])</span>
+</pre></div>
+</div>
+<p>Performing a step with our optimizer transforms the gradient in-place, and then updates the parameter using <code class="xref py py-obj docutils literal notranslate"><span class="pre">SGD([x],</span> <span class="pre">lr=1.0).step()</span></code>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">optim</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="o">.</span><span class="n">grad</span> <span class="c1"># the normalized gradient</span>
+<span class="go">tensor([0.5000, 0.5000])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span>  <span class="c1"># the updated parameter</span>
+<span class="go">tensor([-1.5000,  0.5000], requires_grad=True)</span>
+</pre></div>
+</div>
+<dl class="py method">
 <dt class="sig sig-object py" id="rai_toolbox.optim.L1NormedGradientOptim.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">InnerOpt=&lt;class</span> <span class="pre">'torch.optim.sgd.SGD'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_ndim=-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">div_by_zero_eps=1.1754943508222875e-38</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rai_toolbox.optim.L1NormedGradientOptim.__init__" title="Permalink to this definition">#</a></dt>
-<dd><dl class="field-list simple">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">InnerOpt=&lt;class</span> <span class="pre">'torch.optim.sgd.SGD'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_ndim=-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defaults=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grad_scale=1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grad_bias=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">div_by_zero_eps=1.1754943508222875e-38</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rai_toolbox.optim.L1NormedGradientOptim.__init__" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>params: Iterable</strong></dt><dd><p>iterable of parameters to optimize or dicts defining parameter groups</p>
+<dd class="field-odd"><dl>
+<dt><strong>params</strong><span class="classifier">Sequence[Tensor] | Iterable[Mapping[str, Any]]</span></dt><dd><p>Iterable of parameters or dicts defining parameter groups.</p>
 </dd>
-<dt><strong>InnerOpt: Type[Optimizer] | Partial[Optimizer], optional (default=`torch.nn.optim.SGD`)</strong></dt><dd><p>The optimizer that updates the parameters after their gradients have
+<dt><strong>InnerOpt</strong><span class="classifier">Type[Optimizer] | Partial[Optimizer], optional (default=`torch.nn.optim.SGD`)</span></dt><dd><p>The optimizer that updates the parameters after their gradients have
 been transformed.</p>
 </dd>
-<dt><strong>param_ndim</strong><span class="classifier">int | NoneType, optional (default=-1)</span></dt><dd><p>Controls how <code class="xref py py-obj docutils literal notranslate"><span class="pre">_inplace_grad_transform_</span></code> is broadcast onto the gradient
+<dt><strong>param_ndim</strong><span class="classifier">Optional[int]</span></dt><dd><p>Controls how <code class="xref py py-obj docutils literal notranslate"><span class="pre">_inplace_grad_transform_</span></code> is broadcast onto the gradient
 of a given parameter. This can be specified per param-group. By default,
 the gradient transformation broadcasts over the first dimension in a
 batch-like style.</p>
@@ -339,22 +377,23 @@ batch-like style.</p>
 <li><p>A negative number indicates the ‘offset’ from the dimensionality of the gradient (see “Notes” for examples).</p></li>
 <li><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> means that the transformation will be applied directly to the gradient without any broadcasting.</p></li>
 </ul>
+<p>See <a class="reference internal" href="rai_toolbox.optim.GradientTransformerOptimizer.html#rai_toolbox.optim.GradientTransformerOptimizer" title="rai_toolbox.optim.GradientTransformerOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GradientTransformerOptimizer</span></code></a> for more details and examples.</p>
 </dd>
-<dt><strong>defaults: Optional[dict]</strong></dt><dd><p>Specifies default parameters for all parameter groups.</p>
+<dt><strong>grad_scale</strong><span class="classifier">float, optional (default=1.0)</span></dt><dd><p>Multiplies each gradient in-place after the in-place transformation is
+performed. This can be specified per param-group.</p>
+</dd>
+<dt><strong>grad_bias</strong><span class="classifier">float, optional (default=0.0)</span></dt><dd><p>Added to each gradient in-place after the in-place transformation is
+performed. This can be specified per param-group.</p>
+</dd>
+<dt><strong>defaults</strong><span class="classifier">Optional[Dict[str, Any]]</span></dt><dd><p>Specifies default parameters for all parameter groups.</p>
+</dd>
+<dt><strong>div_by_zero_eps</strong><span class="classifier">float, optional (default=`torch.finfo(torch.float32).tiny`)</span></dt><dd><p>A lower bound used to clamp the normalization factor to prevent div-by-zero.</p>
+</dd>
+<dt><strong>**inner_opt_kwargs</strong><span class="classifier">Any</span></dt><dd><p>Named arguments used to initialize <code class="xref py py-obj docutils literal notranslate"><span class="pre">InnerOpt</span></code>.</p>
 </dd>
 </dl>
 </dd>
 </dl>
-<p class="rubric">Notes</p>
-<p>Additional Explanation of <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim</span></code>:</p>
-<p>If the gradient has a shape (d0, d1, d2) and <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim=1</span></code> then the
-transformation will be broadcast over each shape-(d2,) sub-tensor in the
-gradient (of which there are d0 * d1).</p>
-<p>If a gradient has a shape (d0, d1, d2, d3), and if <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim=-1</span></code>,
-then the transformation will broadcast over each shape-(d1, d2, d3) sub-tensor
-in the gradient (of which there are d0). This is equivalent to <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim=3</span></code>.</p>
-<p>If <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim=0</span></code> then the transformation is applied elementwise to the
-gradient by temporarily reshaping the gradient to a shape-(T, 1) tensor.</p>
 </dd></dl>
 
 <p class="rubric">Methods</p>
@@ -370,36 +409,6 @@ gradient by temporarily reshaping the gradient to a shape-(T, 1) tensor.</p>
 <dd class="field-odd"><p></p></dd>
 </dl>
 </p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_param_group</span></code>(param_group)</p></td>
-<td><p>Add a param group to the <code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizer</span></code> s <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_groups</span></code>.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_state_dict</span></code>(state_dict)</p></td>
-<td><p>Loads the optimizer state.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">per_datum_norm</span></code>(x)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">state_dict</span></code>()</p></td>
-<td><p>Returns the state of the optimizer as a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">step</span></code>([closure])</p></td>
-<td><p>Performs a single optimization step (parameter update).</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">zero_grad</span></code>([set_to_none])</p></td>
-<td><p>Sets the gradients of all optimized <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code> s to zero.</p></td>
-</tr>
-</tbody>
-</table>
-<p class="rubric">Attributes</p>
-<table class="autosummary longtable table autosummary">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">p</span></code></p></td>
-<td><p></p></td>
 </tr>
 </tbody>
 </table>

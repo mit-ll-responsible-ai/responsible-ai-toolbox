@@ -14,21 +14,6 @@ rai\_toolbox.optim.LinfProjectedOptim
    .. autosummary::
    
       ~LinfProjectedOptim.__init__
-      ~LinfProjectedOptim.add_param_group
-      ~LinfProjectedOptim.load_state_dict
-      ~LinfProjectedOptim.project
-      ~LinfProjectedOptim.state_dict
-      ~LinfProjectedOptim.step
-      ~LinfProjectedOptim.zero_grad
-   
-   
 
-   
-   
-   .. rubric:: Attributes
-
-   .. autosummary::
-   
-      ~LinfProjectedOptim.param_groups
    
    
