@@ -1,3 +1,31 @@
+.. meta::
+   :description: A description of how-to run PyTorch Lightning's DDP strategy with Hydra using rai-toolbox.
+
+.. admonition:: TL;DR
+   
+   Create a PyTorch Lightning configuration with ``trainer`` and ``module`` fields, e.g.,
+
+   .. code-block:: python
+      
+      Config = make_config(
+          trainer=builds(Trainer, gpus=2, strategy=builds(HydraDDP)),
+          module=builds(MyLightningModule)
+      )
+
+   Define a task function: 
+   
+   .. code-block:: python
+
+      def task_fn(cfg):
+          obj = instantiate(cfg)
+          obj.trainer.fit(obj.module))
+
+   Simply launch a PyTorch Lightning job, e.g., ``launch(Config, task_fn)``
+
+.. attention::
+
+    Unlike PyTorch Lightning's ``ddp``, you **can** execute in a Jupyter Notebook if you use :func:`~rai_toolbox.mushin.HydraDDP`!
+
 .. _hydraddp:
 
 ===================================
