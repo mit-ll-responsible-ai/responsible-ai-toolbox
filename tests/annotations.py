@@ -11,25 +11,21 @@ import torch as tr
 from torch.optim import SGD, Adam
 
 from rai_toolbox import negate
-from rai_toolbox._typing import Partial, Optimizer, OptimizerType
+from rai_toolbox._typing import Optimizer, OptimizerType, Partial
 from rai_toolbox._utils.itertools import flatten_params
 from rai_toolbox.optim import (
-    L2PGD,
-    L1FrankWolfe,
-    L1qFrankWolfe,
-    L2FrankWolfe,
-    LinfFrankWolfe,
     FrankWolfe,
+    GradientTransformerOptimizer,
+    L1FrankWolfe,
     L1NormedGradientOptim,
+    L1qFrankWolfe,
     L1qNormedGradientOptim,
+    L2FrankWolfe,
     L2NormedGradientOptim,
     L2ProjectedOptim,
-    SignedGradientOptim,
+    LinfFrankWolfe,
     LinfProjectedOptim,
-    GradientTransformerOptimizer,
-    L2PGD,
-    LinfPGD,
-    L1qFW,
+    SignedGradientOptim,
 )
 
 
@@ -43,11 +39,6 @@ def check_optim_interface():
     # x needs to be sequence
     SignedGradientOptim(x, InnerOpt=SGD)  # type: ignore
 
-    # bad param-group name
-    L2NormedGradientOptim([{"hello": x}], InnerOpt=SGD)  # type: ignore
-
-    L2ProjectedOptim([{"hello": x}], InnerOpt=SGD, epsilon=1.0)  # type: ignore
-
 
 def check_optim_compatibilities():
     def f(Opt: Union[Partial[Optimizer], OptimizerType]):
@@ -57,7 +48,6 @@ def check_optim_compatibilities():
 
     f(SGD)
     f(Adam)
-    f(L2PGD)
     f(L1FrankWolfe)
     f(L1qFrankWolfe)
     f(L2FrankWolfe)
@@ -70,9 +60,6 @@ def check_optim_compatibilities():
     f(SignedGradientOptim)
     f(LinfProjectedOptim)
     f(GradientTransformerOptimizer)
-    f(L2PGD)
-    f(LinfPGD)
-    f(L1qFW)
 
 
 def check_negate():
