@@ -8,6 +8,7 @@ import torch
 from torch.optim import Optimizer
 
 from rai_toolbox._typing import OptimParams
+from rai_toolbox._utils import check_param_group_value, value_check
 
 from .lp_space import L1qNormedGradientOptim, L2NormedGradientOptim, SignedGradientOptim
 from .optimizer import GradientTransformerOptimizer
@@ -72,8 +73,10 @@ class FrankWolfe(Optimizer):
         div_by_zero_eps : float, optional (default=`torch.finfo(torch.float32).tiny`)
             Prevents div-by-zero error in learning rate schedule.
         """
-        self._eps = div_by_zero_eps
-        self._use_default_lr_schedule = use_default_lr_schedule
+        self._eps = value_check("div_by_zero_eps", div_by_zero_eps, min_=0.0)
+        self._use_default_lr_schedule = value_check(
+            "use_default_lr_schedule", use_default_lr_schedule, type_=bool
+        )
 
         if not self._use_default_lr_schedule and not (0 <= lr <= 1):
             raise ValueError("`lr` must reside in the domain [0, 1]")
@@ -81,6 +84,9 @@ class FrankWolfe(Optimizer):
         defaults = dict(lr=lr, lmo_scaling_factor=lmo_scaling_factor)
 
         super().__init__(params, defaults)  # type: ignore
+
+        check_param_group_value("lmo_scaling_factor", self.param_groups)
+        check_param_group_value("lr", self.param_groups, min_=0.0)
 
     @torch.no_grad()
     def step(self, closure=None):
