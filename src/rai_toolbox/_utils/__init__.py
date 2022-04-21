@@ -24,7 +24,7 @@ def get_device(obj: Union[tr.nn.Module, tr.Tensor]) -> tr.device:
         raise TypeError(f"Expected torch.nn.Module or torch.Tensor, got {obj}")
 
 
-def _safe_name(x):
+def _safe_name(x: Any) -> str:
     return getattr(x, "__name__", str(x))
 
 
@@ -37,11 +37,25 @@ def value_check(
     max_: Optional[Union[int, float]] = None,
     incl_min: bool = True,
     incl_max: bool = True,
-):
+) -> None:
     """
     For internal use only.
 
-    Used to check the type of `value`. Numerical types can also be bounds-checked.
+    Used to check the type of `value`. Numerical types can also be bound-checked.
+
+    Examples
+    --------
+    >>> value_check("x", 1, type_=str)
+    TypeError: `x` must be of type(s) `str`, got 1 (type: int)
+
+    >>> value_check("x", 1, min_=20)
+    ValueError: `x` must satisfy 20 <= x  Got: 1
+
+    >>> value_check("x", 1, min_=1, incl_min=False)
+    ValueError: `x` must satisfy 1 < x  Got: 1
+
+    >>> value_check("x", 1, min_=1, incl_min=True) # ok
+    >>> value_check("x", 0.0, min_=-10, max_=10)  # ok
 
     Raises
     ------
