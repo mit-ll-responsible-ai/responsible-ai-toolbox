@@ -727,26 +727,36 @@ def test_grad_scale_and_bias(
         assert tr.any(x1 != x3), (x1, x3)
 
 
+_params = [tr.tensor(1.0, requires_grad=True)]
+
+
 @pytest.mark.parametrize(
     "bad_optim",
     [
-        partial(
-            L2NormedGradientOptim,
-            {"params": [tr.tensor(1.0, requires_grad=True)], "grad_scale": "apple"},
+        pytest.param(
+            partial(
+                L2NormedGradientOptim,
+                [{"params": _params, "grad_scale": 1.0}],
+            ),
+            marks=pytest.mark.xfail(reason="valid input"),
         ),
         partial(
             L2NormedGradientOptim,
-            {"params": [tr.tensor(1.0, requires_grad=True)], "grad_bias": "apple"},
+            [{"params": _params, "grad_scale": "apple"}],
         ),
         partial(
             L2NormedGradientOptim,
-            [tr.tensor(1.0, requires_grad=True)],
+            [{"params": _params, "grad_bias": "apple"}],
+        ),
+        partial(
+            L2NormedGradientOptim,
+            _params,
             grad_scale="apple",
         ),
-        partial(
-            L2NormedGradientOptim,
-            [tr.tensor(1.0, requires_grad=True)],
-            grad_bias="apple",
+        partial(L2NormedGradientOptim, _params, grad_bias="apple"),
+        pytest.param(
+            partial(L2NormedGradientOptim, _params, grad_bias=2.0),
+            marks=pytest.mark.xfail(reason="valid input"),
         ),
     ],
 )
