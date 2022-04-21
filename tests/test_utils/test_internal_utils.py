@@ -89,7 +89,6 @@ def test_check_multiple_types(value: Union[str, int]):
     ],
 )
 def test_min_max_ordering(kwargs):
-    # with pytest.raises(ValueError):
     value_check("dummy", **kwargs)
 
 
@@ -115,28 +114,54 @@ def test_min_max_ordering(kwargs):
     ],
 )
 def test_bad_inequality(kwargs):
-    # with pytest.raises(ValueError):
     value_check("dummy", **kwargs)
 
 
 @given(
-    lower=(st.none() | st.floats(allow_nan=False)),
-    upper=(st.none() | st.floats(allow_nan=False)),
+    lower=(st.none() | st.floats(allow_nan=False, min_value=-1e6, max_value=1e6)),
+    upper=(st.none() | st.floats(allow_nan=False, min_value=-1e6, max_value=1e6)),
     data=st.data(),
+    incl_max=st.booleans(),
+    incl_min=st.booleans(),
 )
-def test_valid_inequalities(lower, upper, data: st.DataObject):
+def test_valid_inequalities(
+    lower, upper, data: st.DataObject, incl_max: bool, incl_min: bool
+):
+    if lower is None:
+        incl_min = True
+    if upper is None:
+        incl_max = True
+
     if lower is None and upper is None:
         assume(False)
         assert False
+
     if lower is not None and upper is not None:
         lower, upper = (upper, lower) if upper < lower else (lower, upper)
 
+    if incl_min is False or incl_max is False and lower == upper:
+        assume(False)
+        assert False
+
     value = (
-        data.draw(st.floats(min_value=lower, max_value=upper), label="value")
+        data.draw(
+            st.floats(
+                min_value=lower,
+                max_value=upper,
+                exclude_max=not incl_max,
+                exclude_min=not incl_min,
+            ),
+            label="value",
+        )
         if lower != upper
         else lower
     )
 
     value_check(
-        "dummy", value=value, min_=lower, max_=upper, incl_max=True, incl_min=True
+        "dummy",
+        value=value,
+        min_=lower,
+        max_=upper,
+        incl_max=incl_max,
+        incl_min=incl_min,
     )
