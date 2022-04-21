@@ -328,24 +328,21 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
                     f"`param_ndim` must be an int or None, got: {param_ndim}"
                 )
 
+            if not isinstance(group["grad_scale"], (float, int)):
+                raise TypeError(
+                    f"grad_scale must be a float, got {group['grad_scale']}"
+                )
+
+            if not isinstance(group["grad_bias"], (float, int)):
+                raise TypeError(f"grad_bias must be a float, got {group['grad_bias']}")
+
             for p in group["params"]:
                 p: Tensor
-                if param_ndim is None:
-                    continue
-                if p.ndim < abs(param_ndim):
+                if param_ndim is not None and p.ndim < abs(param_ndim):
                     raise ValueError(
                         f"`param_ndim={param_ndim}` specified for parameter "
                         f"with ndim={p.ndim} is not valid. `abs(param_ndim) <= "
                         f"ndim` must hold."
-                    )
-                if not isinstance(group["grad_scale"], (float, int)):
-                    raise TypeError(
-                        f"grad_scale must be a float, got {group['grad_scale']}"
-                    )
-
-                if not isinstance(group["grad_bias"], (float, int)):
-                    raise TypeError(
-                        f"grad_bias must be a float, got {group['grad_bias']}"
                     )
 
     @abstractmethod

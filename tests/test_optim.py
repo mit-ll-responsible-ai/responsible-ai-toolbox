@@ -725,3 +725,31 @@ def test_grad_scale_and_bias(
 
     if b1 != b3 or s1 != s3:
         assert tr.any(x1 != x3), (x1, x3)
+
+
+@pytest.mark.parametrize(
+    "bad_optim",
+    [
+        partial(
+            L2NormedGradientOptim,
+            {"params": [tr.tensor(1.0, requires_grad=True)], "grad_scale": "apple"},
+        ),
+        partial(
+            L2NormedGradientOptim,
+            {"params": [tr.tensor(1.0, requires_grad=True)], "grad_bias": "apple"},
+        ),
+        partial(
+            L2NormedGradientOptim,
+            [tr.tensor(1.0, requires_grad=True)],
+            grad_scale="apple",
+        ),
+        partial(
+            L2NormedGradientOptim,
+            [tr.tensor(1.0, requires_grad=True)],
+            grad_bias="apple",
+        ),
+    ],
+)
+def test_bad_grad_scale_bias(bad_optim):
+    with pytest.raises(TypeError):
+        bad_optim(lr=1.0, param_ndim=None)
