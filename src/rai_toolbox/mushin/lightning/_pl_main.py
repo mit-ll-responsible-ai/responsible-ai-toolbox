@@ -16,12 +16,14 @@ from ..hydra import zen
 log = logging.getLogger(__name__)
 
 
-def task(trainer: Trainer, module: LightningModule, pl_testing: bool) -> None:
+def task(
+    trainer: Trainer, module: LightningModule, pl_testing: bool, pl_local_rank: int
+) -> None:
     if pl_testing:
-        log.info("Launching child process using Training.test")
+        log.info(f"Rank {pl_local_rank}: Launched subprocess using Training.test")
         trainer.test(module)
     else:
-        log.info("Launching child process using Training.fit")
+        log.info(f"Rank {pl_local_rank}: Launched subprocess using Training.fit")
         trainer.fit(module)
 
 

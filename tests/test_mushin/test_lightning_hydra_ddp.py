@@ -84,13 +84,13 @@ def test_ddp_with_hydra_runjob(subdir, num_jobs, testing):
 
     # Make sure config.yaml was created for additional
     # processes.
-    logs = list(Path.cwd().glob("**/config.yaml"))
-    assert len(logs) == num_jobs * 2
+    yamls = list(Path.cwd().glob("**/config.yaml"))
+    assert len(yamls) == num_jobs
 
     # Make sure the parameter was set and used
-    cfg = load_from_yaml(logs[0])
+    cfg = load_from_yaml(yamls[0])
     assert cfg.devices == 2
 
     # Make sure PL spawned a job that is logged by Hydra
-    logs = list(Path.cwd().glob("**/train_ddp_process_*.log"))
+    logs = list(Path.cwd().glob("**/*.log"))
     assert len(logs) == num_jobs

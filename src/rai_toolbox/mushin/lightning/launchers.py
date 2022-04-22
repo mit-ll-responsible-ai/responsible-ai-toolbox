@@ -67,7 +67,14 @@ def _subprocess_call(local_rank: int, testing: bool) -> None:
     # Set flag to run Trainer.fit or Trainer.test in `_pl_main.py`
     command += ["++pl_testing=" + ("false" if not testing else "true")]
 
-    command += [f"hydra.run.dir={os_cwd}", f"hydra.job.name={hydra_cfg.job.name}"]
+    # Set flag for local rank
+    command += [f"++pl_local_rank={local_rank}"]
+
+    command += [
+        f"hydra.run.dir={os_cwd}",
+        f"hydra.output_subdir={hydra_cfg.output_subdir}",
+        f"hydra.job.name={hydra_cfg.job.name}",
+    ]
     subprocess.Popen(command, env=env_copy, cwd=cwd)
 
 
