@@ -84,7 +84,7 @@ Next lets create an example configuration and task function using `hydra-zen <ht
 
    from hydra_zen import builds, make_config, instantiate, launch
    from rai_toolbox.mushin import HydraDDP
-   from rai_toolbox.testing import TestLightningModule
+   from rai_toolbox.mushin.testing.lightning import TestLightningModule
 
    TrainerConfig = builds(
        pl.Trainer,

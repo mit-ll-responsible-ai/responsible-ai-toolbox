@@ -88,10 +88,11 @@ if PL_VERSION >= Version(1, 6, 0):
         """DDP Strategy that supports Hydra run and multirun jobs.
 
         This strategy assumes a `Trainer.fit` or `Trainer.test` has been configured
-        to execute via Hydra.  It requires that Hydra saves a `config.yaml` in the current working directory with the following keys/properties set:
+        to execute via Hydra.  It requires that Hydra saves a `config.yaml` in the current working directory with the following keys/properties set::
 
-        - trainer: A `pytorch_lightning.Trainer` configuration
-        - module: A `pytorch_lightning.LightningModule` configuration
+           ├── Config
+           │    ├── trainer: A `pytorch_lightning.Trainer` configuration
+           │    ├── module: A `pytorch_lightning.LightningModule` configuration
 
         This strategy will launch a child subprocesses for additional GPU beyond the first using the following base command::
 
@@ -99,12 +100,42 @@ if PL_VERSION >= Version(1, 6, 0):
 
         Examples
         --------
-        >>> from pytorch_lightning import Trainer
-        >>> from rai_toolbox.mushin import HydraDDP
-        >>> PLModule = # some LightningModule
 
-        >>> trainer = Trainer(PLModule, accelerator="auto", devices=2, strategy=HydraDDP())
-        >>> trainer.fit(module)
+        First define a Hydra configuration using hydra-zen
+
+        >>> import pytorch_lightning as pl
+        ... from hydra_zen import builds, make_config,
+        ... from rai_toolbox.mushin import HydraDDP
+        ... from rai_toolbox.mushin.testing.lightning import TestLightningModule
+        ...
+        ... TrainerConfig = builds(
+        ...     pl.Trainer,
+        ...     accelerator="auto",
+        ...     gpus=2,
+        ...     max_epochs=1,
+        ...     fast_dev_run=True,
+        ...     strategy=builds(HydraDDP),
+        ...     populate_full_signature=True
+        ... )
+        ...
+        ... ModuleConfig = builds(TestLightningModule)
+        ...
+        ... Config = make_config(
+        ...     trainer=TrainerConfig,
+        ...     module=ModuleConfig
+        ... )
+
+        Next define a task function to execute the Hydra job
+
+        >>> from hydra_zen import instantiate
+        >>> def task_function(cfg):
+        ...     obj = instantiate(cfg)
+        ...     obj.trainer.fit(obj.module)
+
+        Launch the Hydra+Lightning DDP job
+
+        >>> from hydra_zen import launch
+        >>> job = launch(Config, task_function)
         """
 
         def setup_environment(self) -> None:
@@ -193,25 +224,54 @@ else:  # pragma: no cover
         """DDP Strategy that supports Hydra run and multirun jobs.
 
         This strategy assumes a `Trainer.fit` or `Trainer.test` has been configured
-        to execute via Hydra.  It requires that Hydra saves a `config.yaml` in the current working directory with the following keys/properties set:
+        to execute via Hydra.  It requires that Hydra saves a `config.yaml` in the current working directory with the following keys/properties set::
 
-        - trainer: A `pytorch_lightning.Trainer` configuration
-        - module: A `pytorch_lightning.LightningModule` configuration
+           ├── Config
+           │    ├── trainer: A `pytorch_lightning.Trainer` configuration
+           │    ├── module: A `pytorch_lightning.LightningModule` configuration
 
         This strategy will launch a child subprocesses for additional GPU beyond the first using the following base command::
 
            python -m rai_toolbox.mushin.lightning._pl_main -cp <path to config.yaml> -cn config.yaml
 
-
         Examples
         --------
-        >>> from pytorch_lightning import Trainer
-        >>> from rai_toolbox.mushin import HydraDDP
-        >>> PLModule = # some LightningModule
 
-        >>> trainer = Trainer(PLModule, accelerator="auto", devices=2, strategy=HydraDDP())
-        >>> trainer.fit(module)
+        First define a Hydra configuration using hydra-zen
 
+        >>> import pytorch_lightning as pl
+        ... from hydra_zen import builds, make_config,
+        ... from rai_toolbox.mushin import HydraDDP
+        ... from rai_toolbox.mushin.testing.lightning import TestLightningModule
+        ...
+        ... TrainerConfig = builds(
+        ...     pl.Trainer,
+        ...     accelerator="auto",
+        ...     gpus=2,
+        ...     max_epochs=1,
+        ...     fast_dev_run=True,
+        ...     strategy=builds(HydraDDP),
+        ...     populate_full_signature=True
+        ... )
+        ...
+        ... ModuleConfig = builds(TestLightningModule)
+        ...
+        ... Config = make_config(
+        ...     trainer=TrainerConfig,
+        ...     module=ModuleConfig
+        ... )
+
+        Next define a task function to execute the Hydra job
+
+        >>> from hydra_zen import instantiate
+        >>> def task_function(cfg):
+        ...     obj = instantiate(cfg)
+        ...     obj.trainer.fit(obj.module)
+
+        Launch the Hydra+Lightning DDP job
+
+        >>> from hydra_zen import launch
+        >>> job = launch(Config, task_function)
         """
 
         def setup_environment(self) -> None:
