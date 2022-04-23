@@ -6,26 +6,35 @@
    Create a PyTorch Lightning configuration with ``trainer`` and ``module`` fields, e.g.,
 
    .. code-block:: python
+
+      from pytorch_lightning import Trainer
+      from hydra_zen import builds, make_config
+      from rai_toolbox.mushin import HydraDDP
       
+      MyLightningModule = # load/create your lightning module
+
       Config = make_config(
-          trainer=builds(Trainer, gpus=2, strategy=builds(HydraDDP)),
           module=builds(MyLightningModule)
+          trainer=builds(Trainer, gpus=2, strategy=builds(HydraDDP)),
       )
 
    Define a task function: 
    
    .. code-block:: python
 
+      from hydra_zen import instantiate
+
       def task_fn(cfg):
           obj = instantiate(cfg)
           obj.trainer.fit(obj.module))
 
-   Simply launch a PyTorch Lightning job, e.g., ``launch(Config, task_fn)``
+   Simply launch a PyTorch Lightning job, e.g., ``launch(Config, task_fn)``,
+   or `create a command line interface <https://mit-ll-responsible-ai.github.io/hydra-zen/tutorials/add_cli.html>`_ to run your job.
 
 .. tip::
 
-    PyTorch Lightning's `Trainer <https://pytorch-lightning.readthedocs.io/en/latest/api_references.html#trainer/>`_ with :func:`~rai_toolbox.mushin.HydraDDP`
-    is **compatible** with interactive environments such as Jupyter Notebooks!
+    Using :func:`~rai_toolbox.mushin.HydraDDP`, PyTorch Lightning's ddp-mode `Trainer <https://pytorch-lightning.readthedocs.io/en/latest/api_references.html#trainer/>`_
+    **becomes compatible** with interactive environments such as Jupyter Notebooks!
 
 .. _hydraddp:
 
