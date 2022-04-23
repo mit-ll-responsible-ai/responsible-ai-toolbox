@@ -42,14 +42,13 @@
 Run PyTorch Lightning DDP in Hydra
 ===================================
 
-Executing Hydra with `PyTorch Lightning's Distributed Data Parallel (DDP) Strategy <https://pytorch-lightning.readthedocs.io/en/latest/accelerators/gpu_expert.html#what-is-a-strategy/>`_
-has challenges due to these two issues:
+Executing Hydra with `PyTorch Lightning's Distributed Data Parallel (DDP) Strategy <https://pytorch-lightning.readthedocs.io/en/latest/accelerators/gpu_expert.html#what-is-a-strategy/>`_ 
+often `has issues <https://github.com/PyTorchLightning/pytorch-lightning/issues/11300>`_
+, in part because the strategy launches subprocesses where the command is derived from 
+values in `sys.argv`.
 
-1. Hydra changes directories to a `working directory <https://hydra.cc/docs/1.0/tutorials/basic/running_your_app/working_directory/>`_
-2. PyTorch Lightning DDP strategy launches subprocesses where the command is derived from values in `sys.argv`.
-
-The rai-toolbox comes with a custom strategy, :func:`~rai_toolbox.mushin.HydraDDP`, that addresses
-the challenge of running Hydra and Lightning together using DDP.
+The rai-toolbox comes with a custom strategy, :func:`~rai_toolbox.mushin.HydraDDP`, 
+that addresses the challenge of running Hydra and Lightning together using DDP.
 
 In this How-To we will
 
@@ -58,8 +57,8 @@ In this How-To we will
 3. Execute the training task
 4. Examing the logged files in the Hydra working directory
 
-First, in order to use :func:`~rai_toolbox.mushin.HydraDDP`, the Hydra configuration must
-contain the following two configurations:
+First, in order to use :func:`~rai_toolbox.mushin.HydraDDP`, the Hydra configuration 
+must contain the following two configurations:
 
 .. code-block:: reStructuredText
    :caption: 1: Define requirements for Hydra configuration
