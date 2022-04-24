@@ -352,6 +352,17 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
         """Applies a transformation, in place, on the gradient of the each parameter
         in the provided param group.
 
+        Parameters
+        ----------
+        param : torch.Tensor
+            The parameter whose gradient (stored in `.grad`) will be modified in-place.
+        
+        optim_group : Dict[str, Any]
+            The parameter group associated with `param`; contains per-parameter 
+            configured values that can affect the gradient transformation.
+
+        Notes
+        -----
         This transform should *always* be designed to broadcast over the leading
         dimension of the parameters's gradient. That is, each gradient  should be
         assumed to have the shape-(N, d0, ...) and the transformation should be
