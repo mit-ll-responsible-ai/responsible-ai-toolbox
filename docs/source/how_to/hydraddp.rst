@@ -3,7 +3,8 @@
 
 .. admonition:: TL;DR
    
-   Create a PyTorch Lightning configuration with ``trainer`` and ``module`` fields, e.g.,
+   Create a minimal PyTorch Lightning configuration with ``trainer`` and ``module`` 
+   fields, e.g.,
 
    .. code-block:: python
 
@@ -34,7 +35,7 @@
 .. tip::
 
     Using :func:`~rai_toolbox.mushin.HydraDDP`, PyTorch Lightning's ddp-mode `Trainer <https://pytorch-lightning.readthedocs.io/en/latest/api_references.html#trainer/>`_
-    **becomes compatible** with interactive environments such as Jupyter Notebooks!
+    becomes compatible with interactive environments such as Jupyter Notebooks!
 
 .. _hydraddp:
 
@@ -42,7 +43,7 @@
 Run PyTorch Lightning DDP in Hydra
 ===================================
 
-Executing Hydra with `PyTorch Lightning's Distributed Data Parallel (DDP) Strategy <https://pytorch-lightning.readthedocs.io/en/latest/accelerators/gpu_expert.html#what-is-a-strategy/>`_ 
+Using Hydra to run `PyTorch Lightning's Distributed Data Parallel (DDP) Strategy <https://pytorch-lightning.readthedocs.io/en/latest/accelerators/gpu_expert.html#what-is-a-strategy/>`_ 
 often `has issues <https://github.com/PyTorchLightning/pytorch-lightning/issues/11300>`_
 , in part because the strategy launches subprocesses where the command is derived from 
 values in `sys.argv`.
@@ -52,26 +53,28 @@ that addresses the challenge of running Hydra and Lightning together using DDP.
 
 In this How-To we will
 
-1. Define the requirements for a Hydra configuration
-2. Build a `hydra-zen <https://github.com/mit-ll-responsible-ai/hydra-zen/>`_ configuration to execute a PyTorch Lightning multi-GPU training task
-3. Execute the training task
-4. Examing the logged files in the Hydra working directory
+1. Define the requirements for a Hydra configuration.
+2. Build a `hydra-zen <https://github.com/mit-ll-responsible-ai/hydra-zen/>`_ configuration to execute a PyTorch Lightning multi-GPU training task.
+3. Launch the training task.
+4. Examine the logged files in the Hydra working directory.
 
 First, in order to use :func:`~rai_toolbox.mushin.HydraDDP`, the Hydra configuration 
-must contain the following two configurations:
+must contain the following two sub-configurations:
 
 .. code-block:: reStructuredText
    :caption: 1: Define requirements for Hydra configuration
    
-   ├── Config
-   │    ├── trainer: A ``pytorch_lightning.Trainer`` configuration
-   │    ├── module: A ``pytorch_lightning.LightningModule`` configuration
+   Config
+    ├── trainer: A ``pytorch_lightning.Trainer`` configuration
+    ├── module: A ``pytorch_lightning.LightningModule`` configuration
 
 
-This configuration requirement allows us to define a nicely behaved task function (``rai_toolbox.mushin.lightning._pl_main.py``) that is launched for each subprocess:
+This configuration requirement enables :func:`~rai_toolbox.mushin.HydraDDP` to use a 
+toolbox-provided task function (``rai_toolbox.mushin.lightning._pl_main.py``) that is 
+launched for each subprocess:
 
 .. code-block:: python
-   :caption: Task Function For HydraDDP Subprocess
+   :caption: The task function automatically run by each HydraDDP subprocess
 
    def task(trainer: Trainer, module: LightningModule, pl_testing: bool, pl_local_rank: int) -> None:
        if pl_testing:
@@ -81,12 +84,13 @@ This configuration requirement allows us to define a nicely behaved task functio
            log.info(f"Rank {pl_local_rank}: Launched subprocess using Training.fit")
            trainer.fit(module)
 
-The configuration flags for ``pl_testing`` and ``pl_local_rank`` are automatically applied in :func:`~rai_toolbox.mushin.HydraDDP` before execution.
+Note that the configuration flags for ``pl_testing`` and ``pl_local_rank`` are 
+automatically set by :func:`~rai_toolbox.mushin.HydraDDP` before execution.
 
-Next lets create an example configuration and task function using `hydra-zen <https://github.com/mit-ll-responsible-ai/hydra-zen/>`_:
+Next let's create an example configuration and task function using `hydra-zen <https://github.com/mit-ll-responsible-ai/hydra-zen/>`_:
 
 .. code-block:: python
-   :caption: 2: hydra-zen configuration for HydraDDP
+   :caption: 2: Creating hydra-zen configuration and task function for leveraging HydraDDP
    
    import pytorch_lightning as pl
 
@@ -96,15 +100,11 @@ Next lets create an example configuration and task function using `hydra-zen <ht
 
    TrainerConfig = builds(
        pl.Trainer,
-       accelerator="auto",
-       gpus=2,
-       max_epochs=1,
-       fast_dev_run=True,
        strategy=builds(HydraDDP),
-       populate_full_signature=True
+       populate_full_signature=True,
    )
 
-   ModuleConfig = builds(TestLightningModule)
+   ModuleConfig = builds(TestLightningModule, populate_full_signature=True)
 
    Config = make_config(
        trainer=TrainerConfig,
@@ -115,12 +115,18 @@ Next lets create an example configuration and task function using `hydra-zen <ht
        obj = instantiate(cfg)
        obj.trainer.fit(obj.module)
 
-Next execute the training job
+Next, we launch the training job. For the purpose of this How-To, we will run only for 
+a single epoch and in "fast dev run" mode.  
 
 .. code-block:: python
-   :caption: 3: Execute Task
+   :caption: 3: Execute a Hydra-compatible ddp job using two gpus
 
-   >> job = launch(Config, task_function)
+   >>> job = launch(Config, task_function, 
+   ...              overrides=["trainer.gpus=2", 
+   ...                         "trainer.max_epochs=1",
+   ...                         "trainer.fast_dev_run=True",
+   ...                        ]
+   ...              )
    GPU available: True, used: True
    ...
 
