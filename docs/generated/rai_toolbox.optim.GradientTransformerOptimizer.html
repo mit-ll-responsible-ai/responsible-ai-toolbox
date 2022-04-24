@@ -476,6 +476,18 @@ gradient by temporarily reshaping the gradient to a shape-(T, 1) tensor.</p>
 <em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_inplace_grad_transform_</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim_group</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/optim/optimizer.html#GradientTransformerOptimizer._inplace_grad_transform_"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.optim.GradientTransformerOptimizer._inplace_grad_transform_" title="Permalink to this definition">#</a></dt>
 <dd><p>Applies a transformation, in place, on the gradient of the each parameter
 in the provided param group.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>param</strong><span class="classifier">torch.Tensor</span></dt><dd><p>The parameter whose gradient (stored in <code class="xref py py-obj docutils literal notranslate"><span class="pre">grad</span></code>) will be modified in-place.</p>
+</dd>
+<dt><strong>optim_group</strong><span class="classifier">Dict[str, Any]</span></dt><dd><p>The parameter group associated with <code class="xref py py-obj docutils literal notranslate"><span class="pre">param</span></code>; contains per-parameter 
+configured values that can affect the gradient transformation.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
 <p>This transform should <em>always</em> be designed to broadcast over the leading
 dimension of the parameters’s gradient. That is, each gradient  should be
 assumed to have the shape-(N, d0, …) and the transformation should be

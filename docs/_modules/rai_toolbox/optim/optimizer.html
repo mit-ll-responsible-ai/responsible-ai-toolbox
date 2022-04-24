@@ -512,6 +512,17 @@
         <span class="sd">&quot;&quot;&quot;Applies a transformation, in place, on the gradient of the each parameter</span>
 <span class="sd">        in the provided param group.</span>
 
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        param : torch.Tensor</span>
+<span class="sd">            The parameter whose gradient (stored in `.grad`) will be modified in-place.</span>
+<span class="sd">        </span>
+<span class="sd">        optim_group : Dict[str, Any]</span>
+<span class="sd">            The parameter group associated with `param`; contains per-parameter </span>
+<span class="sd">            configured values that can affect the gradient transformation.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
 <span class="sd">        This transform should *always* be designed to broadcast over the leading</span>
 <span class="sd">        dimension of the parameters&#39;s gradient. That is, each gradient  should be</span>
 <span class="sd">        assumed to have the shape-(N, d0, ...) and the transformation should be</span>
