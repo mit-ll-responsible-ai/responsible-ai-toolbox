@@ -147,3 +147,57 @@ The log file should contain the following information:
    [2022-04-21 20:35:42,810][torch.distributed.distributed_c10d][INFO] - Rank 1: Completed store-based barrier for key:store_based_barrier_key:1 with 2 nodes.
 
 Here you can see that the first line in the logged output indicates that the subprocess was launched for the second (Rank 1) GPU as expected.
+
+
+
+Bonus: Adding Some Bells & Whistles to Our Hydra Application
+============================================================
+
+There are a couple of enhancements that we can add to our Hydra-based application, 
+which are beyond the scope of this How-To; it is simple to `add a command line interface to our code <https://mit-ll-responsible-ai.github.io/hydra-zen/tutorials/add_cli.html>`_ and to make the :func:`~rai_toolbox.mushin.HydraDDP` strategy available 
+as `a swappable configuration group <https://mit-ll-responsible-ai.github.io/hydra-zen/tutorials/config_groups.html>`_. We refer the reader to the linked tutorials for 
+further explanation and instruction.
+
+The code from this How-To has been modified accordingly and placed in the script 
+``pl_trainer.py``: 
+
+.. code-block:: python
+   :caption: Contents of ``pl_trainer.py``
+   
+   import hydra
+   from hydra.core.config_store import ConfigStore
+
+   import pytorch_lightning as pl
+
+   from hydra_zen import builds, make_config, instantiate
+   from rai_toolbox.mushin import HydraDDP
+   from rai_toolbox.mushin.testing.lightning import TestLightningModule
+
+   TrainerConfig = builds(pl.Trainer, populate_full_signature=True)
+   ModuleConfig = builds(TestLightningModule, populate_full_signature=True)
+
+   Config = make_config(trainer=TrainerConfig, module=ModuleConfig)
+
+   cs = ConfigStore.instance()
+   cs.store(group="trainer/strategy", 
+            name="hydra_ddp", 
+            node=builds(HydraDDP),
+   )
+   cs.store(name="pl_app", node=Config)
+
+
+   @hydra.main(config_path=None, config_name="pl_app")
+   def task_function(cfg):
+       obj = instantiate(cfg)
+       obj.trainer.fit(obj.module)
+   
+   if __name__ == "__main__":
+      task_function()
+
+We can configure and run this code from the command line:
+
+.. code-block:: console
+
+   $ python pl_trainer.py +trainer/strategy=hydra_ddp trainer.gpus=2 trainer.max_epochs=1 trainer.fast_dev_run=True
+   GPU available: True, used: True
+   ...
