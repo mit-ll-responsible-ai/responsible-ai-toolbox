@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - docs-test
 
 jobs:
   deploy:
@@ -23,7 +24,6 @@ jobs:
           conda list
           conda config --show-sources
           conda config --show
-    steps:
       - uses: actions/checkout@v2
         with: 
           fetch-depth: 0
