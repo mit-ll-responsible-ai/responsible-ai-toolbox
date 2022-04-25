@@ -41,6 +41,11 @@ class PerturbationModel(Protocol):
 
 
 class AdditivePerturbation(nn.Module, PerturbationModel):
+    r"""Modifies a piece or batch of data by adding a perturbation: :math:`x \rightarrow x+\delta`.
+
+    :math:`\delta` is a trainable parameter of `AdditivePerturbation`.
+    """
+
     def __init__(
         self,
         data_or_shape: Union[Tensor, Sequence[int]],
@@ -58,6 +63,9 @@ class AdditivePerturbation(nn.Module, PerturbationModel):
         data_or_shape: Union[Tensor, Tuple[int, ...]]
             Determines the shape of the perturbation. If a tensor is supplied, its dtype
             and device are mirrored by the initialized perturbation.
+
+            This parameter can be modified to control whether the perturbation adds
+            elementwise or broadcast-adds over `x`.
 
         init_fn: Optional[Callable[[Tensor], None]]
             Operates in-place on a zero'd perturbation tensor to determine the
