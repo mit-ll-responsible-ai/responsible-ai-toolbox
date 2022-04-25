@@ -42,6 +42,7 @@ extensions = [
     "numpydoc",
     "sphinx_copybutton",
     "sphinx_tabs.tabs",
+    "nbsphinx",
 ]
 
 # Strip input prompts:

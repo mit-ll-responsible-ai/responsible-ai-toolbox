@@ -10,18 +10,23 @@ jobs:
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          activate-environment: sphinx-docs
+          python-version: 3.9
+          channels: conda-forge
+          channel-priority: strict
+          environment-file: ./docs/example-environment-caching.yml
+          use-only-tar-bz2: true
+      - run: |
+          conda info
+          conda list
+          conda config --show-sources
+          conda config --show
+    steps:
+      - uses: actions/checkout@v2
         with: 
           fetch-depth: 0
-
-      - name: Setup Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.8'
-
-      - name: Upgrade pip
-        run: |
-          # install pip=>20.1 to use "pip cache dir"
-          python3 -m pip install --upgrade pip
       - name: Get pip cache dir
         id: pip-cache
         run: echo "::set-output name=dir::$(pip cache dir)"
