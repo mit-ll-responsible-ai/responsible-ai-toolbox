@@ -257,27 +257,50 @@
 <dd><p>DDP Strategy that supports Hydra run and multirun jobs.</p>
 <p>This strategy assumes a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Trainer.fit</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">Trainer.test</span></code> has been configured
 to execute via Hydra.  It requires that Hydra saves a <code class="xref py py-obj docutils literal notranslate"><span class="pre">config.yaml</span></code> in the current working directory with the following keys/properties set:</p>
-<ul class="simple">
-<li><p>trainer: A <code class="xref py py-obj docutils literal notranslate"><span class="pre">pytorch_lightning.Trainer</span></code> configuration</p></li>
-<li><p>module: A <code class="xref py py-obj docutils literal notranslate"><span class="pre">pytorch_lightning.LightningModule</span></code> configuration</p></li>
-<li><p>pl_testing: A boolean: True for <code class="xref py py-obj docutils literal notranslate"><span class="pre">Trainer.test</span></code> and False (default) <code class="xref py py-obj docutils literal notranslate"><span class="pre">Trainer.fit</span></code></p></li>
-</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>├── Config
+│    ├── trainer: A `pytorch_lightning.Trainer` configuration
+│    ├── module: A `pytorch_lightning.LightningModule` configuration
+</pre></div>
+</div>
 <p>This strategy will launch a child subprocesses for additional GPU beyond the first using the following base command:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">rai_toolbox</span><span class="o">.</span><span class="n">mushin</span><span class="o">.</span><span class="n">lightning</span><span class="o">.</span><span class="n">_pl_main</span> <span class="o">-</span><span class="n">cp</span> <span class="o">&lt;</span><span class="n">path</span> <span class="n">to</span> <span class="n">config</span><span class="o">.</span><span class="n">yaml</span><span class="o">&gt;</span> <span class="o">-</span><span class="n">cn</span> <span class="n">config</span><span class="o">.</span><span class="n">yaml</span>
 </pre></div>
 </div>
-<p class="rubric">Notes</p>
-<p>In order to execute a MULTIRUN Hydra job we must make sure to destroy an distributed
-processes on setup of this function.  This will lead to issues if running multiple jobs
-in the notebook or trying to do <code class="xref py py-obj docutils literal notranslate"><span class="pre">Trainer.fit</span></code> followed by <code class="xref py py-obj docutils literal notranslate"><span class="pre">Trainer.test</span></code>.</p>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pytorch_lightning</span> <span class="kn">import</span> <span class="n">Trainer</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">rai_toolbox.mushin</span> <span class="kn">import</span> <span class="n">HydraDDP</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">PLModule</span> <span class="o">=</span> <span class="c1"># some LightningModule</span>
+<p>First define a Hydra configuration using hydra-zen</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pytorch_lightning</span> <span class="k">as</span> <span class="nn">pl</span>
+<span class="gp">... </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">builds</span><span class="p">,</span> <span class="n">make_config</span><span class="p">,</span>
+<span class="gp">... </span><span class="kn">from</span> <span class="nn">rai_toolbox.mushin</span> <span class="kn">import</span> <span class="n">HydraDDP</span>
+<span class="gp">... </span><span class="kn">from</span> <span class="nn">rai_toolbox.mushin.testing.lightning</span> <span class="kn">import</span> <span class="n">TestLightningModule</span>
+<span class="gp">...</span>
+<span class="gp">... </span><span class="n">TrainerConfig</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">pl</span><span class="o">.</span><span class="n">Trainer</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">accelerator</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">gpus</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">max_epochs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">fast_dev_run</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">strategy</span><span class="o">=</span><span class="n">builds</span><span class="p">(</span><span class="n">HydraDDP</span><span class="p">),</span>
+<span class="gp">... </span>    <span class="n">populate_full_signature</span><span class="o">=</span><span class="kc">True</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">... </span><span class="n">ModuleConfig</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">TestLightningModule</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">... </span><span class="n">Config</span> <span class="o">=</span> <span class="n">make_config</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">trainer</span><span class="o">=</span><span class="n">TrainerConfig</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">module</span><span class="o">=</span><span class="n">ModuleConfig</span>
+<span class="gp">... </span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">trainer</span> <span class="o">=</span> <span class="n">Trainer</span><span class="p">(</span><span class="n">PLModule</span><span class="p">,</span> <span class="n">accelerator</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="n">devices</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">strategy</span><span class="o">=</span><span class="n">HydraDDP</span><span class="p">())</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">trainer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
+<p>Next define a task function to execute the Hydra job</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">instantiate</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">task_function</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">obj</span> <span class="o">=</span> <span class="n">instantiate</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">obj</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">module</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Launch the Hydra+Lightning DDP job</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">launch</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">job</span> <span class="o">=</span> <span class="n">launch</span><span class="p">(</span><span class="n">Config</span><span class="p">,</span> <span class="n">task_function</span><span class="p">)</span>
 </pre></div>
 </div>
 <dl class="py method">

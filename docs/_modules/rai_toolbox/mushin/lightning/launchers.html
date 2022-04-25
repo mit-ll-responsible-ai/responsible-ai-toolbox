@@ -227,10 +227,13 @@
     <span class="c1"># Set flag to run Trainer.fit or Trainer.test in `_pl_main.py`</span>
     <span class="n">command</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">&quot;++pl_testing=&quot;</span> <span class="o">+</span> <span class="p">(</span><span class="s2">&quot;false&quot;</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">testing</span> <span class="k">else</span> <span class="s2">&quot;true&quot;</span><span class="p">)]</span>
 
+    <span class="c1"># Set flag for local rank</span>
+    <span class="n">command</span> <span class="o">+=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;++pl_local_rank=</span><span class="si">{</span><span class="n">local_rank</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+
     <span class="n">command</span> <span class="o">+=</span> <span class="p">[</span>
-        <span class="sa">f</span><span class="s2">&quot;hydra.output_subdir=.pl_hydra_</span><span class="si">{</span><span class="n">local_rank</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
         <span class="sa">f</span><span class="s2">&quot;hydra.run.dir=</span><span class="si">{</span><span class="n">os_cwd</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-        <span class="sa">f</span><span class="s2">&quot;hydra.job.name=train_ddp_process_</span><span class="si">{</span><span class="n">local_rank</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="sa">f</span><span class="s2">&quot;hydra.output_subdir=</span><span class="si">{</span><span class="n">hydra_cfg</span><span class="o">.</span><span class="n">output_subdir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="sa">f</span><span class="s2">&quot;hydra.job.name=</span><span class="si">{</span><span class="n">hydra_cfg</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="n">env_copy</span><span class="p">,</span> <span class="n">cwd</span><span class="o">=</span><span class="n">cwd</span><span class="p">)</span>
 
@@ -245,31 +248,54 @@
         <span class="sd">&quot;&quot;&quot;DDP Strategy that supports Hydra run and multirun jobs.</span>
 
 <span class="sd">        This strategy assumes a `Trainer.fit` or `Trainer.test` has been configured</span>
-<span class="sd">        to execute via Hydra.  It requires that Hydra saves a `config.yaml` in the current working directory with the following keys/properties set:</span>
+<span class="sd">        to execute via Hydra.  It requires that Hydra saves a `config.yaml` in the current working directory with the following keys/properties set::</span>
 
-<span class="sd">        - trainer: A `pytorch_lightning.Trainer` configuration</span>
-<span class="sd">        - module: A `pytorch_lightning.LightningModule` configuration</span>
-<span class="sd">        - pl_testing: A boolean: True for `Trainer.test` and False (default) `Trainer.fit`</span>
+<span class="sd">           ├── Config</span>
+<span class="sd">           │    ├── trainer: A `pytorch_lightning.Trainer` configuration</span>
+<span class="sd">           │    ├── module: A `pytorch_lightning.LightningModule` configuration</span>
 
 <span class="sd">        This strategy will launch a child subprocesses for additional GPU beyond the first using the following base command::</span>
 
 <span class="sd">           python -m rai_toolbox.mushin.lightning._pl_main -cp &lt;path to config.yaml&gt; -cn config.yaml</span>
 
-<span class="sd">        Notes</span>
-<span class="sd">        -----</span>
-<span class="sd">        In order to execute a MULTIRUN Hydra job we must make sure to destroy an distributed</span>
-<span class="sd">        processes on setup of this function.  This will lead to issues if running multiple jobs</span>
-<span class="sd">        in the notebook or trying to do `Trainer.fit` followed by `Trainer.test`.</span>
-
-
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
-<span class="sd">        &gt;&gt;&gt; from pytorch_lightning import Trainer</span>
-<span class="sd">        &gt;&gt;&gt; from rai_toolbox.mushin import HydraDDP</span>
-<span class="sd">        &gt;&gt;&gt; PLModule = # some LightningModule</span>
 
-<span class="sd">        &gt;&gt;&gt; trainer = Trainer(PLModule, accelerator=&quot;auto&quot;, devices=2, strategy=HydraDDP())</span>
-<span class="sd">        &gt;&gt;&gt; trainer.fit(module)</span>
+<span class="sd">        First define a Hydra configuration using hydra-zen</span>
+
+<span class="sd">        &gt;&gt;&gt; import pytorch_lightning as pl</span>
+<span class="sd">        ... from hydra_zen import builds, make_config,</span>
+<span class="sd">        ... from rai_toolbox.mushin import HydraDDP</span>
+<span class="sd">        ... from rai_toolbox.mushin.testing.lightning import TestLightningModule</span>
+<span class="sd">        ...</span>
+<span class="sd">        ... TrainerConfig = builds(</span>
+<span class="sd">        ...     pl.Trainer,</span>
+<span class="sd">        ...     accelerator=&quot;auto&quot;,</span>
+<span class="sd">        ...     gpus=2,</span>
+<span class="sd">        ...     max_epochs=1,</span>
+<span class="sd">        ...     fast_dev_run=True,</span>
+<span class="sd">        ...     strategy=builds(HydraDDP),</span>
+<span class="sd">        ...     populate_full_signature=True</span>
+<span class="sd">        ... )</span>
+<span class="sd">        ...</span>
+<span class="sd">        ... ModuleConfig = builds(TestLightningModule)</span>
+<span class="sd">        ...</span>
+<span class="sd">        ... Config = make_config(</span>
+<span class="sd">        ...     trainer=TrainerConfig,</span>
+<span class="sd">        ...     module=ModuleConfig</span>
+<span class="sd">        ... )</span>
+
+<span class="sd">        Next define a task function to execute the Hydra job</span>
+
+<span class="sd">        &gt;&gt;&gt; from hydra_zen import instantiate</span>
+<span class="sd">        &gt;&gt;&gt; def task_function(cfg):</span>
+<span class="sd">        ...     obj = instantiate(cfg)</span>
+<span class="sd">        ...     obj.trainer.fit(obj.module)</span>
+
+<span class="sd">        Launch the Hydra+Lightning DDP job</span>
+
+<span class="sd">        &gt;&gt;&gt; from hydra_zen import launch</span>
+<span class="sd">        &gt;&gt;&gt; job = launch(Config, task_function)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">def</span> <span class="nf">setup_environment</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -359,33 +385,54 @@
         <span class="sd">&quot;&quot;&quot;DDP Strategy that supports Hydra run and multirun jobs.</span>
 
 <span class="sd">        This strategy assumes a `Trainer.fit` or `Trainer.test` has been configured</span>
-<span class="sd">        to execute via Hydra.  It requires that Hydra saves a `config.yaml` in the current working directory with the following keys/properties set:</span>
+<span class="sd">        to execute via Hydra.  It requires that Hydra saves a `config.yaml` in the current working directory with the following keys/properties set::</span>
 
-<span class="sd">        - trainer: A `pytorch_lightning.Trainer` configuration</span>
-<span class="sd">        - module: A `pytorch_lightning.LightningModule` configuration</span>
-<span class="sd">        - pl_testing: A boolean: True for `Trainer.test` and False (default) `Trainer.fit`</span>
+<span class="sd">           ├── Config</span>
+<span class="sd">           │    ├── trainer: A `pytorch_lightning.Trainer` configuration</span>
+<span class="sd">           │    ├── module: A `pytorch_lightning.LightningModule` configuration</span>
 
 <span class="sd">        This strategy will launch a child subprocesses for additional GPU beyond the first using the following base command::</span>
 
 <span class="sd">           python -m rai_toolbox.mushin.lightning._pl_main -cp &lt;path to config.yaml&gt; -cn config.yaml</span>
 
-
-<span class="sd">        Notes</span>
-<span class="sd">        -----</span>
-<span class="sd">        In order to execute a MULTIRUN Hydra job we must make sure to destroy an</span>
-<span class="sd">        distributed processes on setup of this function.  This will lead to issues if</span>
-<span class="sd">        running multiple jobs in the notebook or trying to do `Trainer.fit` followed by</span>
-<span class="sd">        `Trainer.test`.</span>
-
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
-<span class="sd">        &gt;&gt;&gt; from pytorch_lightning import Trainer</span>
-<span class="sd">        &gt;&gt;&gt; from rai_toolbox.mushin import HydraDDP</span>
-<span class="sd">        &gt;&gt;&gt; PLModule = # some LightningModule</span>
 
-<span class="sd">        &gt;&gt;&gt; trainer = Trainer(PLModule, accelerator=&quot;auto&quot;, devices=2, strategy=HydraDDP())</span>
-<span class="sd">        &gt;&gt;&gt; trainer.fit(module)</span>
+<span class="sd">        First define a Hydra configuration using hydra-zen</span>
 
+<span class="sd">        &gt;&gt;&gt; import pytorch_lightning as pl</span>
+<span class="sd">        ... from hydra_zen import builds, make_config,</span>
+<span class="sd">        ... from rai_toolbox.mushin import HydraDDP</span>
+<span class="sd">        ... from rai_toolbox.mushin.testing.lightning import TestLightningModule</span>
+<span class="sd">        ...</span>
+<span class="sd">        ... TrainerConfig = builds(</span>
+<span class="sd">        ...     pl.Trainer,</span>
+<span class="sd">        ...     accelerator=&quot;auto&quot;,</span>
+<span class="sd">        ...     gpus=2,</span>
+<span class="sd">        ...     max_epochs=1,</span>
+<span class="sd">        ...     fast_dev_run=True,</span>
+<span class="sd">        ...     strategy=builds(HydraDDP),</span>
+<span class="sd">        ...     populate_full_signature=True</span>
+<span class="sd">        ... )</span>
+<span class="sd">        ...</span>
+<span class="sd">        ... ModuleConfig = builds(TestLightningModule)</span>
+<span class="sd">        ...</span>
+<span class="sd">        ... Config = make_config(</span>
+<span class="sd">        ...     trainer=TrainerConfig,</span>
+<span class="sd">        ...     module=ModuleConfig</span>
+<span class="sd">        ... )</span>
+
+<span class="sd">        Next define a task function to execute the Hydra job</span>
+
+<span class="sd">        &gt;&gt;&gt; from hydra_zen import instantiate</span>
+<span class="sd">        &gt;&gt;&gt; def task_function(cfg):</span>
+<span class="sd">        ...     obj = instantiate(cfg)</span>
+<span class="sd">        ...     obj.trainer.fit(obj.module)</span>
+
+<span class="sd">        Launch the Hydra+Lightning DDP job</span>
+
+<span class="sd">        &gt;&gt;&gt; from hydra_zen import launch</span>
+<span class="sd">        &gt;&gt;&gt; job = launch(Config, task_function)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">def</span> <span class="nf">setup_environment</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
