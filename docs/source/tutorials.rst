@@ -14,7 +14,6 @@ familiarity with PyTorch and common concepts from the field of deep learning.
    :maxdepth: 1
    :caption: Contents:
 
-   tutorials/placeholder
    tutorials/CIFAR10-Adversarial-Perturbations.ipynb
 
 
