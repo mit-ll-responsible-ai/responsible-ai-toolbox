@@ -17,7 +17,7 @@ jobs:
           python-version: 3.9
           channels: conda-forge
           channel-priority: strict
-          environment-file: ./docs/example-environment-caching.yml
+          environment-file: ./docs/conda_env.yml
           use-only-tar-bz2: true
       - run: |
           conda info
