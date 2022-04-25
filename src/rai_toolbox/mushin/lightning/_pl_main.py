@@ -6,16 +6,24 @@
 This script is called from `rai_toolbox.mushin.lightning.launchers.HydraDDP
 """
 
+import logging
+
 import hydra
 from pytorch_lightning import LightningModule, Trainer
 
 from ..hydra import zen
 
+log = logging.getLogger(__name__)
 
-def task(trainer: Trainer, module: LightningModule, pl_testing: bool) -> None:
+
+def task(
+    trainer: Trainer, module: LightningModule, pl_testing: bool, pl_local_rank: int
+) -> None:
     if pl_testing:
+        log.info(f"Rank {pl_local_rank}: Launched subprocess using Training.test")
         trainer.test(module)
     else:
+        log.info(f"Rank {pl_local_rank}: Launched subprocess using Training.fit")
         trainer.fit(module)
 
 
