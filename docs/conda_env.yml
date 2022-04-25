@@ -6,3 +6,4 @@ dependencies:
   - pandoc=2.18
   - ipykernel=6.13.0
   - pip
+  - setuptools
