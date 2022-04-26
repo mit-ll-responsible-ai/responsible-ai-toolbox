@@ -7,7 +7,8 @@ Navigate your console to the `responsible-ai-toolbox/docs/` directory. In a cond
 $ conda install nbsphinx=0.8.8 pandoc=2.18 ipykernel=6.13.0 -c conda-forge
 ```
 
-In the same conda environment install the toolbox and install the docs-requirements:
+In the same conda environment [install the toolbox](https://mit-ll-responsible-ai.github.io/responsible-ai-toolbox/#installation) 
+and install the docs-requirements:
 
 ```console
 $ pip install -r requirements.txt

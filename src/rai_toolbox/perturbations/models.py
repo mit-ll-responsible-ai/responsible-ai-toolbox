@@ -13,15 +13,15 @@ from typing_extensions import Protocol, runtime_checkable
 
 @runtime_checkable
 class PerturbationModel(Protocol):
-    """Protocal for Perturbation Models"""
+    """Protocol for Perturbation Models."""
 
     def __init__(self, *args, **kwargs) -> None:  # pragma: no cover
         ...
 
     @abstractmethod
     def __call__(self, data: Tensor) -> Tensor:  # pragma: no cover
-        """A perturbation model should take data as the input and output a
-        perturbation
+        """A perturbation model should take data as the input and output the
+        peturbed data.
 
         Parameters
         ----------
@@ -31,7 +31,7 @@ class PerturbationModel(Protocol):
         Returns
         -------
         Tensor
-            The perturbed data
+            The perturbed data with the same shape as `data`.
         """
 
     def parameters(
