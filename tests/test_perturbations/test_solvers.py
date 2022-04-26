@@ -374,3 +374,4 @@ def test_gradient_ascent_on_requires_grad_data(is_leaf: bool):
     )
 
     assert x.grad is None
+    assert x.requires_grad is True
