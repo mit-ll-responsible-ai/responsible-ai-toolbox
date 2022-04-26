@@ -167,12 +167,12 @@
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">torch</span> <span class="k">as</span> <span class="nn">tr</span>
-
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
 <span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">CrossEntropyLoss</span><span class="p">,</span> <span class="n">Module</span>
 
 <span class="kn">from</span> <span class="nn">rai_toolbox</span> <span class="kn">import</span> <span class="n">negate</span>
 <span class="kn">from</span> <span class="nn">rai_toolbox._typing</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ArrayLike</span><span class="p">,</span>
     <span class="n">InstantiatesTo</span><span class="p">,</span>
     <span class="n">Optimizer</span><span class="p">,</span>
     <span class="n">OptimizerType</span><span class="p">,</span>
@@ -181,7 +181,6 @@
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">rai_toolbox._utils.stateful</span> <span class="kn">import</span> <span class="n">evaluating</span><span class="p">,</span> <span class="n">frozen</span>
 <span class="kn">from</span> <span class="nn">rai_toolbox.perturbations</span> <span class="kn">import</span> <span class="n">AdditivePerturbation</span><span class="p">,</span> <span class="n">PerturbationModel</span>
-<span class="kn">from</span> <span class="nn">rai_toolbox._typing</span> <span class="kn">import</span> <span class="n">ArrayLike</span>
 
 
 <div class="viewcode-block" id="gradient_ascent"><a class="viewcode-back" href="../../../generated/rai_toolbox.perturbations.gradient_ascent.html#rai_toolbox.perturbations.gradient_ascent">[docs]</a><span class="k">def</span> <span class="nf">gradient_ascent</span><span class="p">(</span>
@@ -321,6 +320,12 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">data</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
     <span class="n">target</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="o">.</span><span class="n">is_leaf</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">target</span><span class="o">.</span><span class="n">is_leaf</span><span class="p">:</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span>
 
     <span class="c1"># Initialize</span>
     <span class="n">best_loss</span> <span class="o">=</span> <span class="kc">None</span>

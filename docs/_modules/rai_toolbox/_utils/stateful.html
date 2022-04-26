@@ -190,7 +190,8 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    *items: tr.Tensor | tr.nn.Module | tr.optim.Optimizer | Iterable[tr.Tensor] | Iterable[Dict[str, Iterable[tr.Tensor]]]</span>
-<span class="sd">        Tensors, modules, optimizers, or param-groups.</span>
+<span class="sd">        Tensors, modules, optimizers, or param-groups. All tensors/parameters must</span>
+<span class="sd">        be leaf tensors [1]_ .</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -200,6 +201,10 @@
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
 <span class="sd">    &#39;Unfreezing&#39; the tensors restores their original states faithfully.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1]  https://pytorch.org/docs/stable/generated/torch.Tensor.is_leaf.html</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
@@ -287,7 +292,12 @@
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        *items: tr.Tensor | tr.nn.Module | tr.optim.Optimizer | Iterable[tr.Tensor] | Iterable[Dict[str, Iterable[tr.Tensor]]]</span>
-<span class="sd">            Tensors, modules, optimizers, or param-groups to be frozen.</span>
+<span class="sd">            Tensors, modules, optimizers, or param-groups to be frozen. All tensors/</span>
+<span class="sd">            parameters must be leaf tensors [1]_ .</span>
+
+<span class="sd">        References</span>
+<span class="sd">        ----------</span>
+<span class="sd">        .. [1]  https://pytorch.org/docs/stable/generated/torch.Tensor.is_leaf.html</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>

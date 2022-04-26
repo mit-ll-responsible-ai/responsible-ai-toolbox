@@ -246,9 +246,16 @@
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>*items: tr.Tensor | tr.nn.Module | tr.optim.Optimizer | Iterable[tr.Tensor] | Iterable[Dict[str, Iterable[tr.Tensor]]]</strong></dt><dd><p>Tensors, modules, optimizers, or param-groups to be frozen.</p>
+<dt><strong>*items: tr.Tensor | tr.nn.Module | tr.optim.Optimizer | Iterable[tr.Tensor] | Iterable[Dict[str, Iterable[tr.Tensor]]]</strong></dt><dd><p>Tensors, modules, optimizers, or param-groups to be frozen. All tensors/
+parameters must be leaf tensors <a class="reference internal" href="#rc9069e36a276-1" id="id1">[1]</a> .</p>
 </dd>
 </dl>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<dl class="citation">
+<dt class="label" id="rc9069e36a276-1"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p><a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.Tensor.is_leaf.html">https://pytorch.org/docs/stable/generated/torch.Tensor.is_leaf.html</a></p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>

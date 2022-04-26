@@ -243,7 +243,8 @@ Returns a callable that, when called, restores the state of the tensors.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>*items: tr.Tensor | tr.nn.Module | tr.optim.Optimizer | Iterable[tr.Tensor] | Iterable[Dict[str, Iterable[tr.Tensor]]]</strong></dt><dd><p>Tensors, modules, optimizers, or param-groups.</p>
+<dt><strong>*items: tr.Tensor | tr.nn.Module | tr.optim.Optimizer | Iterable[tr.Tensor] | Iterable[Dict[str, Iterable[tr.Tensor]]]</strong></dt><dd><p>Tensors, modules, optimizers, or param-groups. All tensors/parameters must
+be leaf tensors <a class="reference internal" href="#r0993f7f31cd2-1" id="id1">[1]</a> .</p>
 </dd>
 </dl>
 </dd>
@@ -256,6 +257,12 @@ Returns a callable that, when called, restores the state of the tensors.</p>
 </dl>
 <p class="rubric">Notes</p>
 <p>‘Unfreezing’ the tensors restores their original states faithfully.</p>
+<p class="rubric">References</p>
+<dl class="citation">
+<dt class="label" id="r0993f7f31cd2-1"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p><a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.Tensor.is_leaf.html">https://pytorch.org/docs/stable/generated/torch.Tensor.is_leaf.html</a></p>
+</dd>
+</dl>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">torch</span> <span class="k">as</span> <span class="nn">tr</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">rai_toolbox.utils</span> <span class="kn">import</span> <span class="n">freeze</span>
