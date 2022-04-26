@@ -90,7 +90,6 @@ def freeze(
     def restore_state():
         for item in (True, False):
             for p in seen[item]:
-                print(p, item)
                 p.requires_grad_(item)
 
     return restore_state
