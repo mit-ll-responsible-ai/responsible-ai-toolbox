@@ -25,9 +25,40 @@ To see `rai_toolbox` in action, please refer to the `examples/ <https://github.c
 and `experiments/ <https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox/tree/main/experiments>`_ sections of our repository.
 
 
+Installation
+============
+
+hydra-zen is lightweight: its only dependencies are ``hydra-core`` and 
+``typing-extensions``. To install it, run:
+
+.. code:: console
+
+   $ pip install rai-toolbox
+
+
+To include our "mushin" capabilities, which leverages `pytorch lightning <https://www.pytorchlightning.ai/>`_ 
+and `hydra-zen <https://github.com/mit-ll-responsible-ai/hydra-zen>`_ for enhanced boilerplate-free ML, run:
+
+.. code:: console
+   
+   $ pip install rai-toolbox[mushin]
+
+
+If instead you want to try out the features in the upcoming version, you can install 
+the latest pre-release of the toolbox with:
+
+.. code:: console
+
+   $ pip install --pre rai-toolbox
+
+
+Please refer to the `INSTALL_REQUIRES` field in 
+`this file <https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox/blob/main/setup.py>`_ 
+for a list of installation dependencies.
+
 
 Learning about the responsible AI toolbox
-=====================================
+=========================================
 
 Our docs are divided into four sections: Tutorials, How-Tos, Explanations, and 
 Reference.

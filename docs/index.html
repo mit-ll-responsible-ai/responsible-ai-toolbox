@@ -158,6 +158,11 @@
 <nav id="bd-toc-nav">
     <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#installation">
+   Installation
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#learning-about-the-responsible-ai-toolbox">
    Learning about the responsible AI toolbox
   </a>
@@ -208,6 +213,27 @@ ecosystem to bolster your responsible AI R&amp;D. For instance, one can naturall
 perform distributed adversarial training.</p>
 <p>To see <code class="xref py py-obj docutils literal notranslate"><span class="pre">rai_toolbox</span></code> in action, please refer to the <a class="reference external" href="https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox/tree/main/examples">examples/</a>
 and <a class="reference external" href="https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox/tree/main/experiments">experiments/</a> sections of our repository.</p>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">#</a></h2>
+<p>hydra-zen is lightweight: its only dependencies are <code class="docutils literal notranslate"><span class="pre">hydra-core</span></code> and
+<code class="docutils literal notranslate"><span class="pre">typing-extensions</span></code>. To install it, run:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pip install rai-toolbox
+</pre></div>
+</div>
+<p>To include our “mushin” capabilities, which leverages <a class="reference external" href="https://www.pytorchlightning.ai/">pytorch lightning</a>
+and <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen">hydra-zen</a> for enhanced boilerplate-free ML, run:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pip install rai-toolbox<span class="o">[</span>mushin<span class="o">]</span>
+</pre></div>
+</div>
+<p>If instead you want to try out the features in the upcoming version, you can install
+the latest pre-release of the toolbox with:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pip install --pre rai-toolbox
+</pre></div>
+</div>
+<p>Please refer to the <code class="xref py py-obj docutils literal notranslate"><span class="pre">INSTALL_REQUIRES</span></code> field in
+<a class="reference external" href="https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox/blob/main/setup.py">this file</a>
+for a list of installation dependencies.</p>
+</section>
 <section id="learning-about-the-responsible-ai-toolbox">
 <h2>Learning about the responsible AI toolbox<a class="headerlink" href="#learning-about-the-responsible-ai-toolbox" title="Permalink to this headline">#</a></h2>
 <p>Our docs are divided into four sections: Tutorials, How-Tos, Explanations, and
