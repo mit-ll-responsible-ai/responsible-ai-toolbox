@@ -351,3 +351,26 @@ def test_solve_works_within_no_grad():
             targeted=True,
         )
     assert adv.item() == -2.0
+
+
+@given(...)
+def test_gradient_ascent_on_requires_grad_data(is_leaf: bool):
+    x = torch.tensor([2.0], requires_grad=True)
+    if not is_leaf:
+        x = 1 * x
+
+    assert x.is_leaf is is_leaf
+    assert x.grad is None
+
+    gradient_ascent(
+        model=lambda x: x**2,
+        data=x,
+        target=x,
+        optimizer=SGD,
+        steps=1,
+        lr=1,
+        criterion=lambda pred, _: pred,
+        targeted=True,
+    )
+
+    assert x.grad is None

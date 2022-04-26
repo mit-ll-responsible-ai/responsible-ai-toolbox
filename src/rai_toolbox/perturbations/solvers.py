@@ -6,12 +6,12 @@ import functools
 from typing import Any, Callable, List, Optional, Tuple, Union
 
 import torch as tr
-
 from torch import Tensor
 from torch.nn import CrossEntropyLoss, Module
 
 from rai_toolbox import negate
 from rai_toolbox._typing import (
+    ArrayLike,
     InstantiatesTo,
     Optimizer,
     OptimizerType,
@@ -20,7 +20,6 @@ from rai_toolbox._typing import (
 )
 from rai_toolbox._utils.stateful import evaluating, frozen
 from rai_toolbox.perturbations import AdditivePerturbation, PerturbationModel
-from rai_toolbox._typing import ArrayLike
 
 
 def gradient_ascent(
@@ -160,6 +159,12 @@ def gradient_ascent(
     """
     data = tr.as_tensor(data)
     target = tr.as_tensor(target)
+
+    if not data.is_leaf:
+        data = data.detach()
+
+    if not target.is_leaf:
+        target = target.detach()
 
     # Initialize
     best_loss = None
