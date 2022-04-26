@@ -24,10 +24,6 @@ jobs:
           use-only-tar-bz2: true
       - run: |
           conda activate sphinx-docs
-          conda info
-          conda list
-          conda config --show-sources
-          conda config --show
           which pip
 
       - name: Install package
