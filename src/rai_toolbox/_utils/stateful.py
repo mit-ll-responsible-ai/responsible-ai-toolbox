@@ -5,6 +5,7 @@
 from abc import ABCMeta, abstractmethod
 from functools import wraps
 from typing import Callable, Dict, Iterable, TypeVar, Union, cast
+from weakref import WeakSet
 
 import torch as tr
 
@@ -73,7 +74,7 @@ def freeze(
     >>> m.weight.requires_grad, m.bias.requires_grad
     (True, True)
     """
-    param_states: Dict[tr.Tensor, bool] = {}
+    seen = {True: WeakSet(), False: WeakSet()}
     for item in items:
         if isinstance(item, tr.nn.Module):
             item = item.parameters()
@@ -81,16 +82,16 @@ def freeze(
             item = item.param_groups
 
         for param in flatten_params(item):
-            if param not in param_states:
-                # we need to check to see if we have already encountered a parameter
-                # so that we avoid overwriting its original state during a second
-                # encounter
-                param_states[param] = param.requires_grad
-                param.requires_grad_(False)
+            seen[param.requires_grad].add(param)
+        
+        for param in seen[True]:
+            param.requires_grad_(False)
 
     def restore_state():
-        for p, requires_grad in param_states.items():
-            p.requires_grad_(requires_grad)
+        for item in (True, False):
+            for p in seen[item]:
+                print(p, item)
+                p.requires_grad_(item)
 
     return restore_state
 
@@ -222,12 +223,20 @@ class evaluating(ContextDecorator):
         >>> module.training
         True
         """
-        self._modules = {m: m.training for m in modules}
+        self._states: Dict[bool, WeakSet[tr.nn.Module]] = {
+            True: WeakSet(),
+            False: WeakSet(),
+        }
+
+        self._states[True].update(m for m in modules if m.training)
+        self._states[False].update(m for m in modules if not m.training)
 
     def __enter__(self):
-        for m in self._modules:
-            m.eval()
+        for train_status in self._states:
+            for m in self._states[train_status]:
+                m.eval()
 
     def __exit__(self, type, value, traceback):
-        for module, train_status in self._modules.items():
-            module.train(train_status)
+        for train_status in self._states:
+            for module in self._states[train_status]:
+                module.train(train_status)
