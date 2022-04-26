@@ -4,40 +4,28 @@ on:
   push:
     branches:
       - main
+      - docs-test
 
 jobs:
   deploy:
     runs-on: ubuntu-18.04
+    defaults:
+      run:
+        shell: bash -l {0}
     steps:
       - uses: actions/checkout@v2
       - uses: conda-incubator/setup-miniconda@v2
         with:
-          activate-environment: sphinx-docs
           python-version: 3.9
           channels: conda-forge
           channel-priority: strict
-          environment-file: ./docs/example-environment-caching.yml
+          activate-environment: sphinx-docs
+          environment-file: ./docs/conda_env.yml
           use-only-tar-bz2: true
       - run: |
-          conda info
-          conda list
-          conda config --show-sources
-          conda config --show
-    steps:
-      - uses: actions/checkout@v2
-        with: 
-          fetch-depth: 0
-      - name: Get pip cache dir
-        id: pip-cache
-        run: echo "::set-output name=dir::$(pip cache dir)"
+          conda activate sphinx-docs
+          which pip
 
-      - name: Cache dependencies
-        uses: actions/cache@v2
-        with:
-          path: ${{ steps.pip-cache.outputs.dir }}
-          key: ${{ runner.os }}-pip-${{ hashFiles('./docs/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
       - name: Install package
         run: python3 -m pip install .[mushin]
 
