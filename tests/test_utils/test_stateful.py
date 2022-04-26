@@ -116,7 +116,7 @@ def test_freeze_handles_multiple_references_to_same_tensor(
     x: tr.Tensor, num_repeats: int
 ):
     original_requires_grad = x.requires_grad
-    unfreeze = freeze([x] * (num_repeats + 1))
+    unfreeze = freeze(*[x] * (num_repeats + 1))
     assert x.requires_grad is False
     unfreeze()
     assert x.requires_grad is original_requires_grad

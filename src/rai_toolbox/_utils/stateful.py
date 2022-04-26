@@ -84,8 +84,8 @@ def freeze(
         for param in flatten_params(item):
             seen[param.requires_grad].add(param)
 
-        for param in seen[True]:
-            param.requires_grad_(False)
+    for param in seen[True]:
+        param.requires_grad_(False)
 
     def restore_state():
         for item in (True, False):
