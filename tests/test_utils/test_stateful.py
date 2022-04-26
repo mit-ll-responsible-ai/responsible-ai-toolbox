@@ -2,6 +2,7 @@
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 import weakref
+
 import hypothesis.strategies as st
 import pytest
 import torch as tr
@@ -166,12 +167,13 @@ def test_evaluate_handles_multiple_references_to_same_module(
 
 
 def test_requires_grad_True_within_freeze_is_restored_to_False():
-    x = tr.tensor(1., requires_grad=False)
+    x = tr.tensor(1.0, requires_grad=False)
     assert not x.requires_grad
     with frozen(x):
         x.requires_grad_(True)
         assert x.requires_grad
     assert not x.requires_grad
+
 
 def test_train_True_within_eval_is_restored_to_False():
     model = tr.nn.Linear(1, 1)
@@ -184,14 +186,16 @@ def test_train_True_within_eval_is_restored_to_False():
         assert model.training
     assert not model.training
 
+
 @given(...)
 def test_freeze_uses_weakrefs(requires_grad: bool):
     x = tr.tensor(1.0, requires_grad=requires_grad)
     xref = weakref.ref(x)
     assert xref() is x
-    context = freeze(x)
+    context = freeze(x)  # noqa: F841
     del x
     assert xref() is None
+
 
 @given(...)
 def test_evaluating_uses_weakrefs(eval_: bool):
@@ -201,6 +205,6 @@ def test_evaluating_uses_weakrefs(eval_: bool):
 
     xref = weakref.ref(model)
     assert xref() is model
-    context = evaluating(model)
+    context = evaluating(model)  # noqa: F841
     del model
     assert xref() is None
