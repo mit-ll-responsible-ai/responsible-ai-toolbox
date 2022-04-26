@@ -1,7 +1,7 @@
 # Copyright 2022, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
-
+import weakref
 import hypothesis.strategies as st
 import pytest
 import torch as tr
@@ -163,3 +163,44 @@ def test_evaluate_handles_multiple_references_to_same_module(
         assert x.training is False
 
     assert x.training is original_status
+
+
+def test_requires_grad_True_within_freeze_is_restored_to_False():
+    x = tr.tensor(1., requires_grad=False)
+    assert not x.requires_grad
+    with frozen(x):
+        x.requires_grad_(True)
+        assert x.requires_grad
+    assert not x.requires_grad
+
+def test_train_True_within_eval_is_restored_to_False():
+    model = tr.nn.Linear(1, 1)
+    model.eval()
+    assert not model.training
+
+    with evaluating(model):
+        assert not model.training
+        model.train(True)
+        assert model.training
+    assert not model.training
+
+@given(...)
+def test_freeze_uses_weakrefs(requires_grad: bool):
+    x = tr.tensor(1.0, requires_grad=requires_grad)
+    xref = weakref.ref(x)
+    assert xref() is x
+    context = freeze(x)
+    del x
+    assert xref() is None
+
+@given(...)
+def test_evaluating_uses_weakrefs(eval_: bool):
+    model = tr.nn.Linear(1, 1)
+    if eval_:
+        model.eval()
+
+    xref = weakref.ref(model)
+    assert xref() is model
+    context = evaluating(model)
+    del model
+    assert xref() is None
