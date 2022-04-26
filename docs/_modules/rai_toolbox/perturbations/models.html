@@ -174,15 +174,15 @@
 
 <div class="viewcode-block" id="PerturbationModel"><a class="viewcode-back" href="../../../generated/rai_toolbox.perturbations.PerturbationModel.html#rai_toolbox.perturbations.PerturbationModel">[docs]</a><span class="nd">@runtime_checkable</span>
 <span class="k">class</span> <span class="nc">PerturbationModel</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Protocal for Perturbation Models&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Protocol for Perturbation Models.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
         <span class="o">...</span>
 
-    <span class="nd">@abstractmethod</span>
+<div class="viewcode-block" id="PerturbationModel.__call__"><a class="viewcode-back" href="../../../generated/rai_toolbox.perturbations.PerturbationModel.html#rai_toolbox.perturbations.PerturbationModel.__call__">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sd">&quot;&quot;&quot;A perturbation model should take data as the input and output a</span>
-<span class="sd">        perturbation</span>
+        <span class="sd">&quot;&quot;&quot;A perturbation model should take data as the input and output the</span>
+<span class="sd">        peturbed data.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -192,8 +192,8 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        Tensor</span>
-<span class="sd">            The perturbed data</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">            The perturbed data with the same shape as `data`.</span>
+<span class="sd">        &quot;&quot;&quot;</span></div>
 
     <span class="k">def</span> <span class="nf">parameters</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">recurse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>

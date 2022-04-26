@@ -7,6 +7,7 @@ rai\_toolbox.perturbations.PerturbationModel
 
    
    .. automethod:: __init__
+   .. automethod:: __call__
 
    
    .. rubric:: Methods
@@ -14,6 +15,7 @@ rai\_toolbox.perturbations.PerturbationModel
    .. autosummary::
    
       ~PerturbationModel.__init__
+      ~PerturbationModel.__call__
    
    
 

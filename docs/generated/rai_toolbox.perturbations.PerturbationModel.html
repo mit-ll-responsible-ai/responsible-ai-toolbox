@@ -275,11 +275,32 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="rai_toolbox.perturbations.PerturbationModel">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rai_toolbox.perturbations.</span></span><span class="sig-name descname"><span class="pre">PerturbationModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/perturbations/models.html#PerturbationModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.perturbations.PerturbationModel" title="Permalink to this definition">#</a></dt>
-<dd><p>Protocal for Perturbation Models</p>
+<dd><p>Protocol for Perturbation Models.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="rai_toolbox.perturbations.PerturbationModel.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rai_toolbox.perturbations.PerturbationModel.__init__" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rai_toolbox.perturbations.PerturbationModel.__call__">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/perturbations/models.html#PerturbationModel.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.perturbations.PerturbationModel.__call__" title="Permalink to this definition">#</a></dt>
+<dd><p>A perturbation model should take data as the input and output the
+peturbed data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>data: Tensor</strong></dt><dd><p>The data to perturb.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>Tensor</dt><dd><p>The perturbed data with the same shape as <code class="xref py py-obj docutils literal notranslate"><span class="pre">data</span></code>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 <p class="rubric">Methods</p>
 <table class="autosummary longtable table autosummary">
@@ -290,6 +311,9 @@
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#rai_toolbox.perturbations.PerturbationModel.__init__" title="rai_toolbox.perturbations.PerturbationModel.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(*args, **kwargs)</p></td>
 <td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#rai_toolbox.perturbations.PerturbationModel.__call__" title="rai_toolbox.perturbations.PerturbationModel.__call__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__call__</span></code></a>(data)</p></td>
+<td><p>A perturbation model should take data as the input and output the peturbed data.</p></td>
 </tr>
 </tbody>
 </table>
