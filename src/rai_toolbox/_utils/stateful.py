@@ -29,7 +29,8 @@ def freeze(
     Parameters
     ----------
     *items: tr.Tensor | tr.nn.Module | tr.optim.Optimizer | Iterable[tr.Tensor] | Iterable[Dict[str, Iterable[tr.Tensor]]]
-        Tensors, modules, optimizers, or param-groups.
+        Tensors, modules, optimizers, or param-groups. All tensors/parameters must
+        be leaf tensors [1]_ .
 
     Returns
     -------
@@ -39,6 +40,10 @@ def freeze(
     Notes
     -----
     'Unfreezing' the tensors restores their original states faithfully.
+
+    References
+    ----------
+    .. [1]  https://pytorch.org/docs/stable/generated/torch.Tensor.is_leaf.html
 
     Examples
     --------
@@ -126,7 +131,12 @@ class frozen(ContextDecorator):
         Parameters
         ----------
         *items: tr.Tensor | tr.nn.Module | tr.optim.Optimizer | Iterable[tr.Tensor] | Iterable[Dict[str, Iterable[tr.Tensor]]]
-            Tensors, modules, optimizers, or param-groups to be frozen.
+            Tensors, modules, optimizers, or param-groups to be frozen. All tensors/
+            parameters must be leaf tensors [1]_ .
+
+        References
+        ----------
+        .. [1]  https://pytorch.org/docs/stable/generated/torch.Tensor.is_leaf.html
 
         Examples
         --------
