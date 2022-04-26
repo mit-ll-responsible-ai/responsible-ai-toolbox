@@ -9,14 +9,14 @@ import torch
 from pytorch_lightning import Trainer
 
 from rai_toolbox.mushin.lightning import MetricsCallback
-from rai_toolbox.mushin.testing.lightning import TestLightningModule
+from rai_toolbox.mushin.testing.lightning import SimpleLightningModule
 
 
 @pytest.mark.usefixtures("cleandir")
 @pytest.mark.parametrize("testing", [True, False])
 def test_metrics_callback(testing):
     trainer = Trainer(max_epochs=1, callbacks=[MetricsCallback()])
-    module = TestLightningModule()
+    module = SimpleLightningModule()
 
     if testing:
         trainer.test(module)

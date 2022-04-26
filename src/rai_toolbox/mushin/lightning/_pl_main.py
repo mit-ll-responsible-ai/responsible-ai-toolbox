@@ -7,9 +7,10 @@ This script is called from `rai_toolbox.mushin.lightning.launchers.HydraDDP
 """
 
 import logging
+from typing import Optional
 
 import hydra
-from pytorch_lightning import LightningModule, Trainer
+from pytorch_lightning import LightningDataModule, LightningModule, Trainer
 
 from ..hydra import zen
 
@@ -17,14 +18,18 @@ log = logging.getLogger(__name__)
 
 
 def task(
-    trainer: Trainer, module: LightningModule, pl_testing: bool, pl_local_rank: int
+    trainer: Trainer,
+    module: LightningModule,
+    datamodule: Optional[LightningDataModule] = None,
+    pl_testing: bool = False,
+    pl_local_rank: int = 0,
 ) -> None:
     if pl_testing:
         log.info(f"Rank {pl_local_rank}: Launched subprocess using Training.test")
-        trainer.test(module)
+        trainer.test(module, datamodule=datamodule)
     else:
         log.info(f"Rank {pl_local_rank}: Launched subprocess using Training.fit")
-        trainer.fit(module)
+        trainer.fit(module, datamodule=datamodule)
 
 
 @hydra.main(config_path=None, config_name="config")

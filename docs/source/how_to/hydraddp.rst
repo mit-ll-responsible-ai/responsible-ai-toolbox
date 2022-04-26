@@ -96,7 +96,7 @@ Next let's create an example configuration and task function using `hydra-zen <h
 
    from hydra_zen import builds, make_config, instantiate, launch
    from rai_toolbox.mushin import HydraDDP
-   from rai_toolbox.mushin.testing.lightning import TestLightningModule
+   from rai_toolbox.mushin.testing.lightning import SimpleLightningModule
 
    TrainerConfig = builds(
        pl.Trainer,
@@ -104,7 +104,7 @@ Next let's create an example configuration and task function using `hydra-zen <h
        populate_full_signature=True,
    )
 
-   ModuleConfig = builds(TestLightningModule, populate_full_signature=True)
+   ModuleConfig = builds(SimpleLightningModule, populate_full_signature=True)
 
    Config = make_config(
        trainer=TrainerConfig,
@@ -171,10 +171,10 @@ The code from this How-To has been modified accordingly and placed in the script
 
    from hydra_zen import builds, make_config, instantiate
    from rai_toolbox.mushin import HydraDDP
-   from rai_toolbox.mushin.testing.lightning import TestLightningModule
+   from rai_toolbox.mushin.testing.lightning import SimpleLightningModule
 
    TrainerConfig = builds(pl.Trainer, populate_full_signature=True)
-   ModuleConfig = builds(TestLightningModule, populate_full_signature=True)
+   ModuleConfig = builds(SimpleLightningModule, populate_full_signature=True)
 
    Config = make_config(trainer=TrainerConfig, module=ModuleConfig)
 
