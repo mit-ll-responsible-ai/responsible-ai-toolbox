@@ -5,6 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<meta content="Using the responsible AI toolbox to generate adversarial robustness curves for a PyTorch model." name="description" />
 
     <title>Generating Adversarial Robustness Curves &#8212; rai-toolbox  documentation</title>
     
@@ -478,26 +479,23 @@ div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
 </style>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
-</pre></div>
+<blockquote>
+<div><div class="line-block">
+<div class="line">Copyright (c) 2022 Massachusetts Institute of Technology</div>
+<div class="line">SPDX-License-Identifier: MIT</div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Copyright (c) 2022 Massachusetts Institute of Technology</span>
-<span class="c1"># SPDX-License-Identifier: MIT</span>
-</pre></div>
-</div>
-</div>
+</div></blockquote>
 <section id="Generating-Adversarial-Robustness-Curves">
 <h1>Generating Adversarial Robustness Curves<a class="headerlink" href="#Generating-Adversarial-Robustness-Curves" title="Permalink to this headline">#</a></h1>
-<p>This tutorial demonstrates how to use <code class="docutils literal notranslate"><span class="pre">`rai_toolbox.perturbations.gradient_ascent</span></code> &lt;<a class="reference external" href="https://mit-ll-responsible-ai.github.io/responsible-ai-toolbox/generated/rai_toolbox.perturbations.gradient_ascent.html#rai_toolbox.perturbations.gradient_ascent">https://mit-ll-responsible-ai.github.io/responsible-ai-toolbox/generated/rai_toolbox.perturbations.gradient_ascent.html#rai_toolbox.perturbations.gradient_ascent</a>&gt;`__ to generate <span class="math notranslate nohighlight">\(L^2\)</span>-norm-constrained adversarial perturbations using projected gradient descent (PGD) for images from the CIFAR-10 dataset, based on both a standard classification model and and robust (i.e., adversarially-trained) model. We
-then compute adversarial accuracy for a few batches of samples from the test set, and use this to generate robustness curves for increasing values of perturbation size, <span class="math notranslate nohighlight">\(\epsilon\)</span>.</p>
+<p>This tutorial demonstrates how to use <a class="reference external" href="https://mit-ll-responsible-ai.github.io/responsible-ai-toolbox/generated/rai_toolbox.perturbations.gradient_ascent.html#rai_toolbox.perturbations.gradient_ascent">rai_toolbox.perturbations.gradient_ascent</a> to generate <span class="math notranslate nohighlight">\(L^2\)</span>-norm-constrained adversarial perturbations using projected gradient descent (PGD) for images from the CIFAR-10 dataset, based on both a standard classification model and and robust (i.e., adversarially-trained) model. We then
+compute adversarial accuracy for a few batches of samples from the test set, and use this to generate robustness curves for increasing values of perturbation size, <span class="math notranslate nohighlight">\(\epsilon\)</span>.</p>
 <section id="Getting-Started">
 <h2>Getting Started<a class="headerlink" href="#Getting-Started" title="Permalink to this headline">#</a></h2>
 <p>We will install the rAI-toolbox and then we will create a Jupyter notebook in which we will complete this tutorial.</p>
 <section id="Installing-the-rAI-toolbox">
 <h3>Installing the rAI-toolbox<a class="headerlink" href="#Installing-the-rAI-toolbox" title="Permalink to this headline">#</a></h3>
 <p>To install the rAI-toolbox in your Python environment, run the following command in your terminal:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">pip install rai-toolbox</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pip install rai-toolbox
 </pre></div>
 </div>
 <p>To verify that the toolbox is installed as-expected, open a Python console and try importing <code class="docutils literal notranslate"><span class="pre">rai_toolbox</span></code>.</p>
@@ -508,7 +506,7 @@ then compute adversarial accuracy for a few batches of samples from the test set
 </section>
 <section id="Opening-a-Jupyter-notebook">
 <h2>Opening a Jupyter notebook<a class="headerlink" href="#Opening-a-Jupyter-notebook" title="Permalink to this headline">#</a></h2>
-<p>If you do not have Jupyter Notebook or Jupyter Lab installed in your Python environment, please follow [these instructions] (<a class="reference external" href="https://jupyter.org/install">https://jupyter.org/install</a>). Now open a terminal on your computer and <a class="reference external" href="http://www.pythonlikeyoumeanit.com/Module1_GettingStartedWithPython/Jupyter_Notebooks.html">start a notebook/lab session</a>. A file-viewer will open in an internet browser; pick a directory where you are okay with saving some PyTorch model weights. Create a notebook called
+<p>If you do not have Jupyter Notebook or Jupyter Lab installed in your Python environment, please follow <a class="reference external" href="https://jupyter.org/install">these instructions</a>. Now open a terminal on your computer and <a class="reference external" href="http://www.pythonlikeyoumeanit.com/Module1_GettingStartedWithPython/Jupyter_Notebooks.html">start a notebook/lab session</a>. A file-viewer will open in an internet browser; pick a directory where you are okay with saving some PyTorch model weights. Create a notebook called
 <code class="docutils literal notranslate"><span class="pre">CIFAR10-Adversarial-Perturbations.ipynb</span></code>.</p>
 </section>
 <section id="Loading-the-CIFAR-10-dataset">
@@ -582,7 +580,7 @@ then compute adversarial accuracy for a few batches of samples from the test set
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Classes: </span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">classes</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <span class="c1"># Instantiate data loader</span>
-<span class="n">dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">BATCH_SIZE</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">BATCH_SIZE</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">drop_last</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -818,7 +816,7 @@ maximize – within the given constraints – the cross-entropy classification l
         <span class="p">)</span>
 
         <span class="n">data_iter</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">dataloader</span><span class="p">)</span>
-        <span class="n">accur</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">accur</span> <span class="o">=</span> <span class="mf">0.0</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_batches</span><span class="p">):</span>
             <span class="c1"># Sample next batch</span>
             <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">data_iter</span><span class="p">)</span>
