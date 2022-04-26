@@ -1,15 +1,22 @@
 # Building the Docs
 
-Install `responsible-ai-toolbox` and install the docs-requirements:
 
-```shell
-/rai_toolbox/docs> pip install -r requirements.txt
+Navigate your console to the `responsible-ai-toolbox/docs/` directory. In a conda environment install the following:
+
+```console
+$ conda install nbsphinx=0.8.8 pandoc=2.18 ipykernel=6.13.0 -c conda-forge
+```
+
+In the same conda environment install the toolbox and install the docs-requirements:
+
+```console
+$ pip install -r requirements.txt
 ```
 
 Then build the docs:
  
-```shell script
-/rai_toolbox/docs> python -m sphinx source build
+```console
+$ python -m sphinx source build
 ```
 
 The resulting HTML files will be in `responsible-ai-toolbox/docs/build`.
