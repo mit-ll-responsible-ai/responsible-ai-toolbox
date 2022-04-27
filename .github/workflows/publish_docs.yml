@@ -41,7 +41,7 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
 
       - name: Activate environment
-      - run: |
+        run: |
           conda activate sphinx-docs
           which pip
 
