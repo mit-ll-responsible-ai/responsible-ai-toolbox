@@ -166,11 +166,14 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">subprocess</span>
 <span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">sleep</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">TypeVar</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">hydra.core.hydra_config</span> <span class="kn">import</span> <span class="n">HydraConfig</span>
+<span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">load_from_yaml</span>
+<span class="kn">from</span> <span class="nn">omegaconf.errors</span> <span class="kn">import</span> <span class="n">ConfigAttributeError</span>
 <span class="kn">from</span> <span class="nn">pytorch_lightning</span> <span class="kn">import</span> <span class="n">Trainer</span>
 <span class="kn">from</span> <span class="nn">pytorch_lightning.trainer.states</span> <span class="kn">import</span> <span class="n">TrainerFn</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">distributed</span>
@@ -222,6 +225,15 @@
         <span class="k">else</span> <span class="n">cwd</span>
     <span class="p">)</span>
 
+    <span class="c1"># Validate that minimal configuration requirements</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">hydra_output</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;config.yaml&quot;</span>
+    <span class="k">assert</span> <span class="n">config</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>
+    <span class="n">cfg</span> <span class="o">=</span> <span class="n">load_from_yaml</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s2">&quot;trainer&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cfg</span> <span class="ow">or</span> <span class="s2">&quot;module&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cfg</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">ConfigAttributeError</span><span class="p">(</span>
+            <span class="s2">&quot;Missing configurations `trainer` and `module` are required for use with HydraDDP.  See documentation for further details.&quot;</span>
+        <span class="p">)</span>
+
     <span class="c1"># create the command for CLI</span>
     <span class="n">command</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">&quot;-cp&quot;</span><span class="p">,</span> <span class="n">hydra_output</span><span class="p">,</span> <span class="s2">&quot;-cn&quot;</span><span class="p">,</span> <span class="s2">&quot;config.yaml&quot;</span><span class="p">]</span>
 
@@ -254,6 +266,7 @@
 <span class="sd">           ├── Config</span>
 <span class="sd">           │    ├── trainer: A `pytorch_lightning.Trainer` configuration</span>
 <span class="sd">           │    ├── module: A `pytorch_lightning.LightningModule` configuration</span>
+<span class="sd">           │    ├── datamodule: [OPTIONAL] A `pytorch_lightning.LightningDataModule` configuration</span>
 
 <span class="sd">        This strategy will launch a child subprocesses for additional GPU beyond the first using the following base command::</span>
 
@@ -267,7 +280,7 @@
 <span class="sd">        &gt;&gt;&gt; import pytorch_lightning as pl</span>
 <span class="sd">        ... from hydra_zen import builds, make_config,</span>
 <span class="sd">        ... from rai_toolbox.mushin import HydraDDP</span>
-<span class="sd">        ... from rai_toolbox.mushin.testing.lightning import TestLightningModule</span>
+<span class="sd">        ... from rai_toolbox.mushin.testing.lightning import SimpleLightningModule</span>
 <span class="sd">        ...</span>
 <span class="sd">        ... TrainerConfig = builds(</span>
 <span class="sd">        ...     pl.Trainer,</span>
@@ -279,7 +292,7 @@
 <span class="sd">        ...     populate_full_signature=True</span>
 <span class="sd">        ... )</span>
 <span class="sd">        ...</span>
-<span class="sd">        ... ModuleConfig = builds(TestLightningModule)</span>
+<span class="sd">        ... ModuleConfig = builds(SimpleLightningModule)</span>
 <span class="sd">        ...</span>
 <span class="sd">        ... Config = make_config(</span>
 <span class="sd">        ...     trainer=TrainerConfig,</span>
@@ -292,6 +305,27 @@
 <span class="sd">        &gt;&gt;&gt; def task_function(cfg):</span>
 <span class="sd">        ...     obj = instantiate(cfg)</span>
 <span class="sd">        ...     obj.trainer.fit(obj.module)</span>
+
+<span class="sd">        Launch the Hydra+Lightning DDP job</span>
+
+<span class="sd">        &gt;&gt;&gt; from hydra_zen import launch</span>
+<span class="sd">        &gt;&gt;&gt; job = launch(Config, task_function)</span>
+
+<span class="sd">        ``HydraDDP`` also supports ``LightningDataModule`` configuration.</span>
+
+<span class="sd">        &gt;&gt;&gt; DataModuleConfig = ... # A LightningDataModule config</span>
+<span class="sd">        &gt;&gt;&gt; Config = make_config(</span>
+<span class="sd">        ...     trainer=TrainerConfig,</span>
+<span class="sd">        ...     module=ModuleConfig</span>
+<span class="sd">        ...     datamodule=DataModuleconfig</span>
+<span class="sd">        ... )</span>
+
+<span class="sd">        Next define a task function to execute the Hydra job</span>
+
+<span class="sd">        &gt;&gt;&gt; from hydra_zen import instantiate</span>
+<span class="sd">        &gt;&gt;&gt; def task_function(cfg):</span>
+<span class="sd">        ...     obj = instantiate(cfg)</span>
+<span class="sd">        ...     obj.trainer.fit(obj.module, datamodule=obj.datamodule)</span>
 
 <span class="sd">        Launch the Hydra+Lightning DDP job</span>
 
@@ -391,6 +425,7 @@
 <span class="sd">           ├── Config</span>
 <span class="sd">           │    ├── trainer: A `pytorch_lightning.Trainer` configuration</span>
 <span class="sd">           │    ├── module: A `pytorch_lightning.LightningModule` configuration</span>
+<span class="sd">           │    ├── datamodule: [OPTIONAL] A `pytorch_lightning.LightningDataModule` configuration</span>
 
 <span class="sd">        This strategy will launch a child subprocesses for additional GPU beyond the first using the following base command::</span>
 
@@ -404,7 +439,7 @@
 <span class="sd">        &gt;&gt;&gt; import pytorch_lightning as pl</span>
 <span class="sd">        ... from hydra_zen import builds, make_config,</span>
 <span class="sd">        ... from rai_toolbox.mushin import HydraDDP</span>
-<span class="sd">        ... from rai_toolbox.mushin.testing.lightning import TestLightningModule</span>
+<span class="sd">        ... from rai_toolbox.mushin.testing.lightning import SimpleLightningModule</span>
 <span class="sd">        ...</span>
 <span class="sd">        ... TrainerConfig = builds(</span>
 <span class="sd">        ...     pl.Trainer,</span>
@@ -416,7 +451,7 @@
 <span class="sd">        ...     populate_full_signature=True</span>
 <span class="sd">        ... )</span>
 <span class="sd">        ...</span>
-<span class="sd">        ... ModuleConfig = builds(TestLightningModule)</span>
+<span class="sd">        ... ModuleConfig = builds(SimpleLightningModule)</span>
 <span class="sd">        ...</span>
 <span class="sd">        ... Config = make_config(</span>
 <span class="sd">        ...     trainer=TrainerConfig,</span>
@@ -429,6 +464,27 @@
 <span class="sd">        &gt;&gt;&gt; def task_function(cfg):</span>
 <span class="sd">        ...     obj = instantiate(cfg)</span>
 <span class="sd">        ...     obj.trainer.fit(obj.module)</span>
+
+<span class="sd">        Launch the Hydra+Lightning DDP job</span>
+
+<span class="sd">        &gt;&gt;&gt; from hydra_zen import launch</span>
+<span class="sd">        &gt;&gt;&gt; job = launch(Config, task_function)</span>
+
+<span class="sd">        ``HydraDDP`` also supports ``LightningDataModule`` configuration.</span>
+
+<span class="sd">        &gt;&gt;&gt; DataModuleConfig = ... # A LightningDataModule config</span>
+<span class="sd">        &gt;&gt;&gt; Config = make_config(</span>
+<span class="sd">        ...     trainer=TrainerConfig,</span>
+<span class="sd">        ...     module=ModuleConfig</span>
+<span class="sd">        ...     datamodule=DataModuleconfig</span>
+<span class="sd">        ... )</span>
+
+<span class="sd">        Next define a task function to execute the Hydra job</span>
+
+<span class="sd">        &gt;&gt;&gt; from hydra_zen import instantiate</span>
+<span class="sd">        &gt;&gt;&gt; def task_function(cfg):</span>
+<span class="sd">        ...     obj = instantiate(cfg)</span>
+<span class="sd">        ...     obj.trainer.fit(obj.module, datamodule=obj.datamodule)</span>
 
 <span class="sd">        Launch the Hydra+Lightning DDP job</span>
 

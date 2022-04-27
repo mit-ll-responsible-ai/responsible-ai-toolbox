@@ -14,4 +14,3 @@ rai\_toolbox.mushin.HydraDDP
    .. autosummary::
    
       ~HydraDDP.__init__
-   
