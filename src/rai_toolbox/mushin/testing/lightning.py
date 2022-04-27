@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 import torch
-from pytorch_lightning import LightningModule
+from pytorch_lightning import LightningDataModule, LightningModule
 from torch.nn import functional as fnn
 from torch.utils.data import DataLoader, Dataset
 
@@ -20,7 +20,7 @@ class RandomDataset(Dataset):
         return self.len
 
 
-class TestLightningModule(LightningModule):
+class SimpleLightningModule(LightningModule):
     def __init__(self):
         super().__init__()
         self.layer = torch.nn.Linear(32, 2)
@@ -73,6 +73,17 @@ class TestLightningModule(LightningModule):
         lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=1)
         return [optimizer], [lr_scheduler]
 
+    def train_dataloader(self):
+        return DataLoader(RandomDataset(32, 64))
+
+    def val_dataloader(self):
+        return DataLoader(RandomDataset(32, 64))
+
+    def test_dataloader(self):
+        return DataLoader(RandomDataset(32, 64))
+
+
+class SimpleDataModule(LightningDataModule):
     def train_dataloader(self):
         return DataLoader(RandomDataset(32, 64))
 

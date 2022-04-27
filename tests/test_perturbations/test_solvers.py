@@ -353,6 +353,7 @@ def test_solve_works_within_no_grad():
     assert adv.item() == -2.0
 
 
+@pytest.mark.filterwarnings("ignore::UserWarning")
 @given(...)
 def test_gradient_ascent_on_requires_grad_data(is_leaf: bool):
     x = torch.tensor([2.0], requires_grad=True)

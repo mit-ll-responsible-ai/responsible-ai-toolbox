@@ -2,7 +2,6 @@
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 
-import os
 from pathlib import Path
 from typing import Any
 
@@ -12,10 +11,8 @@ from hydra_zen import builds, instantiate, launch, load_from_yaml, make_config
 from omegaconf.errors import ConfigAttributeError
 from pytorch_lightning import Trainer
 
-from rai_toolbox.mushin.hydra import zen
 from rai_toolbox.mushin.lightning import HydraDDP
-from rai_toolbox.mushin.lightning._pl_main import task as pl_main_task
-from rai_toolbox.mushin.testing.lightning import TestLightningModule
+from rai_toolbox.mushin.testing.lightning import SimpleDataModule, SimpleLightningModule
 
 
 def task_fn(cfg: Any):
@@ -27,8 +24,27 @@ def task_fn(cfg: Any):
         trainer.fit(module)
 
 
+def task_fn_with_datamodule(cfg: Any):
+    trainer: Trainer = instantiate(cfg.trainer)
+    module = instantiate(cfg.module)
+    datamodule = instantiate(cfg.datamodule)
+    if "run_test" in cfg and cfg.run_test:
+        trainer.test(module, datamodule=datamodule)
+    else:
+        trainer.fit(module, datamodule=datamodule)
+
+
+def task_fn_raises(cfg: Any):
+    trainer: Trainer = instantiate(cfg.trainer)
+    module = instantiate(cfg.wrong_config_name)
+    if "run_test" in cfg and cfg.run_test:
+        trainer.test(module)
+    else:
+        trainer.fit(module)
+
+
 @pytest.mark.usefixtures("cleandir")
-def test_ddp_with_hydra_raises():
+def test_ddp_with_hydra_raises_misconfiguration():
     trainer = builds(
         Trainer,
         max_epochs=1,
@@ -37,25 +53,74 @@ def test_ddp_with_hydra_raises():
         strategy=builds(HydraDDP),
         fast_dev_run=True,
     )
-    module = builds(TestLightningModule)
+    module = builds(SimpleLightningModule)
     Config = make_config(trainer=trainer, wrong_config_name=module, devices=2)
     with pytest.raises(ConfigAttributeError):
-        launch(Config, zen(pl_main_task))
+        launch(Config, task_fn_raises)
 
 
 @pytest.mark.skipif(
     torch.cuda.device_count() < 2, reason="Need at least 2 GPUs to test"
 )
 @pytest.mark.usefixtures("cleandir")
-@pytest.mark.parametrize("subdir", [None, "dksa"])
-@pytest.mark.parametrize("num_jobs", [1, 2])
-@pytest.mark.parametrize("testing", [True, False])
-def test_ddp_with_hydra_runjob(subdir, num_jobs, testing):
-
-    overrides = [f"+run_test={testing}"]
+@pytest.mark.parametrize("subdir", [None, ".hydra", "dksa"])
+def test_ddp_with_hydra_output_subdir(subdir):
+    overrides = []
 
     if subdir is not None:
         overrides += [f"hydra.output_subdir={subdir}"]
+
+    trainer = builds(
+        Trainer,
+        max_epochs=1,
+        accelerator="auto",
+        devices="${devices}",
+        strategy=builds(HydraDDP),
+        fast_dev_run=True,
+    )
+    module = builds(SimpleLightningModule)
+    Config = make_config(trainer=trainer, module=module, devices=2)
+    job = launch(Config, task_fn, overrides)
+
+    if subdir is None:
+        subdir = ".hydra"
+
+    cfg_file = Path(job.working_dir) / subdir / "config.yaml"
+    assert cfg_file.exists()
+
+
+@pytest.mark.skipif(
+    torch.cuda.device_count() < 2, reason="Need at least 2 GPUs to test"
+)
+@pytest.mark.usefixtures("cleandir")
+@pytest.mark.parametrize("testing", [True, False])
+def test_ddp_with_hydra_with_datamodule(testing):
+    overrides = [f"+run_test={testing}"]
+    trainer = builds(
+        Trainer,
+        max_epochs=1,
+        accelerator="auto",
+        devices="${devices}",
+        strategy=builds(HydraDDP),
+        fast_dev_run=True,
+    )
+    module = builds(SimpleLightningModule)
+    datamodule = builds(SimpleDataModule)
+    Config = make_config(
+        trainer=trainer, module=module, datamodule=datamodule, devices=2
+    )
+    launch(Config, task_fn_with_datamodule, overrides=overrides)
+
+
+@pytest.mark.skipif(
+    torch.cuda.device_count() < 2, reason="Need at least 2 GPUs to test"
+)
+@pytest.mark.usefixtures("cleandir")
+@pytest.mark.parametrize("num_jobs", [1, 2])
+@pytest.mark.parametrize("testing", [True, False])
+def test_ddp_with_hydra_runjob(num_jobs, testing):
+
+    overrides = [f"+run_test={testing}"]
 
     multirun = False
     if num_jobs > 1:
@@ -77,20 +142,15 @@ def test_ddp_with_hydra_runjob(subdir, num_jobs, testing):
         strategy=builds(HydraDDP),
         fast_dev_run=True,
     )
-    module = builds(TestLightningModule)
+    module = builds(SimpleLightningModule)
     Config = make_config(trainer=trainer, module=module, devices=2)
     launch(Config, task_fn, overrides, multirun=multirun)
-    assert "LOCAL_RANK" not in os.environ
 
-    # Make sure config.yaml was created for additional
-    # processes.
+    # Make sure config.yaml was created for each job
     yamls = list(Path.cwd().glob("**/config.yaml"))
     assert len(yamls) == num_jobs
 
     # Make sure the parameter was set and used
-    cfg = load_from_yaml(yamls[0])
-    assert cfg.devices == 2
-
-    # Make sure PL spawned a job that is logged by Hydra
-    logs = list(Path.cwd().glob("**/*.log"))
-    assert len(logs) == num_jobs
+    for yaml in yamls:
+        cfg = load_from_yaml(yaml)
+        assert cfg.devices == 2
