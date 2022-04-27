@@ -8,12 +8,20 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     defaults:
       run:
         shell: bash -l {0}
     steps:
       - uses: actions/checkout@v2
+        env:
+          CACHE_NUMBER: 0
+      - name: Cache conda
+        uses: actions/cache@v3
+        with:
+          path: ~/conda_pkgs_dir
+          key:
+            $docs-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('setup.cfg') }}-${{ hashFiles('setup.py') }}-${{ hashFiles('tests/conftest.py') }}-${{ hashFiles('.github/workflows/publish_docs.yml') }}
       - uses: conda-incubator/setup-miniconda@v2
         with:
           python-version: 3.9
@@ -25,6 +33,11 @@ jobs:
       - run: |
           conda activate sphinx-docs
           which pip
+
+      - uses: actions/cache@v3
+        with:
+          path: ${{ env.pythonLocation }}
+          key: docs-env-${{ env.CACHE_NUMBER }}-${{ env.pythonLocation }}-${{ hashFiles('setup.cfg') }}-${{ hashFiles('setup.py') }}-${{ hashFiles('tests/conftest.py') }}-${{ hashFiles('.github/workflows/publish_docs.yml') }}
 
       - name: Install package
         run: python3 -m pip install .[mushin]
