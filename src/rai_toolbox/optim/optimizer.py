@@ -314,9 +314,9 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
         """
         if defaults is None:
             defaults = {}
-        defaults["param_ndim"] = defaults.get("param_ndim", param_ndim)
-        defaults["grad_scale"] = defaults.get("grad_scale", grad_scale)
-        defaults["grad_bias"] = defaults.get("grad_bias", grad_bias)
+        defaults.setdefault("param_ndim", param_ndim)
+        defaults.setdefault("grad_scale", grad_scale)
+        defaults.setdefault("grad_bias", grad_bias)
 
         super().__init__(params, defaults)  # type: ignore
         self.inner_opt = InnerOpt(self.param_groups, **inner_opt_kwargs)

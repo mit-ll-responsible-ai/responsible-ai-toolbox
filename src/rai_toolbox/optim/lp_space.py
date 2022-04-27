@@ -450,7 +450,7 @@ class L2ProjectedOptim(L2NormedGradientOptim, ProjectionMixin):
 
         if defaults is None:
             defaults = {}
-        defaults["epsilon"] = defaults.get("epsilon", epsilon)
+        defaults.setdefault("epsilon", epsilon)
 
         super().__init__(
             params,
