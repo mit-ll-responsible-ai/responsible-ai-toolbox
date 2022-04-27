@@ -1,6 +1,12 @@
 # Building the Docs
 
 
+## Deploying the docs to our website
+
+To deploy the docs to our website, you must push to the `docs` branch. In GitHub create a pull request from `main` into `docs`.
+
+
+## Building the docs locally
 Navigate your console to the `responsible-ai-toolbox/docs/` directory. In a conda environment install the following:
 
 ```console
