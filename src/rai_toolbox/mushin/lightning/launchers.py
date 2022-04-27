@@ -5,11 +5,14 @@
 import os
 import subprocess
 import sys
+from pathlib import Path
 from time import sleep
 from typing import Any, Callable, TypeVar
 
 import numpy as np
 from hydra.core.hydra_config import HydraConfig
+from hydra_zen import load_from_yaml
+from omegaconf.errors import ConfigAttributeError
 from pytorch_lightning import Trainer
 from pytorch_lightning.trainer.states import TrainerFn
 from torch import distributed
@@ -61,6 +64,15 @@ def _subprocess_call(local_rank: int, testing: bool) -> None:
         else cwd
     )
 
+    # Validate that minimal configuration requirements
+    config = Path(hydra_output) / "config.yaml"
+    assert config.exists()
+    cfg = load_from_yaml(config)
+    if "trainer" not in cfg or "module" not in cfg:
+        raise ConfigAttributeError(
+            "Missing configurations `trainer` and `module` are required for use with HydraDDP.  See documentation for further details."
+        )
+
     # create the command for CLI
     command += ["-cp", hydra_output, "-cn", "config.yaml"]
 
@@ -93,6 +105,7 @@ if PL_VERSION >= Version(1, 6, 0):
            ├── Config
            │    ├── trainer: A `pytorch_lightning.Trainer` configuration
            │    ├── module: A `pytorch_lightning.LightningModule` configuration
+           │    ├── datamodule: [OPTIONAL] A `pytorch_lightning.LightningDataModule` configuration
 
         This strategy will launch a child subprocesses for additional GPU beyond the first using the following base command::
 
@@ -106,7 +119,7 @@ if PL_VERSION >= Version(1, 6, 0):
         >>> import pytorch_lightning as pl
         ... from hydra_zen import builds, make_config,
         ... from rai_toolbox.mushin import HydraDDP
-        ... from rai_toolbox.mushin.testing.lightning import TestLightningModule
+        ... from rai_toolbox.mushin.testing.lightning import SimpleLightningModule
         ...
         ... TrainerConfig = builds(
         ...     pl.Trainer,
@@ -118,7 +131,7 @@ if PL_VERSION >= Version(1, 6, 0):
         ...     populate_full_signature=True
         ... )
         ...
-        ... ModuleConfig = builds(TestLightningModule)
+        ... ModuleConfig = builds(SimpleLightningModule)
         ...
         ... Config = make_config(
         ...     trainer=TrainerConfig,
@@ -131,6 +144,27 @@ if PL_VERSION >= Version(1, 6, 0):
         >>> def task_function(cfg):
         ...     obj = instantiate(cfg)
         ...     obj.trainer.fit(obj.module)
+
+        Launch the Hydra+Lightning DDP job
+
+        >>> from hydra_zen import launch
+        >>> job = launch(Config, task_function)
+
+        ``HydraDDP`` also supports ``LightningDataModule`` configuration.
+
+        >>> DataModuleConfig = ... # A LightningDataModule config
+        >>> Config = make_config(
+        ...     trainer=TrainerConfig,
+        ...     module=ModuleConfig
+        ...     datamodule=DataModuleconfig
+        ... )
+
+        Next define a task function to execute the Hydra job
+
+        >>> from hydra_zen import instantiate
+        >>> def task_function(cfg):
+        ...     obj = instantiate(cfg)
+        ...     obj.trainer.fit(obj.module, datamodule=obj.datamodule)
 
         Launch the Hydra+Lightning DDP job
 
@@ -230,6 +264,7 @@ else:  # pragma: no cover
            ├── Config
            │    ├── trainer: A `pytorch_lightning.Trainer` configuration
            │    ├── module: A `pytorch_lightning.LightningModule` configuration
+           │    ├── datamodule: [OPTIONAL] A `pytorch_lightning.LightningDataModule` configuration
 
         This strategy will launch a child subprocesses for additional GPU beyond the first using the following base command::
 
@@ -243,7 +278,7 @@ else:  # pragma: no cover
         >>> import pytorch_lightning as pl
         ... from hydra_zen import builds, make_config,
         ... from rai_toolbox.mushin import HydraDDP
-        ... from rai_toolbox.mushin.testing.lightning import TestLightningModule
+        ... from rai_toolbox.mushin.testing.lightning import SimpleLightningModule
         ...
         ... TrainerConfig = builds(
         ...     pl.Trainer,
@@ -255,7 +290,7 @@ else:  # pragma: no cover
         ...     populate_full_signature=True
         ... )
         ...
-        ... ModuleConfig = builds(TestLightningModule)
+        ... ModuleConfig = builds(SimpleLightningModule)
         ...
         ... Config = make_config(
         ...     trainer=TrainerConfig,
@@ -268,6 +303,27 @@ else:  # pragma: no cover
         >>> def task_function(cfg):
         ...     obj = instantiate(cfg)
         ...     obj.trainer.fit(obj.module)
+
+        Launch the Hydra+Lightning DDP job
+
+        >>> from hydra_zen import launch
+        >>> job = launch(Config, task_function)
+
+        ``HydraDDP`` also supports ``LightningDataModule`` configuration.
+
+        >>> DataModuleConfig = ... # A LightningDataModule config
+        >>> Config = make_config(
+        ...     trainer=TrainerConfig,
+        ...     module=ModuleConfig
+        ...     datamodule=DataModuleconfig
+        ... )
+
+        Next define a task function to execute the Hydra job
+
+        >>> from hydra_zen import instantiate
+        >>> def task_function(cfg):
+        ...     obj = instantiate(cfg)
+        ...     obj.trainer.fit(obj.module, datamodule=obj.datamodule)
 
         Launch the Hydra+Lightning DDP job
 
