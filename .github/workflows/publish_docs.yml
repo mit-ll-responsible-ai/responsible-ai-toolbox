@@ -14,30 +14,36 @@ jobs:
         shell: bash -l {0}
     steps:
       - uses: actions/checkout@v2
-        env:
-          CACHE_NUMBER: 0
-      - name: Cache conda
-        uses: actions/cache@v3
-        with:
-          path: ~/conda_pkgs_dir
-          key:
-            $docs-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('setup.cfg') }}-${{ hashFiles('setup.py') }}-${{ hashFiles('tests/conftest.py') }}-${{ hashFiles('.github/workflows/publish_docs.yml') }}
       - uses: conda-incubator/setup-miniconda@v2
         with:
           python-version: 3.9
           channels: conda-forge
           channel-priority: strict
           activate-environment: sphinx-docs
-          environment-file: ./docs/conda_env.yml
           use-only-tar-bz2: true
+
+      - name: Get Date
+        id: get-date
+        run: echo "::set-output name=today::$(/bin/date -u '+%Y%m%d')"
+        shell: bash
+
+      - name: Cache Conda env
+        id: cache
+        uses: actions/cache@v2
+        env:
+          CACHE_NUMBER: 0
+        with:
+          path: ${{ env.CONDA }}/envs
+          key: conda-docs-${{ runner.os }}--${{ runner.arch }}--${{ steps.get-date.outputs.today }}-${{ hashFiles('setup.cfg') }}-${{ hashFiles('setup.py') }}-${{ hashFiles('tests/conftest.py') }}-${{ hashFiles('.github/workflows/publish_docs.yml') }}
+
+      - name: Update environment
+        run: conda env update -n sphinx-docs -f ./docs/conda_env.yml
+        if: steps.cache.outputs.cache-hit != 'true'
+
+      - name: Activate environment
       - run: |
           conda activate sphinx-docs
           which pip
-
-      - uses: actions/cache@v3
-        with:
-          path: ${{ env.pythonLocation }}
-          key: docs-env-${{ env.CACHE_NUMBER }}-${{ env.pythonLocation }}-${{ hashFiles('setup.cfg') }}-${{ hashFiles('setup.py') }}-${{ hashFiles('tests/conftest.py') }}-${{ hashFiles('.github/workflows/publish_docs.yml') }}
 
       - name: Install package
         run: python3 -m pip install .[mushin]
