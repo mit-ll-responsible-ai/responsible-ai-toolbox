@@ -321,6 +321,12 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
         super().__init__(params, defaults)  # type: ignore
         self.inner_opt = InnerOpt(self.param_groups, **inner_opt_kwargs)
 
+        # ensure inner-opt's defaults include those of `self`
+        self.inner_opt.defaults.update(**self.inner_opt.defaults, **self.defaults)
+
+        # state of `self` must mirror that of inner-opt
+        self.__setstate__(self.inner_opt.__getstate__())  # type: ignore
+
         for group in self.param_groups:
             param_ndim = group["param_ndim"]
             if param_ndim is not None and not isinstance(param_ndim, int):
@@ -345,6 +351,19 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
                         f"ndim` must hold."
                     )
 
+    def state_dict(self) -> dict:
+        return self.inner_opt.state_dict()
+
+    def __setstate__(self, state: dict):
+        self.inner_opt.__setstate__(state)
+        super().__setstate__(self.inner_opt.__getstate__())  # type: ignore
+
+    def __getstate__(self) -> dict:
+        return self.inner_opt.__getstate__()  # type: ignore
+
+    def __repr__(self) -> str:
+        return super().__repr__().replace("(", f"[{type(self.inner_opt).__name__}](", 1)
+
     @abstractmethod
     def _inplace_grad_transform_(
         self, param: Tensor, optim_group: DatumParamGroup
@@ -356,9 +375,9 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
         ----------
         param : torch.Tensor
             The parameter whose gradient (stored in `.grad`) will be modified in-place.
-        
+
         optim_group : Dict[str, Any]
-            The parameter group associated with `param`; contains per-parameter 
+            The parameter group associated with `param`; contains per-parameter
             configured values that can affect the gradient transformation.
 
         Notes
