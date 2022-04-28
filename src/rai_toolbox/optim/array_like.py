@@ -25,7 +25,7 @@ class ClampedGradientOptimizer(GradientTransformerOptimizer):
     def __init__(
         self,
         params: Optional[OptimParams] = None,
-        InnerOpt: Union[Opt, Partial[Opt], OptimizerType] = ...,
+        InnerOpt: Union[Opt, Partial[Opt], OptimizerType] = SGD,
         *,
         clamp_min: Optional[float] = None,
         clamp_max: Optional[float] = None,
