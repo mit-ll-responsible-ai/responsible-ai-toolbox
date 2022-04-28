@@ -18,6 +18,7 @@ from torch.testing import assert_allclose
 
 from rai_toolbox._typing import Partial
 from rai_toolbox.optim import (
+    ClampedGradientOptimizer,
     FrankWolfe,
     GradientTransformerOptimizer,
     L1FrankWolfe,
@@ -30,6 +31,7 @@ from rai_toolbox.optim import (
     LinfFrankWolfe,
     LinfProjectedOptim,
     SignedGradientOptim,
+    TopQGradientOptim,
 )
 from rai_toolbox.optim.lp_space import _LpNormOptimizer
 from rai_toolbox.optim.optimizer import _to_batch
@@ -105,6 +107,8 @@ def test_closure_is_called_by_step(
         partial(L1FrankWolfe, epsilon=1.0, lr=0.5),
         partial(L2FrankWolfe, epsilon=1.0, lr=0.5),
         partial(LinfFrankWolfe, epsilon=1.0, lr=0.5),
+        partial(ClampedGradientOptimizer, clamp_min=-1e6, lr=0.1),
+        partial(TopQGradientOptim, q=0.5, lr=0.1),
     ],
 )
 @pytest.mark.parametrize("device", [tr.device("cpu"), tr.device("cuda", index=0)])
