@@ -20,7 +20,7 @@ class BaseWorkflow(ABC):
     cfgs: List[Any]
     "List of configurations for each Hydra job"
 
-    metrics: Dict[str, Any]
+    metrics: Dict[str, List[Any]]
     "Dictionary of metrics for across all jobs"
 
     workflow_overrides: Dict[str, Any]
@@ -29,7 +29,7 @@ class BaseWorkflow(ABC):
     jobs: List[Any]
     "List of jobs returned for each experiment within the workflow"
 
-    working_dir: str
+    working_dir: Union[Path, str]
     "The working directory of the experiment defined by Hydra's sweep directory (``hydra.sweep.dir``)"
 
     def __init__(self, eval_task_cfg=None) -> None:
@@ -48,7 +48,7 @@ class BaseWorkflow(ABC):
 
         # initialize attributes
         self.cfgs = []
-        self.metrics = []
+        self.metrics = {}
         self.workflow_overrides = {}
         self.jobs = []
         self.working_dir = "."
@@ -111,7 +111,7 @@ class BaseWorkflow(ABC):
             These parameters represent the values for configurations to use for the experiment.
             These values will be appeneded to the `overrides` for the Hydra job.
         """
-        self.workflow_overrides = workflow_overrides
+        self._workflow_overrides = workflow_overrides
 
         if overrides is None:
             overrides = []
@@ -230,13 +230,14 @@ class RobustnessCurve(BaseWorkflow):
 
         # set working directory of this workflow
         first_job_working_dir = self.jobs[0].working_dir
+        assert first_job_working_dir is not None
         self.working_dir = Path(first_job_working_dir).parent
 
         # extract configs, overrides, and metrics
         self.cfgs = [j.cfg for j in self.jobs]
         job_overrides = [j.hydra_cfg.hydra.overrides.task for j in self.jobs]
         job_metrics = [j.return_value for j in self.jobs]
-        workflow_params = self.workflow_overrides.keys()
+        workflow_params = list(self._workflow_overrides.keys())
         self.metrics, self.workflow_overrides = _load_metrics(
             job_overrides, job_metrics, workflow_params
         )
@@ -284,7 +285,7 @@ class RobustnessCurve(BaseWorkflow):
 
         # Load saved YAML overrides for each job (in hydra.job.output_subdir)
         job_overrides = [
-            load_from_yaml(f)
+            list(load_from_yaml(f))
             for f in sorted(Path(working_dir).glob(f"**/*/{config_dir}/overrides.yaml"))
         ]
 
@@ -354,7 +355,7 @@ class RobustnessCurve(BaseWorkflow):
 
         xdata = self.to_xarray()
         if group is None:
-            plots = xdata[metric].plot(x="epsilon", ax=ax, **kwargs)
+            plots = xdata[metric].plot(x="epsilon", ax=ax, **kwargs)  # type: ignore
 
         else:
             # TODO: xarray.groupby doesn't support multidimensional grouping
@@ -371,7 +372,9 @@ class RobustnessCurve(BaseWorkflow):
 
 
 def _load_metrics(
-    job_overrides, job_metrics, workflow_params: Optional[Sequence[str]] = None
+    job_overrides: List[List[str]],
+    job_metrics: List[Dict[str, Any]],
+    workflow_params: Optional[Sequence[str]] = None,
 ) -> Tuple[Dict[str, List[Any]], Dict[str, List[Any]]]:
     workflow_overrides = defaultdict(list)
     metrics = defaultdict(list)

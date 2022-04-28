@@ -155,11 +155,11 @@ def test_robustnesscurve_extra_param(fake_param_string):
         fake_param = 1
 
     if fake_param_string:
-        task.run(epsilon=[0, 1, 2, 3], fake_param=fake_param)
+        task.run(epsilon=[0, 1, 2, 3], fake_param=fake_param)  # type: ignore
         task.plot("result", group="fake_param")
     else:
         with pytest.raises(TypeError):
-            task.run(epsilon=[0, 1, 2, 3], fake_param=fake_param)
+            task.run(epsilon=[0, 1, 2, 3], fake_param=fake_param)  # type: ignore
 
 
 @pytest.mark.usefixtures("cleandir")
@@ -174,11 +174,11 @@ def test_robustnesscurve_extra_param_multirun(fake_param_string):
         fake_param = [1, 2]
 
     if fake_param_string:
-        task.run(epsilon=[0, 1, 2, 3], fake_param=fake_param)
+        task.run(epsilon=[0, 1, 2, 3], fake_param=fake_param)  # type: ignore
         task.plot("result")
     else:
         with pytest.raises(TypeError):
-            task.run(epsilon=[0, 1, 2, 3], fake_param=fake_param)
+            task.run(epsilon=[0, 1, 2, 3], fake_param=fake_param)  # type: ignore
 
 
 @pytest.mark.usefixtures("cleandir")
