@@ -2,9 +2,9 @@
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 
+from functools import partial
 from typing import Any, Dict, Optional, Union
 
-import numpy as np
 import torch
 from torch import Generator, Tensor, default_generator
 from torch.optim import SGD
@@ -14,7 +14,13 @@ from rai_toolbox._typing import Optimizer as Opt
 from rai_toolbox._typing import OptimizerType, OptimParams, Partial
 from rai_toolbox._utils import check_param_group_value, value_check
 
-from .optimizer import DatumParamGroup, GradientTransformerOptimizer, ProjectionMixin
+from .array_like import TopQGradientOptim
+from .optimizer import (
+    ChainedGradTransformerOptimizer,
+    DatumParamGroup,
+    GradientTransformerOptimizer,
+    ProjectionMixin,
+)
 
 __all__ = [
     "L1NormedGradientOptim",
@@ -592,7 +598,7 @@ class LinfProjectedOptim(SignedGradientOptim, ProjectionMixin):
         return loss
 
 
-class L1qNormedGradientOptim(GradientTransformerOptimizer):
+class L1qNormedGradientOptim(ChainedGradTransformerOptimizer):
     r"""A gradient-transforming optimizer that sparsifies a parameter's gradient and
     normalizes the gradient to have an :math:`L^1`-norm of `grad_scale`, prior to
     updating the parameter using `InnerOpt.step`.
@@ -717,7 +723,10 @@ class L1qNormedGradientOptim(GradientTransformerOptimizer):
             Named arguments used to initialize `InnerOpt`.
         """
         super().__init__(
-            params,
+            SignedGradientOptim,
+            partial(TopQGradientOptim, q=q, dq=dq, generator=generator),
+            partial(L1NormedGradientOptim, div_by_zero_eps=div_by_zero_eps),
+            params=params,
             InnerOpt=InnerOpt,
             defaults=defaults,
             param_ndim=param_ndim,
@@ -725,47 +734,3 @@ class L1qNormedGradientOptim(GradientTransformerOptimizer):
             grad_bias=grad_bias,
             **inner_opt_kwargs,
         )
-
-        self.div_by_zero_eps = value_check("div_by_zero_eps", div_by_zero_eps, min_=0.0)
-        self.q = value_check("q", q, min_=0.0, max_=1.0)
-        self.dq = value_check("dq", dq, min_=0.0, max_=1.0)
-        self._generator = value_check("generator", generator, type_=torch.Generator)
-
-        self._qlow = max(0.0, q - dq)
-        self._qhigh = min(1.0, q + dq)
-
-    def _inplace_grad_transform_(
-        self, param: Tensor, optim_group: Dict[str, Any]
-    ) -> None:
-        del optim_group
-
-        if param.grad is None:  # pragma: no cover
-            return
-
-        q = (
-            (self._qhigh - self._qlow) * torch.rand(1, generator=self._generator)
-            + self._qlow
-            if self.dq and (self._qlow < self.q or self._qhigh > self.q)
-            else self.q
-        )
-
-        # Convert percent to number of pixels
-        shp = param.grad.shape
-        nb = shp[0]
-
-        num_pix = np.prod(shp[1:])
-        num_q = 1.0 - q
-        num_q = max(1, int(num_q * num_pix))
-
-        g = param.grad.flatten(1)
-
-        batch_idx = torch.tensor([[i] * num_q for i in range(nb)])
-
-        _, corners_q = torch.topk(g.abs(), num_q, dim=1)
-        s = torch.zeros_like(g)
-        s[batch_idx, corners_q] = g.sign()[batch_idx, corners_q]
-
-        s_norm = torch.norm(s, dim=1, p=1, keepdim=True)  # type: ignore
-        s /= torch.clamp(s_norm, self.div_by_zero_eps, None)
-
-        param.grad[...] = s.view(shp)  # type: ignore
