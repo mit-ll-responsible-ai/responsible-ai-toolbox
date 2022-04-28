@@ -43,6 +43,9 @@ def task_fn_raises(cfg: Any):
         trainer.fit(module)
 
 
+@pytest.mark.skipif(
+    torch.cuda.device_count() < 2, reason="Need at least 2 GPUs to test"
+)
 @pytest.mark.usefixtures("cleandir")
 def test_ddp_with_hydra_raises_misconfiguration():
     trainer = builds(

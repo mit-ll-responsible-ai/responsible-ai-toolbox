@@ -155,7 +155,7 @@ x = tr.tensor([[1.0]])
 
 class DummyOpt(tr.optim.Optimizer):
     def __init__(self, params, **kw) -> None:
-        pass
+        super().__init__(params, kw)
 
 
 @pytest.mark.parametrize(
