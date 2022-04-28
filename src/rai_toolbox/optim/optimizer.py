@@ -298,6 +298,9 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
 
         Notes
         -----
+        `GradientTransformerOptimizer` mirrors state with `InnerOpt` so that their
+        `param_groups`, `defaults`, and `state` are always in sync.
+
         Additional Explanation of `param_ndim`:
 
         If the gradient has a shape `(d0, d1, d2)` and `param_ndim=1` then the
