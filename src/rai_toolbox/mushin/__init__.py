@@ -4,5 +4,13 @@
 
 from ._utils import load_experiment, load_from_checkpoint
 from .lightning import HydraDDP, MetricsCallback
+from .workflows import BaseWorkflow, RobustnessCurve
 
-__all__ = ["load_experiment", "load_from_checkpoint", "MetricsCallback", "HydraDDP"]
+__all__ = [
+    "load_experiment",
+    "load_from_checkpoint",
+    "MetricsCallback",
+    "HydraDDP",
+    "RobustnessCurve",
+    "BaseWorkflow",
+]

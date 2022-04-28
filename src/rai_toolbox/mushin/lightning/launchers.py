@@ -84,7 +84,7 @@ def _subprocess_call(local_rank: int, testing: bool) -> None:
 
     command += [
         f"hydra.run.dir={os_cwd}",
-        f"hydra.output_subdir={hydra_cfg.output_subdir}",
+        f"hydra.output_subdir=.pl_hydra_rank_{local_rank}",
         f"hydra.job.name={hydra_cfg.job.name}",
     ]
     subprocess.Popen(command, env=env_copy, cwd=cwd)
