@@ -328,6 +328,11 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
         defaults.setdefault("grad_bias", grad_bias)
 
         if instantiates_to(InnerOpt, Optimizer):
+            if params is None:
+                raise TypeError(
+                    "`params` cannot be `None` when `InnerOpt` is an un-instantiated "
+                    "optimizer type."
+                )
             super().__init__(params, defaults)  # type: ignore
             self.inner_opt = InnerOpt(self.param_groups, **inner_opt_kwargs)  # type: ignore
         elif isinstance(InnerOpt, Optimizer):

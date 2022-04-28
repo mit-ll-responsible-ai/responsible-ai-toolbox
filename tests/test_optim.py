@@ -775,3 +775,8 @@ def test_bad_inner_opt():
 def test_bad_chain_opt():
     with pytest.raises(TypeError):
         ChainedGradTransformerOptimizer(True, 1.0, params=_params, lr=1.0, param_ndim=None)  # type: ignore
+
+
+def test_bad_params():
+    with pytest.raises(TypeError):
+        ChainedGradTransformerOptimizer(params=None, InnerOpt=SGD, lr=1.0)
