@@ -156,7 +156,7 @@ def test_custom_repr():
 def test_custom_repr_for_chained():
     opt = ChainedGradTransformerOptimizer(
         SignedGradientOptim,
-        ClampedGradientOptimizer,
+        partial(ClampedGradientOptimizer, clamp_min=1.0),
         params=[tr.tensor([1.0], requires_grad=True)],
         lr=1.0,
     )
