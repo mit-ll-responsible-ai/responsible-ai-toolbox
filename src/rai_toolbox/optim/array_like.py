@@ -13,7 +13,7 @@ from rai_toolbox._typing import Optimizer as Opt
 from rai_toolbox._typing import OptimizerType, OptimParams, Partial
 from rai_toolbox._utils import check_param_group_value, value_check
 
-from .optimizer import DatumParamGroup, GradientTransformerOptimizer
+from .optimizer import REQUIRED, DatumParamGroup, GradientTransformerOptimizer
 
 
 class ClampedParamGroup(DatumParamGroup):
@@ -53,7 +53,7 @@ class TopQGradientOptim(GradientTransformerOptimizer):
         params: OptimParams,
         InnerOpt: Union[Partial[Opt], OptimizerType] = SGD,
         *,
-        q: float,
+        q: float = REQUIRED,
         dq: float = 0.0,
         param_ndim: Union[int, None] = -1,
         defaults: Optional[Dict[str, Any]] = None,

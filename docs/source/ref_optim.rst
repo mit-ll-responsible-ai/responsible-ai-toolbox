@@ -18,6 +18,7 @@ Base Optimizers
    :toctree: generated/
 
    GradientTransformerOptimizer
+   ChainedGradTransformerOptimizer
    ProjectionMixin
 
 ********************************
