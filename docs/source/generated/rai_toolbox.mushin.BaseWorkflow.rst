@@ -8,8 +8,7 @@ rai\_toolbox.mushin.BaseWorkflow
    
    .. automethod:: __init__
    .. automethod:: evaluation_task
-   .. automethod:: run
-   .. automethod:: load_workflow_jobs_
+   .. automethod:: jobs_post_process
 
    
    .. rubric:: Methods
@@ -18,7 +17,7 @@ rai\_toolbox.mushin.BaseWorkflow
    
       ~BaseWorkflow.__init__
       ~BaseWorkflow.evaluation_task
-      ~BaseWorkflow.load_workflow_jobs_
+      ~BaseWorkflow.jobs_post_process
       ~BaseWorkflow.plot
       ~BaseWorkflow.run
       ~BaseWorkflow.to_dataframe
@@ -35,6 +34,7 @@ rai\_toolbox.mushin.BaseWorkflow
    
       ~BaseWorkflow.cfgs
       ~BaseWorkflow.metrics
-      ~BaseWorkflow.metric_params
+      ~BaseWorkflow.workflow_overrides
+      ~BaseWorkflow.jobs
    
    

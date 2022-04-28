@@ -7,8 +7,9 @@ rai\_toolbox.mushin.RobustnessCurve
 
    
    .. automethod:: __init__
-   .. automethod:: evaluation_task
    .. automethod:: run
+   .. automethod:: plot
+   .. automethod:: load_from_dir
 
    
    .. rubric:: Methods
@@ -17,8 +18,10 @@ rai\_toolbox.mushin.RobustnessCurve
    
       ~RobustnessCurve.__init__
       ~RobustnessCurve.evaluation_task
-      ~RobustnessCurve.load_workflow_jobs_
+      ~RobustnessCurve.jobs_post_process
+      ~RobustnessCurve.load_from_dir
       ~RobustnessCurve.plot
+      ~RobustnessCurve.run
       ~RobustnessCurve.to_dataframe
       ~RobustnessCurve.to_xarray
       ~RobustnessCurve.validate
@@ -33,6 +36,6 @@ rai\_toolbox.mushin.RobustnessCurve
    
       ~BaseWorkflow.cfgs
       ~BaseWorkflow.metrics
-      ~BaseWorkflow.metric_params
-   
+      ~BaseWorkflow.workflow_overrides
+      ~BaseWorkflow.jobs
    
