@@ -2,7 +2,6 @@
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 
-from dataclasses import dataclass
 from pathlib import Path
 
 import pytorch_lightning as pl
@@ -175,21 +174,17 @@ ModelCfg = make_config(
 PerturbationCfg = make_config(steps=7, perturbation=MISSING)
 TrainerCfg = make_config(gpus=NUM_GPUS, trainer=Trainer, module=Evaluator)
 
-_Config = make_config(
+Config = make_config(
     defaults=[
         "_self_",
         {"perturbation": "l2pgd"},
         {"dataset": "cifar10"},
         {"model": "cifar10_resnet50"},
     ],
+    seed=12219,
+    epsilon=0.0,
     bases=(DatasetCfg, ModelCfg, PerturbationCfg, TrainerCfg),
 )
-
-
-@dataclass
-class Config(_Config):  # type: ignore
-    epsilon: float = 0.0
-    seed: int = 12219
 
 
 ###################
