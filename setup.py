@@ -77,6 +77,7 @@ setup(
             "pytorch-lightning >= 1.5.0",
             "hydra-zen >= 0.6.0",
             "xarray >= 0.19.0",
+            "matplotlib >= 3.3",
         ],
     },
 )
