@@ -2,8 +2,6 @@
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 
-from pathlib import Path
-
 import configs
 import hydra
 import pytorch_lightning as pl
@@ -23,17 +21,14 @@ class MadryLabRobustness(RobustnessCurve):
     ) -> torch.Tensor:
         pl.seed_everything(seed)
         trainer.test(module)
-
-        assert Path("test_metrics.pt").exists()
-        metrics = torch.load("test_metrics.pt")
-        return metrics["Test/Accuracy"][-1]
+        return
 
 
 @hydra.main(config_path=None, config_name="madry_config")
 def main(cfg: configs.Config):
     robustness_job = MadryLabRobustness(cfg)
     robustness_job.run(job_epsilons=cfg.job_epsilons)
-    robustness_job.plot()
+    robustness_job.plot("Test/Accuracy", save_fig=True)
 
 
 if __name__ == "__main__":
