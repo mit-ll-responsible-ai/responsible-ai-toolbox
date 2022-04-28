@@ -2,6 +2,7 @@
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 
+from .array_like import ClampedGradientOptimizer, TopQGradientOptim
 from .frank_wolfe import (
     FrankWolfe,
     L1FrankWolfe,
@@ -17,7 +18,11 @@ from .lp_space import (
     LinfProjectedOptim,
     SignedGradientOptim,
 )
-from .optimizer import GradientTransformerOptimizer, ProjectionMixin
+from .optimizer import (
+    ChainedGradTransformerOptimizer,
+    GradientTransformerOptimizer,
+    ProjectionMixin,
+)
 
 __all__ = [
     "L1FrankWolfe",
@@ -33,4 +38,7 @@ __all__ = [
     "LinfProjectedOptim",
     "GradientTransformerOptimizer",
     "ProjectionMixin",
+    "TopQGradientOptim",
+    "ClampedGradientOptimizer",
+    "ChainedGradTransformerOptimizer",
 ]
