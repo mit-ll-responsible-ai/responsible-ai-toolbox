@@ -2,7 +2,7 @@
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 import numpy as np
 import torch
@@ -22,6 +22,12 @@ class ClampedParamGroup(DatumParamGroup):
 
 
 class ClampedGradientOptimizer(GradientTransformerOptimizer):
+    """A gradient-tranforming  optimizer that clamps the elements of a gradient to
+    fall within user-specified bounds, prior to using `InnerOp.step` to update the
+    corresponding parameter."""
+
+    param_groups: List[ClampedParamGroup]
+
     def __init__(
         self,
         params: Optional[OptimParams] = None,
@@ -32,12 +38,62 @@ class ClampedGradientOptimizer(GradientTransformerOptimizer):
         defaults: Optional[Dict[str, Any]] = None,
         **inner_opt_kwargs,
     ) -> None:
+        """
+        Parameters
+        ----------
+        params : Sequence[Tensor] | Iterable[Mapping[str, Any]]
+            Iterable of parameters or dicts defining parameter groups.
+
+        InnerOpt : Type[Optimizer] | Partial[Optimizer], optional (default=`torch.nn.optim.SGD`)
+            The optimizer that updates the parameters after their gradients have
+            been transformed.
+
+        epsilon : float
+            Specifies the size of the L2-space ball that all parameters will be
+            projected into, post optimization step.
+
+        clamp_min: Optional[float]
+            Lower-bound of the range to be clamped to.  Must be specified if `clamp_max` is `None`.
+
+        clamp_max: Optional[float]
+            Upper-bound of the range to be clamped to. Must be specified if `clamp_min`
+            is `None`.
+
+        grad_scale : float, optional (default=1.0)
+            Multiplies each gradient in-place after the in-place transformation is
+            performed. This can be specified per param-group.
+
+        grad_bias : float, optional (default=0.0)
+            Added to each gradient in-place after the in-place transformation is
+            performed. This can be specified per param-group.
+
+        defaults : Optional[Dict[str, Any]]
+            Specifies default parameters for all parameter groups.
+
+        div_by_zero_eps : float, optional (default=`torch.finfo(torch.float32).tiny`)
+            A lower bound used to clamp the normalization factor to prevent div-by-zero.
+
+        **inner_opt_kwargs : Any
+            Named arguments used to initialize `InnerOpt`.
+
+        Examples"""
         if defaults is None:
             defaults = {}
         defaults.setdefault("clamp_min", clamp_min)
         defaults.setdefault("clamp_max", clamp_max)
-
         super().__init__(params, InnerOpt, defaults=defaults, **inner_opt_kwargs)
+
+        for group in self.param_groups:
+            if group["clamp_min"] is None and group["clamp_max"] is None:
+                raise ValueError("Either `clamp_min` or `clamp_max` must be specified")
+
+            if group["clamp_min"] is not None and group["clamp_max"] is not None:
+                value_check(
+                    "clamp_min",
+                    group["clamp_min"],
+                    max_=group["clamp_max"],
+                    upper_name="max_clamp",
+                )
 
     def _inplace_grad_transform_(
         self, param: Tensor, optim_group: ClampedParamGroup

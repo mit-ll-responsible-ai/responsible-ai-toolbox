@@ -40,6 +40,8 @@ def value_check(
     incl_min: bool = True,
     incl_max: bool = True,
     optional: bool = False,
+    lower_name: str = "",
+    upper_name: str = "",
 ) -> T:
     """
     For internal use only.
@@ -101,11 +103,15 @@ def value_check(
         err_msg = f"`{name}` must satisfy"
 
         if min_ is not None:
-            err_msg += f" {min_} {lsymb} "
+            if lower_name:
+                min_ = f"{lower_name}(= {min_})"  # type: ignore
+            err_msg += f" {min_} {lsymb}"
 
-        err_msg += f"{name}"
+        err_msg += f" {name}"
 
         if max_ is not None:
+            if upper_name:
+                max_ = f"{upper_name}(= {max_})"  # type: ignore
             err_msg += f" {rsymb} {max_}"
 
         err_msg += f"  Got: {value}"

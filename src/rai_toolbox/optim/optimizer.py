@@ -796,6 +796,8 @@ class ChainedGradTransformerOptimizer(GradientTransformerOptimizer):
             opt._inplace_grad_transform_(param=param, optim_group=optim_group)
 
     def __setstate__(self, state: dict):
+        # synchornize state between `self`, members of `self._chain`,
+        # and `self.inner_opt`
         self.inner_opt.__setstate__(state)
         state = self.inner_opt.__getstate__()  # type: ignore
         for c in self._chain:
