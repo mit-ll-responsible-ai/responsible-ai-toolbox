@@ -18,6 +18,8 @@ from torch.testing import assert_allclose
 
 from rai_toolbox._typing import Partial
 from rai_toolbox.optim import (
+    ChainedGradTransformerOptimizer,
+    ClampedGradientOptimizer,
     FrankWolfe,
     GradientTransformerOptimizer,
     L1FrankWolfe,
@@ -763,3 +765,13 @@ _params = [tr.tensor(1.0, requires_grad=True)]
 def test_bad_grad_scale_bias(bad_optim):
     with pytest.raises(TypeError):
         bad_optim(lr=1.0, param_ndim=None)
+
+
+def test_bad_inner_opt():
+    with pytest.raises(TypeError):
+        ClampedGradientOptimizer(params=_params, InnerOpt=1)  # type: ignore
+
+
+def test_bad_chain_opt():
+    with pytest.raises(TypeError):
+        ChainedGradTransformerOptimizer(True, 1.0, params=_params, lr=1.0, param_ndim=None)  # type: ignore
