@@ -143,41 +143,6 @@ class L1qFrankWolfe(L1qNormedGradientOptim):
     References
     ----------
     .. [1] https://en.wikipedia.org/wiki/Frank%E2%80%93Wolfe_algorithm#Algorithm
-
-    Examples
-    --------
-    Using `L1qFrankWolfe`, we'll sparsify the parameter's gradient to retain signs of
-    the top 70% elements, and we'll constrain the updated parameter to fall within a
-    :math:`L^1`-ball of radius `1.8`.
-
-    >>> import torch as tr
-    >>> from rai_toolbox.optim import L1qFrankWolfe
-
-    Creating a parameter for our optimizer to update, and our optimizer. We
-    specify `param_ndim=None` so that the sparsification/normalization occurs on the
-    gradient without any broadcasting.
-
-    >>> x = tr.tensor([1.0, 1.0, 1.0], requires_grad=True)
-    >>> optim = L1qFrankWolfe(
-    ...     [x],
-    ...     q=0.30,
-    ...     epsilon=1.8,
-    ...     param_ndim=None,
-    ... )
-
-    Performing a simple calculation with `x` and performing backprop to create
-    a gradient.
-
-    >>> (tr.tensor([0.0, 1.0, 2.0]) * x).sum().backward()
-
-    Performing a step with our optimizer uses the Frank Wolfe algorithm to update
-    its parameters; the resulting parameter was updated with a LMO based on a
-    sparsified, sign-only gradient. Note that the parameter falls within/on the
-    L1-ball of radius `1.8`.
-
-    >>> optim.step()
-    >>> x  # the updated parameter; has a L1-norm of 1.8
-    tensor([ 0.0000, -0.9000, -0.9000], requires_grad=True)
     """
 
     def __init__(
@@ -246,6 +211,41 @@ class L1qFrankWolfe(L1qNormedGradientOptim):
 
         generator : torch.Generator, optional (default=`torch.default_generator`)
             Controls the RNG source.
+
+        Examples
+        --------
+        Using `L1qFrankWolfe`, we'll sparsify the parameter's gradient to retain signs of
+        the top 70% elements, and we'll constrain the updated parameter to fall within a
+        :math:`L^1`-ball of radius `1.8`.
+
+        >>> import torch as tr
+        >>> from rai_toolbox.optim import L1qFrankWolfe
+
+        Creating a parameter for our optimizer to update, and our optimizer. We
+        specify `param_ndim=None` so that the sparsification/normalization occurs on the
+        gradient without any broadcasting.
+
+        >>> x = tr.tensor([1.0, 1.0, 1.0], requires_grad=True)
+        >>> optim = L1qFrankWolfe(
+        ...     [x],
+        ...     q=0.30,
+        ...     epsilon=1.8,
+        ...     param_ndim=None,
+        ... )
+
+        Performing a simple calculation with `x` and performing backprop to create
+        a gradient.
+
+        >>> (tr.tensor([0.0, 1.0, 2.0]) * x).sum().backward()
+
+        Performing a step with our optimizer uses the Frank Wolfe algorithm to update
+        its parameters; the resulting parameter was updated with a LMO based on a
+        sparsified, sign-only gradient. Note that the parameter falls within/on the
+        L1-ball of radius `1.8`.
+
+        >>> optim.step()
+        >>> x  # the updated parameter; has a L1-norm of 1.8
+        tensor([ 0.0000, -0.9000, -0.9000], requires_grad=True)
         """
         super().__init__(
             params,
@@ -281,34 +281,7 @@ class L1FrankWolfe(GradientTransformerOptimizer):
     References
     ----------
     .. [1] https://en.wikipedia.org/wiki/Frank%E2%80%93Wolfe_algorithm#Algorithm
-
-    Examples
-    --------
-    Using `L1FrankWolfe`, we'll constrain the updated parameter to fall within a
-    :math:`L^1`-ball of radius `1.8`.
-
-    >>> import torch as tr
-    >>> from rai_toolbox.optim import L1FrankWolfe
-
-    Creating a parameter for our optimizer to update, and our optimizer. We
-    specify `param_ndim=None` so that the constrain occurs on the parameter without any
-    broadcasting.
-
-    >>> x = tr.tensor([1.0, 1.0], requires_grad=True)
-    >>> optim = L1FrankWolfe([x], epsilon=1.8, param_ndim=None)
-
-    Performing a simple calculation with `x` and performing backprop to create
-    a gradient.
-
-    >>> (tr.tensor([1.0, 2.0]) * x).sum().backward()
-
-    Performing a step with our optimizer uses the Frank Wolfe algorithm to update
-    its parameters. Note that the updated parameter falls within/on the
-    :math:`L^1`-ball of radius `1.8`.
-
-    >>> optim.step()
-    >>> x
-    tensor([ 0.0000, -1.8000], requires_grad=True)"""
+    """
 
     def __init__(
         self,
@@ -355,6 +328,34 @@ class L1FrankWolfe(GradientTransformerOptimizer):
 
         div_by_zero_eps : float, optional (default=`torch.finfo(torch.float32).tiny`)
             Prevents div-by-zero error in learning rate schedule.
+
+        Examples
+        --------
+        Using `L1FrankWolfe`, we'll constrain the updated parameter to fall within a
+        :math:`L^1`-ball of radius `1.8`.
+
+        >>> import torch as tr
+        >>> from rai_toolbox.optim import L1FrankWolfe
+
+        Creating a parameter for our optimizer to update, and our optimizer. We
+        specify `param_ndim=None` so that the constrain occurs on the parameter without any
+        broadcasting.
+
+        >>> x = tr.tensor([1.0, 1.0], requires_grad=True)
+        >>> optim = L1FrankWolfe([x], epsilon=1.8, param_ndim=None)
+
+        Performing a simple calculation with `x` and performing backprop to create
+        a gradient.
+
+        >>> (tr.tensor([1.0, 2.0]) * x).sum().backward()
+
+        Performing a step with our optimizer uses the Frank Wolfe algorithm to update
+        its parameters. Note that the updated parameter falls within/on the
+        :math:`L^1`-ball of radius `1.8`.
+
+        >>> optim.step()
+        >>> x
+        tensor([ 0.0000, -1.8000], requires_grad=True)
         """
         super().__init__(
             params,
@@ -397,34 +398,7 @@ class L2FrankWolfe(L2NormedGradientOptim):
     References
     ----------
     .. [1] https://en.wikipedia.org/wiki/Frank%E2%80%93Wolfe_algorithm#Algorithm
-
-    Examples
-    --------
-    Using `L2FrankWolfe`, we'll constrain the updated parameter to fall within a
-    :math:`L^2`-ball of radius `1.8`.
-
-    >>> import torch as tr
-    >>> from rai_toolbox.optim import L2FrankWolfe
-
-    Creating a parameter for our optimizer to update, and our optimizer. We
-    specify `param_ndim=None` so that the constrain occurs on the parameter without any
-    broadcasting.
-
-    >>> x = tr.tensor([1.0, 1.0], requires_grad=True)
-    >>> optim = L2FrankWolfe([x], epsilon=1.8, param_ndim=None)
-
-    Performing a simple calculation with `x` and performing backprop to create
-    a gradient.
-
-    >>> (tr.tensor([1.0, 2.0]) * x).sum().backward()
-
-    Performing a step with our optimizer uses the Frank Wolfe algorithm to update
-    its parameters. Note that the updated parameter falls within/on the
-    :math:`L^2`-ball of radius `1.8`.
-
-    >>> optim.step()
-    >>> x
-    tensor([-0.8050, -1.6100], requires_grad=True)"""
+    """
 
     def __init__(
         self,
@@ -471,6 +445,34 @@ class L2FrankWolfe(L2NormedGradientOptim):
 
         div_by_zero_eps : float, optional (default=`torch.finfo(torch.float32).tiny`)
             Prevents div-by-zero error in learning rate schedule.
+
+        Examples
+        --------
+        Using `L2FrankWolfe`, we'll constrain the updated parameter to fall within a
+        :math:`L^2`-ball of radius `1.8`.
+
+        >>> import torch as tr
+        >>> from rai_toolbox.optim import L2FrankWolfe
+
+        Creating a parameter for our optimizer to update, and our optimizer. We
+        specify `param_ndim=None` so that the constrain occurs on the parameter without any
+        broadcasting.
+
+        >>> x = tr.tensor([1.0, 1.0], requires_grad=True)
+        >>> optim = L2FrankWolfe([x], epsilon=1.8, param_ndim=None)
+
+        Performing a simple calculation with `x` and performing backprop to create
+        a gradient.
+
+        >>> (tr.tensor([1.0, 2.0]) * x).sum().backward()
+
+        Performing a step with our optimizer uses the Frank Wolfe algorithm to update
+        its parameters. Note that the updated parameter falls within/on the
+        :math:`L^2`-ball of radius `1.8`.
+
+        >>> optim.step()
+        >>> x
+        tensor([-0.8050, -1.6100], requires_grad=True)
         """
         super().__init__(
             params,

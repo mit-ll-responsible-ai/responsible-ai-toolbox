@@ -167,96 +167,6 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
     Methods
     -------
     _inplace_grad_transform_
-
-    Examples
-    --------
-    Let's create a gradient-transforming optimizer that replaces the gradient
-    of each parameter with the elementwise sign of the gradient (:math:`\pm 1`) prior to
-    performing the step of the inner optimizer:
-
-    >>> import torch as tr
-    >>> from rai_toolbox.optim import GradientTransformerOptimizer
-    >>> class SignedGradientOptim(GradientTransformerOptimizer):
-    ...
-    ...     def _inplace_grad_transform_(self, param: tr.Tensor, **_kwds) -> None:
-    ...         if param.grad is None:
-    ...             return
-    ...         tr.sign(param.grad, out=param.grad)  # operates in-place
-
-    Now we'll use this optimizer – with `torch.nn.optim.AdamW` providing the actual
-    parameter-update functionality – to update the parameter.
-
-    >>> x = tr.tensor([-10.0, 10.0], requires_grad=True)
-    >>> optim = SignedGradientOptim([x], InnerOpt=tr.optim.AdamW, lr=0.1)
-
-    Using `x` in a calculation and compute an associated gradient for it:
-
-    >>> (10_000 * x).sum().backward()
-
-    Updating `x` using our grad-sign + AdamW optimizer:
-
-    >>> optim.step()
-    >>> x
-    tensor([-10.9000,   8.9000], requires_grad=True)
-
-    This was a simple optimizer which did not involve any broadcasting in the gradient
-    transformation; the next example will involve broadcasting.
-
-    **Controlling the gradient transformation with param_ndim**
-
-    To understand the role of `param_ndim` let's design an optimizer that normalizes a
-    gradient by its max value – along some user-specified dimension – prior to
-    performing the gradient-based update to its parameter.
-
-    >>> class MaxNormedGradientOptim(GradientTransformerOptimizer):
-    ...
-    ...     def _inplace_grad_transform_(self, param: tr.Tensor, **_kwds) -> None:
-    ...         if param.grad is None:
-    ...             return
-    ...
-    ...         g = param.grad.flatten(1) # (N, d1, ..., dm) -> (N, d1 * ... * dm)
-    ...         max_norms = tr.max(g, dim=1).values
-    ...         max_norms = max_norms.view(-1, *([1] * (param.ndim - 1)))  # reshape to have dimenionality-m
-    ...         param.grad /= tr.clamp(max_norms, 1e-20, None)  # clamp to prevent div by 0
-
-
-    Note that we design `_inplace_grad_transform_` to operate in-place on the gradient
-    and that treat the gradient as if it has a shape `(N, d1, ..., dm)`, where we
-    want to compute the max over each of the `N` sub-tensors of shape-`(d1, ..., dm)`.
-
-    Critically, we did not use `param_ndim` at all in this method;
-    `GradientTransformerOptimizer` assumes that we designed this method to broadcast in
-    a batch-style, as we did, and automatically leverages `param_ndim` accordingly.
-
-    Now we will create a shape-(2, 2) parameter to see how `MaxNormedGradientOptim`
-    can compute the max-norm over various dimensions of the parameter. Let's print out
-    the transformed gradient when we use each of `param_ndim`: `0`, `1`, or `2`.
-
-    >>> x = tr.tensor([[1.0, 2.0],
-    ...                [20.0, 10.0]], requires_grad=True)
-    >>> for param_ndim in [0, 1, 2]:
-    ...     optim = MaxNormedGradientOptim([x], param_ndim=param_ndim, InnerOpt=tr.optim.SGD, lr=0.0)
-    ...
-    ...     loss = (x * x).sum()
-    ...     loss.backward()
-    ...     optim.step()
-    ...     print("param_ndim: {param_ndim}, normed grad:\n{x.grad}\n..")
-    ...     optim.zero_grad()
-    param_ndim: 0, normed grad:
-    tensor([[1., 1.],
-            [1., 1.]])
-    ..
-    param_ndim: 1, normed grad:
-    tensor([[0.5000, 1.0000],
-            [1.0000, 0.5000]])
-    ..
-    param_ndim: 2, normed grad:
-    tensor([[0.0500, 0.1000],
-            [1.0000, 0.5000]])
-
-    See that `param_ndim=0` applies the max-norm elementwise, whereas `param_ndim=1`
-    applied the max-norm to each 1D row of the gradient, and `param_ndim=2` applies
-    the max-norm over the entire 2D gradient.
     """
 
     param_groups: List[DatumParamGroup]
@@ -272,7 +182,7 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
         defaults: Optional[Dict[str, Any]] = None,
         **inner_opt_kwargs,
     ) -> None:
-        """
+        r"""
         Parameters
         ----------
         params : Sequence[Tensor] | Iterable[ParamGroup]
@@ -321,6 +231,95 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
 
         If `param_ndim=0` then the transformation is applied elementwise to the
         gradient by temporarily reshaping the gradient to a shape-(T, 1) tensor.
+
+        Examples
+        --------
+        Let's create a gradient-transforming optimizer that replaces the gradient
+        of each parameter with the elementwise sign of the gradient (:math:`\pm 1`) prior to
+        performing the step of the inner optimizer:
+
+        >>> import torch as tr
+        >>> from rai_toolbox.optim import GradientTransformerOptimizer
+        >>> class SignedGradientOptim(GradientTransformerOptimizer):
+        ...
+        ...     def _inplace_grad_transform_(self, param: tr.Tensor, **_kwds) -> None:
+        ...         if param.grad is None:
+        ...             return
+        ...         tr.sign(param.grad, out=param.grad)  # operates in-place
+
+        Now we'll use this optimizer – with `torch.nn.optim.AdamW` providing the actual
+        parameter-update functionality – to update the parameter.
+
+        >>> x = tr.tensor([-10.0, 10.0], requires_grad=True)
+        >>> optim = SignedGradientOptim([x], InnerOpt=tr.optim.AdamW, lr=0.1)
+
+        Using `x` in a calculation and compute an associated gradient for it:
+
+        >>> (10_000 * x).sum().backward()
+
+        Updating `x` using our grad-sign + AdamW optimizer:
+
+        >>> optim.step()
+        >>> x
+        tensor([-10.9000,   8.9000], requires_grad=True)
+
+        This was a simple optimizer which did not involve any broadcasting in the gradient
+        transformation; the next example will involve broadcasting.
+
+        **Controlling the gradient transformation with param_ndim**
+
+        To understand the role of `param_ndim` let's design an optimizer that normalizes a
+        gradient by its max value – along some user-specified dimension – prior to
+        performing the gradient-based update to its parameter.
+
+        >>> class MaxNormedGradientOptim(GradientTransformerOptimizer):
+        ...
+        ...     def _inplace_grad_transform_(self, param: tr.Tensor, **_kwds) -> None:
+        ...         if param.grad is None:
+        ...             return
+        ...
+        ...         g = param.grad.flatten(1) # (N, d1, ..., dm) -> (N, d1 * ... * dm)
+        ...         max_norms = tr.max(g, dim=1).values
+        ...         max_norms = max_norms.view(-1, *([1] * (param.ndim - 1)))  # reshape to have dimenionality-m
+        ...         param.grad /= tr.clamp(max_norms, 1e-20, None)  # clamp to prevent div by 0
+
+        Note that we design `_inplace_grad_transform_` to operate in-place on the gradient
+        and that treat the gradient as if it has a shape `(N, d1, ..., dm)`, where we
+        want to compute the max over each of the `N` sub-tensors of shape-`(d1, ..., dm)`.
+
+        Critically, we did not use `param_ndim` at all in this method;
+        `GradientTransformerOptimizer` assumes that we designed this method to broadcast in
+        a batch-style, as we did, and automatically leverages `param_ndim` accordingly.
+
+        Now we will create a shape-(2, 2) parameter to see how `MaxNormedGradientOptim`
+        can compute the max-norm over various dimensions of the parameter. Let's print out
+        the transformed gradient when we use each of `param_ndim`: `0`, `1`, or `2`.
+
+        >>> x = tr.tensor([[1.0, 2.0],
+        ...                [20.0, 10.0]], requires_grad=True)
+        >>> for param_ndim in [0, 1, 2]:
+        ...     optim = MaxNormedGradientOptim([x], param_ndim=param_ndim, InnerOpt=tr.optim.SGD, lr=0.0)
+        ...
+        ...     loss = (x * x).sum()
+        ...     loss.backward()
+        ...     optim.step()
+        ...     print("param_ndim: {param_ndim}, normed grad:\n{x.grad}\n..")
+        ...     optim.zero_grad()
+        param_ndim: 0, normed grad:
+        tensor([[1., 1.],
+                [1., 1.]])
+        ..
+        param_ndim: 1, normed grad:
+        tensor([[0.5000, 1.0000],
+                [1.0000, 0.5000]])
+        ..
+        param_ndim: 2, normed grad:
+        tensor([[0.0500, 0.1000],
+                [1.0000, 0.5000]])
+
+        See that `param_ndim=0` applies the max-norm elementwise, whereas `param_ndim=1`
+        applied the max-norm to each 1D row of the gradient, and `param_ndim=2` applies
+        the max-norm over the entire 2D gradient.
         """
         if defaults is None:
             defaults = {}
@@ -408,14 +407,14 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
         Notes
         -----
         This transform should *always* be designed to broadcast over the leading
-        dimension of the parameters's gradient. That is, each gradient  should be
+        dimension of the parameter's gradient. That is, each gradient  should be
         assumed to have the shape-(N, d0, ...) and the transformation should be
         applied - in-place - to each shape-(d0, ...) sub-tensor.
 
         Prior to calling `_in_place_grad_transform_`, `GradientTransformerOptimizer`
         will temporarily reshape each parameter and its gradient to have the appropriate
-        shape, in accordance with the value specified for `param_ndim` such that the
-        shape (d0, ...) contains `param_ndim` entries.
+        shape – in accordance with the value specified for `param_ndim` – such that
+        the shape (d0, ...) contains `|param_ndim|` entries.
 
         In the case where `param_ndim=0`, the transformation will be applied to a
         shape-(T, 1) tensor, where `T` corresponds to the total number of elements
@@ -580,120 +579,6 @@ class ChainedGradTransformerOptimizer(GradientTransformerOptimizer):
     `ChainedGradTransformerOptimizer` mirrors state with `InnerOpt`, and with all of
     the user-specified chained gradient-trasnformers, so that their `param_groups`,
     `defaults`, and `state` are always in sync.
-
-    Examples
-    --------
-    **Basic Example**
-
-    Let's chain together two gradient-transforming optimizers supplied by rAI-toolbox:
-    `TopQGradientOptim` and `ClampedGradientOptimizer`
-
-    >>> from rai_toolbox.optim import (
-    ... ChainedGradTransformerOptimizer,
-    ... ClampedGradientOptimizer,
-    ... TopQGradientOptim,
-    ... )
-    >>> import torch as tr
-    >>> from functools import partial
-
-    >>> x1 = tr.ones(3, requires_grad=True)  # shape-(3,)
-
-    Our optimizer will retain only the top-33rd percentile elements in the gradient:
-    the smallest elements will be zero'd. Then the resulting gradient will be
-    clamped so that its largest possible entry is `2.8`. Finally, the standard `SGD`
-    optimizer will be used, with `lr=1.0`, to update the parameter(s) using the
-    transformed gradients.
-
-    We specify `TopQGradientOptim` and then `ClampedGradientOptimizer`; the
-    transformations are applied in order from left to right. Providing per-optimizer
-    defaults is achieved most naturally using :py:func:`functools.partial`.
-
-    >>> optim = ChainedGradTransformerOptimizer(
-    ...     partial(TopQGradientOptim, q=0.33),
-    ...     partial(ClampedGradientOptimizer, clamp_max=2.8),
-    ...     params=[x1],
-    ...     lr=1.0,
-    ...     param_ndim=None, # we don't want any broadcasting to occur
-    ... )
-    ClampedGradientOptimizer ○ TopQGradientOptim [SGD](
-    Parameter Group 0
-        clamp_max: 2.8
-        clamp_min: None
-        dampening: 0
-        dq: 0.0
-        grad_bias: 0
-        grad_scale: 1
-        lr: 1.0
-        maximize: False
-        momentum: 0
-        nesterov: False
-        param_ndim: None
-        q: 0.33
-        weight_decay: 0
-    )
-
-    Let's verify that `optim` transforms our gradients as-expected.
-
-    >>> (tr.tensor([1.0, 2.0, 3.0]) * x1).sum().backward()
-    >>> optim.step()
-    >>> x1.grad  # element-0 should be zero'd by top-q; element-2 should be clamped to 2.8
-    tensor([0.0000, 2.0000, 2.8000])
-
-    See that `SGD([x1], lr=1.0).step()` is used to update our parameters; this can be
-    controlled via the `InnerOpt` argument.
-
-    >>> x1
-    tensor([ 1.0000, -1.0000, -1.8000], requires_grad=True)
-
-    **Adding Parameter Groups**
-
-    Our chained gradient-transforming optimizers mirror their states with `optim` and
-    `SGD`, thus we can add parameter groups and the group's settings will be applied to
-    our chain as-expected.
-
-    Let's add a 2D parameter, where we want to apply the top-q sparsification row-wise
-    (via `param_ndim=1`), and retain only 64th-percentile gradient elements.
-
-    >>> x2 = tr.ones(2, 3, requires_grad=True)  # shape-(2, 3)
-    >>> optim.add_param_group(dict(params=x2, param_ndim=1, q=0.64))
-    >>> optim
-    ClampedGradientOptimizer ○ TopQGradientOptim [SGD](
-    Parameter Group 0
-        clamp_max: 2.8
-        clamp_min: None
-        dampening: 0
-        dq: 0.0
-        grad_bias: 0
-        grad_scale: 1
-        lr: 1.0
-        maximize: False
-        momentum: 0
-        nesterov: False
-        param_ndim: None
-        q: 0.33
-        weight_decay: 0
-    Parameter Group 1
-        clamp_max: 2.8
-        clamp_min: None
-        dampening: 0
-        dq: 0.0
-        grad_bias: 0
-        grad_scale: 1
-        lr: 1.0
-        maximize: False
-        momentum: 0
-        nesterov: False
-        param_ndim: 1
-        q: 0.64
-
-    >>> optim.zero_grad()
-    >>> (tr.tensor([1.0, 2.0, 3.0]) * (x1 + x2)).sum().backward()
-    >>> optim.step()
-    >>> x1.grad
-    tensor([0.0000, 2.8000, 2.8000])
-    >>> x2.grad
-    tensor([[0.0000, 0.0000, 2.8000],
-        [0.0000, 0.0000, 2.8000]])
     """
 
     def __init__(
@@ -707,7 +592,7 @@ class ChainedGradTransformerOptimizer(GradientTransformerOptimizer):
         defaults: Optional[Dict[str, Any]] = None,
         **inner_opt_kwargs,
     ) -> None:
-        """
+        r"""
         Parameters
         ----------
         *transforming_optimizers: InstantiatesTo[GradientTransformerOptimizer],
@@ -762,6 +647,120 @@ class ChainedGradTransformerOptimizer(GradientTransformerOptimizer):
 
         If `param_ndim=0` then the transformation is applied elementwise to the
         gradient by temporarily reshaping the gradient to a shape-(T, 1) tensor.
+
+        Examples
+        --------
+        **Basic Example**
+
+        Let's chain together two gradient-transforming optimizers supplied by rAI-toolbox:
+        `TopQGradientOptim` and `ClampedGradientOptimizer`
+
+        >>> from rai_toolbox.optim import (
+        ... ChainedGradTransformerOptimizer,
+        ... ClampedGradientOptimizer,
+        ... TopQGradientOptim,
+        ... )
+        >>> import torch as tr
+        >>> from functools import partial
+
+        >>> x1 = tr.ones(3, requires_grad=True)  # shape-(3,)
+
+        Our optimizer will retain only the top-33rd percentile elements in the gradient:
+        the smallest elements will be zero'd. Then the resulting gradient will be
+        clamped so that its largest possible entry is `2.8`. Finally, the standard `SGD`
+        optimizer will be used, with `lr=1.0`, to update the parameter(s) using the
+        transformed gradients.
+
+        We specify `TopQGradientOptim` and then `ClampedGradientOptimizer`; the
+        transformations are applied in order from left to right. Providing per-optimizer
+        defaults is achieved most naturally using :py:func:`functools.partial`.
+
+        >>> optim = ChainedGradTransformerOptimizer(
+        ...     partial(TopQGradientOptim, q=0.33),
+        ...     partial(ClampedGradientOptimizer, clamp_max=2.8),
+        ...     params=[x1],
+        ...     lr=1.0,
+        ...     param_ndim=None, # we don't want any broadcasting to occur
+        ... )
+        ClampedGradientOptimizer ○ TopQGradientOptim [SGD](
+        Parameter Group 0
+            clamp_max: 2.8
+            clamp_min: None
+            dampening: 0
+            dq: 0.0
+            grad_bias: 0
+            grad_scale: 1
+            lr: 1.0
+            maximize: False
+            momentum: 0
+            nesterov: False
+            param_ndim: None
+            q: 0.33
+            weight_decay: 0
+        )
+
+        Let's verify that `optim` transforms our gradients as-expected.
+
+        >>> (tr.tensor([1.0, 2.0, 3.0]) * x1).sum().backward()
+        >>> optim.step()
+        >>> x1.grad  # element-0 should be zero'd by top-q; element-2 should be clamped to 2.8
+        tensor([0.0000, 2.0000, 2.8000])
+
+        See that `SGD([x1], lr=1.0).step()` is used to update our parameters; this can be
+        controlled via the `InnerOpt` argument.
+
+        >>> x1
+        tensor([ 1.0000, -1.0000, -1.8000], requires_grad=True)
+
+        **Adding Parameter Groups**
+
+        Our chained gradient-transforming optimizers mirror their states with `optim` and
+        `SGD`, thus we can add parameter groups and the group's settings will be applied to
+        our chain as-expected.
+
+        Let's add a 2D parameter, where we want to apply the top-q sparsification row-wise
+        (via `param_ndim=1`), and retain only 64th-percentile gradient elements.
+
+        >>> x2 = tr.ones(2, 3, requires_grad=True)  # shape-(2, 3)
+        >>> optim.add_param_group(dict(params=x2, param_ndim=1, q=0.64))
+        >>> optim
+        ClampedGradientOptimizer ○ TopQGradientOptim [SGD](
+        Parameter Group 0
+            clamp_max: 2.8
+            clamp_min: None
+            dampening: 0
+            dq: 0.0
+            grad_bias: 0
+            grad_scale: 1
+            lr: 1.0
+            maximize: False
+            momentum: 0
+            nesterov: False
+            param_ndim: None
+            q: 0.33
+            weight_decay: 0
+        Parameter Group 1
+            clamp_max: 2.8
+            clamp_min: None
+            dampening: 0
+            dq: 0.0
+            grad_bias: 0
+            grad_scale: 1
+            lr: 1.0
+            maximize: False
+            momentum: 0
+            nesterov: False
+            param_ndim: 1
+            q: 0.64
+
+        >>> optim.zero_grad()
+        >>> (tr.tensor([1.0, 2.0, 3.0]) * (x1 + x2)).sum().backward()
+        >>> optim.step()
+        >>> x1.grad
+        tensor([0.0000, 2.8000, 2.8000])
+        >>> x2.grad
+        tensor([[0.0000, 0.0000, 2.8000],
+            [0.0000, 0.0000, 2.8000]])
         """
         self._chain = ()
 
