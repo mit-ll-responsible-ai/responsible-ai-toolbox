@@ -2,44 +2,38 @@
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 
-from abc import ABC, abstractstaticmethod
+from abc import ABC, abstractmethod, abstractstaticmethod
 from collections import defaultdict
 from pathlib import Path
-from typing import Any, Dict, Mapping, Optional, Sequence, Union
+from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 import torch as tr
+from hydra.core.utils import JobReturn
 from hydra_zen import load_from_yaml, make_config
 
 from .hydra import launch, zen
 
 
 class BaseWorkflow(ABC):
-    cfgs: Mapping[str, Any]
+    """ """
+
+    cfgs: List[Any]
     "List of configurations for each Hydra job"
 
     metrics: Dict[str, Any]
     "Dictionary of metrics for across all jobs"
 
-    metric_params: Dict[str, Any]
+    workflow_overrides: Dict[str, Any]
     "Workflow parameters defined additional arguments to ``run``"
+
+    jobs: List[Any]
+    "List of jobs returned for each experiment within the workflow"
+
+    working_dir: str
+    "The working directory of the experiment defined by Hydra's sweep directory (``hydra.sweep.dir``)"
 
     def __init__(self, eval_task_cfg=None) -> None:
         """Workflows and experiments using Hydra.
-
-        Workflows are expected to contain subdirectories of Hydra runs
-        containing the Hydra YAML configuration and any saved metrics
-        file (defined by the evaulation task)::
-
-            ├── working_dir
-            │    ├── <experiment directory name: 0>
-            │    |    ├── <hydra output subdirectory: (default: .hydra)>
-            |    |    |    ├── config.yaml
-            |    |    |    ├── hydra.yaml
-            |    |    |    ├── overrides.yaml
-            │    |    ├── <metrics_filename>
-            │    ├── <experiment directory name: 1>
-            |    |    ...
-
 
         Parameters
         ----------
@@ -51,7 +45,13 @@ class BaseWorkflow(ABC):
         self.eval_task_cfg = (
             eval_task_cfg if eval_task_cfg is not None else make_config()
         )
-        self.validate()
+
+        # initialize attributes
+        self.cfgs = []
+        self.metrics = []
+        self.workflow_overrides = {}
+        self.jobs = []
+        self.working_dir = "."
 
     @abstractstaticmethod
     def evaluation_task(*args: Any, **kwargs: Any) -> Any:
@@ -65,10 +65,8 @@ class BaseWorkflow(ABC):
             |    ├── module
             |    ├── another_config
 
-        The inputs to ``evaluation_task` can be any of the three configurations:
+        The inputs to ``evaluation_task`` can be any of the three configurations:
         ``trainer``, ``module``, or ``another_config`` such as::
-
-        .. code-block:: python
 
             def evaluation_task(trainer: Trainer, module: LightningModule) -> None:
                 trainer.fit(module)
@@ -84,12 +82,12 @@ class BaseWorkflow(ABC):
         working_dir: Optional[str] = None,
         sweeper: Optional[str] = None,
         launcher: Optional[str] = None,
-        overrides: Optional[Sequence[str]] = None,
-        **workflow_params: str,
+        overrides: Optional[List[str]] = None,
+        **workflow_overrides: str,
     ):
         """Run the experiment.
 
-        Individual workflows can expclitly define ``workflow_params`` to improve
+        Individual workflows can expclitly define ``workflow_overrides`` to improve
         readability and undstanding of what parameters are expected for a particular
         workflow.
 
@@ -105,14 +103,16 @@ class BaseWorkflow(ABC):
         launcher: str | None (default: None)
             The configuration name of the Hydra Launcher to use (i.e., the override for ``hydra/launcher=launcher``)
 
-        overrides: Sequence[str] | None (default: None)
+        overrides: List[str] | None (default: None)
             Parameter overrides not considered part of the workflow parameter set.
-            This is helpful for filtering out parameters stored in ``self.metric_params``.
+            This is helpful for filtering out parameters stored in ``self.workflow_overrides``.
 
-        **workflow_params: str
+        **workflow_overrides: str
             These parameters represent the values for configurations to use for the experiment.
             These values will be appeneded to the `overrides` for the Hydra job.
         """
+        self.workflow_overrides = workflow_overrides
+
         if overrides is None:
             overrides = []
         else:
@@ -127,8 +127,14 @@ class BaseWorkflow(ABC):
         if launcher is not None:
             overrides += [f"hydra/launcher={launcher}"]
 
-        for k, v in workflow_params.items():
-            overrides.append(f"{k}={v}")
+        for k, v in workflow_overrides.items():
+            if not isinstance(v, str):
+                raise TypeError(
+                    f"Workflow override parameter {k} must be a string but got {type(v)}"
+                )
+
+            prefix = "+" if not hasattr(self.eval_task_cfg, k) else ""
+            overrides += [prefix + f"{k}={v}"]
 
         # Run a Multirun over epsilons
         (jobs,) = launch(
@@ -138,23 +144,104 @@ class BaseWorkflow(ABC):
             multirun=True,
         )
 
-        if working_dir is not None:
-            self.working_dir = working_dir
-
-        else:
-            # TODO: Is there a better way of getting the directory?
-            # TODO: Raise error or warning if no jobs?
-            if len(jobs) > 0:
-                first_job_working_dir = jobs[0].working_dir
-                workflow_base_dir = Path(first_job_working_dir).parent
-                self.working_dir = workflow_base_dir
-
         self.jobs = jobs
-        self.load_workflow_jobs_(
-            self.working_dir, workflow_params=workflow_params.keys()
+        self.jobs_post_process()
+
+    @abstractmethod
+    def jobs_post_process(self):
+        """Method to extract attributes and metrics relevant to the workflow."""
+
+    def plot(self, **kwargs) -> None:
+        """Plot workflow metrics"""
+        raise NotImplementedError()
+
+    def to_dataframe(self):
+        """Convert workflow data to Pandas DataFrame."""
+        raise NotImplementedError()
+
+    def to_xarray(self):
+        """Convert workflow data to xArray Dataset or DataArray"""
+        raise NotImplementedError()
+
+
+class RobustnessCurve(BaseWorkflow):
+    """Abstract class for workflows that measure performance for different perturbation.
+
+    This workflow requires and uses parameter ``epsilon`` as the configuration option for varying
+    the a perturbation.
+    """
+
+    def run(
+        self,
+        *,
+        epsilon: Union[str, Sequence[float]],
+        working_dir: Optional[str] = None,
+        sweeper: Optional[str] = None,
+        launcher: Optional[str] = None,
+        overrides: Optional[List[str]] = None,
+        **workflow_overrides: str,
+    ):
+        """Run the experiment for varying the perturbation value ``epsilon``.
+
+        Parameters
+        ----------
+        epsilon: str | Sequence[float]
+            The configuration parameter for the perturbation.  Unlike Hydra overrides this
+            parameter can be a list of floats that will be conveted into a multirun sequence
+            override for Hydra.
+
+        working_dir: str (default: None, the Hydra default will be used)
+            The directory to run the experiment in.  This value is used for
+            setting `hydra.sweep.dir`.
+
+        sweeper: str | None (default: None)
+            The configuration name of the Hydra Sweeper to use (i.e., the override for ``hydra/sweeper=sweeper``)
+
+        launcher: str | None (default: None)
+            The configuration name of the Hydra Launcher to use (i.e., the override for ``hydra/launcher=launcher``)
+
+        overrides: List[str] | None (default: None)
+            Parameter overrides not considered part of the workflow parameter set.
+            This is helpful for filtering out parameters stored in ``self.workflow_overrides``.
+
+        **workflow_overrides: str
+            These parameters represent the values for configurations to use for the experiment.
+            These values will be appeneded to the `overrides` for the Hydra job.
+        """
+
+        if not isinstance(epsilon, str):
+            eps_arg = ",".join(str(i) for i in epsilon)
+        else:
+            eps_arg = epsilon
+
+        return super().run(
+            epsilon=eps_arg,
+            working_dir=working_dir,
+            sweeper=sweeper,
+            launcher=launcher,
+            overrides=overrides,
+            **workflow_overrides,
         )
 
-    def load_workflow_jobs_(
+    def jobs_post_process(self):
+        assert len(self.jobs) > 0
+        # TODO: Make protocol type for JobReturn
+        assert isinstance(self.jobs[0], JobReturn)
+
+        # set working directory of this workflow
+        first_job_working_dir = self.jobs[0].working_dir
+        self.working_dir = Path(first_job_working_dir).parent
+
+        # extract configs, overrides, and metrics
+        self.cfgs = [j.cfg for j in self.jobs]
+        job_overrides = [j.hydra_cfg.hydra.overrides.task for j in self.jobs]
+        job_metrics = [j.return_value for j in self.jobs]
+        workflow_params = self.workflow_overrides.keys()
+        self.metrics, self.workflow_overrides = _load_metrics(
+            job_overrides, job_metrics, workflow_params
+        )
+
+    def load_from_dir(
         self,
         working_dir: Union[Path, str],
         config_dir: str = ".hydra",
@@ -180,9 +267,14 @@ class BaseWorkflow(ABC):
                 ``Path(working_dir).glob("**/*/<metrics_filename")``
 
         workflow_params: Sequence[str] | None (default: None)
-            A string of parameters to use for ``metric_params``.  If ``None`` it will
+            A string of parameters to use for ``workflow_params``.  If ``None`` it will
             default to all parameters saved in Hydra's ``overrides.yaml`` file.
         """
+
+        multirun_cfg = Path(working_dir) / "multirun.yaml"
+        assert (
+            multirun_cfg.exists()
+        ), "Working directory does not contain `multirun.yaml` file.  Be sure to use the value of the Hydra sweep directory for the workflow"
 
         # Load saved YAML configurations for each job (in hydra.job.output_subdir)
         job_cfgs = [
@@ -203,114 +295,26 @@ class BaseWorkflow(ABC):
         ]
 
         self.cfgs = job_cfgs
-        self.metric_params = defaultdict(list)
-        self.metrics = defaultdict(list)
-        for task_overrides, metrics in zip(job_overrides, job_metrics):
-            for override in task_overrides:
-                k, v = override.split("=")
-                if workflow_params is None or k in workflow_params:
-                    try:
-                        v = float(v)
-                    except ValueError:
-                        pass
-
-                    self.metric_params[k].append(v)
-
-            for k, v in metrics.items():
-                if isinstance(v, list) and len(v) == 1:
-                    v = v[0]
-                self.metrics[k].append(v)
-
-    def plot(self, **kwargs) -> None:
-        """Plot workflow metrics"""
-        raise NotImplementedError()
-
-    def to_dataframe(self):
-        """Convert workflow data to Pandas DataFrame."""
-        raise NotImplementedError()
-
-    def to_xarray(self):
-        """Convert workflow data to xArray Dataset or DataArray"""
-        raise NotImplementedError()
-
-
-class RobustnessCurve(BaseWorkflow):
-    """Abstract class for workflows that measure performance for different perturbation.
-
-    This workflow requires and uses parameter ``epsilon`` as the configuration option for varying
-    the a perturbation.
-    """
-
-    def run(
-        self,
-        *,
-        epsilon: Union[str, Sequence[float], range],
-        working_dir: Optional[str] = None,
-        sweeper: Optional[str] = None,
-        launcher: Optional[str] = None,
-        overrides: Optional[Sequence[str]] = None,
-        **workflow_params: str,
-    ):
-        """Run the experiment for varying the perturbation value ``epsilon``.
-
-        Parameters
-        ----------
-        epsilon: str | Sequence[float] | range
-            The configuration parameter for the perturbation.  Unlike Hydra overrides this
-            parameter can be a list of floats that will be conveted into a multirun sequence
-            override for Hydra.
-
-        working_dir: str (default: None, the Hydra default will be used)
-            The directory to run the experiment in.  This value is used for
-            setting `hydra.sweep.dir`.
-
-        sweeper: str | None (default: None)
-            The configuration name of the Hydra Sweeper to use (i.e., the override for ``hydra/sweeper=sweeper``)
-
-        launcher: str | None (default: None)
-            The configuration name of the Hydra Launcher to use (i.e., the override for ``hydra/launcher=launcher``)
-
-        overrides: Sequence[str] | None (default: None)
-            Parameter overrides not considered part of the workflow parameter set.
-            This is helpful for filtering out parameters stored in ``self.metric_params``.
-
-        **workflow_params: str
-            These parameters represent the values for configurations to use for the experiment.
-            These values will be appeneded to the `overrides` for the Hydra job.
-        """
-
-        if not isinstance(epsilon, str):
-            eps_arg = ",".join(str(i) for i in epsilon)
-        elif isinstance(epsilon, range):
-            eps_arg = repr(epsilon)
-        else:
-            eps_arg = epsilon
-
-        return super().run(
-            epsilon=eps_arg,
-            working_dir=working_dir,
-            sweeper=sweeper,
-            launcher=launcher,
-            overrides=overrides,
-            **workflow_params,
+        self.metrics, self.workflow_overrides = _load_metrics(
+            job_overrides, job_metrics, workflow_params
         )
 
     def to_dataframe(self):
-        """Convert workflow data to Pandas DataFrame"""
+        """Convert workflow data to Pandas DataFrame."""
         import pandas as pd
 
         d = {}
         d.update(self.metrics)
-        d.update(self.metric_params)
+        d.update(self.workflow_overrides)
         return pd.DataFrame(d).sort_values("epsilon")
 
     def to_xarray(self, dim: str = "x"):
-        """Convert workflow data to xarray Dataset"""
+        """Convert workflow data to xarray Dataset."""
         import xarray as xr
 
         return xr.Dataset(
             {k: ([dim], v) for k, v in self.metrics.items()},
-            coords={k: ([dim], v) for k, v in self.metric_params.items()},
+            coords={k: ([dim], v) for k, v in self.workflow_overrides.items()},
         ).sortby("epsilon")
 
     def plot(
@@ -318,27 +322,77 @@ class RobustnessCurve(BaseWorkflow):
         metric: str,
         ax=None,
         group: Optional[str] = None,
-        dim: str = "x",
-        save_fig: bool = False,
+        save_filename: Optional[str] = None,
         **kwargs,
     ) -> None:
+        """Plot metrics versus ``epsilon``.
+
+        Using the ``xarray.Dataset`` from ``to_xarray``, plot the metrics
+        against the workflow perturbation parameters.
+
+        Parameters
+        ----------
+        metric: str
+            The metric saved
+
+        ax: Axes | None (default: None)
+            If not ``None``, the matplotlib.Axes to use for plotting.
+
+        group: str | None (default: None)
+            Needed if other parameters besides ``epsilon`` were varied. A plot
+
+        save_filename: str | None (default: None)
+            If not ``None`` save figure to the filename provided.
+
+        **kwargs: Any
+            Additional arguments passed to ``xarray.plot``
+        """
         import matplotlib.pyplot as plt
 
         if ax is None:
             _, ax = plt.subplots()
 
-        xdata = self.to_xarray(dim=dim)
+        xdata = self.to_xarray()
         if group is None:
             plots = xdata[metric].plot(x="epsilon", ax=ax, **kwargs)
 
         else:
+            # TODO: xarray.groupby doesn't support multidimensional grouping
             dg = xdata.groupby(group)
             plots = [
                 grp[metric].plot(x="epsilon", label=name, ax=ax, **kwargs)
                 for name, grp in dg
             ]
 
-        if save_fig:
-            plt.savefig("robustness_curve.pdf")
+        if save_filename is not None:
+            plt.savefig(save_filename)
 
         return plots
+
+
+def _load_metrics(
+    job_overrides, job_metrics, workflow_params: Optional[Sequence[str]] = None
+) -> Tuple[Dict[str, List[Any]], Dict[str, List[Any]]]:
+    workflow_overrides = defaultdict(list)
+    metrics = defaultdict(list)
+    for task_overrides, task_metrics in zip(job_overrides, job_metrics):
+        for override in task_overrides:
+            k, v = override.split("=")
+            param = k.split("+")[-1]
+            if workflow_params is None or param in workflow_params:
+                try:
+                    v = float(v)
+                except ValueError:
+                    pass
+
+                # remove any hydra override prefix
+                workflow_overrides[param].append(v)
+
+        for k, v in task_metrics.items():
+            # get item if it's a single element array
+            if isinstance(v, list) and len(v) == 1:
+                v = v[0]
+
+            metrics[k].append(v)
+
+    return metrics, workflow_overrides
