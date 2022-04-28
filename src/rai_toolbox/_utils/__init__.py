@@ -2,7 +2,7 @@
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 from numbers import Real
-from typing import Any, Iterable, Mapping, Optional, Tuple, TypeVar, Union
+from typing import Any, Iterable, Mapping, Optional, Tuple, TypeVar, Union, cast
 
 import torch as tr
 
@@ -39,6 +39,7 @@ def value_check(
     max_: Optional[Union[int, float]] = None,
     incl_min: bool = True,
     incl_max: bool = True,
+    optional: bool = False,
 ) -> T:
     """
     For internal use only.
@@ -71,9 +72,12 @@ def value_check(
     assert isinstance(incl_min, bool), incl_min
     assert isinstance(incl_max, bool), incl_max
 
+    if optional and value is None:
+        return value
+
     if not isinstance(value, type_):
         raise TypeError(
-            f"`{name}` must be of type(s) `{_safe_name(type_)}`, got {value} (type: {_safe_name(type(value))})"
+            f"`{name}` must be {'None or' if optional else ''}of type(s) `{_safe_name(type_)}`, got {value} (type: {_safe_name(type(value))})"
         )
 
     if min_ is not None and max_ is not None:
@@ -107,7 +111,7 @@ def value_check(
         err_msg += f"  Got: {value}"
 
         raise ValueError(err_msg)
-    return value
+    return cast(T, value)
 
 
 def check_param_group_value(
@@ -119,6 +123,7 @@ def check_param_group_value(
     max_: Optional[Union[int, float]] = None,
     incl_min: bool = True,
     incl_max: bool = True,
+    optional: bool = False,
 ) -> None:
     for group in param_groups:
         value_check(
@@ -129,4 +134,5 @@ def check_param_group_value(
             min_=min_,
             incl_min=incl_min,
             incl_max=incl_max,
+            optional=optional,
         )
