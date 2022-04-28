@@ -324,12 +324,12 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
         defaults.setdefault("grad_scale", grad_scale)
         defaults.setdefault("grad_bias", grad_bias)
 
-        if callable(InnerOpt):
+        if instantiates_to(InnerOpt, Optimizer):
             super().__init__(params, defaults)  # type: ignore
-            self.inner_opt = InnerOpt(self.param_groups, **inner_opt_kwargs)
+            self.inner_opt = InnerOpt(self.param_groups, **inner_opt_kwargs)  # type: ignore
         elif isinstance(InnerOpt, Optimizer):
             self.inner_opt = InnerOpt
-            super().__init__(InnerOpt.param_groups, defaults)
+            super().__init__(self.inner_opt.param_groups, defaults)
         else:
             raise TypeError(
                 f"`InnerOpt` must be an Optimizer type or instance, got: {InnerOpt}"
@@ -597,6 +597,7 @@ class ChainedGradTransformerOptimizer(GradientTransformerOptimizer):
     def _inplace_grad_transform_(
         self, param: Tensor, optim_group: DatumParamGroup
     ) -> None:
+        # [f1, f2, f3] -> f3(f2(f1(grad)))
         for opt in self._chain:
             opt._inplace_grad_transform_(param=param, optim_group=optim_group)
 
