@@ -20,16 +20,19 @@ from typing import (
 import torch
 from torch import Tensor
 from torch.optim import SGD, Optimizer
+from typing_extensions import TypedDict
 
+from rai_toolbox._typing import InstantiatesTo
 from rai_toolbox._typing import Optimizer as Opt
-from rai_toolbox._typing import OptimizerType, OptimParams, ParamGroup, Partial
+from rai_toolbox._typing import OptimizerType, OptimParams, Partial, instantiates_to
 
 _T = TypeVar("_T", bound=Optional[Union[Tensor, float]])
 
 __all__ = ["GradientTransformerOptimizer", "ProjectionMixin"]
 
 
-class DatumParamGroup(ParamGroup):
+class DatumParamGroup(TypedDict):
+    params: List[Tensor]
     param_ndim: Optional[int]
     grad_scale: float
     grad_bias: float
@@ -253,8 +256,8 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
 
     def __init__(
         self,
-        params: OptimParams,
-        InnerOpt: Union[Partial[Opt], OptimizerType] = SGD,
+        params: Optional[OptimParams] = None,
+        InnerOpt: Union[Opt, Partial[Opt], OptimizerType] = SGD,
         *,
         param_ndim: Union[int, None] = -1,
         grad_scale: float = 1.0,
@@ -321,11 +324,26 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
         defaults.setdefault("grad_scale", grad_scale)
         defaults.setdefault("grad_bias", grad_bias)
 
-        super().__init__(params, defaults)  # type: ignore
-        self.inner_opt = InnerOpt(self.param_groups, **inner_opt_kwargs)
+        if callable(InnerOpt):
+            super().__init__(params, defaults)  # type: ignore
+            self.inner_opt = InnerOpt(self.param_groups, **inner_opt_kwargs)
+        elif isinstance(InnerOpt, Optimizer):
+            self.inner_opt = InnerOpt
+            super().__init__(InnerOpt.param_groups, defaults)
+        else:
+            raise TypeError(
+                f"`InnerOpt` must be an Optimizer type or instance, got: {InnerOpt}"
+            )
 
         # ensure inner-opt's defaults include those of `self`
-        self.inner_opt.defaults.update(**self.inner_opt.defaults, **self.defaults)
+        self.inner_opt.defaults.update(
+            **{
+                k: v
+                for k, v in self.inner_opt.defaults.items()
+                if k not in self.defaults
+            },
+            **self.defaults,
+        )
 
         # state of `self` must mirror that of inner-opt
         self.__setstate__(self.inner_opt.__getstate__())  # type: ignore
@@ -459,7 +477,7 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
     def step(self, closure=None):
         if closure is not None:
             closure = self._create_gradient_transforming_closure(closure)
-            loss = self.inner_opt.step(closure)
+            loss = self.inner_opt.step(closure)  # type: ignore
         else:
             self._apply_gradient_transforms_()
             self.inner_opt.step()
@@ -541,3 +559,60 @@ class ProjectionMixin(metaclass=ABCMeta):
             for p in group["params"]:
                 p = _to_batch(p, param_ndim)
                 self._project_parameter_(param=p, optim_group=group)
+
+
+class ChainedGradTransformerOptimizer(GradientTransformerOptimizer):
+    def __init__(
+        self,
+        *transforming_optimizers: InstantiatesTo[GradientTransformerOptimizer],
+        params: Optional[OptimParams] = None,
+        InnerOpt: Union[Opt, Partial[Opt], OptimizerType] = SGD,
+        param_ndim: Union[int, None] = -1,
+        grad_scale: float = 1,
+        grad_bias: float = 0,
+        defaults: Optional[Dict[str, Any]] = None,
+        **inner_opt_kwargs,
+    ) -> None:
+        self._chain = ()
+
+        super().__init__(
+            params,
+            InnerOpt,
+            param_ndim=param_ndim,
+            grad_scale=grad_scale,
+            grad_bias=grad_bias,
+            defaults=defaults,
+            **inner_opt_kwargs,
+        )
+        for _opt in transforming_optimizers:
+            if not instantiates_to(_opt, GradientTransformerOptimizer):
+                raise TypeError(
+                    f"*transforming_optimizers must contain `Type[GradientTransformerOptimizer]`, got: {transforming_optimizers}"
+                )
+        self._chain = tuple(
+            opt(params, InnerOpt=self.inner_opt, defaults=self.defaults)
+            for opt in transforming_optimizers
+        )
+
+    def _inplace_grad_transform_(
+        self, param: Tensor, optim_group: DatumParamGroup
+    ) -> None:
+        for opt in self._chain:
+            opt._inplace_grad_transform_(param=param, optim_group=optim_group)
+
+    def __setstate__(self, state: dict):
+        self.inner_opt.__setstate__(state)
+        state = self.inner_opt.__getstate__()  # type: ignore
+        for c in self._chain:
+            c.__setstate__(state)
+        super().__setstate__(state)
+
+    def __repr__(self) -> str:
+        return (
+            super()
+            .__repr__()
+            .replace(
+                type(self).__name__,
+                " ○ ".join(type(c).__name__ for c in self._chain[::-1]),
+            )
+        )
