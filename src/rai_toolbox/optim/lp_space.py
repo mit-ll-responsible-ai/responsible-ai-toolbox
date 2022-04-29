@@ -14,7 +14,7 @@ from rai_toolbox._typing import Optimizer as Opt
 from rai_toolbox._typing import OptimizerType, OptimParams, Partial
 from rai_toolbox._utils import check_param_group_value, value_check
 
-from .array_like import TopQGradientOptimizer
+from .misc import TopQGradientOptimizer
 from .optimizer import (
     REQUIRED,
     ChainedGradTransformerOptimizer,
