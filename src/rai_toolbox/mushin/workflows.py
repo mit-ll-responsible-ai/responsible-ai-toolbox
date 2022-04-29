@@ -11,6 +11,8 @@ import torch as tr
 from hydra.core.utils import JobReturn
 from hydra_zen import load_from_yaml, make_config
 
+from rai_toolbox._utils import value_check
+
 from .hydra import launch, zen
 
 
@@ -95,7 +97,7 @@ class BaseWorkflow(ABC):
         sweeper: Optional[str] = None,
         launcher: Optional[str] = None,
         overrides: Optional[List[str]] = None,
-        **workflow_overrides: str,
+        **workflow_overrides: Union[str, int, float, bool],
     ):
         """Run the experiment.
 
@@ -119,7 +121,7 @@ class BaseWorkflow(ABC):
             Parameter overrides not considered part of the workflow parameter set.
             This is helpful for filtering out parameters stored in ``self.workflow_overrides``.
 
-        **workflow_overrides: str
+        **workflow_overrides: str | int | float | bool
             These parameters represent the values for configurations to use for the experiment.
             These values will be appeneded to the `overrides` for the Hydra job.
         """
@@ -138,10 +140,7 @@ class BaseWorkflow(ABC):
             overrides.append(f"hydra/launcher={launcher}")
 
         for k, v in workflow_overrides.items():
-            if not isinstance(v, str):
-                raise TypeError(
-                    f"Workflow override parameter {k} must be a string but got {type(v)}"
-                )
+            value_check(k, v, type_=(int, float, bool, str))
 
             prefix = "+" if not hasattr(self.eval_task_cfg, k) else ""
             overrides.append(f"{prefix}{k}={v}")

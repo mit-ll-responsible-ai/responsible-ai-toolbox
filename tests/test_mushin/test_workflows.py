@@ -146,20 +146,18 @@ def test_robustnesscurve_load_from_dir():
 @pytest.mark.usefixtures("cleandir")
 @pytest.mark.parametrize("fake_param_string", [True, False])
 def test_robustnesscurve_extra_param(fake_param_string):
+    class BadVal:
+        pass
+
     LocalRobustness = create_workflow()
     task = LocalRobustness(make_config(epsilon=0))
 
     if fake_param_string:
-        fake_param = "h"
-    else:
-        fake_param = 1
-
-    if fake_param_string:
-        task.run(epsilon=[0, 1, 2, 3], fake_param=fake_param)  # type: ignore
+        task.run(epsilon=[0, 1, 2, 3], fake_param="some_value")
         task.plot("result", group="fake_param")
     else:
         with pytest.raises(TypeError):
-            task.run(epsilon=[0, 1, 2, 3], fake_param=fake_param)  # type: ignore
+            task.run(epsilon=[0, 1, 2, 3], fake_param=BadVal)  # type: ignore
 
 
 @pytest.mark.usefixtures("cleandir")
@@ -169,16 +167,11 @@ def test_robustnesscurve_extra_param_multirun(fake_param_string):
     task = LocalRobustness(make_config(epsilon=0))
 
     if fake_param_string:
-        fake_param = "1,2"
-    else:
-        fake_param = [1, 2]
-
-    if fake_param_string:
-        task.run(epsilon=[0, 1, 2, 3], fake_param=fake_param)  # type: ignore
+        task.run(epsilon=[0, 1, 2, 3], fake_param="1,2")
         task.plot("result")
     else:
         with pytest.raises(TypeError):
-            task.run(epsilon=[0, 1, 2, 3], fake_param=fake_param)  # type: ignore
+            task.run(epsilon=[0, 1, 2, 3], fake_param=[1, 2])  # type: ignore
 
 
 @pytest.mark.usefixtures("cleandir")
