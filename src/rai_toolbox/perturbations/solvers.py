@@ -238,9 +238,13 @@ def gradient_ascent(
             losses = criterion(logits, target)
 
             if use_best:
-                losses, xadv = _replace_best(losses, best_loss, xadv, best_x)
+                # we negate the loss when `targeted=True` so min-loss is always best
+                losses, xadv = _replace_best(losses, best_loss, xadv, best_x, min=True)
 
     if not targeted:
+        # The returned loss is always relative to the original criterion.
+        # E.g. an adversarial perturbation with a "low" negated loss will yield
+        # a high loss.
         losses = -1 * losses
     return xadv.detach(), losses.detach()
 

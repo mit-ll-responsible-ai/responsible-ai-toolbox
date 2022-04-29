@@ -7,6 +7,7 @@ from typing import Any
 import numpy as np
 import pytest
 import torch
+import torch as tr
 from hypothesis import given, settings
 from hypothesis import strategies as st
 from hypothesis.extra import numpy as hnp
@@ -376,3 +377,26 @@ def test_gradient_ascent_on_requires_grad_data(is_leaf: bool):
 
     assert x.grad is None
     assert x.requires_grad is True
+
+
+class dummy_stateful_solver:
+    def __init__(self) -> None:
+        self.state = 1
+
+    def __call__(self, targeted: bool):
+        del targeted
+        self.state += 1
+        return tr.tensor([[self.state - 1]]), tr.tensor([[self.state - 1]])
+
+
+@given(repeats=st.integers(1, 10), targeted=st.booleans())
+def test_random_restart_targeted(repeats, targeted: bool):
+
+    fn1 = dummy_stateful_solver()
+    xadv, loss = random_restart(fn1, repeats=repeats)(targeted=targeted)
+    if targeted:
+        assert xadv.item() == 1
+        assert loss.item() == 1
+    else:
+        assert xadv.item() == repeats
+        assert loss.item() == repeats
