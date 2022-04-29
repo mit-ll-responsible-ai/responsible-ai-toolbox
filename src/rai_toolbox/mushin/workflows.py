@@ -406,7 +406,11 @@ def _load_metrics(
             param = k.split("+")[-1]
             if workflow_params is None or param in workflow_params:
                 try:
-                    v = float(v)
+                    val = float(v)
+                    if val.is_integer() and "." not in v:
+                        # v is e.g., 1 or -2. Not 1.0 or -2.0
+                        val = int(v)
+                    v = val
                 except ValueError:
                     pass
 
