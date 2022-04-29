@@ -143,32 +143,34 @@ class TopQGradientOptim(GradientTransformerOptimizer):
 
         if param.grad is None:  # pragma: no cover
             return
+
         q = optim_group["q"]
         dq = optim_group["dq"]
 
-        _qlow = max(0.0, q - dq)
-        _qhigh = min(1.0, q + dq)
+        if dq > 0.0:
+            _qlow = max(0.0, q - dq)
+            _qhigh = min(1.0, q + dq)
 
-        q = (
-            (_qhigh - _qlow) * torch.rand(1, generator=self._generator) + _qlow
-            if dq and (_qlow < q or _qhigh > q)
-            else q
-        )
+            q = float(
+                (_qhigh - _qlow) * torch.rand(1, generator=self._generator) + _qlow
+                if dq and (_qlow < q or _qhigh > q)
+                else q
+            )
 
         # Convert percent to number of entries
         shp = param.grad.shape
-        nb = shp[0]
 
-        num_pix = np.prod(shp[1:])
         num_q = 1.0 - q
-        num_q = max(1, int(num_q * num_pix))
+        num_q = round(num_q * np.prod(shp[1:]))
 
         g = param.grad.flatten(1)
 
-        batch_idx = torch.tensor([[i] * num_q for i in range(nb)])
+        batch_idx = torch.tensor([[i] * num_q for i in range(shp[0])])
 
         _, corners_q = torch.topk(g.abs(), num_q, dim=1)
         s = torch.zeros_like(g)
-        s[batch_idx, corners_q] = g[batch_idx, corners_q]
+
+        if corners_q.numel():
+            s[batch_idx, corners_q] = g[batch_idx, corners_q]
 
         param.grad[...] = s.view(shp)  # type: ignore

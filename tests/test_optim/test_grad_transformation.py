@@ -108,7 +108,7 @@ def test_closure_is_called_by_step(
         partial(L2FrankWolfe, epsilon=1.0, lr=0.5),
         partial(LinfFrankWolfe, epsilon=1.0, lr=0.5),
         partial(ClampedGradientOptimizer, clamp_min=-1e6, lr=0.1),
-        partial(TopQGradientOptim, q=0.5, lr=0.1),
+        partial(TopQGradientOptim, q=0.0, lr=0.1),
     ],
 )
 @pytest.mark.parametrize("device", [tr.device("cpu"), tr.device("cuda", index=0)])
@@ -401,7 +401,7 @@ def test_fw_lr_disabled_lr_sched(start: float, n: int, epsilon: float):
     "Optim, p",
     [
         (L1FrankWolfe, 1),
-        (partial(L1qFrankWolfe, q=1.0), 1),
+        (partial(L1qFrankWolfe, q=0.0), 1),
         (L2FrankWolfe, 2),
         (LinfFrankWolfe, float("inf")),
     ],
@@ -596,7 +596,7 @@ def test_l1q_with_dq_draws_from_user_provided_rng(seed: Optional[int]):
     if seed:
         assert len(saved_grads) == 1
     else:
-        assert len(saved_grads) == 3
+        assert len(saved_grads) == 4
 
 
 @pytest.mark.parametrize(
@@ -605,7 +605,7 @@ def test_l1q_with_dq_draws_from_user_provided_rng(seed: Optional[int]):
         L2NormedGradientOptim,
         L1NormedGradientOptim,
         SignedGradientOptim,
-        partial(L1qNormedGradientOptim, q=1.0),
+        partial(L1qNormedGradientOptim, q=0.0),
         partial(L2ProjectedOptim, epsilon=1e6),
         partial(LinfProjectedOptim, epsilon=1e6),
     ],
