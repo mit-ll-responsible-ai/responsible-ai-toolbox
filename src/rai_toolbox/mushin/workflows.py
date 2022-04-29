@@ -127,17 +127,15 @@ class BaseWorkflow(ABC):
 
         if overrides is None:
             overrides = []
-        else:
-            overrides = overrides
 
         if working_dir is not None:
-            overrides += [f"hydra.sweep.dir={working_dir}"]
+            overrides.append(f"hydra.sweep.dir={working_dir}")
 
         if sweeper is not None:
-            overrides += [f"hydra/sweeper={sweeper}"]
+            overrides.append(f"hydra/sweeper={sweeper}")
 
         if launcher is not None:
-            overrides += [f"hydra/launcher={launcher}"]
+            overrides.append(f"hydra/launcher={launcher}")
 
         for k, v in workflow_overrides.items():
             if not isinstance(v, str):
@@ -146,7 +144,7 @@ class BaseWorkflow(ABC):
                 )
 
             prefix = "+" if not hasattr(self.eval_task_cfg, k) else ""
-            overrides += [prefix + f"{k}={v}"]
+            overrides.append(f"{prefix}{k}={v}")
 
         # Run a Multirun over epsilons
         (jobs,) = launch(
