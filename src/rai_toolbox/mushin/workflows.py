@@ -125,17 +125,22 @@ class BaseWorkflow(ABC):
             setting `hydra.sweep.dir`.
 
         sweeper: str | None (default: None)
-            The configuration name of the Hydra Sweeper to use (i.e., the override for ``hydra/sweeper=sweeper``)
+            The configuration name of the Hydra Sweeper to use (i.e., the override for
+            `hydra/sweeper=sweeper`)
 
         launcher: str | None (default: None)
-            The configuration name of the Hydra Launcher to use (i.e., the override for ``hydra/launcher=launcher``)
+            The configuration name of the Hydra Launcher to use (i.e., the override for
+            `hydra/launcher=launcher`)
 
         overrides: List[str] | None (default: None)
             Parameter overrides not considered part of the workflow parameter set.
-            This is helpful for filtering out parameters stored in ``self.workflow_overrides``.
+            This is helpful for filtering out parameters stored in
+            `self.workflow_overrides`.
 
         **workflow_overrides: dict | str | int | float | bool | multirun | hydra_list
-            These parameters represent the values for configurations to use for the experiment.
+            These parameters represent the values for configurations to use for the
+            experiment.
+
             These values will be appeneded to the `overrides` for the Hydra job.
         """
         self._workflow_overrides = workflow_overrides
@@ -210,26 +215,31 @@ class RobustnessCurve(BaseWorkflow):
         Parameters
         ----------
         epsilon: str | Sequence[float]
-            The configuration parameter for the perturbation.  Unlike Hydra overrides this
-            parameter can be a list of floats that will be conveted into a multirun sequence
-            override for Hydra.
+            The configuration parameter for the perturbation.  Unlike Hydra overrides
+            this parameter can be a list of floats that will be conveted into a
+            multirun sequence override for Hydra.
 
         working_dir: str (default: None, the Hydra default will be used)
             The directory to run the experiment in.  This value is used for
             setting `hydra.sweep.dir`.
 
         sweeper: str | None (default: None)
-            The configuration name of the Hydra Sweeper to use (i.e., the override for ``hydra/sweeper=sweeper``)
+            The configuration name of the Hydra Sweeper to use (i.e., the override for
+            `hydra/sweeper=sweeper`)
 
         launcher: str | None (default: None)
-            The configuration name of the Hydra Launcher to use (i.e., the override for ``hydra/launcher=launcher``)
+            The configuration name of the Hydra Launcher to use (i.e., the override for
+            `hydra/launcher=launcher`)
 
         overrides: List[str] | None (default: None)
             Parameter overrides not considered part of the workflow parameter set.
-            This is helpful for filtering out parameters stored in ``self.workflow_overrides``.
+            This is helpful for filtering out parameters stored in
+            `self.workflow_overrides`.
 
         **workflow_overrides: str
-            These parameters represent the values for configurations to use for the experiment.
+            These parameters represent the values for configurations to use for the
+            experiment.
+
             These values will be appeneded to the `overrides` for the Hydra job.
         """
 
