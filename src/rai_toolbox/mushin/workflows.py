@@ -15,22 +15,33 @@ from .hydra import launch, zen
 
 
 class BaseWorkflow(ABC):
-    """ """
+    """Provides an interface for creating a reusable workflow: encapsulated
+    "boilerplate" for running, aggregating, and analyzing one or more Hydra jobs.
 
-    cfgs: List[Any]
-    "List of configurations for each Hydra job"
+    Attributes
+    ----------
+    cfgs : List[Any]
+        List of configurations for each Hydra job.
 
-    metrics: Dict[str, List[Any]]
-    "Dictionary of metrics for across all jobs"
+    metrics : Dict[str, List[Any]]
+        Dictionary of metrics for across all jobs.
 
-    workflow_overrides: Dict[str, Any]
-    "Workflow parameters defined additional arguments to ``run``"
+    workflow_overrides : Dict[str, Any]
+        Workflow parameters defined additional arguments to `run`.
 
-    jobs: List[Any]
-    "List of jobs returned for each experiment within the workflow"
+    jobs : List[Any]
+        List of jobs returned for each experiment within the workflow.
 
     working_dir: Union[Path, str]
-    "The working directory of the experiment defined by Hydra's sweep directory (``hydra.sweep.dir``)"
+        The working directory of the experiment defined by Hydra's sweep directory
+        (``hydra.sweep.dir``).
+    """
+
+    cfgs: List[Any]
+    metrics: Dict[str, List[Any]]
+    workflow_overrides: Dict[str, Any]
+    jobs: List[Any]
+    working_dir: Union[Path, str]
 
     def __init__(self, eval_task_cfg=None) -> None:
         """Workflows and experiments using Hydra.
@@ -71,6 +82,7 @@ class BaseWorkflow(ABC):
             def evaluation_task(trainer: Trainer, module: LightningModule) -> None:
                 trainer.fit(module)
         """
+        raise NotImplementedError()
 
     def validate(self):
         """Valide the configuration will execute with the user defined evaluation task"""
@@ -167,8 +179,8 @@ class BaseWorkflow(ABC):
 class RobustnessCurve(BaseWorkflow):
     """Abstract class for workflows that measure performance for different perturbation.
 
-    This workflow requires and uses parameter ``epsilon`` as the configuration option for varying
-    the a perturbation.
+    This workflow requires and uses parameter `epsilon` as the configuration option
+    for varying the a perturbation.
     """
 
     def run(
