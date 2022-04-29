@@ -23,6 +23,8 @@ from torch.optim import SGD, Optimizer
 
 from rai_toolbox._typing import Optimizer as Opt
 from rai_toolbox._typing import OptimizerType, OptimParams, ParamGroup, Partial
+from rai_toolbox._utils import to_batch as _to_batch
+from rai_toolbox._utils import validate_param_ndim as _validate_param_ndim
 
 _T = TypeVar("_T", bound=Optional[Union[Tensor, float]])
 
@@ -37,103 +39,6 @@ class DatumParamGroup(ParamGroup):
 
 def _shares_memory(x: Tensor, y: Tensor) -> bool:
     return x.storage().data_ptr() == y.storage().data_ptr()
-
-
-def _reshape_to_batch(x: Tensor, param_ndim: Optional[int]) -> Tensor:
-    """Reshapes to a shape-`(N, d1, ..., dm)`, where `(d1, ..., dm)` has `param_ndim`
-    dimensions. Dimensions will be added or consolidated to achieve this."""
-    if param_ndim is None:
-        param_ndim = x.ndim
-
-    if param_ndim < 0:
-        param_ndim += x.ndim
-
-    # `1 + param_ndim` is the required dimensionality
-    # for a shape-(N, d0, d1, ...) tensor, where (d0, d1, ...)
-    # is the shape of the param_ndim-dimension tensor.
-    #
-    # We compute `ndim_delta` to determine if we need to add
-    # or consolidate dimensions to create the shape-(N, d0, d1, ...)
-    # tensor.
-    ndim_delta = (1 + param_ndim) - x.ndim
-
-    if ndim_delta > 0:
-        # E.g.:
-        #   p.shape: (d0, )
-        #   desired shape: (N=1, d0)
-        x = x[ndim_delta * (None,)]
-    elif ndim_delta < 0:
-        # E.g.:
-        #   p.shape: (d0, d1, d2, d3)
-        #   desired shape: (N=d0*d1, d2, d3)
-        x = x.view(-1, *x.shape[x.ndim - param_ndim :])
-    if x.ndim < 2:  # make at least 2D
-        # (N,) -> (N, 1)
-        x = x.view(*x.shape, *(1,) * (2 - x.ndim))
-    return x
-
-
-def _to_batch(p: Tensor, param_ndim: Optional[int]) -> Tensor:
-    """
-    Returns a view of `p`, reshaped as shape-(N, d0, ...) where (d0, ...)
-    has `param_ndim` entries.
-
-    See Parameters for further description
-
-    Parameters
-    ----------
-    p : Tensor
-
-    param_ndim: Optional[int]
-        Determines the shape of the resulting parameter
-
-        - A positive number determines the dimensionality of the tensor that the transformation will act on.
-        - A negative number indicates the 'offset' from the dimensionality of the tensor.
-        - `None` means that the transformation will be applied to the tensor without any broadcasting.
-
-    Returns
-    -------
-    reshaped_p: Tensor
-
-    Examples
-    --------
-    >>> import torch as tr
-    >>> x = tr.rand((3, 5, 2))
-
-    >>> _to_batch(x, 0).shape
-    torch.Size([30, 1])
-
-    >>> _to_batch(x, 1).shape
-    torch.Size([15, 2])
-
-    >>> _to_batch(x, 2).shape
-    torch.Size([3, 5, 2])
-
-    >>> _to_batch(x, None).shape
-    torch.Size([1, 3, 5, 2])
-
-    >>> _to_batch(x, -1).shape
-    torch.Size([3, 5, 2])
-
-    >>> _to_batch(x, -2).shape
-    torch.Size([15, 2])
-
-    >>> _to_batch(x, -3).shape
-    torch.Size([30, 1])
-    """
-
-    # atleast_2d needed for case where p was scalar
-    vp = _reshape_to_batch(p, param_ndim=param_ndim)
-
-    if p.grad is not None:
-        vp.grad = _reshape_to_batch(p.grad, param_ndim=param_ndim)
-
-    # vp (vp.grad) must be a view of p (p.grad). There is
-    # not a simple way to assert this.
-
-    # our views must be size-preserving
-    assert torch.numel(vp) == torch.numel(p)
-    return vp
 
 
 class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
@@ -347,12 +252,7 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
 
             for p in group["params"]:
                 p: Tensor
-                if param_ndim is not None and p.ndim < abs(param_ndim):
-                    raise ValueError(
-                        f"`param_ndim={param_ndim}` specified for parameter "
-                        f"with ndim={p.ndim} is not valid. `abs(param_ndim) <= "
-                        f"ndim` must hold."
-                    )
+                _validate_param_ndim(param_ndim=param_ndim, p=p)
 
     def state_dict(self) -> dict:
         return self.inner_opt.state_dict()

@@ -5,19 +5,30 @@
 import pytest
 import torch as tr
 
+from rai_toolbox import to_batch
 from rai_toolbox.perturbations.init import (
     uniform_like_l1_n_ball_,
     uniform_like_l2_n_ball_,
 )
 
 
-@pytest.mark.parametrize("dshape", [(1,), (2,), (5,), (2, 3), (5, 2, 3)])
-def test_uniform_like_l2_n_ball(dshape):
+@pytest.mark.parametrize(
+    "dshape, param_ndim",
+    [
+        [(500, 1), -1],
+        [(500,), 0],
+        [(500, 2), -1],
+        [(500, 5), -1],
+        [(500, 2, 3), -1],
+        [(500, 5, 2, 3), -1],
+    ],
+)
+def test_uniform_like_l2_n_ball(dshape, param_ndim):
     # Test adapted from: https://github.com/nengo/nengo/blob/master/nengo/tests/test_dists.py
-    samples = tr.zeros(500, *dshape)
-    uniform_like_l2_n_ball_(samples)
+    samples = tr.zeros(dshape)
+    uniform_like_l2_n_ball_(samples, param_ndim=param_ndim)
 
-    samples = samples.flatten(1)
+    samples = to_batch(samples, param_ndim).flatten(1)
     n, d = samples.shape
     assert tr.allclose(samples.mean(dim=0), tr.tensor(0.0), atol=0.1)
 

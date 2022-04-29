@@ -18,6 +18,7 @@ from rai_toolbox._typing import (
     Partial,
     instantiates_to,
 )
+from rai_toolbox._utils import value_check
 from rai_toolbox._utils.stateful import evaluating, frozen
 from rai_toolbox.perturbations import AdditivePerturbation, PerturbationModel
 
@@ -245,14 +246,14 @@ def gradient_ascent(
 
 
 def random_restart(
-    perturber: Callable[..., Tuple[Tensor, Tensor]],
+    solver: Callable[..., Tuple[Tensor, Tensor]],
     repeats: int,
 ) -> Callable[..., Tuple[Tensor, Tensor]]:
-    """Executes a perturbation function multiple times saving out the best perturbation.
+    """Executes a solver function multiple times saving out the best perturbation.
 
     Parameters
     ----------
-    perturber : Callable[..., Tuple[Tensor, Tensor]]
+    solver : Callable[..., Tuple[Tensor, Tensor]]
         The perturbation function, e.g., projected_gradient_perturbation.
 
     repeats : int
@@ -262,37 +263,31 @@ def random_restart(
     -------
     random_restart_fn : Callable[..., Tuple[Tensor, Tensor]]
         Wrapped function that will execute `perturber` `repeats` times.
-
     """
-    if repeats < 1:
-        raise ValueError(f"expected times >= 1, got {repeats}")
+    value_check("repeats", repeats, min_=1, incl_min=True)
 
-    @functools.wraps(perturber)
+    @functools.wraps(solver)
     def random_restart_fn(*args, **kwargs) -> Tuple[Tensor, Tensor]:
         targeted = kwargs.get("targeted", False)
-        use_best = kwargs.get("use_best", False)
+
         best_x = None
         best_loss = None
 
         for _ in range(repeats):
             # run the attack
-            xadv, losses = perturber(*args, **kwargs)
+            xadv, losses = solver(*args, **kwargs)
 
             # Save best loss for each data point
-            if use_best:
-                best_loss, best_x = _replace_best(
-                    loss=losses,
-                    best_loss=best_loss,
-                    data=xadv,
-                    best_data=best_x,
-                    min=targeted,
-                )
-            else:
-                best_loss = losses
-                best_x = xadv
+            best_loss, best_x = _replace_best(
+                loss=losses,
+                best_loss=best_loss,
+                data=xadv,
+                best_data=best_x,
+                min=targeted,
+            )
 
-        assert isinstance(best_x, Tensor)
-        assert isinstance(best_loss, Tensor)
+        assert best_x is not None
+        assert best_loss is not None
         return best_x, best_loss
 
     return random_restart_fn
