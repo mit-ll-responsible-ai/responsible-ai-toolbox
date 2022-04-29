@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 from abc import ABC, abstractmethod, abstractstaticmethod
-from collections import defaultdict
+from collections import UserList, defaultdict
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
@@ -14,6 +14,19 @@ from hydra_zen import load_from_yaml, make_config
 from rai_toolbox._utils import value_check
 
 from .hydra import launch, zen
+
+
+class multirun(UserList):
+    """Signals that a sequence is to be iterated over in a multirun"""
+
+    pass
+
+
+class hydra_list(UserList):
+    """Signals that a sequence is provided as a single configured value (i.e. it is not
+    to be iterated over during a multirun)"""
+
+    pass
 
 
 class BaseWorkflow(ABC):
@@ -97,7 +110,7 @@ class BaseWorkflow(ABC):
         sweeper: Optional[str] = None,
         launcher: Optional[str] = None,
         overrides: Optional[List[str]] = None,
-        **workflow_overrides: Union[str, int, float, bool],
+        **workflow_overrides: Union[str, int, float, bool, multirun, hydra_list],
     ):
         """Run the experiment.
 
@@ -121,7 +134,7 @@ class BaseWorkflow(ABC):
             Parameter overrides not considered part of the workflow parameter set.
             This is helpful for filtering out parameters stored in ``self.workflow_overrides``.
 
-        **workflow_overrides: str | int | float | bool
+        **workflow_overrides: dict | str | int | float | bool | multirun | hydra_list
             These parameters represent the values for configurations to use for the experiment.
             These values will be appeneded to the `overrides` for the Hydra job.
         """
@@ -140,7 +153,9 @@ class BaseWorkflow(ABC):
             overrides.append(f"hydra/launcher={launcher}")
 
         for k, v in workflow_overrides.items():
-            value_check(k, v, type_=(int, float, bool, str))
+            value_check(k, v, type_=(int, float, bool, str, multirun, hydra_list))
+            if isinstance(v, multirun):
+                v = ",".join(str(item) for item in v)
 
             prefix = "+" if not hasattr(self.eval_task_cfg, k) else ""
             overrides.append(f"{prefix}{k}={v}")
@@ -219,12 +234,10 @@ class RobustnessCurve(BaseWorkflow):
         """
 
         if not isinstance(epsilon, str):
-            eps_arg = ",".join(str(i) for i in epsilon)
-        else:
-            eps_arg = epsilon
+            epsilon = multirun(epsilon)
 
         return super().run(
-            epsilon=eps_arg,
+            epsilon=epsilon,
             working_dir=working_dir,
             sweeper=sweeper,
             launcher=launcher,
