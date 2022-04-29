@@ -632,7 +632,7 @@ class L1qNormedGradientOptim(ChainedGradTransformerOptimizer):
 
         q : float
             Specifies the (fractional) percentile of absolute-largest gradient elements
-            to retain when sparsifying the gradient. E.g `q=0.9`means that only the
+            to retain when sparsifying the gradient. E.g `q=0.9` means that only the
             gradient elements within the 90th-percentile will be retained.
 
             Must be within `[0.0, 1.0]`. The sparsification is applied to the gradient
