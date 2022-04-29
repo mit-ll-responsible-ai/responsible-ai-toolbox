@@ -14,8 +14,9 @@ from rai_toolbox._typing import Optimizer as Opt
 from rai_toolbox._typing import OptimizerType, OptimParams, Partial
 from rai_toolbox._utils import check_param_group_value, value_check
 
-from .array_like import TopQGradientOptim
+from .array_like import TopQGradientOptimizer
 from .optimizer import (
+    REQUIRED,
     ChainedGradTransformerOptimizer,
     DatumParamGroup,
     GradientTransformerOptimizer,
@@ -156,10 +157,10 @@ class SignedGradientOptim(GradientTransformerOptimizer):
         params: OptimParams,
         InnerOpt: Union[Partial[Opt], OptimizerType] = SGD,
         *,
-        param_ndim: Optional[int] = None,
         grad_scale: float = 1.0,
         grad_bias: float = 0.0,
         defaults: Optional[Dict[str, Any]] = None,
+        param_ndim: Optional[int] = None,
         **inner_opt_kwargs,
     ) -> None:
         r"""
@@ -172,18 +173,6 @@ class SignedGradientOptim(GradientTransformerOptimizer):
             The optimizer that updates the parameters after their gradients have
             been transformed.
 
-        param_ndim : Optional[int]
-            Controls how `_inplace_grad_transform_` is broadcast onto the gradient
-            of a given parameter. This can be specified per param-group. By default,
-            the gradient transformation broadcasts over the first dimension in a
-            batch-like style.
-
-            - A positive number determines the dimensionality of the gradient that the transformation will act on.
-            - A negative number indicates the 'offset' from the dimensionality of the gradient. E.g. `-1` leads to batch-style broadcasting.
-            - `None` means that the transformation will be applied directly to the gradient without any broadcasting.
-
-            See `GradientTransformerOptimizer` for more details and examples
-
         grad_scale : float, optional (default=1.0)
             Multiplies each gradient in-place after the in-place transformation is
             performed. This can be specified per param-group.
@@ -193,6 +182,10 @@ class SignedGradientOptim(GradientTransformerOptimizer):
             performed. This can be specified per param-group.
 
         defaults : Optional[Dict[str, Any]]
+
+        param_ndim : Optional[int]
+            Controls how `_inplace_grad_transform_` is broadcast onto the gradient
+            of a given parameter. This has no effect for `SignedGradientOptim`.
             Specifies default parameters for all parameter groups.
 
         **inner_opt_kwargs : Any
@@ -608,6 +601,7 @@ class L1qNormedGradientOptim(ChainedGradTransformerOptimizer):
     --------
     L1NormedGradientOptim
     L2NormedGradientOptim
+    TopQGradientOptimizer
     GradientTransformerOptimizer
     """
 
@@ -616,7 +610,7 @@ class L1qNormedGradientOptim(ChainedGradTransformerOptimizer):
         params: OptimParams,
         InnerOpt: Union[Partial[Opt], OptimizerType] = SGD,
         *,
-        q: float,
+        q: float = REQUIRED,
         dq: float = 0.0,
         param_ndim: Union[int, None] = -1,
         grad_scale: float = 1.0,
@@ -707,7 +701,7 @@ class L1qNormedGradientOptim(ChainedGradTransformerOptimizer):
         Performing a simple calculation with `x` and performing backprop to create
         a gradient.
 
-        >>> (tr.tensor([0.0, 1.0, 2.0]) * x).sum().backward()
+        >>> x.backward(gradient=tr.tensor([0.0, 1.0, 2.0]))
         >>> x.grad # the original gradient
         tensor([0., 1., 2.])
 
@@ -721,7 +715,7 @@ class L1qNormedGradientOptim(ChainedGradTransformerOptimizer):
         """
         super().__init__(
             SignedGradientOptim,
-            partial(TopQGradientOptim, q=q, dq=dq, generator=generator),
+            partial(TopQGradientOptimizer, q=q, dq=dq, generator=generator),
             partial(L1NormedGradientOptim, div_by_zero_eps=div_by_zero_eps),
             params=params,
             InnerOpt=InnerOpt,

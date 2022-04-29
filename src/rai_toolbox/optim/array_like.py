@@ -15,6 +15,8 @@ from rai_toolbox._utils import check_param_group_value, value_check
 
 from .optimizer import REQUIRED, DatumParamGroup, GradientTransformerOptimizer
 
+__all__ = ["ClampedGradientOptimizer", "TopQGradientOptimizer"]
+
 
 class ClampedParamGroup(DatumParamGroup):
     clamp_min: Optional[float]
@@ -36,6 +38,7 @@ class ClampedGradientOptimizer(GradientTransformerOptimizer):
         clamp_min: Optional[float] = None,
         clamp_max: Optional[float] = None,
         defaults: Optional[Dict[str, Any]] = None,
+        param_ndim: Optional[int] = None,
         **inner_opt_kwargs,
     ) -> None:
         """
@@ -70,6 +73,11 @@ class ClampedGradientOptimizer(GradientTransformerOptimizer):
         defaults : Optional[Dict[str, Any]]
             Specifies default parameters for all parameter groups.
 
+        param_ndim : Optional[int]
+            Controls how `_inplace_grad_transform_` is broadcast onto the gradient
+            of a given parameter. This has no effect for `ClampedGradientOptimizer`.
+            Specifies default parameters for all parameter groups.
+
         **inner_opt_kwargs : Any
             Named arguments used to initialize `InnerOpt`.
 
@@ -81,11 +89,10 @@ class ClampedGradientOptimizer(GradientTransformerOptimizer):
         >>> x = tr.ones(2, requires_grad=True)
         >>> optim = ClampedGradientOptimizer(params=[x], lr=1.0, clamp_min=-1.0, clamp_max=3.0)
 
-        >>> (x * tr.tensor([-0.5, 10])).sum().backward()
+        >>> x.backward(gradient=tr.tensor([-0.5, 10]))
         >>> optim.step()
         >>> x.grad
         tensor([-0.5000,  3.0000])
-
         >>> x
         tensor([ 1.5000, -2.0000], requires_grad=True)
         """
@@ -93,7 +100,13 @@ class ClampedGradientOptimizer(GradientTransformerOptimizer):
             defaults = {}
         defaults.setdefault("clamp_min", clamp_min)
         defaults.setdefault("clamp_max", clamp_max)
-        super().__init__(params, InnerOpt, defaults=defaults, **inner_opt_kwargs)
+        super().__init__(
+            params,
+            InnerOpt,
+            defaults=defaults,
+            param_ndim=param_ndim,
+            **inner_opt_kwargs,
+        )
 
         for group in self.param_groups:
             if group["clamp_min"] is None and group["clamp_max"] is None:
@@ -115,7 +128,16 @@ class ClampedGradientOptimizer(GradientTransformerOptimizer):
         param.grad.clamp_(min=optim_group["clamp_min"], max=optim_group["clamp_max"])
 
 
-class TopQGradientOptim(GradientTransformerOptimizer):
+class TopQGradientOptimizer(GradientTransformerOptimizer):
+    """A gradient-tranforming  optimizer that zeros the elements of a gradient whose
+    absolue magnitudes fall below the Qth percentile. `InnerOp.step` is then to update
+    the corresponding parameter.
+
+    See Also
+    --------
+    L1qNormedGradientOptim
+    GradientTransformerOptimizer"""
+
     def __init__(
         self,
         params: OptimParams,
@@ -129,6 +151,144 @@ class TopQGradientOptim(GradientTransformerOptimizer):
         **inner_opt_kwargs,
     ):
 
+        r"""
+        Parameters
+        ----------
+        params : Sequence[Tensor] | Iterable[Mapping[str, Any]]
+            Iterable of parameters or dicts defining parameter groups.
+
+        InnerOpt : Type[Optimizer] | Partial[Optimizer], optional (default=`torch.nn.optim.SGD`)
+            The optimizer that updates the parameters after their gradients have
+            been transformed.
+
+        q : float
+            Specifies the (fractional) percentile of absolute-largest gradient elements
+            to retain when sparsifying the gradient. E.g `q=0.9` means that only the
+            gradient elements within the 90th-percentile will be retained.
+
+            Must be within `[0.0, 1.0]`. The sparsification is applied to the gradient
+            in accordance to `param_ndim`.
+
+        dq : float, optional (default=0.0)
+            If specified, the sparsity factor for each gradient transformation will
+            be drawn from a uniform distribution over :math:`[q - dq, q + dq] \in [0.0, 1.0]`.
+
+        param_ndim : Union[int, None], optional (default=-1)
+            Controls how `_inplace_grad_transform_` is broadcast onto the gradient
+            of a given parameter. This can be specified per param-group. By default,
+            the gradient transformation broadcasts over the first dimension in a
+            batch-like style.
+
+            - A positive number determines the dimensionality of the gradient that the transformation will act on.
+            - A negative number indicates the 'offset' from the dimensionality of the gradient. E.g. `-1` leads to batch-style broadcasting.
+            - `None` means that the transformation will be applied directly to the gradient without any broadcasting.
+
+            See `GradientTransformerOptimizer` for more details and examples
+
+        grad_scale : float, optional (default=1.0)
+            Multiplies each gradient in-place after the in-place transformation is
+            performed. This can be specified per param-group.
+
+        grad_bias : float, optional (default=0.0)
+            Added to each gradient in-place after the in-place transformation is
+            performed. This can be specified per param-group.
+
+        defaults : Optional[Dict[str, Any]]
+            Specifies default parameters for all parameter groups.
+
+        generator : torch.Generator, optional (default=`torch.default_generator`)
+            Controls the RNG source.
+
+        **inner_opt_kwargs : Any
+            Named arguments used to initialize `InnerOpt`.
+
+        Examples
+        --------
+        Let's use `TopQGradientOptimizer` along with a standard SGD-step with a learning
+        rate of `1.0`. We'll sparsify the gradient of a 2D parameter using varying
+        percentile values. We set `param_ndim=None` so that no broadcasting occurs.
+
+        >>> import torch as tr
+        >>> from rai_toolbox.optim import TopQGradientOptim
+
+        >>> gradient = tr.tensor([[0.5,   1.0],
+        ...                       [-2.5, 0.30]])
+        >>> for q in [0.0, 0.25, 0.5, 0.75, 1.0]:
+        ...     x = tr.ones((2, 2), requires_grad=True)
+        ...     optim = TopQGradientOptim(params=[x], lr=1.0, q=q, param_ndim=None)
+        ...     x.backward(gradient=gradient)
+        ...     optim.step()
+        ...     print(f"grad (q={q})\n{x.grad}\nx:\n{x}\n---")
+        grad (q=0.0)
+        tensor([[ 0.5000,  1.0000],
+                [-2.5000,  0.3000]])
+        x:
+        tensor([[0.5000, 0.0000],
+                [3.5000, 0.7000]], requires_grad=True)
+        ---
+        grad (q=0.25)
+        tensor([[ 0.5000,  1.0000],
+                [-2.5000,  0.0000]])
+        x:
+        tensor([[0.5000, 0.0000],
+                [3.5000, 1.0000]], requires_grad=True)
+        ---
+        grad (q=0.5)
+        tensor([[ 0.0000,  1.0000],
+                [-2.5000,  0.0000]])
+        x:
+        tensor([[1.0000, 0.0000],
+                [3.5000, 1.0000]], requires_grad=True)
+        ---
+        grad (q=0.75)
+        tensor([[ 0.0000,  0.0000],
+                [-2.5000,  0.0000]])
+        x:
+        tensor([[1.0000, 1.0000],
+                [3.5000, 1.0000]], requires_grad=True)
+        ---
+        grad (q=1.0)
+        tensor([[0., 0.],
+                [0., 0.]])
+        x:
+        tensor([[1., 1.],
+                [1., 1.]], requires_grad=True)
+        ---
+
+        We'll repeat this exercise using `param_ndim=1` so that the top-Q
+        sparsification is applied to each row independently (i.e. it is "broadcast"
+        over each 1D sub-tensor in our gradient).
+
+        >>> gradient = tr.tensor([[0.5,   1.0],
+        ...                       [-2.5, 0.30]])
+        >>> for q in [0.0, 0.5, 1.0]:
+        ...     x = tr.ones((2, 2), requires_grad=True)
+        ...     optim = TopQGradientOptim(params=[x], lr=1.0, q=q, param_ndim=1)
+        ...     x.backward(gradient=gradient)
+        ...     optim.step()
+        ...     print(f"grad (q={q})\n{x.grad}\nx:\n{x}\n---")
+        grad (q=0.0)
+        tensor([[ 0.5000,  1.0000],
+                [-2.5000,  0.3000]])
+        x:
+        tensor([[0.5000, 0.0000],
+                [3.5000, 0.7000]], requires_grad=True)
+        ---
+        grad (q=0.5)
+        tensor([[ 0.0000,  1.0000],
+                [-2.5000,  0.0000]])
+        x:
+        tensor([[1.0000, 0.0000],
+                [3.5000, 1.0000]], requires_grad=True)
+        ---
+        grad (q=1.0)
+        tensor([[0., 0.],
+                [0., 0.]])
+        x:
+        tensor([[1., 1.],
+                [1., 1.]], requires_grad=True)
+        ---
+        """
         if defaults is None:
             defaults = {}
         defaults.setdefault("q", q)
@@ -176,13 +336,11 @@ class TopQGradientOptim(GradientTransformerOptimizer):
         num_q = round(num_q * np.prod(shp[1:]))
 
         g = param.grad.flatten(1)
-
-        batch_idx = torch.tensor([[i] * num_q for i in range(shp[0])])
-
-        _, corners_q = torch.topk(g.abs(), num_q, dim=1)
         s = torch.zeros_like(g)
 
-        if corners_q.numel():
+        if num_q:
+            _, corners_q = torch.topk(g.abs(), num_q, dim=1)
+            batch_idx = torch.tensor([[i] * num_q for i in range(shp[0])])
             s[batch_idx, corners_q] = g[batch_idx, corners_q]
 
         param.grad[...] = s.view(shp)  # type: ignore

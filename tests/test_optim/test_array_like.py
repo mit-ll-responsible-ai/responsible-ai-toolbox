@@ -9,7 +9,7 @@ import torch as tr
 from hypothesis import assume, given, note
 from torch.testing import assert_allclose
 
-from rai_toolbox.optim import ClampedGradientOptimizer, TopQGradientOptim
+from rai_toolbox.optim import ClampedGradientOptimizer, TopQGradientOptimizer
 
 
 @given(
@@ -43,7 +43,7 @@ def test_top_q_grad(q):
     expected[: round(q * 10)] = 0
 
     x = tr.ones_like(grad, requires_grad=True)
-    optim = TopQGradientOptim(params=[x], q=q, lr=1.0, param_ndim=None)
+    optim = TopQGradientOptimizer(params=[x], q=q, lr=1.0, param_ndim=None)
 
     (x * grad).sum().backward()
     optim.step()
