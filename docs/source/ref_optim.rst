@@ -36,9 +36,9 @@ Optimizers with Normed Gradients
    L1qNormedGradientOptim
 
 
-***************************************************
-Miscellaneous with Gradient-Transforming Optimizers
-***************************************************
+**********************************************
+Miscellaneous Gradient-Transforming Optimizers
+**********************************************
 .. currentmodule:: rai_toolbox.optim
 
 .. autosummary::
