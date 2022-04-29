@@ -5,8 +5,10 @@
 from pathlib import Path
 
 import matplotlib.pyplot as plt
+import pandas as pd
 import pytest
 import torch as tr
+import xarray as xr
 from hydra_zen import make_config
 
 from rai_toolbox.mushin.workflows import BaseWorkflow, RobustnessCurve, _load_metrics
@@ -111,13 +113,11 @@ def test_robustnesscurve_to_data():
     task.run(epsilon=[0, 1, 2, 3])
 
     df = task.to_dataframe()
-    import pandas as pd
 
     assert isinstance(df, pd.DataFrame)
     assert len(df["epsilon"]) == 4
 
     xd = task.to_xarray()
-    import xarray as xr
 
     assert isinstance(xd, xr.Dataset)
     assert len(xd["epsilon"]) == 4
