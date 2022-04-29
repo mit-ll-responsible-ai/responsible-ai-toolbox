@@ -70,13 +70,25 @@ class ClampedGradientOptimizer(GradientTransformerOptimizer):
         defaults : Optional[Dict[str, Any]]
             Specifies default parameters for all parameter groups.
 
-        div_by_zero_eps : float, optional (default=`torch.finfo(torch.float32).tiny`)
-            A lower bound used to clamp the normalization factor to prevent div-by-zero.
-
         **inner_opt_kwargs : Any
             Named arguments used to initialize `InnerOpt`.
 
-        Examples"""
+        Examples
+        --------
+        Let's clamp each element of the parameter's gradient to `[-1, 3]` prior to
+        performing a step with `SGD` using a learning rate of `1.0`.
+
+        >>> x = tr.ones(2, requires_grad=True)
+        >>> optim = ClampedGradientOptimizer(params=[x], lr=1.0, clamp_min=-1.0, clamp_max=3.0)
+
+        >>> (x * tr.tensor([-0.5, 10])).sum().backward()
+        >>> optim.step()
+        >>> x.grad
+        tensor([-0.5000,  3.0000])
+
+        >>> x
+        tensor([ 1.5000, -2.0000], requires_grad=True)
+        """
         if defaults is None:
             defaults = {}
         defaults.setdefault("clamp_min", clamp_min)
