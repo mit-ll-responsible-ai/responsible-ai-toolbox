@@ -141,7 +141,7 @@ class BaseWorkflow(ABC):
             These parameters represent the values for configurations to use for the
             experiment.
 
-            These values will be appeneded to the `overrides` for the Hydra job.
+            These values will be appended to the `overrides` for the Hydra job.
         """
         self._workflow_overrides = workflow_overrides
 
@@ -162,7 +162,13 @@ class BaseWorkflow(ABC):
             if isinstance(v, multirun):
                 v = ",".join(str(item) for item in v)
 
-            prefix = "+" if not hasattr(self.eval_task_cfg, k) else ""
+            prefix = ""
+            if (
+                not hasattr(self.eval_task_cfg, k)
+                or getattr(self.eval_task_cfg, k) is None
+            ):
+                prefix = "+"
+
             overrides.append(f"{prefix}{k}={v}")
 
         # Run a Multirun over epsilons
@@ -196,8 +202,22 @@ class BaseWorkflow(ABC):
 class RobustnessCurve(BaseWorkflow):
     """Abstract class for workflows that measure performance for different perturbation.
 
-    This workflow requires and uses parameter `epsilon` as the configuration option
-    for varying the a perturbation.
+    This workflow requires and uses parameter ``epsilon`` as the configuration option for varying
+    the a perturbation.
+
+    This workflow creates subdirectories of by using Hydra.  These directories
+    contain the Hydra YAML configuration and any saved metrics file (defined by the evaulation task)::
+
+        ├── working_dir
+        │    ├── <experiment directory name: 0>
+        │    |    ├── <hydra output subdirectory: (default: .hydra)>
+        |    |    |    ├── config.yaml
+        |    |    |    ├── hydra.yaml
+        |    |    |    ├── overrides.yaml
+        │    |    ├── <metrics_filename>
+        │    ├── <experiment directory name: 1>
+        |    |    ...
+
     """
 
     def run(
@@ -208,7 +228,7 @@ class RobustnessCurve(BaseWorkflow):
         sweeper: Optional[str] = None,
         launcher: Optional[str] = None,
         overrides: Optional[List[str]] = None,
-        **workflow_overrides: str,
+        **workflow_overrides: Union[str, int, float, bool, multirun, hydra_list],
     ):
         """Run the experiment for varying the perturbation value ``epsilon``.
 
@@ -236,7 +256,7 @@ class RobustnessCurve(BaseWorkflow):
             This is helpful for filtering out parameters stored in
             `self.workflow_overrides`.
 
-        **workflow_overrides: str
+        **workflow_overrides: dict | str | int | float | bool | multirun | hydra_list
             These parameters represent the values for configurations to use for the
             experiment.
 
@@ -387,7 +407,7 @@ class RobustnessCurve(BaseWorkflow):
 
         xdata = self.to_xarray()
         if group is None:
-            plots = xdata[metric].plot(x="epsilon", ax=ax, **kwargs)  # type: ignore
+            plots = xdata[metric].plot.line(x="epsilon", ax=ax, **kwargs)
 
         else:
             # TODO: xarray.groupby doesn't support multidimensional grouping
