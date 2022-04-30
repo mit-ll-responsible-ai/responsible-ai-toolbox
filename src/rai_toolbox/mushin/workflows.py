@@ -128,11 +128,6 @@ class BaseWorkflow(ABC):
             overrides += [f"hydra/launcher={launcher}"]
 
         for k, v in workflow_overrides.items():
-            if not isinstance(v, str):
-                raise TypeError(
-                    f"Workflow override parameter {k} must be a string but got {type(v)}"
-                )
-
             prefix = "+" if not hasattr(self.eval_task_cfg, k) else ""
             overrides += [prefix + f"{k}={v}"]
 
@@ -355,7 +350,7 @@ class RobustnessCurve(BaseWorkflow):
 
         xdata = self.to_xarray()
         if group is None:
-            plots = xdata[metric].plot(x="epsilon", ax=ax, **kwargs)  # type: ignore
+            plots = xdata[metric].plot.line(x="epsilon", ax=ax, **kwargs)  # type: ignore
 
         else:
             # TODO: xarray.groupby doesn't support multidimensional grouping
