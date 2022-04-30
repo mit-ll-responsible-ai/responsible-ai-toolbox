@@ -110,7 +110,7 @@ class BaseWorkflow(ABC):
         sweeper: Optional[str] = None,
         launcher: Optional[str] = None,
         overrides: Optional[List[str]] = None,
-        **workflow_overrides: Union[str, int, float, bool, multirun, hydra_list],
+        **workflow_overrides: Union[str, int, float, bool, dict, multirun, hydra_list],
     ):
         """Run the experiment.
 
@@ -137,9 +137,13 @@ class BaseWorkflow(ABC):
             This is helpful for filtering out parameters stored in
             `self.workflow_overrides`.
 
-        **workflow_overrides: dict | str | int | float | bool | multirun | hydra_list
+        **workflow_overrides: str | int | float | bool | multirun | hydra_list | dict
             These parameters represent the values for configurations to use for the
             experiment.
+
+            Passing `param=multirun([1, 2, 3])` will perform a multirun over those
+            three param values, whereas passing `param=hydra_list([1, 2, 3])` will
+            pass the entire list as a single input.
 
             These values will be appended to the `overrides` for the Hydra job.
         """
@@ -158,7 +162,7 @@ class BaseWorkflow(ABC):
             overrides.append(f"hydra/launcher={launcher}")
 
         for k, v in workflow_overrides.items():
-            value_check(k, v, type_=(int, float, bool, str, multirun, hydra_list))
+            value_check(k, v, type_=(int, float, bool, str, dict, multirun, hydra_list))
             if isinstance(v, multirun):
                 v = ",".join(str(item) for item in v)
 
