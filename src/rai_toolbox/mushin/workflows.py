@@ -203,6 +203,17 @@ class BaseWorkflow(ABC):
         raise NotImplementedError()
 
 
+def _num_from_string(str_input: str) -> Union[str, int, float]:
+    try:
+        val = float(str_input)
+        if val.is_integer() and "." not in str_input:
+            # v is e.g., 1 or -2. Not 1.0 or -2.0
+            val = int(str_input)
+        return val
+    except ValueError:
+        return str_input
+
+
 class RobustnessCurve(BaseWorkflow):
     """Abstract class for workflows that measure performance for different perturbation.
 
@@ -240,7 +251,7 @@ class RobustnessCurve(BaseWorkflow):
         ----------
         epsilon: str | Sequence[float]
             The configuration parameter for the perturbation.  Unlike Hydra overrides
-            this parameter can be a list of floats that will be conveted into a
+            this parameter can be a list of floats that will be converted into a
             multirun sequence override for Hydra.
 
         working_dir: str (default: None, the Hydra default will be used)
@@ -437,18 +448,10 @@ def _load_metrics(
     for task_overrides, task_metrics in zip(job_overrides, job_metrics):
         for override in task_overrides:
             k, v = override.split("=")
+            # remove any hydra override prefix
             param = k.split("+")[-1]
             if workflow_params is None or param in workflow_params:
-                try:
-                    val = float(v)
-                    if val.is_integer() and "." not in v:
-                        # v is e.g., 1 or -2. Not 1.0 or -2.0
-                        val = int(v)
-                    v = val
-                except ValueError:
-                    pass
-
-                # remove any hydra override prefix
+                v = _num_from_string(v)
                 workflow_overrides[param].append(v)
 
         for k, v in task_metrics.items():
