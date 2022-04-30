@@ -7,13 +7,17 @@ from collections import UserList, defaultdict
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
+import numpy as np
 import torch as tr
 from hydra.core.utils import JobReturn
 from hydra_zen import load_from_yaml, make_config
+from typing_extensions import TypeAlias
 
 from rai_toolbox._utils import value_check
 
 from .hydra import launch, zen
+
+LoadedVal: TypeAlias = Union[str, int, float]
 
 
 class multirun(UserList):
@@ -55,6 +59,7 @@ class BaseWorkflow(ABC):
     cfgs: List[Any]
     metrics: Dict[str, List[Any]]
     workflow_overrides: Dict[str, Any]
+    multirun_task_overrides: Dict[str, Union[Sequence[LoadedVal], LoadedVal]]
     jobs: List[Any]
     working_dir: Union[Path, str]
 
@@ -76,6 +81,7 @@ class BaseWorkflow(ABC):
         self.cfgs = []
         self.metrics = {}
         self.workflow_overrides = {}
+        self.multirun_task_overrides = {}
         self.jobs = []
         self.working_dir = "."
 
@@ -203,7 +209,7 @@ class BaseWorkflow(ABC):
         raise NotImplementedError()
 
 
-def _num_from_string(str_input: str) -> Union[str, int, float]:
+def _num_from_string(str_input: str) -> LoadedVal:
     try:
         val = float(str_input)
         if val.is_integer() and "." not in str_input:
@@ -282,12 +288,14 @@ class RobustnessCurve(BaseWorkflow):
             epsilon = multirun(epsilon)
 
         return super().run(
-            epsilon=epsilon,
             working_dir=working_dir,
             sweeper=sweeper,
             launcher=launcher,
             overrides=overrides,
             **workflow_overrides,
+            # for multiple multi-run params, epsilon should fastest-varying param;
+            # i.e. epsilon should be the trailing dim in the multi-dim array of results
+            epsilon=epsilon,
         )
 
     def jobs_post_process(self):
@@ -300,11 +308,28 @@ class RobustnessCurve(BaseWorkflow):
         assert first_job_working_dir is not None
         self.working_dir = Path(first_job_working_dir).parent
 
+        # e.g. {'epsilon': [1.0, 2.0, 3.0], "foo": "apple"}
+        self.multirun_task_overrides = {}
+
+        for entry in load_from_yaml(
+            self.working_dir / "multirun.yaml"
+        ).hydra.overrides.task:
+            entry: str  # e.g. +epsilon=1.0,3.0,2.0
+            param_name, val = entry.split("=", 1)
+            if "," in val:
+                val = [_num_from_string(v) for v in val.split(",")]
+            else:
+                val = _num_from_string(val)
+
+            param_name = param_name.split("+")[-1]
+            self.multirun_task_overrides[param_name] = val
+
         # extract configs, overrides, and metrics
         self.cfgs = [j.cfg for j in self.jobs]
         job_overrides = [j.hydra_cfg.hydra.overrides.task for j in self.jobs]
         job_metrics = [j.return_value for j in self.jobs]
         workflow_params = list(self._workflow_overrides.keys())
+
         self.metrics, self.workflow_overrides = _load_metrics(
             job_overrides, job_metrics, workflow_params
         )
@@ -376,14 +401,40 @@ class RobustnessCurve(BaseWorkflow):
         d.update(self.workflow_overrides)
         return pd.DataFrame(d).sort_values("epsilon")
 
-    def to_xarray(self, dim: str = "x"):
+    def to_xarray(self):
         """Convert workflow data to xarray Dataset."""
         import xarray as xr
 
-        return xr.Dataset(
-            {k: ([dim], v) for k, v in self.metrics.items()},
-            coords={k: ([dim], v) for k, v in self.workflow_overrides.items()},
-        ).sortby("epsilon")
+        orig_coords = {
+            k: v for k, v in self.multirun_task_overrides.items() if isinstance(v, list)
+        }
+
+        # non-multirun overrides
+        attrs = {
+            k: v
+            for k, v in self.multirun_task_overrides.items()
+            if not isinstance(v, list)
+        }
+
+        # we will add additional coordinates as-needed for multi-dim metrics
+        coords: Dict[str, Any] = orig_coords.copy()
+        shape = tuple(len(v) for v in coords.values())
+
+        data = {}
+        for k, v in self.metrics.items():
+            datum = np.asarray(v).reshape(shape + np.asarray(v[0]).shape)
+            n = 0
+            for n in range(datum.ndim - len(coords)):
+                # Create additional arbitrary coordinates as-needed for non-scalar
+                # metrics
+                coords[f"{k}_dim{n}"] = np.arange(datum.shape[len(orig_coords) + n])
+
+            data[k] = (
+                list(orig_coords)
+                + [f"{k}_dim{i}" for i in range(datum.ndim - len(shape))],
+                datum,
+            )
+        return xr.Dataset(coords=coords, data_vars=data, attrs=attrs).sortby("epsilon")
 
     def plot(
         self,

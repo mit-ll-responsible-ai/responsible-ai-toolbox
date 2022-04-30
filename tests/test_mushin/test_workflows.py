@@ -6,6 +6,7 @@ from pathlib import Path
 
 import hypothesis.strategies as st
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 import pytest
 import torch as tr
@@ -14,7 +15,12 @@ from hydra_zen import make_config
 from hypothesis import given, settings
 from hypothesis.extra.numpy import array_shapes, arrays
 
-from rai_toolbox.mushin.workflows import BaseWorkflow, RobustnessCurve, _load_metrics
+from rai_toolbox.mushin.workflows import (
+    BaseWorkflow,
+    RobustnessCurve,
+    _load_metrics,
+    multirun,
+)
 
 common_shape = array_shapes(min_dims=2, max_dims=2)
 
@@ -228,3 +234,37 @@ def test_load_metrics(workflow_params):
         assert "param_1" in overs
     else:
         assert "param_1" not in overs
+
+
+class MultiDimMetrics(RobustnessCurve):
+    # returns     "images" -> shape-(4, 1)
+    #         "accuracies" -> scalar
+    @staticmethod
+    def evaluation_task(epsilon):
+        val = 100 - epsilon**2
+
+        result = dict(images=[[val] * 1] * 4, accuracies=val + 2)
+        return result
+
+
+@pytest.mark.usefixtures("cleandir")
+def test_robustness_with_multidim_metrics():
+    wf = MultiDimMetrics()
+    wf.run(epsilon=[1.0, 3.0, 2.0], foo="val", bar=multirun(["a", "b"]))
+    xarray = wf.to_xarray()
+    assert list(xarray.data_vars.keys()) == ["images", "accuracies"]
+    assert list(xarray.coords.keys()) == [
+        "bar",
+        "epsilon",
+        "images_dim0",
+        "images_dim1",
+    ]
+    assert xarray.accuracies.shape == (2, 3)
+    assert xarray.images.shape == (2, 3, 4, 1)
+    assert xarray.attrs == {"foo": "val"}
+
+    for eps, expected in zip([1.0, 2.0, 3.0], [99.0, 96.0, 91.0]):
+        # test that results were organized as-expected
+        sub_xray = xarray.sel(epsilon=eps)
+        assert np.all(sub_xray.accuracies == expected + 2).item()
+        assert np.all(sub_xray.images == expected).item()
