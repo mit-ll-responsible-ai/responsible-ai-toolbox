@@ -73,11 +73,13 @@ def test_robustnesscurve_validate():
         task.validate()
 
 
-@settings(deadline=None, max_examples=5)
 @pytest.mark.usefixtures("cleandir")
-@pytest.mark.parametrize("config", [None, make_config(epsilon=0)])
-@given(epsilon=epsilons, as_array=st.booleans())
-def test_robustnesscurve_run(config, as_array, epsilon):
+@pytest.mark.parametrize(
+    "config", [None, make_config(epsilon=0), make_config(epsilon=None)]
+)
+@pytest.mark.parametrize("as_array", [True, False])
+def test_robustnesscurve_run(config, as_array):
+    epsilon = [0, 1, 2, 3.0]
     LocalRobustness = create_workflow(as_array)
     task = LocalRobustness(config)
     task.run(epsilon=epsilon)
@@ -171,9 +173,10 @@ def test_robustnesscurve_extra_param(fake_param_string):
     else:
         fake_param = 1
 
-    task.run(epsilon=[0, 1, 2, 3], fake_param=fake_param)  # type: ignore
+    task.run(epsilon=[0, 1, 2, 3], fake_param=fake_param)
     assert "fake_param" in task.workflow_overrides
     assert task.workflow_overrides["fake_param"] == [fake_param] * 4
+    task.plot("result", group="fake_param")
 
 
 @pytest.mark.usefixtures("cleandir")
@@ -189,7 +192,7 @@ def test_robustnesscurve_extra_param_multirun(fake_param_string):
         # just `fake_param=[1,2]`
         fake_param = [1, 2]
 
-    task.run(epsilon=[0, 1, 2, 3], fake_param=fake_param)  # type: ignore
+    task.run(epsilon=[0, 1, 2, 3], fake_param=fake_param)
     assert "fake_param" in task.workflow_overrides
 
     num_jobs = 4 * 2 if fake_param_string else 4

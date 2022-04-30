@@ -9,9 +9,9 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 import torch as tr
 from hydra.core.utils import JobReturn
-from hydra_zen import load_from_yaml, make_config, launch
+from hydra_zen import load_from_yaml, make_config
 
-from .hydra import zen
+from .hydra import launch, zen
 
 
 class BaseWorkflow(ABC):
@@ -83,7 +83,7 @@ class BaseWorkflow(ABC):
         sweeper: Optional[str] = None,
         launcher: Optional[str] = None,
         overrides: Optional[List[str]] = None,
-        **workflow_overrides: str,
+        **workflow_overrides: Any,
     ):
         """Run the experiment.
 
@@ -107,7 +107,7 @@ class BaseWorkflow(ABC):
             Parameter overrides not considered part of the workflow parameter set.
             This is helpful for filtering out parameters stored in ``self.workflow_overrides``.
 
-        **workflow_overrides: str
+        **workflow_overrides: Any
             These parameters represent the values for configurations to use for the experiment.
             These values will be appeneded to the `overrides` for the Hydra job.
         """
@@ -128,7 +128,13 @@ class BaseWorkflow(ABC):
             overrides += [f"hydra/launcher={launcher}"]
 
         for k, v in workflow_overrides.items():
-            prefix = "+" if not hasattr(self.eval_task_cfg, k) else ""
+            prefix = ""
+            if (
+                not hasattr(self.eval_task_cfg, k)
+                or getattr(self.eval_task_cfg, k) is None
+            ):
+                prefix = "+"
+
             overrides += [prefix + f"{k}={v}"]
 
         # Run a Multirun over epsilons
