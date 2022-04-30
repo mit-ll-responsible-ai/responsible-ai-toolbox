@@ -9,9 +9,9 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 import torch as tr
 from hydra.core.utils import JobReturn
-from hydra_zen import load_from_yaml, make_config
+from hydra_zen import load_from_yaml, make_config, launch
 
-from .hydra import launch, zen
+from .hydra import zen
 
 
 class BaseWorkflow(ABC):
@@ -164,6 +164,20 @@ class RobustnessCurve(BaseWorkflow):
 
     This workflow requires and uses parameter ``epsilon`` as the configuration option for varying
     the a perturbation.
+
+    This workflow creates subdirectories of by using Hydra.  These directories
+    contain the Hydra YAML configuration and any saved metrics file (defined by the evaulation task)::
+
+        ├── working_dir
+        │    ├── <experiment directory name: 0>
+        │    |    ├── <hydra output subdirectory: (default: .hydra)>
+        |    |    |    ├── config.yaml
+        |    |    |    ├── hydra.yaml
+        |    |    |    ├── overrides.yaml
+        │    |    ├── <metrics_filename>
+        │    ├── <experiment directory name: 1>
+        |    |    ...
+
     """
 
     def run(
@@ -174,7 +188,7 @@ class RobustnessCurve(BaseWorkflow):
         sweeper: Optional[str] = None,
         launcher: Optional[str] = None,
         overrides: Optional[List[str]] = None,
-        **workflow_overrides: str,
+        **workflow_overrides: Any,
     ):
         """Run the experiment for varying the perturbation value ``epsilon``.
 
@@ -199,7 +213,7 @@ class RobustnessCurve(BaseWorkflow):
             Parameter overrides not considered part of the workflow parameter set.
             This is helpful for filtering out parameters stored in ``self.workflow_overrides``.
 
-        **workflow_overrides: str
+        **workflow_overrides: Any
             These parameters represent the values for configurations to use for the experiment.
             These values will be appeneded to the `overrides` for the Hydra job.
         """
@@ -350,7 +364,7 @@ class RobustnessCurve(BaseWorkflow):
 
         xdata = self.to_xarray()
         if group is None:
-            plots = xdata[metric].plot.line(x="epsilon", ax=ax, **kwargs)  # type: ignore
+            plots = xdata[metric].plot.line(x="epsilon", ax=ax, **kwargs)
 
         else:
             # TODO: xarray.groupby doesn't support multidimensional grouping
