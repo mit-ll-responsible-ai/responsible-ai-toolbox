@@ -711,20 +711,20 @@ class ChainedGradTransformerOptimizer(GradientTransformerOptimizer):
         >>> x1.grad  # element-0 should be zero'd by top-q; element-2 should be clamped to 2.8
         tensor([0.0000, 2.0000, 2.8000])
 
-        See that `SGD([x1], lr=1.0).step()` is used to update our parameters; this can be
-        controlled via the `InnerOpt` argument.
+        See that `SGD([x1], lr=1.0).step()` is used to update our parameters; this can be controlled via the `InnerOpt` argument.
 
         >>> x1
         tensor([ 1.0000, -1.0000, -1.8000], requires_grad=True)
 
         **Adding Parameter Groups**
 
-        Our chained gradient-transforming optimizers mirror their states with `optim` and
-        `SGD`, thus we can add parameter groups and the group's settings will be applied to
-        our chain as-expected.
+        Our chained gradient-transforming optimizers mirror their states with `optim` 
+        and `SGD`, thus we can add parameter groups and the group's settings will be 
+        applied to our chain as-expected.
 
-        Let's add a 2D parameter, where we want to apply the top-q sparsification row-wise
-        (via `param_ndim=1`), and retain only 64th-percentile gradient elements.
+        Let's add a 2D parameter, where we want to apply the top-q sparsification 
+        row-wise (via `param_ndim=1`), and retain only 64th-percentile gradient 
+        elements.
 
         >>> x2 = tr.ones(2, 3, requires_grad=True)  # shape-(2, 3)
         >>> optim.add_param_group(dict(params=x2, param_ndim=1, q=0.64))
