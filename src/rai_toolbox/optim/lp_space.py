@@ -330,7 +330,7 @@ class L2NormedGradientOptim(_LpNormOptimizer):
     _p: Final = 2
 
 
-class L2ProjectedOptim(L2NormedGradientOptim, ProjectionMixin):
+class L2ProjectedOptim(ProjectionMixin, L2NormedGradientOptim):
     r"""A gradient-tranforming optimizer that constrains the updated parameters
     to lie within an :math:`\epsilon`-sized ball in :math:`L^2` space centered on the
     origin.
@@ -355,7 +355,7 @@ class L2ProjectedOptim(L2NormedGradientOptim, ProjectionMixin):
         params: OptimParams,
         InnerOpt: Union[Partial[Opt], OptimizerType] = SGD,
         *,
-        epsilon: float,
+        epsilon: float = REQUIRED,
         param_ndim: Union[int, None] = -1,
         grad_scale: float = 1.0,
         grad_bias: float = 0.0,
@@ -464,14 +464,8 @@ class L2ProjectedOptim(L2NormedGradientOptim, ProjectionMixin):
         """Applies an in-place projection on the given parameter"""
         param.renorm_(p=self.p, dim=0, maxnorm=optim_group["epsilon"])
 
-    @torch.no_grad()
-    def step(self, closure=None):
-        loss = super().step(closure)
-        self.project()
-        return loss
 
-
-class LinfProjectedOptim(SignedGradientOptim, ProjectionMixin):
+class LinfProjectedOptim(ProjectionMixin, SignedGradientOptim):
     r"""A gradient-tranforming optimizer that constrains the updated parameter values to fall within :math:`[-\epsilon, \epsilon]`.
 
     A step with this optimizer takes the elementwise sign of a parameter's gradient
@@ -491,7 +485,7 @@ class LinfProjectedOptim(SignedGradientOptim, ProjectionMixin):
         params: OptimParams,
         InnerOpt: Union[Partial[Opt], OptimizerType] = SGD,
         *,
-        epsilon: float,
+        epsilon: float = REQUIRED,
         param_ndim=None,
         grad_scale: float = 1.0,
         grad_bias: float = 0.0,
@@ -560,10 +554,9 @@ class LinfProjectedOptim(SignedGradientOptim, ProjectionMixin):
         >>> x  # the updated parameter
         tensor([-1.8000,  1.5000], requires_grad=True)
         """
-        assert epsilon >= 0
         if defaults is None:
             defaults = {}
-        defaults["epsilon"] = defaults.get("epsilon", epsilon)
+        defaults.setdefault("epsilon", epsilon)
 
         super().__init__(
             params,
@@ -581,11 +574,6 @@ class LinfProjectedOptim(SignedGradientOptim, ProjectionMixin):
         epsilon = optim_group["epsilon"]
         param.clamp_(min=-epsilon, max=epsilon)
 
-    @torch.no_grad()
-    def step(self, closure=None):
-        loss = super().step(closure)
-        self.project()
-        return loss
 
 
 class L1qNormedGradientOptim(ChainedGradTransformerOptimizer):

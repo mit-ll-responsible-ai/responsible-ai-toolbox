@@ -495,16 +495,21 @@ class GradientTransformerOptimizer(Optimizer, metaclass=ABCMeta):
 
 
 class ProjectionMixin(metaclass=ABCMeta):
-    """A mixin that adds a parameter-projection method to an optimizer.
+    """A mixin that adds a parameter-projection method to an optimizer. Calling the 
+    optimizer's step method will subsequently apply `_project_parameter_` to each 
+    updated parameter in-place.
 
     Calling `.project()` will apply the in-place projection on each parameter
     stored by the optimizer.
+
+    This mixin must be used to the left of the optimizer class whose `step` method is 
+    being relied on.
 
     Notes
     -----
     'param_ndim' can be included in the optimizer's param groups in order to describe
     how the projection should be applied to each parameter (i.e., whether or not
-    it is broadcasted).
+    it is broadcasted). Otherwise `param_ndim` is assumed to be `None`.
 
     - A positive number determines the dimensionality of the tensor that the projection will act on.
     - A negative number indicates the 'offset' from the dimensionality of the tensor.
@@ -512,6 +517,7 @@ class ProjectionMixin(metaclass=ABCMeta):
 
     Methods
     -------
+    project
     _project_parameter_
 
     Examples
@@ -521,15 +527,10 @@ class ProjectionMixin(metaclass=ABCMeta):
 
     >>> import torch as tr
     >>> from rai_toolbox.optim import ProjectionMixin
-    >>> class ClampedSGD(tr.optim.SGD, ProjectionMixin):
+    >>> class ClampedSGD(ProjectionMixin, tr.optim.SGD):
     ...     def _project_parameter_(self, param: tr.Tensor, optim_group: dict) -> None:
     ...         param.clamp_(min=-1.0, max=1.0)  # note: projection operates in-place
-    ...
-    ...     @tr.no_grad()
-    ...     def step(self, closure=None):
-    ...         loss = super().step(closure)
-    ...         self.project()
-    ...         return loss
+
 
     >>> x = tr.tensor([-0.1, 0.1], requires_grad=True)
     >>> optim = ClampedSGD([x], lr=1.0)
@@ -555,7 +556,13 @@ class ProjectionMixin(metaclass=ABCMeta):
         This operation should *always* be designed to broadcast over the leading
         dimension of the tensor. That is, each parameter gradient should be assumed
         to have the shape-(N, d0, ...) and the transformation should be applied -
-        in-place - to each shape-(d0, ...) sub-tensor."""
+        in-place - to each shape-(d0, ...) sub-tensor.
+        
+        Prior to calling `_in_place_grad_transform_`, `ProjectionMixin`
+        will temporarily reshape each parameter and its gradient to have the appropriate
+        shape – in accordance with the value specified for `param_ndim` – such that
+        the shape (d0, ...) contains `|param_ndim|` entries.
+        """
         raise NotImplementedError()
 
     @torch.no_grad()
@@ -567,6 +574,14 @@ class ProjectionMixin(metaclass=ABCMeta):
             for p in group["params"]:
                 p = _to_batch(p, param_ndim)
                 self._project_parameter_(param=p, optim_group=group)
+
+    @torch.no_grad()
+    def step(self, closure=None):
+        """Applies the optimizer step on each parameter, and then projects each 
+        parameter in-place."""
+        loss = super().step(closure)  # type: ignore
+        self.project()
+        return loss
 
 
 class ChainedGradTransformerOptimizer(GradientTransformerOptimizer):
