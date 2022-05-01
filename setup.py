@@ -27,7 +27,7 @@ INSTALL_REQUIRES = [
     "torchvision >= 0.10.0",
     "torch >= 1.9.0",
     "torchmetrics >= 0.6.0",
-    "typing-extensions >= 3.10.0.1",
+    "typing-extensions >= 4.1.1",
 ]
 TESTS_REQUIRE = [
     "pytest >= 3.8",
