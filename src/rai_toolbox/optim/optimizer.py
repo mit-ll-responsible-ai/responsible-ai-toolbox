@@ -718,12 +718,12 @@ class ChainedGradTransformerOptimizer(GradientTransformerOptimizer):
 
         **Adding Parameter Groups**
 
-        Our chained gradient-transforming optimizers mirror their states with `optim` 
-        and `SGD`, thus we can add parameter groups and the group's settings will be 
+        Our chained gradient-transforming optimizers mirror their states with `optim`
+        and `SGD`, thus we can add parameter groups and the group's settings will be
         applied to our chain as-expected.
 
-        Let's add a 2D parameter, where we want to apply the top-q sparsification 
-        row-wise (via `param_ndim=1`), and retain only 64th-percentile gradient 
+        Let's add a 2D parameter, where we want to apply the top-q sparsification
+        row-wise (via `param_ndim=1`), and retain only 64th-percentile gradient
         elements.
 
         >>> x2 = tr.ones(2, 3, requires_grad=True)  # shape-(2, 3)
