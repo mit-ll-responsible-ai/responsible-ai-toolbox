@@ -51,7 +51,7 @@ class BaseWorkflow(ABC):
     jobs : List[Any]
         List of jobs returned for each experiment within the workflow.
 
-    working_dir: Union[Path, str]
+    working_dir: pathlib.Path
         The working directory of the experiment defined by Hydra's sweep directory
         (`hydra.sweep.dir`).
     """
@@ -59,9 +59,8 @@ class BaseWorkflow(ABC):
     cfgs: List[Any]
     metrics: Dict[str, List[Any]]
     workflow_overrides: Dict[str, Any]
-    multirun_task_overrides: Dict[str, Union[Sequence[LoadedValue], LoadedValue]]
     jobs: List[Any]
-    working_dir: Union[Path, str]
+    working_dir: Path
 
     def __init__(self, eval_task_cfg=None) -> None:
         """Workflows and experiments using Hydra.
@@ -81,9 +80,29 @@ class BaseWorkflow(ABC):
         self.cfgs = []
         self.metrics = {}
         self.workflow_overrides = {}
-        self.multirun_task_overrides = {}
+        self._multirun_task_overrides = {}
         self.jobs = []
-        self.working_dir = "."
+        self.working_dir = Path.cwd()  # TODO: I don't think we should assume this
+
+    @property
+    def multirun_task_overrides(
+        self,
+    ) -> Dict[str, Union[LoadedValue, Sequence[LoadedValue]]]:
+        # e.g. {'epsilon': [1.0, 2.0, 3.0], "foo": "apple"}
+        if not self._multirun_task_overrides:
+            for entry in load_from_yaml(
+                self.working_dir / "multirun.yaml"
+            ).hydra.overrides.task:
+                entry: str  # e.g. +epsilon=1.0,3.0,2.0
+                param_name, val = entry.split("=", 1)
+                if "," in val:
+                    val = [_num_from_string(v) for v in val.split(",")]
+                else:
+                    val = _num_from_string(val)
+
+                param_name = param_name.split("+")[-1]
+                self._multirun_task_overrides[param_name] = val
+        return self._multirun_task_overrides
 
     @abstractstaticmethod
     def evaluation_task(*args: Any, **kwargs: Any) -> Any:
@@ -316,22 +335,6 @@ class RobustnessCurve(BaseWorkflow):
         assert first_job_working_dir is not None
         self.working_dir = Path(first_job_working_dir).parent
 
-        # e.g. {'epsilon': [1.0, 2.0, 3.0], "foo": "apple"}
-        self.multirun_task_overrides = {}
-
-        for entry in load_from_yaml(
-            self.working_dir / "multirun.yaml"
-        ).hydra.overrides.task:
-            entry: str  # e.g. +epsilon=1.0,3.0,2.0
-            param_name, val = entry.split("=", 1)
-            if "," in val:
-                val = [_num_from_string(v) for v in val.split(",")]
-            else:
-                val = _num_from_string(val)
-
-            param_name = param_name.split("+")[-1]
-            self.multirun_task_overrides[param_name] = val
-
         # extract configs, overrides, and metrics
         self.cfgs = [j.cfg for j in self.jobs]
         job_overrides = [j.hydra_cfg.hydra.overrides.task for j in self.jobs]
@@ -348,7 +351,7 @@ class RobustnessCurve(BaseWorkflow):
         config_dir: str = ".hydra",
         metrics_filename: str = "test_metrics.pt",
         workflow_params: Optional[Sequence[str]] = None,
-    ) -> None:
+    ):
         """Loading workflow job data from a given working directory.
 
         Parameters
@@ -371,6 +374,7 @@ class RobustnessCurve(BaseWorkflow):
             A string of parameters to use for `workflow_params`.  If `None` it will
             default to all parameters saved in Hydra's `overrides.yaml` file.
         """
+        self.working_dir = Path(working_dir).resolve()
 
         multirun_cfg = Path(working_dir) / "multirun.yaml"
         assert (
@@ -399,6 +403,7 @@ class RobustnessCurve(BaseWorkflow):
         self.metrics, self.workflow_overrides = _load_metrics(
             job_overrides, job_metrics, workflow_params
         )
+        return self
 
     def to_dataframe(self):
         """Convert workflow data to Pandas DataFrame."""

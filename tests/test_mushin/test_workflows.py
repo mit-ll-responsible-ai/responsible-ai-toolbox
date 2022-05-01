@@ -14,6 +14,7 @@ import xarray as xr
 from hydra_zen import make_config
 from hypothesis import given, settings
 from hypothesis.extra.numpy import array_shapes, arrays
+from xarray.testing import assert_identical
 
 from rai_toolbox.mushin.workflows import (
     BaseWorkflow,
@@ -241,8 +242,8 @@ class MultiDimMetrics(RobustnessCurve):
     @staticmethod
     def evaluation_task(epsilon):
         val = 100 - epsilon**2
-
         result = dict(images=[[val] * 1] * 4, accuracies=val + 2)
+        tr.save(result, "test_metrics.pt")
         return result
 
 
@@ -267,3 +268,14 @@ def test_robustness_with_multidim_metrics():
         sub_xray = xarray.sel(epsilon=eps)
         assert np.all(sub_xray.accuracies == expected + 2).item()
         assert np.all(sub_xray.images == expected).item()
+
+
+@pytest.mark.usefixtures("cleandir")
+def test_xarray_from_loaded_workflow():
+    wf = MultiDimMetrics()
+    wf.run(epsilon=[1.0, 3.0, 2.0], foo="val", bar=multirun(["a", "b"]))
+    xarray1 = wf.to_xarray()
+
+    wf2 = MultiDimMetrics().load_from_dir(wf.working_dir)
+    xarray2 = wf2.to_xarray()
+    assert_identical(xarray1, xarray2)
