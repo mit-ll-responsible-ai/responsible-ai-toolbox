@@ -142,7 +142,7 @@ def test_robustnesscurve_to_data(epsilon):
     assert isinstance(df, pd.DataFrame)
     assert len(df["epsilon"]) == len(epsilon)
 
-    xd = task.to_xarray()
+    xd = task.to_xarray(non_multirun_params_as_singleton_dims=True)
 
     assert isinstance(xd, xr.Dataset)
     assert len(xd["epsilon"]) == len(epsilon)
@@ -179,7 +179,6 @@ def test_robustnesscurve_extra_param(fake_param_string):
 
     if fake_param_string:
         task.run(epsilon=[0, 1, 2, 3], fake_param="some_value")
-        task.plot("result", group="fake_param")
     else:
         with pytest.raises(TypeError):
             task.run(epsilon=[0, 1, 2, 3], fake_param=BadVal)  # type: ignore
@@ -187,7 +186,7 @@ def test_robustnesscurve_extra_param(fake_param_string):
 
     assert "fake_param" in task.workflow_overrides
     assert task.workflow_overrides["fake_param"] == ["some_value"] * 4
-    task.plot("result", group="fake_param")
+    task.plot("result", group="fake_param", non_multirun_params_as_singleton_dims=True)
 
 
 @pytest.mark.usefixtures("cleandir")

@@ -11,13 +11,13 @@ import numpy as np
 import torch as tr
 from hydra.core.utils import JobReturn
 from hydra_zen import load_from_yaml, make_config
-from typing_extensions import TypeAlias
+from typing_extensions import TypeAlias, TypeGuard
 
 from rai_toolbox._utils import value_check
 
 from .hydra import launch, zen
 
-LoadedVal: TypeAlias = Union[str, int, float]
+LoadedValue: TypeAlias = Union[str, int, float]
 
 
 class multirun(UserList):
@@ -59,7 +59,7 @@ class BaseWorkflow(ABC):
     cfgs: List[Any]
     metrics: Dict[str, List[Any]]
     workflow_overrides: Dict[str, Any]
-    multirun_task_overrides: Dict[str, Union[Sequence[LoadedVal], LoadedVal]]
+    multirun_task_overrides: Dict[str, Union[Sequence[LoadedValue], LoadedValue]]
     jobs: List[Any]
     working_dir: Union[Path, str]
 
@@ -209,7 +209,7 @@ class BaseWorkflow(ABC):
         raise NotImplementedError()
 
 
-def _num_from_string(str_input: str) -> LoadedVal:
+def _num_from_string(str_input: str) -> LoadedValue:
     try:
         val = float(str_input)
         if val.is_integer() and "." not in str_input:
@@ -218,6 +218,10 @@ def _num_from_string(str_input: str) -> LoadedVal:
         return val
     except ValueError:
         return str_input
+
+
+def _non_str_sequence(x: Any) -> TypeGuard[Sequence[Any]]:
+    return isinstance(x, Sequence) and not isinstance(x, str)
 
 
 class RobustnessCurve(BaseWorkflow):
@@ -297,6 +301,10 @@ class RobustnessCurve(BaseWorkflow):
             # i.e. epsilon should be the trailing dim in the multi-dim array of results
             epsilon=epsilon,
         )
+
+    @abstractstaticmethod
+    def evaluation_task(*args: Any, **kwargs: Any) -> Dict[str, Any]:
+        raise NotImplementedError()
 
     def jobs_post_process(self):
         assert len(self.jobs) > 0
@@ -401,19 +409,34 @@ class RobustnessCurve(BaseWorkflow):
         d.update(self.workflow_overrides)
         return pd.DataFrame(d).sort_values("epsilon")
 
-    def to_xarray(self):
-        """Convert workflow data to xarray Dataset."""
+    def to_xarray(self, non_multirun_params_as_singleton_dims: bool = False):
+        """Convert workflow data to xarray Dataset.
+
+        Parameters
+        ----------
+        non_multirun_params_as_singleton_dims : bool, optional (default=False)
+            If `True` then non-multirun entries from `workflow_overrides` will be
+            included as length-1 dimensions in the xarray. Useful for merging/
+            concatenation with other Datasets
+
+        Returns
+        -------
+        results : xarray.Dataset
+            A dataset whose dimensions and coordinate-values are determined by the
+            quantities over which the multi-run was performed. The data variables correspond to the named results returned by the jobs."""
         import xarray as xr
 
         orig_coords = {
-            k: v for k, v in self.multirun_task_overrides.items() if isinstance(v, list)
+            k: (v if _non_str_sequence(v) else [v])
+            for k, v in self.multirun_task_overrides.items()
+            if non_multirun_params_as_singleton_dims or _non_str_sequence(v)
         }
 
         # non-multirun overrides
         attrs = {
             k: v
             for k, v in self.multirun_task_overrides.items()
-            if not isinstance(v, list)
+            if not _non_str_sequence(v)
         }
 
         # we will add additional coordinates as-needed for multi-dim metrics
@@ -442,6 +465,7 @@ class RobustnessCurve(BaseWorkflow):
         ax=None,
         group: Optional[str] = None,
         save_filename: Optional[str] = None,
+        non_multirun_params_as_singleton_dims: bool = False,
         **kwargs,
     ) -> None:
         """Plot metrics versus ``epsilon``.
@@ -463,6 +487,11 @@ class RobustnessCurve(BaseWorkflow):
         save_filename: str | None (default: None)
             If not ``None`` save figure to the filename provided.
 
+        non_multirun_params_as_singleton_dims : bool, optional (default=False)
+            If `True` then non-multirun entries from `workflow_overrides` will be
+            included as length-1 dimensions in the xarray. Useful for merging/
+            concatenation with other Datasets
+
         **kwargs: Any
             Additional arguments passed to ``xarray.plot``
         """
@@ -471,7 +500,9 @@ class RobustnessCurve(BaseWorkflow):
         if ax is None:
             _, ax = plt.subplots()
 
-        xdata = self.to_xarray()
+        xdata = self.to_xarray(
+            non_multirun_params_as_singleton_dims=non_multirun_params_as_singleton_dims
+        )
         if group is None:
             plots = xdata[metric].plot.line(x="epsilon", ax=ax, **kwargs)
 
