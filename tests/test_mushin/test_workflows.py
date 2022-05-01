@@ -16,12 +16,8 @@ from hypothesis import given, settings
 from hypothesis.extra.numpy import array_shapes, arrays
 from xarray.testing import assert_identical
 
-from rai_toolbox.mushin.workflows import (
-    BaseWorkflow,
-    RobustnessCurve,
-    _load_metrics,
-    multirun,
-)
+from rai_toolbox.mushin import multirun
+from rai_toolbox.mushin.workflows import BaseWorkflow, RobustnessCurve, _load_metrics
 
 common_shape = array_shapes(min_dims=2, max_dims=2)
 

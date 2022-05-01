@@ -4,7 +4,7 @@
 
 from ._utils import load_experiment, load_from_checkpoint
 from .lightning import HydraDDP, MetricsCallback
-from .workflows import BaseWorkflow, RobustnessCurve
+from .workflows import BaseWorkflow, RobustnessCurve, hydra_list, multirun
 
 __all__ = [
     "load_experiment",
@@ -13,4 +13,6 @@ __all__ = [
     "HydraDDP",
     "RobustnessCurve",
     "BaseWorkflow",
+    "multirun",
+    "hydra_list",
 ]
