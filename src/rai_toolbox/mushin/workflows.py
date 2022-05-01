@@ -19,6 +19,14 @@ from .hydra import launch, zen
 
 LoadedValue: TypeAlias = Union[str, int, float]
 
+__all__ = [
+    "BaseWorkflow",
+    "RobustnessCurve",
+    "MultiRunMetricsWorkflow",
+    "multirun",
+    "hydra_list",
+]
+
 
 class multirun(UserList):
     """Signals that a sequence is to be iterated over in a multirun"""
@@ -243,11 +251,8 @@ def _non_str_sequence(x: Any) -> TypeGuard[Sequence[Any]]:
     return isinstance(x, Sequence) and not isinstance(x, str)
 
 
-class RobustnessCurve(BaseWorkflow):
-    """Abstract class for workflows that measure performance for different perturbation.
-
-    This workflow requires and uses parameter `epsilon` as the configuration option for varying
-    the a perturbation.
+class MultiRunMetricsWorkflow(BaseWorkflow):
+    """Abstract class for workflows that record metrics using Hydra multi-run
 
     This workflow creates subdirectories of by using Hydra.  These directories
     contain the Hydra YAML configuration and any saved metrics file (defined by the evaulation task)::
@@ -262,64 +267,9 @@ class RobustnessCurve(BaseWorkflow):
         │    ├── <experiment directory name: 1>
         |    |    ...
 
+    The evaluation task is expected to return a dictionary that maps
+    `metric-name (str) -> value (number | Sequence[number])`
     """
-
-    def run(
-        self,
-        *,
-        epsilon: Union[str, Sequence[float]],
-        working_dir: Optional[str] = None,
-        sweeper: Optional[str] = None,
-        launcher: Optional[str] = None,
-        overrides: Optional[List[str]] = None,
-        **workflow_overrides: Union[str, int, float, bool, multirun, hydra_list],
-    ):
-        """Run the experiment for varying the perturbation value `epsilon`.
-
-        Parameters
-        ----------
-        epsilon: str | Sequence[float]
-            The configuration parameter for the perturbation.  Unlike Hydra overrides
-            this parameter can be a list of floats that will be converted into a
-            multirun sequence override for Hydra.
-
-        working_dir: str (default: None, the Hydra default will be used)
-            The directory to run the experiment in.  This value is used for
-            setting `hydra.sweep.dir`.
-
-        sweeper: str | None (default: None)
-            The configuration name of the Hydra Sweeper to use (i.e., the override for
-            `hydra/sweeper=sweeper`)
-
-        launcher: str | None (default: None)
-            The configuration name of the Hydra Launcher to use (i.e., the override for
-            `hydra/launcher=launcher`)
-
-        overrides: List[str] | None (default: None)
-            Parameter overrides not considered part of the workflow parameter set.
-            This is helpful for filtering out parameters stored in
-            `self.workflow_overrides`.
-
-        **workflow_overrides: dict | str | int | float | bool | multirun | hydra_list
-            These parameters represent the values for configurations to use for the
-            experiment.
-
-            These values will be appeneded to the `overrides` for the Hydra job.
-        """
-
-        if not isinstance(epsilon, str):
-            epsilon = multirun(epsilon)
-
-        return super().run(
-            working_dir=working_dir,
-            sweeper=sweeper,
-            launcher=launcher,
-            overrides=overrides,
-            **workflow_overrides,
-            # for multiple multi-run params, epsilon should fastest-varying param;
-            # i.e. epsilon should be the trailing dim in the multi-dim array of results
-            epsilon=epsilon,
-        )
 
     @abstractstaticmethod
     def evaluation_task(*args: Any, **kwargs: Any) -> Dict[str, Any]:
@@ -417,7 +367,7 @@ class RobustnessCurve(BaseWorkflow):
         d = {}
         d.update(self.metrics)
         d.update(self.workflow_overrides)
-        return pd.DataFrame(d).sort_values("epsilon")
+        return pd.DataFrame(d)
 
     def to_xarray(self, non_multirun_params_as_singleton_dims: bool = False):
         """Convert workflow data to xarray Dataset.
@@ -467,7 +417,102 @@ class RobustnessCurve(BaseWorkflow):
                 + [f"{k}_dim{i}" for i in range(datum.ndim - len(shape))],
                 datum,
             )
-        return xr.Dataset(coords=coords, data_vars=data, attrs=attrs).sortby("epsilon")
+        return xr.Dataset(coords=coords, data_vars=data, attrs=attrs)
+
+
+class RobustnessCurve(MultiRunMetricsWorkflow):
+    """Abstract class for workflows that measure performance for different perturbation.
+
+    This workflow requires and uses parameter `epsilon` as the configuration option for varying the a perturbation.
+
+    See Also
+    --------
+    MultiRunMetricsWorkflow
+    """
+
+    def run(
+        self,
+        *,
+        epsilon: Union[str, Sequence[float]],
+        working_dir: Optional[str] = None,
+        sweeper: Optional[str] = None,
+        launcher: Optional[str] = None,
+        overrides: Optional[List[str]] = None,
+        **workflow_overrides: Union[str, int, float, bool, multirun, hydra_list],
+    ):
+        """Run the experiment for varying the perturbation value `epsilon`.
+
+        Parameters
+        ----------
+        epsilon: str | Sequence[float]
+            The configuration parameter for the perturbation.  Unlike Hydra overrides
+            this parameter can be a list of floats that will be converted into a
+            multirun sequence override for Hydra.
+
+        working_dir: str (default: None, the Hydra default will be used)
+            The directory to run the experiment in.  This value is used for
+            setting `hydra.sweep.dir`.
+
+        sweeper: str | None (default: None)
+            The configuration name of the Hydra Sweeper to use (i.e., the override for
+            `hydra/sweeper=sweeper`)
+
+        launcher: str | None (default: None)
+            The configuration name of the Hydra Launcher to use (i.e., the override for
+            `hydra/launcher=launcher`)
+
+        overrides: List[str] | None (default: None)
+            Parameter overrides not considered part of the workflow parameter set.
+            This is helpful for filtering out parameters stored in
+            `self.workflow_overrides`.
+
+        **workflow_overrides: dict | str | int | float | bool | multirun | hydra_list
+            These parameters represent the values for configurations to use for the
+            experiment.
+
+            These values will be appeneded to the `overrides` for the Hydra job.
+        """
+
+        if not isinstance(epsilon, str):
+            epsilon = multirun(epsilon)
+
+        return super().run(
+            working_dir=working_dir,
+            sweeper=sweeper,
+            launcher=launcher,
+            overrides=overrides,
+            **workflow_overrides,
+            # for multiple multi-run params, epsilon should fastest-varying param;
+            # i.e. epsilon should be the trailing dim in the multi-dim array of results
+            epsilon=epsilon,
+        )
+
+    def to_dataframe(self):
+        """Convert workflow data to Pandas DataFrame."""
+        return super().to_dataframe().sort_values("epsilon")
+
+    def to_xarray(self, non_multirun_params_as_singleton_dims: bool = False):
+        """Convert workflow data to xarray Dataset.
+
+        Parameters
+        ----------
+        non_multirun_params_as_singleton_dims : bool, optional (default=False)
+            If `True` then non-multirun entries from `workflow_overrides` will be
+            included as length-1 dimensions in the xarray. Useful for merging/
+            concatenation with other Datasets
+
+        Returns
+        -------
+        results : xarray.Dataset
+            A dataset whose dimensions and coordinate-values are determined by the
+            quantities over which the multi-run was performed. The data variables correspond to the named results returned by the jobs."""
+        return (
+            super()
+            .to_xarray(
+                non_multirun_params_as_singleton_dims=non_multirun_params_as_singleton_dims
+            )
+            .sortby("epsilon")
+        )
 
     def plot(
         self,
