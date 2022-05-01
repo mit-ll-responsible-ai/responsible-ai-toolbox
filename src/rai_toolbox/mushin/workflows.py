@@ -11,7 +11,7 @@ import numpy as np
 import torch as tr
 from hydra.core.utils import JobReturn
 from hydra_zen import load_from_yaml, make_config
-from typing_extensions import TypeAlias, TypeGuard
+from typing_extensions import Self, TypeAlias, TypeGuard
 
 from rai_toolbox._utils import value_check
 
@@ -346,13 +346,14 @@ class RobustnessCurve(BaseWorkflow):
         )
 
     def load_from_dir(
-        self,
+        self: Self,
         working_dir: Union[Path, str],
         config_dir: str = ".hydra",
         metrics_filename: str = "test_metrics.pt",
         workflow_params: Optional[Sequence[str]] = None,
-    ):
-        """Loading workflow job data from a given working directory.
+    ) -> Self:
+        """Loading workflow job data from a given working directory. The workflow
+        is loaded in-place and "self" is returned by this method.
 
         Parameters
         ----------
@@ -373,10 +374,14 @@ class RobustnessCurve(BaseWorkflow):
         workflow_params: Sequence[str] | None (default: None)
             A string of parameters to use for `workflow_params`.  If `None` it will
             default to all parameters saved in Hydra's `overrides.yaml` file.
+
+        Returns
+        -------
+        loaded_workflow : Self
         """
         self.working_dir = Path(working_dir).resolve()
 
-        multirun_cfg = Path(working_dir) / "multirun.yaml"
+        multirun_cfg = self.working_dir / "multirun.yaml"
         assert (
             multirun_cfg.exists()
         ), "Working directory does not contain `multirun.yaml` file.  Be sure to use the value of the Hydra sweep directory for the workflow"
@@ -384,19 +389,19 @@ class RobustnessCurve(BaseWorkflow):
         # Load saved YAML configurations for each job (in hydra.job.output_subdir)
         job_cfgs = [
             load_from_yaml(f)
-            for f in sorted(Path(working_dir).glob(f"**/*/{config_dir}/config.yaml"))
+            for f in sorted(self.working_dir.glob(f"**/*/{config_dir}/config.yaml"))
         ]
 
         # Load saved YAML overrides for each job (in hydra.job.output_subdir)
         job_overrides = [
             list(load_from_yaml(f))
-            for f in sorted(Path(working_dir).glob(f"**/*/{config_dir}/overrides.yaml"))
+            for f in sorted(self.working_dir.glob(f"**/*/{config_dir}/overrides.yaml"))
         ]
 
         # Load metrics for each job
         job_metrics = [
             tr.load(f)
-            for f in sorted(Path(working_dir).glob(f"**/*/{metrics_filename}"))
+            for f in sorted(self.working_dir.glob(f"**/*/{metrics_filename}"))
         ]
 
         self.cfgs = job_cfgs
