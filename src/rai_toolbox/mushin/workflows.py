@@ -53,7 +53,7 @@ class BaseWorkflow(ABC):
 
     working_dir: Union[Path, str]
         The working directory of the experiment defined by Hydra's sweep directory
-        (``hydra.sweep.dir``).
+        (`hydra.sweep.dir`).
     """
 
     cfgs: List[Any]
@@ -97,8 +97,8 @@ class BaseWorkflow(ABC):
             |    ├── module
             |    ├── another_config
 
-        The inputs to ``evaluation_task`` can be any of the three configurations:
-        ``trainer``, ``module``, or ``another_config`` such as::
+        The inputs to `evaluation_task` can be any of the three configurations:
+        `trainer`, `module`, or `another_config` such as::
 
             def evaluation_task(trainer: Trainer, module: LightningModule) -> None:
                 trainer.fit(module)
@@ -120,7 +120,7 @@ class BaseWorkflow(ABC):
     ):
         """Run the experiment.
 
-        Individual workflows can expclitly define ``workflow_overrides`` to improve
+        Individual workflows can expclitly define `workflow_overrides` to improve
         readability and undstanding of what parameters are expected for a particular
         workflow.
 
@@ -227,7 +227,7 @@ def _non_str_sequence(x: Any) -> TypeGuard[Sequence[Any]]:
 class RobustnessCurve(BaseWorkflow):
     """Abstract class for workflows that measure performance for different perturbation.
 
-    This workflow requires and uses parameter ``epsilon`` as the configuration option for varying
+    This workflow requires and uses parameter `epsilon` as the configuration option for varying
     the a perturbation.
 
     This workflow creates subdirectories of by using Hydra.  These directories
@@ -255,7 +255,7 @@ class RobustnessCurve(BaseWorkflow):
         overrides: Optional[List[str]] = None,
         **workflow_overrides: Union[str, int, float, bool, multirun, hydra_list],
     ):
-        """Run the experiment for varying the perturbation value ``epsilon``.
+        """Run the experiment for varying the perturbation value `epsilon`.
 
         Parameters
         ----------
@@ -359,17 +359,17 @@ class RobustnessCurve(BaseWorkflow):
             individual Hydra jobs data (yaml configurations) and saved metrics files.
 
         config_dir: str (default: ".hydra")
-            The directory in an experiment that stores Hydra configurations (``hydra.output_subdir``)
+            The directory in an experiment that stores Hydra configurations (`hydra.output_subdir`)
 
         metrics_filename: str (default: "test_metrics.pt")
             The filename used to save metrics for each individual Hydra job. This can
             be a search pattern as well since this is appended to
 
-                ``Path(working_dir).glob("**/*/<metrics_filename")``
+                `Path(working_dir).glob("**/*/<metrics_filename")`
 
         workflow_params: Sequence[str] | None (default: None)
-            A string of parameters to use for ``workflow_params``.  If ``None`` it will
-            default to all parameters saved in Hydra's ``overrides.yaml`` file.
+            A string of parameters to use for `workflow_params`.  If `None` it will
+            default to all parameters saved in Hydra's `overrides.yaml` file.
         """
 
         multirun_cfg = Path(working_dir) / "multirun.yaml"
@@ -468,9 +468,9 @@ class RobustnessCurve(BaseWorkflow):
         non_multirun_params_as_singleton_dims: bool = False,
         **kwargs,
     ) -> None:
-        """Plot metrics versus ``epsilon``.
+        """Plot metrics versus `epsilon`.
 
-        Using the ``xarray.Dataset`` from ``to_xarray``, plot the metrics
+        Using the `xarray.Dataset` from `to_xarray`, plot the metrics
         against the workflow perturbation parameters.
 
         Parameters
@@ -479,13 +479,13 @@ class RobustnessCurve(BaseWorkflow):
             The metric saved
 
         ax: Axes | None (default: None)
-            If not ``None``, the matplotlib.Axes to use for plotting.
+            If not `None`, the matplotlib.Axes to use for plotting.
 
         group: str | None (default: None)
-            Needed if other parameters besides ``epsilon`` were varied. A plot
+            Needed if other parameters besides `epsilon` were varied.
 
         save_filename: str | None (default: None)
-            If not ``None`` save figure to the filename provided.
+            If not `None` save figure to the filename provided.
 
         non_multirun_params_as_singleton_dims : bool, optional (default=False)
             If `True` then non-multirun entries from `workflow_overrides` will be
@@ -493,7 +493,7 @@ class RobustnessCurve(BaseWorkflow):
             concatenation with other Datasets
 
         **kwargs: Any
-            Additional arguments passed to ``xarray.plot``
+            Additional arguments passed to `xarray.plot`.
         """
         import matplotlib.pyplot as plt
 
