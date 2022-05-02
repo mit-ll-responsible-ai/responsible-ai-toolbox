@@ -34,6 +34,8 @@
     <script src="../_static/clipboard.min.js"></script>
     <script src="../_static/copybutton.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Datasets" href="../ref_datasets.html" />
@@ -163,6 +165,11 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="rai_toolbox.perturbations.random_restart.html">
+     rai_toolbox.perturbations.random_restart
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="rai_toolbox.perturbations.PerturbationModel.html">
      rai_toolbox.perturbations.PerturbationModel
     </a>
@@ -257,8 +264,44 @@
 <h1>rai_toolbox.perturbations.uniform_like_linf_n_ball_<a class="headerlink" href="#rai-toolbox-perturbations-uniform-like-linf-n-ball" title="Permalink to this headline">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="rai_toolbox.perturbations.uniform_like_linf_n_ball_">
-<span class="sig-prename descclassname"><span class="pre">rai_toolbox.perturbations.</span></span><span class="sig-name descname"><span class="pre">uniform_like_linf_n_ball_</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/perturbations/init.html#uniform_like_linf_n_ball_"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.perturbations.uniform_like_linf_n_ball_" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">rai_toolbox.perturbations.</span></span><span class="sig-name descname"><span class="pre">uniform_like_linf_n_ball_</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_ndim=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generator=&lt;torch._C.Generator</span> <span class="pre">object&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/perturbations/init.html#uniform_like_linf_n_ball_"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.perturbations.uniform_like_linf_n_ball_" title="Permalink to this definition">#</a></dt>
+<dd><p>Uniform sampling within an epsilon-sized n-ball for <span class="math notranslate nohighlight">\(L^{\infty}\)</span>-norm.
+The result overwrites <code class="xref py py-obj docutils literal notranslate"><span class="pre">x</span></code> in-place.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x: Tensor, shape-(N, D, …)</strong></dt><dd><p>The tensor to generate a new random tensor from, i.e., returns a tensor of
+similar shape and on the same device.</p>
+</dd>
+<dt><strong>epsilon</strong><span class="classifier">float, optional (default=1)</span></dt><dd><p>Determines the radius of the ball.</p>
+</dd>
+<dt><strong>param_ndim</strong><span class="classifier">Optional[int]</span></dt><dd><p>Unused. Included for parity with other init functions.</p>
+</dd>
+<dt><strong>generator</strong><span class="classifier">torch.Generator, optional (default=`torch.default_generator`)</span></dt><dd><p>Controls the RNG source.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>out: Tensor, shape-(N, …)</dt><dd><p>A new random tensor of the same shape and on the same device as the input.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">torch</span> <span class="k">as</span> <span class="nn">tr</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">rai_toolbox.perturbations.init</span> <span class="kn">import</span> <span class="n">uniform_like_linf_n_ball_</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">uniform_like_linf_n_ball_</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span>
+<span class="go">tensor([[ 1.7092, -1.8723, -0.0806],</span>
+<span class="go">        [-1.4680, -1.8782, -0.1998]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mf">2.</span>
+<span class="go">tensor([[True, True, True],</span>
+<span class="go">        [True, True, True]])</span>
+</pre></div>
+</div>
+</dd></dl>
 
 </section>
 

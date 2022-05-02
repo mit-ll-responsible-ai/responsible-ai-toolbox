@@ -179,6 +179,7 @@
     <span class="n">Partial</span><span class="p">,</span>
     <span class="n">instantiates_to</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span> <span class="nn">rai_toolbox._utils</span> <span class="kn">import</span> <span class="n">value_check</span>
 <span class="kn">from</span> <span class="nn">rai_toolbox._utils.stateful</span> <span class="kn">import</span> <span class="n">evaluating</span><span class="p">,</span> <span class="n">frozen</span>
 <span class="kn">from</span> <span class="nn">rai_toolbox.perturbations</span> <span class="kn">import</span> <span class="n">AdditivePerturbation</span><span class="p">,</span> <span class="n">PerturbationModel</span>
 
@@ -245,6 +246,13 @@
 <span class="sd">        If `perturbation_model` is a type, then it will be instantiated as</span>
 <span class="sd">        `perturbation_model(data)`.</span>
 
+<span class="sd">    criterion : Optional[Callable[[Tensor, Tensor], Tensor]]</span>
+<span class="sd">        The criterion to use for calculating the loss **per-datum**.  I.e. for a</span>
+<span class="sd">        shape-(N, ...) batch of data, `criterion` should return a shape-(N,) tensor of</span>
+<span class="sd">        loss values – one for each datum in the batch.</span>
+
+<span class="sd">        If `None` then `CrossEntropyLoss(reduction=None)` is used.</span>
+
 <span class="sd">    targeted : bool (default: False)</span>
 <span class="sd">        If `True`, then perturb towards the defined `target` otherwise move away from</span>
 <span class="sd">        `target`.</span>
@@ -254,12 +262,9 @@
 <span class="sd">        Note: Requires criterion to output a loss per sample, e.g., set</span>
 <span class="sd">        `reduction=&quot;none&quot;`</span>
 
-<span class="sd">    criterion : Optional[Callable[[Tensor, Tensor], Tensor]]</span>
-<span class="sd">        The criterion to use for calculating the loss.  If `None` then</span>
-<span class="sd">        `CrossEntropyLoss` is used.</span>
-
-<span class="sd">    reduction_fn : Callable[[Tensor], Tensor], optional (default=tr.sum)</span>
-<span class="sd">        Used to reduce the shape-(N,) per-datum loss to a scalar.</span>
+<span class="sd">    reduction_fn : Callable[[Tensor], Tensor], optional (default=torch.sum)</span>
+<span class="sd">        Used to reduce the shape-(N,) per-datum loss to a scalar. This should be</span>
+<span class="sd">        set to `torch.mean` when solving for a &quot;universal&quot; perturbation.</span>
 
 <span class="sd">    **optim_kwargs : Any</span>
 <span class="sd">       Keyword arguments passed to `optimizer` when it is instatiated.</span>
@@ -273,15 +278,21 @@
 <span class="sd">        The loss for each perturbed data point, if `use_best==True` then this is the</span>
 <span class="sd">        best loss across all steps.</span>
 
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    `model` is automatically set to eval-mode and its parameters are set to `requires_grad=False` within the context of this function.</span>
+
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
-<span class="sd">    Let&#39;s perturb two data points, x=-1.0 and x=2.0, to maximize `L(x) = |x|`. We will</span>
-<span class="sd">    use five standard gradient steps, using a learning rate of 0.1. The default</span>
-<span class="sd">    perturbation model is simply additive: `x -&gt; x + δ`.</span>
+<span class="sd">    Let&#39;s perturb two data points, `x1=-1.0` and `x2=2.0`, to maximize</span>
+<span class="sd">    `L(δ; x) = |x + δ|` w.r.t `δ`. We will use five standard gradient steps, using a</span>
+<span class="sd">    learning  rate of 0.1. The default perturbation model is simply additive:</span>
+<span class="sd">    `x -&gt; x + δ`.</span>
 
-<span class="sd">    This solver is refining `δ`, whose initial value is 0 by default, to maximize</span>
-<span class="sd">    `L(x) = |x|`. Thus we should find that our solved perturbations modify our data as:</span>
-<span class="sd">    `-1.0 -&gt; -1.5` and `2.0 -&gt; 2.5`, respectively.</span>
+<span class="sd">    This solver is refining `δ1` and `δ2`, whose initial values are 0 by default, to</span>
+<span class="sd">    maximize `L(x) = |x|` for `x1` and `x2`, respectively. Thus we should find that our</span>
+<span class="sd">    solved perturbations modify our data as: `x-1.0 -&gt; -1.5` and `2.0 -&gt; 2.5`,</span>
+<span class="sd">    respectively.</span>
 
 <span class="sd">    &gt;&gt;&gt; from rai_toolbox.perturbations import gradient_ascent</span>
 <span class="sd">    &gt;&gt;&gt; from torch.optim import SGD</span>
@@ -317,6 +328,32 @@
 <span class="sd">    ... )</span>
 <span class="sd">    &gt;&gt;&gt; perturbed_data</span>
 <span class="sd">    tensor([-0.5000,  1.5000])</span>
+
+<span class="sd">    **Accessing the perturbations**</span>
+
+<span class="sd">    To gain direct access to the solved perturbations, we can provide our own</span>
+<span class="sd">        perturbation model to the solver. Let&#39;s solve the same optimization problem, but provide our own instance of `AdditivePerturbation`</span>
+
+<span class="sd">    &gt;&gt;&gt; from rai_toolbox.perturbations import AdditivePerturbation</span>
+<span class="sd">    &gt;&gt;&gt; pert_model = AdditivePerturbation(data_or_shape=(2,))</span>
+<span class="sd">    &gt;&gt;&gt; perturbed_data, losses = gradient_ascent(</span>
+<span class="sd">    ...    perturbation_model=pert_model,</span>
+<span class="sd">    ...    data=[-1.0, 2.0],</span>
+<span class="sd">    ...    target=0.0,</span>
+<span class="sd">    ...    model=identity_model,</span>
+<span class="sd">    ...    criterion=abs_diff,</span>
+<span class="sd">    ...    optimizer=SGD,</span>
+<span class="sd">    ...    lr=0.1,</span>
+<span class="sd">    ...    steps=5,</span>
+<span class="sd">    ... )</span>
+<span class="sd">    &gt;&gt;&gt; perturbed_data</span>
+<span class="sd">    tensor([-1.5000,  2.5000])</span>
+
+<span class="sd">    Now we can access the values that were solved for `δ1` and `δ2`.</span>
+
+<span class="sd">    &gt;&gt;&gt; pert_model.delta</span>
+<span class="sd">    Parameter containing:</span>
+<span class="sd">    tensor([-0.5000,  0.5000], requires_grad=True)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">data</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
     <span class="n">target</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
@@ -398,23 +435,27 @@
             <span class="n">losses</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">use_best</span><span class="p">:</span>
-                <span class="n">losses</span><span class="p">,</span> <span class="n">xadv</span> <span class="o">=</span> <span class="n">_replace_best</span><span class="p">(</span><span class="n">losses</span><span class="p">,</span> <span class="n">best_loss</span><span class="p">,</span> <span class="n">xadv</span><span class="p">,</span> <span class="n">best_x</span><span class="p">)</span>
+                <span class="c1"># we negate the loss when `targeted=True` so min-loss is always best</span>
+                <span class="n">losses</span><span class="p">,</span> <span class="n">xadv</span> <span class="o">=</span> <span class="n">_replace_best</span><span class="p">(</span><span class="n">losses</span><span class="p">,</span> <span class="n">best_loss</span><span class="p">,</span> <span class="n">xadv</span><span class="p">,</span> <span class="n">best_x</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">targeted</span><span class="p">:</span>
+        <span class="c1"># The returned loss is always relative to the original criterion.</span>
+        <span class="c1"># E.g. an adversarial perturbation with a &quot;low&quot; negated loss will yield</span>
+        <span class="c1"># a high loss.</span>
         <span class="n">losses</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="n">losses</span>
     <span class="k">return</span> <span class="n">xadv</span><span class="o">.</span><span class="n">detach</span><span class="p">(),</span> <span class="n">losses</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span></div>
 
 
-<span class="k">def</span> <span class="nf">random_restart</span><span class="p">(</span>
-    <span class="n">perturber</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]],</span>
+<div class="viewcode-block" id="random_restart"><a class="viewcode-back" href="../../../generated/rai_toolbox.perturbations.random_restart.html#rai_toolbox.perturbations.random_restart">[docs]</a><span class="k">def</span> <span class="nf">random_restart</span><span class="p">(</span>
+    <span class="n">solver</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]],</span>
     <span class="n">repeats</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]]:</span>
-    <span class="sd">&quot;&quot;&quot;Executes a perturbation function multiple times saving out the best perturbation.</span>
+    <span class="sd">&quot;&quot;&quot;Executes a solver function multiple times saving out the best perturbations.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    perturber : Callable[..., Tuple[Tensor, Tensor]]</span>
-<span class="sd">        The perturbation function, e.g., projected_gradient_perturbation.</span>
+<span class="sd">    solver : Callable[..., Tuple[Tensor, Tensor]]</span>
+<span class="sd">        The solver whose execution will be repeated.</span>
 
 <span class="sd">    repeats : int</span>
 <span class="sd">        The number of times to run perturber</span>
@@ -424,39 +465,85 @@
 <span class="sd">    random_restart_fn : Callable[..., Tuple[Tensor, Tensor]]</span>
 <span class="sd">        Wrapped function that will execute `perturber` `repeats` times.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">repeats</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;expected times &gt;= 1, got </span><span class="si">{</span><span class="n">repeats</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    Let&#39;s perturb two data points, `x1=-1.0` and `x2=2.0`, to maximize</span>
+<span class="sd">    `L(δ; x) = |x + δ|` w.r.t `δ`. Our perturbation will randomly initialize `δ1` and `δ2` and we will re-run the solver three times – retaining the best perturbation of `x1` and `x2` respectively</span>
 
-    <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">perturber</span><span class="p">)</span>
+<span class="sd">    &gt;&gt;&gt; from functools import partial</span>
+<span class="sd">    &gt;&gt;&gt; import torch as tr</span>
+<span class="sd">    &gt;&gt;&gt; from torch.optim import SGD</span>
+<span class="sd">    &gt;&gt;&gt; from rai_toolbox.perturbations.init import uniform_like_l1_n_ball_</span>
+<span class="sd">    &gt;&gt;&gt; from rai_toolbox.perturbations import AdditivePerturbation, gradient_ascent, random_restart</span>
+<span class="sd">    &gt;&gt;&gt;</span>
+<span class="sd">    &gt;&gt;&gt; def verbose_abs_diff(model_out, target):</span>
+<span class="sd">    ...     # used to print out loss at each solver step (for purpose of example)</span>
+<span class="sd">    ...     out =  (model_out - target).abs()</span>
+<span class="sd">    ...     print(out)</span>
+<span class="sd">    ...     return out</span>
+
+<span class="sd">    Configuring a peturbation model to randomly initialize the perturbations.</span>
+
+<span class="sd">    &gt;&gt;&gt; RNG = tr.Generator().manual_seed(0)</span>
+<span class="sd">    &gt;&gt;&gt; PertModel = partial(AdditivePerturbation, init_fn=uniform_like_l1_n_ball_, generator=RNG)</span>
+
+<span class="sd">    Creating and running repeating solver.</span>
+
+<span class="sd">    &gt;&gt;&gt; gradient_ascent_with_restart = random_restart(gradient_ascent, 3)</span>
+
+<span class="sd">    &gt;&gt;&gt; perturbed_data, losses = gradient_ascent_with_restart(</span>
+<span class="sd">    ...    perturbation_model=PertModel,</span>
+<span class="sd">    ...    data=[-1.0, 2.0],</span>
+<span class="sd">    ...    target=0.0,</span>
+<span class="sd">    ...    model=lambda data: data,</span>
+<span class="sd">    ...    criterion=verbose_abs_diff,</span>
+<span class="sd">    ...    optimizer=SGD,</span>
+<span class="sd">    ...    lr=0.1,</span>
+<span class="sd">    ...    steps=1,</span>
+<span class="sd">    ... )</span>
+<span class="sd">    tensor([0.5037, 2.7682], grad_fn=&lt;AbsBackward0&gt;)</span>
+<span class="sd">    tensor([0.6037, 2.8682])</span>
+<span class="sd">    tensor([0.9115, 2.1320], grad_fn=&lt;AbsBackward0&gt;)</span>
+<span class="sd">    tensor([1.0115, 2.2320])</span>
+<span class="sd">    tensor([0.6926, 2.6341], grad_fn=&lt;AbsBackward0&gt;)</span>
+<span class="sd">    tensor([0.7926, 2.7341])</span>
+
+<span class="sd">    See that for `x1` the highest loss is `1.0115`, and for `x2` it is `2.8682`. This</span>
+<span class="sd">    should be reflected `losses` and `perturbed_data` that were retained across the</span>
+<span class="sd">    restarts.</span>
+
+<span class="sd">    &gt;&gt;&gt; losses</span>
+<span class="sd">    tensor([1.0115, 2.8682])</span>
+<span class="sd">    &gt;&gt;&gt; perturbed_data</span>
+<span class="sd">    tensor([-1.0115,  2.8682])</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">value_check</span><span class="p">(</span><span class="s2">&quot;repeats&quot;</span><span class="p">,</span> <span class="n">repeats</span><span class="p">,</span> <span class="n">min_</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">incl_min</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">solver</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">random_restart_fn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
         <span class="n">targeted</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;targeted&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
-        <span class="n">use_best</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;use_best&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
         <span class="n">best_x</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">best_loss</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">repeats</span><span class="p">):</span>
             <span class="c1"># run the attack</span>
-            <span class="n">xadv</span><span class="p">,</span> <span class="n">losses</span> <span class="o">=</span> <span class="n">perturber</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">xadv</span><span class="p">,</span> <span class="n">losses</span> <span class="o">=</span> <span class="n">solver</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
             <span class="c1"># Save best loss for each data point</span>
-            <span class="k">if</span> <span class="n">use_best</span><span class="p">:</span>
-                <span class="n">best_loss</span><span class="p">,</span> <span class="n">best_x</span> <span class="o">=</span> <span class="n">_replace_best</span><span class="p">(</span>
-                    <span class="n">loss</span><span class="o">=</span><span class="n">losses</span><span class="p">,</span>
-                    <span class="n">best_loss</span><span class="o">=</span><span class="n">best_loss</span><span class="p">,</span>
-                    <span class="n">data</span><span class="o">=</span><span class="n">xadv</span><span class="p">,</span>
-                    <span class="n">best_data</span><span class="o">=</span><span class="n">best_x</span><span class="p">,</span>
-                    <span class="nb">min</span><span class="o">=</span><span class="n">targeted</span><span class="p">,</span>
-                <span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">best_loss</span> <span class="o">=</span> <span class="n">losses</span>
-                <span class="n">best_x</span> <span class="o">=</span> <span class="n">xadv</span>
+            <span class="n">best_loss</span><span class="p">,</span> <span class="n">best_x</span> <span class="o">=</span> <span class="n">_replace_best</span><span class="p">(</span>
+                <span class="n">loss</span><span class="o">=</span><span class="n">losses</span><span class="p">,</span>
+                <span class="n">best_loss</span><span class="o">=</span><span class="n">best_loss</span><span class="p">,</span>
+                <span class="n">data</span><span class="o">=</span><span class="n">xadv</span><span class="p">,</span>
+                <span class="n">best_data</span><span class="o">=</span><span class="n">best_x</span><span class="p">,</span>
+                <span class="nb">min</span><span class="o">=</span><span class="n">targeted</span><span class="p">,</span>
+            <span class="p">)</span>
 
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">best_x</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">best_loss</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">best_x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">assert</span> <span class="n">best_loss</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="n">best_x</span><span class="p">,</span> <span class="n">best_loss</span>
 
-    <span class="k">return</span> <span class="n">random_restart_fn</span>
+    <span class="k">return</span> <span class="n">random_restart_fn</span></div>
 
 
 <span class="c1"># A function that updates the best loss and best input</span>

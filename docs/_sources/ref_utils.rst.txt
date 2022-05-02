@@ -20,6 +20,7 @@ correctness when using the rAI-toolbox.
 .. autosummary::
    :toctree: generated/
 
+   to_batch
    evaluating
    freeze
    frozen

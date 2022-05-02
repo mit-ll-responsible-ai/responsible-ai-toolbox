@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>rai_toolbox.negate &#8212; rai-toolbox  documentation</title>
+    <title>rai_toolbox.to_batch &#8212; rai-toolbox  documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -36,8 +36,8 @@
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Changelog" href="../changes.html" />
-    <link rel="prev" title="rai_toolbox.frozen" href="rai_toolbox.frozen.html" />
+    <link rel="next" title="rai_toolbox.evaluating" href="rai_toolbox.evaluating.html" />
+    <link rel="prev" title="General Utilities" href="../ref_utils.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -182,8 +182,8 @@
    </i>
   </label>
   <ul class="current">
-   <li class="toctree-l2">
-    <a class="reference internal" href="rai_toolbox.to_batch.html">
+   <li class="toctree-l2 current active">
+    <a class="current reference internal" href="#">
      rai_toolbox.to_batch
     </a>
    </li>
@@ -202,8 +202,8 @@
      rai_toolbox.frozen
     </a>
    </li>
-   <li class="toctree-l2 current active">
-    <a class="current reference internal" href="#">
+   <li class="toctree-l2">
+    <a class="reference internal" href="rai_toolbox.negate.html">
      rai_toolbox.negate
     </a>
    </li>
@@ -248,24 +248,72 @@
               
               <div>
                 
-  <section id="rai-toolbox-negate">
-<h1>rai_toolbox.negate<a class="headerlink" href="#rai-toolbox-negate" title="Permalink to this headline">#</a></h1>
+  <section id="rai-toolbox-to-batch">
+<h1>rai_toolbox.to_batch<a class="headerlink" href="#rai-toolbox-to-batch" title="Permalink to this headline">#</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="rai_toolbox.negate">
-<span class="sig-prename descclassname"><span class="pre">rai_toolbox.</span></span><span class="sig-name descname"><span class="pre">negate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/losses/_utils.html#negate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.negate" title="Permalink to this definition">#</a></dt>
-<dd><p>A wrapper that negates (applies the <code class="xref py py-obj docutils literal notranslate"><span class="pre">-</span></code> operator) to the function’s output.</p>
+<dt class="sig sig-object py" id="rai_toolbox.to_batch">
+<span class="sig-prename descclassname"><span class="pre">rai_toolbox.</span></span><span class="sig-name descname"><span class="pre">to_batch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_ndim</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/_utils.html#to_batch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.to_batch" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns a view of <code class="xref py py-obj docutils literal notranslate"><span class="pre">p</span></code>, reshaped as shape-(N, d0, …) where (d0, …)
+has <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim</span></code> entries.</p>
+<p>See Parameters for further description</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>func</strong><span class="classifier">Callable[…, Negateable]</span></dt><dd></dd>
+<dt><strong>p</strong><span class="classifier">Tensor</span></dt><dd></dd>
+<dt><strong>param_ndim: Optional[int]</strong></dt><dd><p>Determines the shape of the resulting parameter</p>
+<ul class="simple">
+<li><p>A positive number determines the dimensionality of the tensor that the transformation will act on.</p></li>
+<li><p>A negative number indicates the ‘offset’ from the dimensionality of the tensor.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> means that the transformation will be applied to the tensor without any broadcasting.</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>reshaped_p: Tensor, shape-(N, d0, …)</dt><dd><p>Where
+- (d0, …) is of length <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim</span></code> for <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim</span> <span class="pre">&gt;</span> <span class="pre">0</span></code>
+- (d0, …) is (1,) for <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim</span> <span class="pre">==</span> <span class="pre">0</span></code>
+- (d0, …) is of length <code class="xref py py-obj docutils literal notranslate"><span class="pre">p.ndim</span> <span class="pre">-</span> <span class="pre">|param_ndim|</span></code> for <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim</span> <span class="pre">&lt;</span> <span class="pre">0</span></code></p>
+</dd>
 </dl>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">rai_toolbox</span> <span class="kn">import</span> <span class="n">negate</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">negate</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-<span class="go">-2</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">torch</span> <span class="k">as</span> <span class="nn">tr</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">rand</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">to_batch</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">param_ndim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">torch.Size([30, 1])</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">to_batch</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">param_ndim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">torch.Size([15, 2])</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">to_batch</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">param_ndim</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">torch.Size([3, 5, 2])</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">to_batch</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">param_ndim</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">torch.Size([1, 3, 5, 2])</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">to_batch</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">param_ndim</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span>  <span class="c1"># same as `param_ndim=x.ndim`</span>
+<span class="go">torch.Size([1, 3, 5, 2])</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">to_batch</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">param_ndim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">torch.Size([3, 5, 2])</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">to_batch</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">param_ndim</span><span class="o">=-</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">torch.Size([15, 2])</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">to_batch</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">param_ndim</span><span class="o">=-</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">torch.Size([30, 1])</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -278,17 +326,17 @@
               
               <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-    <a class='left-prev' id="prev-link" href="rai_toolbox.frozen.html" title="previous page">
+    <a class='left-prev' id="prev-link" href="../ref_utils.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title">rai_toolbox.frozen</p>
+            <p class="prev-next-title">General Utilities</p>
         </div>
     </a>
-    <a class='right-next' id="next-link" href="../changes.html" title="next page">
+    <a class='right-next' id="next-link" href="rai_toolbox.evaluating.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Changelog</p>
+        <p class="prev-next-title">rai_toolbox.evaluating</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>

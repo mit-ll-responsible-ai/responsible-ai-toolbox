@@ -266,9 +266,24 @@
                 
   <section id="mushin">
 <span id="mushin-reference"></span><h1>Mushin<a class="headerlink" href="#mushin" title="Permalink to this headline">#</a></h1>
-<p>DISCUSSION ABOUT MUSHIN NOTE THAT THESE TOOLS ARE IN EXPERIMENTAL PHASE</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>The features provided by <code class="xref py py-obj docutils literal notranslate"><span class="pre">rai_toolbox.mushin</span></code> are in early-beta phase and are subject to compatibility-breaking changes in the future.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rai_toolbox.mushin</span></code> requires additional installation dependencies. These can be installed via <code class="xref py py-obj docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">rai-toolbox[mushin]</span></code></p>
+</div>
+<p><a class="reference external" href="https://en.wikipedia.org/wiki/Mushin_(mental_state)">Mushin</a> means, roughly,
+<em>“no-mind”</em>;
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">rai_toolbox.mushin</span></code> provides utilities that greatly reduce the “boilerplate” code and overall complexity of conducting machine learning experiments, tests, and analyses.
+Unlike the rest of the toolbox, which is adheres solely to essential PyTorch APIs, <code class="xref py py-obj docutils literal notranslate"><span class="pre">mushin</span></code> is intentionally opinionated and specialized in its design;
+it reflects our (the toolbox dev team’s) shared work flows, best practices, and favorite tools for doing research and development.</p>
+<p>As such, <code class="xref py py-obj docutils literal notranslate"><span class="pre">mushin</span></code> is designed around <a class="reference external" href="https://www.pytorchlightning.ai/">PyTorch-Lightning</a>, which facilitates boilerplate-free and performant machine learning work, and around <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen">hydra-zen</a>, which makes it easy to design configurable and reproducible work flows that leverage <a class="reference external" href="https://github.com/facebookresearch/hydra">the Hydra framework</a>.</p>
 <section id="workflows">
 <h2>Workflows<a class="headerlink" href="#workflows" title="Permalink to this headline">#</a></h2>
+<p>Workflows are designed to simplify and automate the process of configuring, running, and reproducing various data science and machine learning work flows.
+In part, these serve to greatly simplify the process of organizing and running jobs using the Hydra framework, and aggregating the results of those jobs for analysis.</p>
 <table class="autosummary longtable table autosummary">
 <colgroup>
 <col style="width: 10%" />
@@ -289,6 +304,7 @@
 </section>
 <section id="pytorch-lightning-utilities">
 <h2>PyTorch-Lightning Utilities<a class="headerlink" href="#pytorch-lightning-utilities" title="Permalink to this headline">#</a></h2>
+<p>Tools and utilities that make PyTorch-Lightning easy to use for our work. Some of these utilities also enable much-needed compatibility between PyTorch-Lightning and Hydra.</p>
 <table class="autosummary longtable table autosummary">
 <colgroup>
 <col style="width: 10%" />

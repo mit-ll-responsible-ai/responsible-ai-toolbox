@@ -7,6 +7,7 @@
 Datasets
 ########
 
+The following datasets are for useful training, testing, and benchmarking neural networks on: common corruptions, out-of-distribution generalization tasks, and on other robustness-probing data.
 
 ********************
 CIFAR-Based Datasets

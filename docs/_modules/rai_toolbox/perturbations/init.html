@@ -163,19 +163,44 @@
 <span class="c1"># Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).</span>
 <span class="c1"># SPDX-License-Identifier: MIT</span>
 
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+
 <span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Generator</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">default_generator</span>
+
+<span class="kn">from</span> <span class="nn">rai_toolbox._utils</span> <span class="kn">import</span> <span class="n">to_batch</span> <span class="k">as</span> <span class="n">_to_batch</span>
+<span class="kn">from</span> <span class="nn">rai_toolbox._utils</span> <span class="kn">import</span> <span class="n">validate_param_ndim</span> <span class="k">as</span> <span class="n">_validate_param_ndim</span>
+<span class="kn">from</span> <span class="nn">rai_toolbox._utils</span> <span class="kn">import</span> <span class="n">value_check</span>
 
 
 <div class="viewcode-block" id="uniform_like_l1_n_ball_"><a class="viewcode-back" href="../../../generated/rai_toolbox.perturbations.uniform_like_l1_n_ball_.html#rai_toolbox.perturbations.uniform_like_l1_n_ball_">[docs]</a><span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">uniform_like_l1_n_ball_</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Uniform sampling of a n-ball for L_1-norm</span>
+<span class="k">def</span> <span class="nf">uniform_like_l1_n_ball_</span><span class="p">(</span>
+    <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">epsilon</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">param_ndim</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">generator</span><span class="p">:</span> <span class="n">Generator</span> <span class="o">=</span> <span class="n">default_generator</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Uniform sampling of a epsilon-sized n-ball for :math:`L^1`-norm, where `n` is controlled by `x.shape` and `param_ndim`. The result overwrites `x` in-place.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    x: Tensor, shape-(N, D, ...)</span>
 <span class="sd">        The tensor to generate a new random tensor from, i.e., returns a tensor of</span>
 <span class="sd">        similar shape and on the same device.</span>
+
+<span class="sd">        By default, each of the N shape-(D, ...) subtensors are initialized</span>
+<span class="sd">        independently. See `param_ndim` to contol this behavior.</span>
+
+<span class="sd">    epsilon : float, optional (default=1)</span>
+<span class="sd">        Determines the radius of the ball.</span>
+
+<span class="sd">    param_ndim : int | None, optional (default=-1)</span>
+<span class="sd">        Determines the dimenionality of the subtensors that are sampled by this</span>
+<span class="sd">        function.</span>
+
+<span class="sd">        - A positive number determines the dimensionality of each subtensor to be drawn and packed into the shape-(N, D, ...) resulting tensor.</span>
+<span class="sd">        - A negative number determines from the dimensionality of the subtensor in terms of the offset of `x.ndim`. E.g. -1 indicates that `x` is arranged in a batch-style, and that N independent shape-(D, ...) tensors will be sampled.</span>
+<span class="sd">        - `None` means that a single tensor of shape-(N, D, ...) is sampled.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -187,10 +212,40 @@
 <span class="sd">    .. [1] Rauber et al., 2020, Foolbox Native: Fast adversarial attacks to benchmark the robustness of machine learning models in PyTorch, TensorFlow, and JAX https://doi.org/10.21105/joss.02607</span>
 
 <span class="sd">    .. [2] https://mathoverflow.net/a/9188</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; import torch as tr</span>
+<span class="sd">    &gt;&gt;&gt; from rai_toolbox.perturbations.init import uniform_like_l1_n_ball_</span>
+
+<span class="sd">    Drawing two shape(3,) tensors from an :math:`\epsilon=2` sized L1 ball.</span>
+
+<span class="sd">    &gt;&gt;&gt; x = tr.zeros(2, 3)</span>
+<span class="sd">    &gt;&gt;&gt; uniform_like_l1_n_ball_(x, epsilon=2.0) # default: param_ndim=-1</span>
+<span class="sd">    &gt;&gt;&gt; x</span>
+<span class="sd">    tensor([[0.3301, 0.8459, 0.7071],</span>
+<span class="sd">            [0.3470, 0.5077, 0.0977]])</span>
+<span class="sd">    &gt;&gt;&gt; tr.linalg.norm(x, dim=1, ord=1) &lt; 2.0</span>
+<span class="sd">    tensor([True, True])</span>
+
+<span class="sd">    Drawing one tensor shape-(6,) tensor from a :math:`\epsilon=2` sized 6D ball, and</span>
+<span class="sd">    storing it in `x`as a shape-(2, 3) tensor. We specify `param_ndim=2` (or</span>
+<span class="sd">    `param_ndim=None`) to achieve this.</span>
+
+<span class="sd">    &gt;&gt;&gt; x = tr.zeros(2, 3)</span>
+<span class="sd">    &gt;&gt;&gt; uniform_like_l1_n_ball_(x, epsilon=2.0, param_ndim=2)</span>
+<span class="sd">    &gt;&gt;&gt; x</span>
+<span class="sd">    tensor([[0.1413, 0.5270, 0.1570],</span>
+<span class="sd">            [0.4817, 0.2760, 0.4076]])</span>
+<span class="sd">    &gt;&gt;&gt; tr.linalg.norm(x, ord=1) &lt; 2.0</span>
+<span class="sd">    tensor(True)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">xflat</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">_validate_param_ndim</span><span class="p">(</span><span class="n">param_ndim</span><span class="o">=</span><span class="n">param_ndim</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">value_check</span><span class="p">(</span><span class="s2">&quot;epsilon&quot;</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">,</span> <span class="n">min_</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">incl_min</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">xflat</span> <span class="o">=</span> <span class="n">_to_batch</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">param_ndim</span><span class="o">=</span><span class="n">param_ndim</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">nbatch</span><span class="p">,</span> <span class="n">ndim</span> <span class="o">=</span> <span class="n">xflat</span><span class="o">.</span><span class="n">shape</span>
-    <span class="n">u</span> <span class="o">=</span> <span class="n">xflat</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">nbatch</span><span class="p">,</span> <span class="n">ndim</span><span class="p">)</span><span class="o">.</span><span class="n">uniform_</span><span class="p">()</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="n">xflat</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">nbatch</span><span class="p">,</span> <span class="n">ndim</span><span class="p">)</span><span class="o">.</span><span class="n">uniform_</span><span class="p">(</span><span class="n">generator</span><span class="o">=</span><span class="n">generator</span><span class="p">)</span>
     <span class="n">v</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
     <span class="n">vp</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">xflat</span><span class="o">.</span><span class="n">new_zeros</span><span class="p">(</span><span class="n">nbatch</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">v</span><span class="p">[:,</span> <span class="p">:</span> <span class="n">ndim</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     <span class="k">assert</span> <span class="n">v</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">vp</span><span class="o">.</span><span class="n">shape</span>
@@ -200,14 +255,37 @@
 
 
 <div class="viewcode-block" id="uniform_like_l2_n_ball_"><a class="viewcode-back" href="../../../generated/rai_toolbox.perturbations.uniform_like_l2_n_ball_.html#rai_toolbox.perturbations.uniform_like_l2_n_ball_">[docs]</a><span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">uniform_like_l2_n_ball_</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Uniform sampling of a n-ball for L_2-norm</span>
+<span class="k">def</span> <span class="nf">uniform_like_l2_n_ball_</span><span class="p">(</span>
+    <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">epsilon</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">param_ndim</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">generator</span><span class="p">:</span> <span class="n">Generator</span> <span class="o">=</span> <span class="n">default_generator</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Uniform sampling within an epsilon-sized n-ball for :math:`L^2`-norm, where `n`</span>
+<span class="sd">    is controlled by `x.shape` and `param_ndim`. The result overwrites `x` in-place.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    x: Tensor, shape-(N, D, ...)</span>
 <span class="sd">        The tensor to generate a new random tensor from, i.e., returns a tensor of</span>
 <span class="sd">        similar shape and on the same device.</span>
+
+<span class="sd">        By default, each of the N shape-(D, ...) subtensors are initialized</span>
+<span class="sd">        independently. See `param_ndim` to contol this behavior.</span>
+
+<span class="sd">    epsilon : float, optional (default=1)</span>
+<span class="sd">        Determines the radius of the ball.</span>
+
+<span class="sd">    param_ndim : int | None, optional (default=-1)</span>
+<span class="sd">        Determines the dimenionality of the subtensors that are sampled by this</span>
+<span class="sd">        function.</span>
+
+<span class="sd">        - A positive number determines the dimensionality of each subtensor to be drawn and packed into the shape-(N, D, ...) resulting tensor.</span>
+<span class="sd">        - A negative number determines from the dimensionality of the subtensor in terms of the offset of `x.ndim`. E.g. -1 indicates that `x` is arranged in a batch-style, and that N independent shape-(D, ...) tensors will be sampled.</span>
+<span class="sd">        - `None` means that a single tensor of shape-(N, D, ...) is sampled.</span>
+
+<span class="sd">    generator : torch.Generator, optional (default=`torch.default_generator`)</span>
+<span class="sd">        Controls the RNG source.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -221,17 +299,91 @@
 <span class="sd">    .. [2] Voelker et al., 2017, Efficiently sampling vectors and coordinates from the n-sphere and n-ball http://compneuro.uwaterloo.ca/files/publications/voelker.2017.pdf</span>
 
 <span class="sd">    .. [3] Roberts, Martin, 2020, How to generate uniformly random points on n-spheres and in n-balls http://extremelearning.com.au/how-to-generate-uniformly-random-points-on-n-spheres-and-n-balls/</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; import torch as tr</span>
+<span class="sd">    &gt;&gt;&gt; from rai_toolbox.perturbations.init import uniform_like_l2_n_ball_</span>
+
+<span class="sd">    Drawing two shape-(3,) tensors from an :math:`\epsilon=2`-sized L2 3D-ball.</span>
+
+<span class="sd">    &gt;&gt;&gt; x = tr.zeros(2, 3)</span>
+<span class="sd">    &gt;&gt;&gt; uniform_like_l2_n_ball_(x, epsilon=2.0, param_ndim=1)</span>
+<span class="sd">    &gt;&gt;&gt; x</span>
+<span class="sd">    tensor([[0.3030, 1.4269, 0.3927],</span>
+<span class="sd">            [1.4015, 0.4913, 1.3028]])</span>
+<span class="sd">    &gt;&gt;&gt; tr.linalg.norm(x, dim=1, ord=2) &lt; 2.0</span>
+<span class="sd">    tensor([True, True])</span>
+
+<span class="sd">    Drawing one shape-(6, ) tensor from a :math:`\epsilon=2`-sized L2 6D ball, and</span>
+<span class="sd">    storing it in `x`  as a shape-(2, 3) tensor. We specify `param_ndim=2` (or</span>
+<span class="sd">    `param_ndim=None`) to achieve this.</span>
+
+<span class="sd">    &gt;&gt;&gt; x = tr.zeros(2, 3)</span>
+<span class="sd">    &gt;&gt;&gt; uniform_like_l2_n_ball_(x, epsilon=2.0, param_ndim=2)</span>
+<span class="sd">    &gt;&gt;&gt; x</span>
+<span class="sd">    tensor([[-0.6903, -0.8597,  0.0109],</span>
+<span class="sd">            [ 0.0906, -0.2387, -0.3059]])</span>
+<span class="sd">    &gt;&gt;&gt; tr.linalg.norm(x, ord=2) &lt; 2.0</span>
+<span class="sd">    tensor(True)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">xflat</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">_validate_param_ndim</span><span class="p">(</span><span class="n">param_ndim</span><span class="o">=</span><span class="n">param_ndim</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">value_check</span><span class="p">(</span><span class="s2">&quot;epsilon&quot;</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">,</span> <span class="n">min_</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">incl_min</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">xflat</span> <span class="o">=</span> <span class="n">_to_batch</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">param_ndim</span><span class="o">=</span><span class="n">param_ndim</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">nbatch</span><span class="p">,</span> <span class="n">ndim</span> <span class="o">=</span> <span class="n">xflat</span><span class="o">.</span><span class="n">shape</span>
-    <span class="n">z</span> <span class="o">=</span> <span class="n">xflat</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">nbatch</span><span class="p">,</span> <span class="n">ndim</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">normal_</span><span class="p">()</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">xflat</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">nbatch</span><span class="p">,</span> <span class="n">ndim</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">normal_</span><span class="p">(</span><span class="n">generator</span><span class="o">=</span><span class="n">generator</span><span class="p">)</span>
     <span class="n">r</span> <span class="o">=</span> <span class="n">z</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
     <span class="n">x</span><span class="o">.</span><span class="n">copy_</span><span class="p">(</span><span class="n">epsilon</span> <span class="o">*</span> <span class="p">(</span><span class="n">z</span> <span class="o">/</span> <span class="n">r</span><span class="p">)[:,</span> <span class="p">:</span><span class="n">ndim</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span></div>
 
 
 <div class="viewcode-block" id="uniform_like_linf_n_ball_"><a class="viewcode-back" href="../../../generated/rai_toolbox.perturbations.uniform_like_linf_n_ball_.html#rai_toolbox.perturbations.uniform_like_linf_n_ball_">[docs]</a><span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">uniform_like_linf_n_ball_</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="n">x</span><span class="o">.</span><span class="n">copy_</span><span class="p">(</span><span class="n">epsilon</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">rand_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">))</span></div>
+<span class="k">def</span> <span class="nf">uniform_like_linf_n_ball_</span><span class="p">(</span>
+    <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">epsilon</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">param_ndim</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">generator</span><span class="p">:</span> <span class="n">Generator</span> <span class="o">=</span> <span class="n">default_generator</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Uniform sampling within an epsilon-sized n-ball for :math:`L^{\infty}`-norm.</span>
+<span class="sd">    The result overwrites `x` in-place.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x: Tensor, shape-(N, D, ...)</span>
+<span class="sd">        The tensor to generate a new random tensor from, i.e., returns a tensor of</span>
+<span class="sd">        similar shape and on the same device.</span>
+
+<span class="sd">    epsilon : float, optional (default=1)</span>
+<span class="sd">        Determines the radius of the ball.</span>
+
+<span class="sd">    param_ndim : Optional[int]</span>
+<span class="sd">        Unused. Included for parity with other init functions.</span>
+
+<span class="sd">    generator : torch.Generator, optional (default=`torch.default_generator`)</span>
+<span class="sd">        Controls the RNG source.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    out: Tensor, shape-(N, ...)</span>
+<span class="sd">        A new random tensor of the same shape and on the same device as the input.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; import torch as tr</span>
+<span class="sd">    &gt;&gt;&gt; from rai_toolbox.perturbations.init import uniform_like_linf_n_ball_</span>
+<span class="sd">    &gt;&gt;&gt; x = tr.zeros(2, 3)</span>
+<span class="sd">    &gt;&gt;&gt; uniform_like_linf_n_ball_(x, epsilon=2.0)</span>
+<span class="sd">    &gt;&gt;&gt; x</span>
+<span class="sd">    tensor([[ 1.7092, -1.8723, -0.0806],</span>
+<span class="sd">            [-1.4680, -1.8782, -0.1998]])</span>
+<span class="sd">    &gt;&gt;&gt; x.abs() &lt; 2.</span>
+<span class="sd">    tensor([[True, True, True],</span>
+<span class="sd">            [True, True, True]])</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">del</span> <span class="n">param_ndim</span>
+    <span class="n">value_check</span><span class="p">(</span><span class="s2">&quot;epsilon&quot;</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">,</span> <span class="n">min_</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">incl_min</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">x</span><span class="o">.</span><span class="n">uniform_</span><span class="p">(</span><span class="o">-</span><span class="n">epsilon</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">,</span> <span class="n">generator</span><span class="o">=</span><span class="n">generator</span><span class="p">)</span></div>
 </pre></div>
 
               </div>

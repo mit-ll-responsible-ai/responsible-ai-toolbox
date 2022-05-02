@@ -204,36 +204,15 @@
 
 
 <div class="viewcode-block" id="CIFAR10C"><a class="viewcode-back" href="../../../generated/rai_toolbox.datasets.CIFAR10C.html#rai_toolbox.datasets.CIFAR10C">[docs]</a><span class="k">class</span> <span class="nc">CIFAR10C</span><span class="p">(</span><span class="n">_CIFAR10Base</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;CIFAR10C(root: PathLike,</span>
-<span class="sd">             corruption: str,</span>
-<span class="sd">             severity: Literal[1, 2, 3, 4, 5],</span>
-<span class="sd">             transform: Optional[Callable[[Image.Image], Any]] = None,</span>
-<span class="sd">             target_transform: Optional[Callable] = None,</span>
-<span class="sd">             download: bool = False)</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A CIFAR10-test-based dataset for benchmarking neural network robustness to common</span>
+<span class="sd">    corruptions [1]_. For each corruption and for each severity (`1-5`), the</span>
+<span class="sd">    dataset consists of the 10,000 test images from CIFAR10 with that corruption</span>
+<span class="sd">    applied to those images.</span>
 
-<span class="sd">    Parameters</span>
+<span class="sd">    References</span>
 <span class="sd">    ----------</span>
-<span class="sd">    root: str</span>
-<span class="sd">        Root directory of dataset where directory</span>
-<span class="sd">            ``CIFAR-10-C`` exists or will be saved to if download is set to True.</span>
-
-<span class="sd">    corruption: str</span>
-<span class="sd">        The type of corruption, e.g. &quot;fog&quot;. See `CIFAR10C.all_corruptions()` for a full</span>
-<span class="sd">        list of corruptions.</span>
-
-<span class="sd">    severity: Literal[1, 2, 3, 4, 5]</span>
-<span class="sd">        The severity-level of the corruption, ranging from 1 to 5.</span>
-
-<span class="sd">    transform:  Optional[Callable[[Image], Any]]</span>
-<span class="sd">        A function/transform that takes in an PIL image</span>
-<span class="sd">        and returns a transformed version. E.g, ``transforms.RandomCrop``</span>
-
-<span class="sd">    target_transform: Optional[Callable],</span>
-
-<span class="sd">    download: bool, optional (default=False)</span>
-<span class="sd">        If true, downloads the dataset from the internet and puts it in root directory.</span>
-<span class="sd">        If dataset is already downloaded, it is not downloaded again.</span>
-
+<span class="sd">    .. [1] https://zenodo.org/record/2535967#.YnAe_9rMKbg</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;https://zenodo.org/record/2535967/files/CIFAR-10-C.tar&quot;</span>
@@ -326,6 +305,30 @@
         <span class="n">target_transform</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="nb">int</span><span class="p">],</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">download</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        CIFAR10C(root: PathLike, corruption: str, severity: Literal[1, 2, 3, 4, 5], transform: Optional[Callable[[Image.Image], Any]] = None, target_transform: Optional[Callable] = None, download: bool = False)</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        root : PathLike</span>
+<span class="sd">            Root directory of dataset where directory</span>
+<span class="sd">                ``CIFAR-10-C`` exists or will be saved to if download is set to True.</span>
+
+<span class="sd">        corruption : str</span>
+<span class="sd">            The type of corruption, e.g. &quot;fog&quot;. See `CIFAR10C.all_corruptions()` for a full list of corruptions.</span>
+
+<span class="sd">        severity : Literal[1, 2, 3, 4, 5]</span>
+<span class="sd">            The severity-level of the corruption, ranging from 1 to 5.</span>
+
+<span class="sd">        transform :  Optional[Callable[[Image], Any]]</span>
+<span class="sd">            A function/transform that takes in an PIL image</span>
+<span class="sd">            and returns a transformed version. E.g, ``transforms.RandomCrop``</span>
+
+<span class="sd">        target_transform : Optional[Callable]</span>
+
+<span class="sd">        download : bool, optional (default=False)</span>
+<span class="sd">            If true, downloads the dataset from the internet and puts it in root directory.</span>
+<span class="sd">            If dataset is already downloaded, it is not downloaded again.&quot;&quot;&quot;</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">root</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">root</span><span class="p">),</span> <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">,</span> <span class="n">target_transform</span><span class="o">=</span><span class="n">target_transform</span>
@@ -347,7 +350,7 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">severity</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">Integral</span><span class="p">))</span> <span class="ow">and</span> <span class="mi">1</span> <span class="o">&lt;=</span> <span class="n">severity</span> <span class="o">&lt;=</span> <span class="mi">5</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;`severity` must be an integer in [1, 5]. Got </span><span class="si">{</span><span class="n">severity</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-        <span class="n">severity</span> <span class="o">-=</span> <span class="mi">1</span>
+        <span class="n">severity</span> <span class="o">-=</span> <span class="mi">1</span>  <span class="c1"># type: ignore</span>
 
         <span class="n">mmap</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_root</span> <span class="o">/</span> <span class="p">(</span><span class="n">corruption</span> <span class="o">+</span> <span class="s2">&quot;.npy&quot;</span><span class="p">),</span> <span class="n">mmap_mode</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">)</span>
         <span class="n">size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">mmap</span><span class="p">)</span> <span class="o">//</span> <span class="mi">5</span>
@@ -384,36 +387,39 @@
 
 
 <div class="viewcode-block" id="CIFAR100C"><a class="viewcode-back" href="../../../generated/rai_toolbox.datasets.CIFAR100C.html#rai_toolbox.datasets.CIFAR100C">[docs]</a><span class="k">class</span> <span class="nc">CIFAR100C</span><span class="p">(</span><span class="n">CIFAR10C</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;CIFAR100C(root: PathLike,</span>
-<span class="sd">              corruption: str,</span>
-<span class="sd">              severity: Literal[1, 2, 3, 4, 5],</span>
-<span class="sd">              transform: Optional[Callable[[Image.Image], Any]] = None,</span>
-<span class="sd">              target_transform: Optional[Callable] = None,</span>
-<span class="sd">              download: bool = False)</span>
+    <span class="sd">&quot;&quot;&quot;CIFAR100C(root: PathLike, corruption: str, severity: Literal[1, 2, 3, 4, 5], transform: Optional[Callable[[Image.Image], Any]] = None, target_transform: Optional[Callable] = None, download: bool = False)</span>
+
+<span class="sd">    A CIFAR100-test-based dataset for benchmarking neural network robustness to common</span>
+<span class="sd">    corruptions [1]_. For each corruption and for each severity (`1-5`), the</span>
+<span class="sd">    dataset consists of the 10,000 test images from CIFAR100 with that corruption</span>
+<span class="sd">    applied to those images.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    root: str</span>
+<span class="sd">    root : PathLike</span>
 <span class="sd">        Root directory of dataset where directory</span>
 <span class="sd">            ``CIFAR-100-C`` exists or will be saved to if download is set to True.</span>
 
-<span class="sd">    corruption: str</span>
+<span class="sd">    corruption : str</span>
 <span class="sd">        The type of corruption, e.g. &quot;fog&quot;. See `CIFAR100C.all_corruptions()` for a full</span>
 <span class="sd">        list of corruptions.</span>
 
-<span class="sd">    severity: Literal[1, 2, 3, 4, 5]</span>
+<span class="sd">    severity : Literal[1, 2, 3, 4, 5]</span>
 <span class="sd">        The severity-level of the corruption, ranging from 1 to 5.</span>
 
-<span class="sd">    transform:  Optional[Callable[[Image], Any]]</span>
+<span class="sd">    transform :  Optional[Callable[[Image], Any]]</span>
 <span class="sd">        A function/transform that takes in an PIL image</span>
 <span class="sd">        and returns a transformed version. E.g, ``transforms.RandomCrop``</span>
 
-<span class="sd">    target_transform: Optional[Callable],</span>
+<span class="sd">    target_transform : Optional[Callable]</span>
 
 <span class="sd">    download: bool, optional (default=False)</span>
 <span class="sd">        If true, downloads the dataset from the internet and puts it in root directory.</span>
 <span class="sd">        If dataset is already downloaded, it is not downloaded again.</span>
 
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] https://zenodo.org/record/2535967#.YnAe_9rMKbg</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;https://zenodo.org/record/3555552/files/CIFAR-100-C.tar&quot;</span>

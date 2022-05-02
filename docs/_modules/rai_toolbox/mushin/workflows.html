@@ -434,52 +434,59 @@
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    Let&#39;s create a simple workflow where we perform a multirun over a parameter,</span>
-<span class="sd">    epsilon, and evaluate a task function that computes an accuracy based on that</span>
-<span class="sd">    epsilon value.</span>
+<span class="sd">    epsilon, and evaluate a task function that computes an accuracy and loss based on</span>
+<span class="sd">    that epsilon value and a specified scale.</span>
 
 <span class="sd">    &gt;&gt;&gt; from rai_toolbox.mushin.workflows import MultiRunMetricsWorkflow</span>
 <span class="sd">    &gt;&gt;&gt; from rai_toolbox.mushin import multirun</span>
 <span class="sd">    &gt;&gt;&gt; import torch as tr</span>
-<span class="sd">    &gt;&gt;&gt; class LocalRobustness(MultiRunMetricsWorkflow):</span>
+<span class="sd">    ... class LocalRobustness(MultiRunMetricsWorkflow):</span>
 <span class="sd">    ...     @staticmethod</span>
-<span class="sd">    ...     def evaluation_task(epsilon):</span>
+<span class="sd">    ...     def evaluation_task(epsilon: float, scale: float) -&gt; dict:</span>
+<span class="sd">    ...         epsilon *= scale</span>
 <span class="sd">    ...         val = 100 - epsilon**2</span>
-<span class="sd">    ...</span>
-<span class="sd">    ...         result = dict(accuracies=val+2)</span>
-<span class="sd">    ...</span>
+<span class="sd">    ...         result = dict(accuracies=val+2, loss=epsilon**2)</span>
 <span class="sd">    ...         tr.save(result, &quot;test_metrics.pt&quot;)</span>
 <span class="sd">    ...         return result</span>
 
-<span class="sd">    &gt;&gt;&gt; wf = LocalRobustness()</span>
-<span class="sd">    &gt;&gt;&gt; wf.run(epsilon=multirun([1.0, 2.0, 3.0]))</span>
-<span class="sd">    [2022-05-01 12:01:00,451][HYDRA] Launching 3 jobs locally</span>
-<span class="sd">    [2022-05-01 12:01:00,451][HYDRA] 	#0 : +epsilon=1.0</span>
-<span class="sd">    [2022-05-01 12:01:00,543][HYDRA] 	#1 : +epsilon=2.0</span>
-<span class="sd">    [2022-05-01 12:01:00,640][HYDRA] 	#2 : +epsilon=3.0</span>
+<span class="sd">    We&#39;ll run this workflow for six total configurations of three epsilon values and two scale values. This will launch a Hydra multirun job and aggregate the results.</span>
 
-<span class="sd">    Now that this workflow has run, we can view the results as an xarray-dataset.</span>
+<span class="sd">    &gt;&gt;&gt; wf = LocalRobustness()</span>
+<span class="sd">    &gt;&gt;&gt; wf.run(epsilon=multirun([1.0, 2.0, 3.0]), scale=multirun([0.1, 1.0]))</span>
+<span class="sd">    [2022-05-02 11:57:59,219][HYDRA] Launching 6 jobs locally</span>
+<span class="sd">    [2022-05-02 11:57:59,220][HYDRA] 	#0 : +epsilon=1.0 +scale=0.1</span>
+<span class="sd">    [2022-05-02 11:57:59,312][HYDRA] 	#1 : +epsilon=1.0 +scale=1.0</span>
+<span class="sd">    [2022-05-02 11:57:59,405][HYDRA] 	#2 : +epsilon=2.0 +scale=0.1</span>
+<span class="sd">    [2022-05-02 11:57:59,498][HYDRA] 	#3 : +epsilon=2.0 +scale=1.0</span>
+<span class="sd">    [2022-05-02 11:57:59,590][HYDRA] 	#4 : +epsilon=3.0 +scale=0.1</span>
+<span class="sd">    [2022-05-02 11:57:59,683][HYDRA] 	#5 : +epsilon=3.0 +scale=1.0</span>
+
+<span class="sd">    Now that this workflow has run, we can view the results as an xarray-dataset whose</span>
+<span class="sd">    coordinates reflect the multirun parameters that were varied, and whose data-variables are our recorded metrics: &quot;accuracy&quot; and &quot;loss&quot;</span>
 
 <span class="sd">    &gt;&gt;&gt; ds = wf.to_xarray()</span>
 <span class="sd">    &gt;&gt;&gt; ds</span>
 <span class="sd">    &lt;xarray.Dataset&gt;</span>
-<span class="sd">    Dimensions:     (x: 3)</span>
+<span class="sd">    Dimensions:     (epsilon: 3, scale: 2)</span>
 <span class="sd">    Coordinates:</span>
-<span class="sd">        epsilon     (x) float64 1.0 2.0 3.0</span>
-<span class="sd">    Dimensions without coordinates: x</span>
+<span class="sd">    * epsilon     (epsilon) float64 1.0 2.0 3.0</span>
+<span class="sd">    * scale       (scale) float64 0.1 1.0</span>
 <span class="sd">    Data variables:</span>
-<span class="sd">        accuracies  (x) float64 101.0 98.0 93.0</span>
+<span class="sd">        accuracies  (epsilon, scale) float64 102.0 101.0 102.0 98.0 101.9 93.0</span>
+<span class="sd">        loss        (epsilon, scale) float64 0.01 1.0 0.04 4.0 0.09 9.0</span>
 
 <span class="sd">    We can also load this workflow by providing the working directory where it was run.</span>
 
 <span class="sd">    &gt;&gt;&gt; loaded = LocalRobustness().load_from_dir(wf.working_dir)</span>
 <span class="sd">    &gt;&gt;&gt; loaded.to_xarray()</span>
 <span class="sd">    &lt;xarray.Dataset&gt;</span>
-<span class="sd">    Dimensions:     (x: 3)</span>
+<span class="sd">    Dimensions:     (epsilon: 3, scale: 2)</span>
 <span class="sd">    Coordinates:</span>
-<span class="sd">        epsilon     (x) float64 1.0 2.0 3.0</span>
-<span class="sd">    Dimensions without coordinates: x</span>
+<span class="sd">    * epsilon     (epsilon) float64 1.0 2.0 3.0</span>
+<span class="sd">    * scale       (scale) float64 0.1 1.0</span>
 <span class="sd">    Data variables:</span>
-<span class="sd">        accuracies  (x) float64 101.0 98.0 93.0</span>
+<span class="sd">        accuracies  (epsilon, scale) float64 102.0 101.0 102.0 98.0 101.9 93.0</span>
+<span class="sd">        loss        (epsilon, scale) float64 0.01 1.0 0.04 4.0 0.09 9.0</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nd">@abstractstaticmethod</span>

@@ -36,7 +36,7 @@
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="rai_toolbox.perturbations.PerturbationModel" href="rai_toolbox.perturbations.PerturbationModel.html" />
+    <link rel="next" title="rai_toolbox.perturbations.random_restart" href="rai_toolbox.perturbations.random_restart.html" />
     <link rel="prev" title="Perturbations" href="../ref_perturbation.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
@@ -160,6 +160,11 @@
    <li class="toctree-l2 current active">
     <a class="current reference internal" href="#">
      rai_toolbox.perturbations.gradient_ascent
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="rai_toolbox.perturbations.random_restart.html">
+     rai_toolbox.perturbations.random_restart
     </a>
    </li>
    <li class="toctree-l2">
@@ -294,6 +299,11 @@ If <code class="xref py py-obj docutils literal notranslate"><span class="pre">t
 <p>If <code class="xref py py-obj docutils literal notranslate"><span class="pre">perturbation_model</span></code> is a type, then it will be instantiated as
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">perturbation_model(data)</span></code>.</p>
 </dd>
+<dt><strong>criterion</strong><span class="classifier">Optional[Callable[[Tensor, Tensor], Tensor]]</span></dt><dd><p>The criterion to use for calculating the loss <strong>per-datum</strong>.  I.e. for a
+shape-(N, …) batch of data, <code class="xref py py-obj docutils literal notranslate"><span class="pre">criterion</span></code> should return a shape-(N,) tensor of
+loss values – one for each datum in the batch.</p>
+<p>If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> then <code class="xref py py-obj docutils literal notranslate"><span class="pre">CrossEntropyLoss(reduction=None)</span></code> is used.</p>
+</dd>
 <dt><strong>targeted</strong><span class="classifier">bool (default: False)</span></dt><dd><p>If <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a>, then perturb towards the defined <code class="xref py py-obj docutils literal notranslate"><span class="pre">target</span></code> otherwise move away from
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">target</span></code>.</p>
 </dd>
@@ -301,10 +311,8 @@ If <code class="xref py py-obj docutils literal notranslate"><span class="pre">t
 Note: Requires criterion to output a loss per sample, e.g., set
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">reduction=&quot;none&quot;</span></code></p>
 </dd>
-<dt><strong>criterion</strong><span class="classifier">Optional[Callable[[Tensor, Tensor], Tensor]]</span></dt><dd><p>The criterion to use for calculating the loss.  If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> then
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">CrossEntropyLoss</span></code> is used.</p>
-</dd>
-<dt><strong>reduction_fn</strong><span class="classifier">Callable[[Tensor], Tensor], optional (default=tr.sum)</span></dt><dd><p>Used to reduce the shape-(N,) per-datum loss to a scalar.</p>
+<dt><strong>reduction_fn</strong><span class="classifier">Callable[[Tensor], Tensor], optional (default=torch.sum)</span></dt><dd><p>Used to reduce the shape-(N,) per-datum loss to a scalar. This should be
+set to <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.mean</span></code> when solving for a “universal” perturbation.</p>
 </dd>
 <dt><strong>**optim_kwargs</strong><span class="classifier">Any</span></dt><dd><p>Keyword arguments passed to <code class="xref py py-obj docutils literal notranslate"><span class="pre">optimizer</span></code> when it is instatiated.</p>
 </dd>
@@ -320,13 +328,17 @@ best loss across all steps.</p>
 </dl>
 </dd>
 </dl>
+<p class="rubric">Notes</p>
+<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">model</span></code> is automatically set to eval-mode and its parameters are set to <code class="xref py py-obj docutils literal notranslate"><span class="pre">requires_grad=False</span></code> within the context of this function.</p>
 <p class="rubric">Examples</p>
-<p>Let’s perturb two data points, x=-1.0 and x=2.0, to maximize <code class="xref py py-obj docutils literal notranslate"><span class="pre">L(x)</span> <span class="pre">=</span> <span class="pre">|x|</span></code>. We will
-use five standard gradient steps, using a learning rate of 0.1. The default
-perturbation model is simply additive: <code class="xref py py-obj docutils literal notranslate"><span class="pre">x</span> <span class="pre">-&gt;</span> <span class="pre">x</span> <span class="pre">+</span> <span class="pre">δ</span></code>.</p>
-<p>This solver is refining <code class="xref py py-obj docutils literal notranslate"><span class="pre">δ</span></code>, whose initial value is 0 by default, to maximize
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">L(x)</span> <span class="pre">=</span> <span class="pre">|x|</span></code>. Thus we should find that our solved perturbations modify our data as:
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">-1.0</span> <span class="pre">-&gt;</span> <span class="pre">-1.5</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">2.0</span> <span class="pre">-&gt;</span> <span class="pre">2.5</span></code>, respectively.</p>
+<p>Let’s perturb two data points, <code class="xref py py-obj docutils literal notranslate"><span class="pre">x1=-1.0</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">x2=2.0</span></code>, to maximize
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">L(δ;</span> <span class="pre">x)</span> <span class="pre">=</span> <span class="pre">|x</span> <span class="pre">+</span> <span class="pre">δ|</span></code> w.r.t <code class="xref py py-obj docutils literal notranslate"><span class="pre">δ</span></code>. We will use five standard gradient steps, using a
+learning  rate of 0.1. The default perturbation model is simply additive:
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">x</span> <span class="pre">-&gt;</span> <span class="pre">x</span> <span class="pre">+</span> <span class="pre">δ</span></code>.</p>
+<p>This solver is refining <code class="xref py py-obj docutils literal notranslate"><span class="pre">δ1</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">δ2</span></code>, whose initial values are 0 by default, to
+maximize <code class="xref py py-obj docutils literal notranslate"><span class="pre">L(x)</span> <span class="pre">=</span> <span class="pre">|x|</span></code> for <code class="xref py py-obj docutils literal notranslate"><span class="pre">x1</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">x2</span></code>, respectively. Thus we should find that our
+solved perturbations modify our data as: <code class="xref py py-obj docutils literal notranslate"><span class="pre">x-1.0</span> <span class="pre">-&gt;</span> <span class="pre">-1.5</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">2.0</span> <span class="pre">-&gt;</span> <span class="pre">2.5</span></code>,
+respectively.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">rai_toolbox.perturbations</span> <span class="kn">import</span> <span class="n">gradient_ascent</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">torch.optim</span> <span class="kn">import</span> <span class="n">SGD</span>
 </pre></div>
@@ -365,6 +377,33 @@ Here, the perturbations we solve for should modify our data as:
 <span class="go">tensor([-0.5000,  1.5000])</span>
 </pre></div>
 </div>
+<p><strong>Accessing the perturbations</strong></p>
+<dl class="simple">
+<dt>To gain direct access to the solved perturbations, we can provide our own</dt><dd><p>perturbation model to the solver. Let’s solve the same optimization problem, but provide our own instance of <a class="reference internal" href="rai_toolbox.perturbations.AdditivePerturbation.html#rai_toolbox.perturbations.AdditivePerturbation" title="rai_toolbox.perturbations.AdditivePerturbation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AdditivePerturbation</span></code></a></p>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">rai_toolbox.perturbations</span> <span class="kn">import</span> <span class="n">AdditivePerturbation</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pert_model</span> <span class="o">=</span> <span class="n">AdditivePerturbation</span><span class="p">(</span><span class="n">data_or_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">perturbed_data</span><span class="p">,</span> <span class="n">losses</span> <span class="o">=</span> <span class="n">gradient_ascent</span><span class="p">(</span>
+<span class="gp">... </span>   <span class="n">perturbation_model</span><span class="o">=</span><span class="n">pert_model</span><span class="p">,</span>
+<span class="gp">... </span>   <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">],</span>
+<span class="gp">... </span>   <span class="n">target</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+<span class="gp">... </span>   <span class="n">model</span><span class="o">=</span><span class="n">identity_model</span><span class="p">,</span>
+<span class="gp">... </span>   <span class="n">criterion</span><span class="o">=</span><span class="n">abs_diff</span><span class="p">,</span>
+<span class="gp">... </span>   <span class="n">optimizer</span><span class="o">=</span><span class="n">SGD</span><span class="p">,</span>
+<span class="gp">... </span>   <span class="n">lr</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+<span class="gp">... </span>   <span class="n">steps</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">perturbed_data</span>
+<span class="go">tensor([-1.5000,  2.5000])</span>
+</pre></div>
+</div>
+<p>Now we can access the values that were solved for <code class="xref py py-obj docutils literal notranslate"><span class="pre">δ1</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">δ2</span></code>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pert_model</span><span class="o">.</span><span class="n">delta</span>
+<span class="go">Parameter containing:</span>
+<span class="go">tensor([-0.5000,  0.5000], requires_grad=True)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </section>
@@ -382,10 +421,10 @@ Here, the perturbations we solve for should modify our data as:
             <p class="prev-next-title">Perturbations</p>
         </div>
     </a>
-    <a class='right-next' id="next-link" href="rai_toolbox.perturbations.PerturbationModel.html" title="next page">
+    <a class='right-next' id="next-link" href="rai_toolbox.perturbations.random_restart.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">rai_toolbox.perturbations.PerturbationModel</p>
+        <p class="prev-next-title">rai_toolbox.perturbations.random_restart</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>

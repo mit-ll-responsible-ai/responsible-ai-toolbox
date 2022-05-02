@@ -37,7 +37,7 @@
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="rai_toolbox.evaluating" href="generated/rai_toolbox.evaluating.html" />
+    <link rel="next" title="rai_toolbox.to_batch" href="generated/rai_toolbox.to_batch.html" />
     <link rel="prev" title="rai_toolbox.mushin.HydraDDP" href="generated/rai_toolbox.mushin.HydraDDP.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
@@ -184,6 +184,11 @@
   </label>
   <ul>
    <li class="toctree-l2">
+    <a class="reference internal" href="generated/rai_toolbox.to_batch.html">
+     rai_toolbox.to_batch
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="generated/rai_toolbox.evaluating.html">
      rai_toolbox.evaluating
     </a>
@@ -266,16 +271,19 @@ correctness when using the rAI-toolbox.</p>
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/rai_toolbox.evaluating.html#rai_toolbox.evaluating" title="rai_toolbox.evaluating"><code class="xref py py-obj docutils literal notranslate"><span class="pre">evaluating</span></code></a>(*modules)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/rai_toolbox.to_batch.html#rai_toolbox.to_batch" title="rai_toolbox.to_batch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_batch</span></code></a>(p, param_ndim)</p></td>
+<td><p>Returns a view of <code class="xref py py-obj docutils literal notranslate"><span class="pre">p</span></code>, reshaped as shape-(N, d0, ...) where (d0, ...) has <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim</span></code> entries.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/rai_toolbox.evaluating.html#rai_toolbox.evaluating" title="rai_toolbox.evaluating"><code class="xref py py-obj docutils literal notranslate"><span class="pre">evaluating</span></code></a>(*modules)</p></td>
 <td><p>A context manager / decorator that temporarily places one or more modules in eval mode during the context.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/rai_toolbox.freeze.html#rai_toolbox.freeze" title="rai_toolbox.freeze"><code class="xref py py-obj docutils literal notranslate"><span class="pre">freeze</span></code></a>(*items)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/rai_toolbox.freeze.html#rai_toolbox.freeze" title="rai_toolbox.freeze"><code class="xref py py-obj docutils literal notranslate"><span class="pre">freeze</span></code></a>(*items)</p></td>
 <td><p>'Freezes' collections of tensors by setting <code class="xref py py-obj docutils literal notranslate"><span class="pre">requires_grad=False</span></code>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/rai_toolbox.frozen.html#rai_toolbox.frozen" title="rai_toolbox.frozen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">frozen</span></code></a>(*items)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/rai_toolbox.frozen.html#rai_toolbox.frozen" title="rai_toolbox.frozen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">frozen</span></code></a>(*items)</p></td>
 <td><p>A context manager/decorator for 'freezing' collections of tensors; i.e. <code class="xref py py-obj docutils literal notranslate"><span class="pre">requires_grad</span></code> is set to <a class="reference external" href="https://docs.python.org/3/library/constants.html#False" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a> for the tensors during the context.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/rai_toolbox.negate.html#rai_toolbox.negate" title="rai_toolbox.negate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">negate</span></code></a>(func)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/rai_toolbox.negate.html#rai_toolbox.negate" title="rai_toolbox.negate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">negate</span></code></a>(func)</p></td>
 <td><p>A wrapper that negates (applies the <code class="xref py py-obj docutils literal notranslate"><span class="pre">-</span></code> operator) to the function's output.</p></td>
 </tr>
 </tbody>
@@ -296,10 +304,10 @@ correctness when using the rAI-toolbox.</p>
             <p class="prev-next-title">rai_toolbox.mushin.HydraDDP</p>
         </div>
     </a>
-    <a class='right-next' id="next-link" href="generated/rai_toolbox.evaluating.html" title="next page">
+    <a class='right-next' id="next-link" href="generated/rai_toolbox.to_batch.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">rai_toolbox.evaluating</p>
+        <p class="prev-next-title">rai_toolbox.to_batch</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>

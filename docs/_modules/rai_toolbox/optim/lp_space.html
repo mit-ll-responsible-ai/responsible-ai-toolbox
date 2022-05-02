@@ -860,8 +860,8 @@
 <span class="sd">        tensor([1.0000, 0.1000, 0.1000], requires_grad=True)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="n">SignedGradientOptim</span><span class="p">,</span>
             <span class="n">partial</span><span class="p">(</span><span class="n">TopQGradientOptimizer</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="n">q</span><span class="p">,</span> <span class="n">dq</span><span class="o">=</span><span class="n">dq</span><span class="p">,</span> <span class="n">generator</span><span class="o">=</span><span class="n">generator</span><span class="p">),</span>
+            <span class="n">SignedGradientOptim</span><span class="p">,</span>
             <span class="n">partial</span><span class="p">(</span><span class="n">L1NormedGradientOptim</span><span class="p">,</span> <span class="n">div_by_zero_eps</span><span class="o">=</span><span class="n">div_by_zero_eps</span><span class="p">),</span>
             <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
             <span class="n">InnerOpt</span><span class="o">=</span><span class="n">InnerOpt</span><span class="p">,</span>
