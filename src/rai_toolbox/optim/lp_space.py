@@ -77,13 +77,13 @@ class _LpNormOptimizer(ParamTransformingOptimizer):
             Determines how a parameter and its gradient is temporarily reshaped prior
             to being passed to both `_pre_step_transform_` and `_post_step_transform_`.
             By default,the transformation broadcasts over the tensor's first dimension
-            in a batch-like style.
+            in a batch-like style. This can be specified per param-group
 
-            - A positive number determines the dimensionality of the gradient that the transformation will act on.
-            - A negative number indicates the 'offset' from the dimensionality of the gradient (see "Notes" for examples).
-            - `None` means that the transformation will be applied directly to the gradient without any broadcasting.
+            - A positive number determines the dimensionality of the tensor that the transformation will act on.
+            - A negative number indicates the 'offset' from the dimensionality of the tensor (see "Notes" for examples).
+            - `None` means that the transformation will be applied directly to the tensor without any broadcasting.
 
-            See `ParamTransformingOptimizer` for more details and examples.
+            See `ParamTransformingOptimizer` for more details and examples
 
         grad_scale : float, optional (default=1.0)
             Multiplies each gradient in-place after the in-place transformation is
@@ -380,11 +380,11 @@ class L2ProjectedOptim(L2NormedGradientOptim):
             Determines how a parameter and its gradient is temporarily reshaped prior
             to being passed to both `_pre_step_transform_` and `_post_step_transform_`.
             By default,the transformation broadcasts over the tensor's first dimension
-            in a batch-like style.
+            in a batch-like style. This can be specified per param-group
 
-            - A positive number determines the dimensionality of the gradient that the transformation will act on.
-            - A negative number indicates the 'offset' from the dimensionality of the gradient (see "Notes" for examples).
-            - `None` means that the transformation will be applied directly to the gradient without any broadcasting.
+            - A positive number determines the dimensionality of the tensor that the transformation will act on.
+            - A negative number indicates the 'offset' from the dimensionality of the tensor (see "Notes" for examples).
+            - `None` means that the transformation will be applied directly to the tensor without any broadcasting.
 
             See `ParamTransformingOptimizer` for more details and examples
 
@@ -629,17 +629,16 @@ class L1qNormedGradientOptim(ChainedParamTransformingOptimizer):
             be drawn from a uniform distribution over :math:`[q - dq, q + dq] \in [0.0, 1.0]`.
 
         param_ndim : Union[int, None], optional (default=-1)
-            Controls how `_pre_step_transform_` is broadcast onto the gradient
-            of a given parameter. This can be specified per param-group. By default,
-            the gradient transformation broadcasts over the first dimension in a
-            batch-like style.
+            Determines how a parameter and its gradient is temporarily reshaped prior
+            to being passed to both `_pre_step_transform_` and `_post_step_transform_`.
+            By default,the transformation broadcasts over the tensor's first dimension
+            in a batch-like style. This can be specified per param-group
 
-            - A positive number determines the dimensionality of the gradient that the transformation will act on.
-            - A negative number indicates the 'offset' from the dimensionality of the gradient. E.g. `-1` leads to batch-style broadcasting.
-            - `None` means that the transformation will be applied directly to the gradient without any broadcasting.
+            - A positive number determines the dimensionality of the tensor that the transformation will act on.
+            - A negative number indicates the 'offset' from the dimensionality of the tensor (see "Notes" for examples).
+            - `None` means that the transformation will be applied directly to the tensor without any broadcasting.
 
             See `ParamTransformingOptimizer` for more details and examples
-
 
         grad_scale : float, optional (default=1.0)
             Multiplies each gradient in-place after the in-place transformation is

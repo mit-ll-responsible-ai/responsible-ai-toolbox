@@ -133,7 +133,8 @@ def _to_batch(p: Tensor, param_ndim: Optional[int]) -> Tensor:
 
 class ParamTransformingOptimizer(Optimizer, metaclass=ABCMeta):
     r"""An optimizer that performs an in-place transformation to the
-    each parameter, before performing the gradient-based update on each parameter::
+    each parameter, both before and after performing the gradient-based update on each
+    parameter::
 
        _pre_step_transform_(param)
        param = step(param, ...)
@@ -635,6 +636,8 @@ class ChainedParamTransformingOptimizer(ParamTransformingOptimizer):
             - A positive number determines the dimensionality of the tensor that the transformation will act on.
             - A negative number indicates the 'offset' from the dimensionality of the tensor (see "Notes" for examples).
             - `None` means that the transformation will be applied directly to the tensor without any broadcasting.
+
+            See `ParamTransformingOptimizer` for more details.
 
         grad_scale : float, optional (default=1.0)
             Multiplies each gradient in-place after the in-place transformation is
