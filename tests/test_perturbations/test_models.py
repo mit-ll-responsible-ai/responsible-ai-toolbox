@@ -10,9 +10,8 @@ import torch as tr
 from hypothesis import given, settings
 from hypothesis import strategies as st
 from hypothesis.extra import numpy as hnp
-
 from omegaconf import ListConfig
-
+from torch.testing import assert_allclose
 
 from rai_toolbox.perturbations.init import (
     uniform_like_l1_n_ball_,
@@ -74,6 +73,25 @@ def test_models_init_fn(init_fn, x, epsilon):
     params = list(model.parameters())
     assert len(params) == 1
     assert tr.all(params[0].abs() > 0)
+
+
+def test_init_fn_kwargs():
+    gen1 = tr.Generator().manual_seed(1212121212)
+    gen2 = tr.Generator().manual_seed(1212121212)
+    gen3 = tr.Generator().manual_seed(1111111111)
+
+    pert1 = AdditivePerturbation((3,), uniform_like_l1_n_ball_, generator=gen1)
+    pert2 = AdditivePerturbation((3,), uniform_like_l1_n_ball_, generator=gen2)
+    pert3 = AdditivePerturbation((3,), uniform_like_l1_n_ball_, generator=gen3)
+
+    assert_allclose(pert1.delta, pert2.delta)
+    assert tr.all(pert1.delta != pert3.delta)
+
+
+def test_init_fn_validation():
+    gen1 = tr.Generator().manual_seed(1212121212)
+    with pytest.raises(TypeError):
+        AdditivePerturbation((3,), generator=gen1)  # no init_fn
 
 
 @given(

@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 from abc import abstractmethod
-from typing import Callable, Iterator, Optional, Sequence, Union
+from typing import Any, Callable, Iterator, Optional, Sequence, Union
 
 import torch as tr
 from torch import Tensor, nn
@@ -54,6 +54,7 @@ class AdditivePerturbation(nn.Module, PerturbationModel):
         device: Optional[tr.device] = None,
         dtype: Optional[tr.dtype] = None,
         delta_ndim: Optional[int] = None,
+        **init_fn_kwargs: Any,
     ) -> None:
         """The init function should support data is the argument to initialize
         perturbations.
@@ -83,14 +84,17 @@ class AdditivePerturbation(nn.Module, PerturbationModel):
             `data_or_shape`. E.g. if `data_or_shape` has a shape (N, C, H, W), and
             if `delta_ndim=-1`, then the perturbation will have shape (C, H, W),
             and will be applied in a broadcast fashion.
+
+        **init_fn_kwargs: Any
+            Keyword arguments passed to `init_fn`.
         """
         super().__init__()
 
-        init_kwargs = {}
+        _init_kwargs = {}
 
         if isinstance(data_or_shape, tr.Tensor):
             shape = data_or_shape.shape
-            init_kwargs.update(
+            _init_kwargs.update(
                 {
                     "dtype": data_or_shape.dtype,
                     "device": data_or_shape.device,
@@ -101,19 +105,25 @@ class AdditivePerturbation(nn.Module, PerturbationModel):
             shape = tuple(data_or_shape)
 
         if device is not None:
-            init_kwargs["device"] = device
+            _init_kwargs["device"] = device
 
         if dtype is not None:
-            init_kwargs["dtype"] = dtype
+            _init_kwargs["dtype"] = dtype
 
         if delta_ndim is not None:
             offset = len(shape) - delta_ndim if delta_ndim >= 0 else abs(delta_ndim)
             shape = shape[offset:]
 
-        self.delta = nn.Parameter(tr.zeros(shape, **init_kwargs))  # type: ignore
+        self.delta = nn.Parameter(tr.zeros(shape, **_init_kwargs))  # type: ignore
+        del _init_kwargs
 
         if init_fn is not None:
-            init_fn(self.delta)
+            init_fn(self.delta, **init_fn_kwargs)
+        elif init_fn_kwargs:
+            raise TypeError(
+                f"No `init_fn` was specified, but the keyword arguments "
+                f"{init_fn_kwargs} were provided."
+            )
 
     def forward(self, data: Tensor) -> Tensor:
         """Add perturbation to data.
