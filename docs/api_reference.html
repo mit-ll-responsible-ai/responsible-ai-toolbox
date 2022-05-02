@@ -173,26 +173,9 @@
    Mushin
   </a>
  </li>
-</ul>
-<ul class="nav bd-sidenav">
  <li class="toctree-l1">
-  <a class="reference internal" href="generated/rai_toolbox.evaluating.html">
-   rai_toolbox.evaluating
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="generated/rai_toolbox.freeze.html">
-   rai_toolbox.freeze
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="generated/rai_toolbox.frozen.html">
-   rai_toolbox.frozen
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="generated/rai_toolbox.negate.html">
-   rai_toolbox.negate
+  <a class="reference internal" href="ref_utils.html">
+   General Utilities
   </a>
  </li>
 </ul>
@@ -212,19 +195,9 @@
               
               <div class="toc-item">
                 
-<div class="tocsection onthispage mt-5 pt-1 pb-3">
-    <i class="fas fa-list"></i> On this page
-</div>
 
 <nav id="bd-toc-nav">
-    <ul class="visible nav section-nav flex-column">
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#general-pytorch-utilities">
-   General PyTorch Utilities
-  </a>
- </li>
-</ul>
-
+    
 </nav>
               </div>
               
@@ -256,6 +229,7 @@ bottom of any given reference page to see the examples.</p>
 <li class="toctree-l1"><a class="reference internal" href="ref_optim.html">Optimizers</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="ref_optim.html#base-optimizers">Base Optimizers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ref_optim.html#optimizers-with-normed-gradients">Optimizers with Normed Gradients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ref_optim.html#miscellaneous-gradient-transforming-optimizers">Miscellaneous Gradient-Transforming Optimizers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ref_optim.html#optimizers-with-projections-onto-constraint-sets">Optimizers with Projections Onto Constraint Sets</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ref_optim.html#frank-wolfe-optimizers">Frank Wolfe Optimizers</a></li>
 </ul>
@@ -281,34 +255,16 @@ bottom of any given reference page to see the examples.</p>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="ref_mushin.html">Mushin</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ref_mushin.html#workflows">Workflows</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ref_mushin.html#pytorch-lightning-utilities">PyTorch-Lightning Utilities</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ref_utils.html">General Utilities</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ref_utils.html#pytorch-utilities">PyTorch Utilities</a></li>
 </ul>
 </li>
 </ul>
 </div>
-<section id="general-pytorch-utilities">
-<h2>General PyTorch Utilities<a class="headerlink" href="#general-pytorch-utilities" title="Permalink to this headline">#</a></h2>
-<table class="autosummary longtable table autosummary">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/rai_toolbox.evaluating.html#rai_toolbox.evaluating" title="rai_toolbox.evaluating"><code class="xref py py-obj docutils literal notranslate"><span class="pre">evaluating</span></code></a>(*modules)</p></td>
-<td><p>A context manager / decorator that temporarily places one or more modules in eval mode during the context.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/rai_toolbox.freeze.html#rai_toolbox.freeze" title="rai_toolbox.freeze"><code class="xref py py-obj docutils literal notranslate"><span class="pre">freeze</span></code></a>(*items)</p></td>
-<td><p>'Freezes' collections of tensors by setting <code class="xref py py-obj docutils literal notranslate"><span class="pre">requires_grad=False</span></code>.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/rai_toolbox.frozen.html#rai_toolbox.frozen" title="rai_toolbox.frozen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">frozen</span></code></a>(*items)</p></td>
-<td><p>A context manager/decorator for 'freezing' collections of tensors; i.e. <code class="xref py py-obj docutils literal notranslate"><span class="pre">requires_grad</span></code> is set to <a class="reference external" href="https://docs.python.org/3/library/constants.html#False" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a> for the tensors during the context.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/rai_toolbox.negate.html#rai_toolbox.negate" title="rai_toolbox.negate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">negate</span></code></a>(func)</p></td>
-<td><p>A wrapper that negates (applies the <code class="xref py py-obj docutils literal notranslate"><span class="pre">-</span></code> operator) to the function's output.</p></td>
-</tr>
-</tbody>
-</table>
-</section>
 </section>
 
 

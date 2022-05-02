@@ -1,0 +1,579 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>rai_toolbox.optim.misc &#8212; rai-toolbox  documentation</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/tabs.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/clipboard.min.js"></script>
+    <script src="../../../_static/copybutton.js"></script>
+    <script src="../../../_static/tabs.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="../../../index.html">
+<p class="title">rai-toolbox</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../tutorials.html">
+  Tutorials
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../how_tos.html">
+  How-To Guides
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../explanation.html">
+  Explanation
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../api_reference.html">
+  Reference
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../changes.html">
+  Changelog
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    
+  </div>
+</nav>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <h1>Source code for rai_toolbox.optim.misc</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2022, MASSACHUSETTS INSTITUTE OF TECHNOLOGY</span>
+<span class="c1"># Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).</span>
+<span class="c1"># SPDX-License-Identifier: MIT</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Generator</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">default_generator</span>
+<span class="kn">from</span> <span class="nn">torch.optim</span> <span class="kn">import</span> <span class="n">SGD</span>
+
+<span class="kn">from</span> <span class="nn">rai_toolbox._typing</span> <span class="kn">import</span> <span class="n">Optimizer</span> <span class="k">as</span> <span class="n">Opt</span>
+<span class="kn">from</span> <span class="nn">rai_toolbox._typing</span> <span class="kn">import</span> <span class="n">OptimizerType</span><span class="p">,</span> <span class="n">OptimParams</span><span class="p">,</span> <span class="n">Partial</span>
+<span class="kn">from</span> <span class="nn">rai_toolbox._utils</span> <span class="kn">import</span> <span class="n">check_param_group_value</span><span class="p">,</span> <span class="n">value_check</span>
+
+<span class="kn">from</span> <span class="nn">.optimizer</span> <span class="kn">import</span> <span class="n">REQUIRED</span><span class="p">,</span> <span class="n">DatumParamGroup</span><span class="p">,</span> <span class="n">ParamTransformingOptimizer</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ClampedGradientOptimizer&quot;</span><span class="p">,</span> <span class="s2">&quot;TopQGradientOptimizer&quot;</span><span class="p">]</span>
+
+
+<span class="k">class</span> <span class="nc">ClampedParamGroup</span><span class="p">(</span><span class="n">DatumParamGroup</span><span class="p">):</span>
+    <span class="n">clamp_min</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
+    <span class="n">clamp_max</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
+
+
+<span class="k">class</span> <span class="nc">_ClampedOptim</span><span class="p">(</span><span class="n">ParamTransformingOptimizer</span><span class="p">):</span>
+    <span class="n">param_groups</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ClampedParamGroup</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">OptimParams</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">InnerOpt</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Opt</span><span class="p">,</span> <span class="n">Partial</span><span class="p">[</span><span class="n">Opt</span><span class="p">],</span> <span class="n">OptimizerType</span><span class="p">]</span> <span class="o">=</span> <span class="n">SGD</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">clamp_min</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">clamp_max</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">defaults</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">param_ndim</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">inner_opt_kwargs</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        params : Sequence[Tensor] | Iterable[Mapping[str, Any]]</span>
+<span class="sd">            Iterable of parameters or dicts defining parameter groups.</span>
+
+<span class="sd">        InnerOpt : Type[Optimizer] | Partial[Optimizer], optional (default=`torch.nn.optim.SGD`)</span>
+<span class="sd">            The optimizer that updates the parameters after their gradients have</span>
+<span class="sd">            been transformed.</span>
+
+<span class="sd">        epsilon : float</span>
+<span class="sd">            Specifies the size of the L2-space ball that all parameters will be</span>
+<span class="sd">            projected into, post optimization step.</span>
+
+<span class="sd">        clamp_min: Optional[float]</span>
+<span class="sd">            Lower-bound of the range to be clamped to.  Must be specified if `clamp_max` is `None`.</span>
+
+<span class="sd">        clamp_max: Optional[float]</span>
+<span class="sd">            Upper-bound of the range to be clamped to. Must be specified if `clamp_min`</span>
+<span class="sd">            is `None`.</span>
+
+<span class="sd">        grad_scale : float, optional (default=1.0)</span>
+<span class="sd">            Multiplies each gradient in-place after the in-place transformation is</span>
+<span class="sd">            performed. This can be specified per param-group.</span>
+
+<span class="sd">        grad_bias : float, optional (default=0.0)</span>
+<span class="sd">            Added to each gradient in-place after the in-place transformation is</span>
+<span class="sd">            performed. This can be specified per param-group.</span>
+
+<span class="sd">        defaults : Optional[Dict[str, Any]]</span>
+<span class="sd">            Specifies default parameters for all parameter groups.</span>
+
+<span class="sd">        param_ndim : Optional[int]</span>
+<span class="sd">            Controles how `_pre_step_transform_` and `_post_step_transform_`  are</span>
+<span class="sd">            broadcast onto a given parameter. This has no effect for</span>
+<span class="sd">            `ClampedGradientOptimizer`.</span>
+
+<span class="sd">            Specifies default parameters for all parameter groups.</span>
+
+<span class="sd">        **inner_opt_kwargs : Any</span>
+<span class="sd">            Named arguments used to initialize `InnerOpt`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">defaults</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">defaults</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">defaults</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;clamp_min&quot;</span><span class="p">,</span> <span class="n">clamp_min</span><span class="p">)</span>
+        <span class="n">defaults</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;clamp_max&quot;</span><span class="p">,</span> <span class="n">clamp_max</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">params</span><span class="p">,</span>
+            <span class="n">InnerOpt</span><span class="p">,</span>
+            <span class="n">defaults</span><span class="o">=</span><span class="n">defaults</span><span class="p">,</span>
+            <span class="n">param_ndim</span><span class="o">=</span><span class="n">param_ndim</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">inner_opt_kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_groups</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">group</span><span class="p">[</span><span class="s2">&quot;clamp_min&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">group</span><span class="p">[</span><span class="s2">&quot;clamp_max&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Either `clamp_min` or `clamp_max` must be specified&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">group</span><span class="p">[</span><span class="s2">&quot;clamp_min&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">group</span><span class="p">[</span><span class="s2">&quot;clamp_max&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">value_check</span><span class="p">(</span>
+                    <span class="s2">&quot;clamp_min&quot;</span><span class="p">,</span>
+                    <span class="n">group</span><span class="p">[</span><span class="s2">&quot;clamp_min&quot;</span><span class="p">],</span>
+                    <span class="n">max_</span><span class="o">=</span><span class="n">group</span><span class="p">[</span><span class="s2">&quot;clamp_max&quot;</span><span class="p">],</span>
+                    <span class="n">upper_name</span><span class="o">=</span><span class="s2">&quot;max_clamp&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+
+
+<div class="viewcode-block" id="ClampedGradientOptimizer"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.ClampedGradientOptimizer.html#rai_toolbox.optim.ClampedGradientOptimizer">[docs]</a><span class="k">class</span> <span class="nc">ClampedGradientOptimizer</span><span class="p">(</span><span class="n">_ClampedOptim</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A gradient-tranforming  optimizer that clamps the elements of a gradient to</span>
+<span class="sd">    fall within user-specified bounds **prior** to using `InnerOp.step` to update the</span>
+<span class="sd">    corresponding parameter.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    ClampedParameterOptimizer</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    Let&#39;s clamp each element of the parameter&#39;s gradient to `[-1, 3]` prior to</span>
+<span class="sd">    performing a step with `SGD` using a learning rate of `1.0`.</span>
+
+<span class="sd">    &gt;&gt;&gt; import torch as tr</span>
+<span class="sd">    &gt;&gt;&gt; from rai_toolbox.optim import ClampedGradientOptimizer</span>
+<span class="sd">    &gt;&gt;&gt; x = tr.ones(2, requires_grad=True)</span>
+<span class="sd">    &gt;&gt;&gt; optim = ClampedGradientOptimizer(params=[x], lr=1.0, clamp_min=-1.0, clamp_max=3.0)</span>
+
+<span class="sd">    &gt;&gt;&gt; x.backward(gradient=tr.tensor([-0.5, 10]))</span>
+<span class="sd">    &gt;&gt;&gt; optim.step()</span>
+<span class="sd">    &gt;&gt;&gt; x.grad</span>
+<span class="sd">    tensor([-0.5000,  3.0000])</span>
+<span class="sd">    &gt;&gt;&gt; x</span>
+<span class="sd">    tensor([ 1.5000, -2.0000], requires_grad=True)&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_pre_step_transform_</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">optim_group</span><span class="p">:</span> <span class="n">ClampedParamGroup</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">grad</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+            <span class="k">return</span>
+        <span class="n">param</span><span class="o">.</span><span class="n">grad</span><span class="o">.</span><span class="n">clamp_</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="n">optim_group</span><span class="p">[</span><span class="s2">&quot;clamp_min&quot;</span><span class="p">],</span> <span class="nb">max</span><span class="o">=</span><span class="n">optim_group</span><span class="p">[</span><span class="s2">&quot;clamp_max&quot;</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="ClampedParameterOptimizer"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.ClampedParameterOptimizer.html#rai_toolbox.optim.ClampedParameterOptimizer">[docs]</a><span class="k">class</span> <span class="nc">ClampedParameterOptimizer</span><span class="p">(</span><span class="n">_ClampedOptim</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A parameter optimizer that clamps the elements of a parameter to fall within</span>
+<span class="sd">    user-specified bounds **after** `InnerOp.step` has updated the parameter</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    ClampedGradientOptimizer</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    Let&#39;s perform a step with `SGD` using a learning rate of `1.0` to each of our parameters and then clamp their parameters to `[-1.0, 3.0]`.</span>
+
+<span class="sd">    &gt;&gt;&gt; import torch as tr</span>
+<span class="sd">    &gt;&gt;&gt; from rai_toolbox.optim import ClampedParameterOptimizer</span>
+<span class="sd">    &gt;&gt;&gt; x = tr.ones(2, requires_grad=True)</span>
+<span class="sd">    &gt;&gt;&gt; optim = ClampedParameterOptimizer(params=[x], lr=1.0, clamp_min=-1.0, clamp_max=3.0)</span>
+
+<span class="sd">    &gt;&gt;&gt; x.backward(gradient=tr.tensor([0.5, -10.0]))</span>
+<span class="sd">    &gt;&gt;&gt; optim.step()</span>
+<span class="sd">    &gt;&gt;&gt; x</span>
+<span class="sd">    tensor([0.5000, 3.0000], requires_grad=True)&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_post_step_transform_</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">optim_group</span><span class="p">:</span> <span class="n">ClampedParamGroup</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">param</span><span class="o">.</span><span class="n">clamp_</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="n">optim_group</span><span class="p">[</span><span class="s2">&quot;clamp_min&quot;</span><span class="p">],</span> <span class="nb">max</span><span class="o">=</span><span class="n">optim_group</span><span class="p">[</span><span class="s2">&quot;clamp_max&quot;</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="TopQGradientOptimizer"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.TopQGradientOptimizer.html#rai_toolbox.optim.TopQGradientOptimizer">[docs]</a><span class="k">class</span> <span class="nc">TopQGradientOptimizer</span><span class="p">(</span><span class="n">ParamTransformingOptimizer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A gradient-tranforming  optimizer that zeros the elements of a gradient whose</span>
+<span class="sd">    absolue magnitudes fall below the Qth percentile. `InnerOp.step` is then to update</span>
+<span class="sd">    the corresponding parameter.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    L1qNormedGradientOptim</span>
+<span class="sd">    ParamTransformingOptimizer&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="TopQGradientOptimizer.__init__"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.TopQGradientOptimizer.html#rai_toolbox.optim.TopQGradientOptimizer.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">params</span><span class="p">:</span> <span class="n">OptimParams</span><span class="p">,</span>
+        <span class="n">InnerOpt</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Partial</span><span class="p">[</span><span class="n">Opt</span><span class="p">],</span> <span class="n">OptimizerType</span><span class="p">]</span> <span class="o">=</span> <span class="n">SGD</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">q</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">REQUIRED</span><span class="p">,</span>
+        <span class="n">dq</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">param_ndim</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">defaults</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">generator</span><span class="p">:</span> <span class="n">Generator</span> <span class="o">=</span> <span class="n">default_generator</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">inner_opt_kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
+
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        params : Sequence[Tensor] | Iterable[Mapping[str, Any]]</span>
+<span class="sd">            Iterable of parameters or dicts defining parameter groups.</span>
+
+<span class="sd">        InnerOpt : Type[Optimizer] | Partial[Optimizer], optional (default=`torch.nn.optim.SGD`)</span>
+<span class="sd">            The optimizer that updates the parameters after their gradients have</span>
+<span class="sd">            been transformed.</span>
+
+<span class="sd">        q : float</span>
+<span class="sd">            Specifies the (fractional) percentile of absolute-largest gradient elements</span>
+<span class="sd">            to retain when sparsifying the gradient. E.g `q=0.9` means that only the</span>
+<span class="sd">            gradient elements within the 90th-percentile will be retained.</span>
+
+<span class="sd">            Must be within `[0.0, 1.0]`. The sparsification is applied to the gradient</span>
+<span class="sd">            in accordance to `param_ndim`.</span>
+
+<span class="sd">        dq : float, optional (default=0.0)</span>
+<span class="sd">            If specified, the sparsity factor for each gradient transformation will</span>
+<span class="sd">            be drawn from a uniform distribution over :math:`[q - dq, q + dq] \in [0.0, 1.0]`.</span>
+
+<span class="sd">        param_ndim : Union[int, None], optional (default=-1)</span>
+<span class="sd">            Determines how a parameter and its gradient is temporarily reshaped prior</span>
+<span class="sd">            to being passed to both `_pre_step_transform_` and `_post_step_transform_`.</span>
+<span class="sd">            By default,the transformation broadcasts over the tensor&#39;s first dimension</span>
+<span class="sd">            in a batch-like style. This can be specified per param-group</span>
+
+<span class="sd">            - A positive number determines the dimensionality of the tensor that the transformation will act on.</span>
+<span class="sd">            - A negative number indicates the &#39;offset&#39; from the dimensionality of the tensor (see &quot;Notes&quot; for examples).</span>
+<span class="sd">            - `None` means that the transformation will be applied directly to the tensor without any broadcasting.</span>
+
+<span class="sd">            See `ParamTransformingOptimizer` for more details and examples</span>
+
+<span class="sd">        grad_scale : float, optional (default=1.0)</span>
+<span class="sd">            Multiplies each gradient in-place after the in-place transformation is</span>
+<span class="sd">            performed. This can be specified per param-group.</span>
+
+<span class="sd">        grad_bias : float, optional (default=0.0)</span>
+<span class="sd">            Added to each gradient in-place after the in-place transformation is</span>
+<span class="sd">            performed. This can be specified per param-group.</span>
+
+<span class="sd">        defaults : Optional[Dict[str, Any]]</span>
+<span class="sd">            Specifies default parameters for all parameter groups.</span>
+
+<span class="sd">        generator : torch.Generator, optional (default=`torch.default_generator`)</span>
+<span class="sd">            Controls the RNG source.</span>
+
+<span class="sd">        **inner_opt_kwargs : Any</span>
+<span class="sd">            Named arguments used to initialize `InnerOpt`.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        Let&#39;s use `TopQGradientOptimizer` along with a standard SGD-step with a learning</span>
+<span class="sd">        rate of `1.0`. We&#39;ll sparsify the gradient of a 2D parameter using varying</span>
+<span class="sd">        percentile values. We set `param_ndim=None` so that no broadcasting occurs.</span>
+
+<span class="sd">        &gt;&gt;&gt; import torch as tr</span>
+<span class="sd">        &gt;&gt;&gt; from rai_toolbox.optim import TopQGradientOptim</span>
+
+<span class="sd">        &gt;&gt;&gt; gradient = tr.tensor([[0.5,   1.0],</span>
+<span class="sd">        ...                       [-2.5, 0.30]])</span>
+<span class="sd">        &gt;&gt;&gt; for q in [0.0, 0.25, 0.5, 0.75, 1.0]:</span>
+<span class="sd">        ...     x = tr.ones((2, 2), requires_grad=True)</span>
+<span class="sd">        ...     optim = TopQGradientOptim(params=[x], lr=1.0, q=q, param_ndim=None)</span>
+<span class="sd">        ...     x.backward(gradient=gradient)</span>
+<span class="sd">        ...     optim.step()</span>
+<span class="sd">        ...     print(f&quot;grad (q={q})\n{x.grad}\nx:\n{x}\n---&quot;)</span>
+<span class="sd">        grad (q=0.0)</span>
+<span class="sd">        tensor([[ 0.5000,  1.0000],</span>
+<span class="sd">                [-2.5000,  0.3000]])</span>
+<span class="sd">        x:</span>
+<span class="sd">        tensor([[0.5000, 0.0000],</span>
+<span class="sd">                [3.5000, 0.7000]], requires_grad=True)</span>
+<span class="sd">        ---</span>
+<span class="sd">        grad (q=0.25)</span>
+<span class="sd">        tensor([[ 0.5000,  1.0000],</span>
+<span class="sd">                [-2.5000,  0.0000]])</span>
+<span class="sd">        x:</span>
+<span class="sd">        tensor([[0.5000, 0.0000],</span>
+<span class="sd">                [3.5000, 1.0000]], requires_grad=True)</span>
+<span class="sd">        ---</span>
+<span class="sd">        grad (q=0.5)</span>
+<span class="sd">        tensor([[ 0.0000,  1.0000],</span>
+<span class="sd">                [-2.5000,  0.0000]])</span>
+<span class="sd">        x:</span>
+<span class="sd">        tensor([[1.0000, 0.0000],</span>
+<span class="sd">                [3.5000, 1.0000]], requires_grad=True)</span>
+<span class="sd">        ---</span>
+<span class="sd">        grad (q=0.75)</span>
+<span class="sd">        tensor([[ 0.0000,  0.0000],</span>
+<span class="sd">                [-2.5000,  0.0000]])</span>
+<span class="sd">        x:</span>
+<span class="sd">        tensor([[1.0000, 1.0000],</span>
+<span class="sd">                [3.5000, 1.0000]], requires_grad=True)</span>
+<span class="sd">        ---</span>
+<span class="sd">        grad (q=1.0)</span>
+<span class="sd">        tensor([[0., 0.],</span>
+<span class="sd">                [0., 0.]])</span>
+<span class="sd">        x:</span>
+<span class="sd">        tensor([[1., 1.],</span>
+<span class="sd">                [1., 1.]], requires_grad=True)</span>
+<span class="sd">        ---</span>
+
+<span class="sd">        We&#39;ll repeat this exercise using `param_ndim=1` so that the top-Q</span>
+<span class="sd">        sparsification is applied to each row independently (i.e. it is &quot;broadcast&quot;</span>
+<span class="sd">        over each 1D sub-tensor in our gradient).</span>
+
+<span class="sd">        &gt;&gt;&gt; gradient = tr.tensor([[0.5,   1.0],</span>
+<span class="sd">        ...                       [-2.5, 0.30]])</span>
+<span class="sd">        &gt;&gt;&gt; for q in [0.0, 0.5, 1.0]:</span>
+<span class="sd">        ...     x = tr.ones((2, 2), requires_grad=True)</span>
+<span class="sd">        ...     optim = TopQGradientOptim(params=[x], lr=1.0, q=q, param_ndim=1)</span>
+<span class="sd">        ...     x.backward(gradient=gradient)</span>
+<span class="sd">        ...     optim.step()</span>
+<span class="sd">        ...     print(f&quot;grad (q={q})\n{x.grad}\nx:\n{x}\n---&quot;)</span>
+<span class="sd">        grad (q=0.0)</span>
+<span class="sd">        tensor([[ 0.5000,  1.0000],</span>
+<span class="sd">                [-2.5000,  0.3000]])</span>
+<span class="sd">        x:</span>
+<span class="sd">        tensor([[0.5000, 0.0000],</span>
+<span class="sd">                [3.5000, 0.7000]], requires_grad=True)</span>
+<span class="sd">        ---</span>
+<span class="sd">        grad (q=0.5)</span>
+<span class="sd">        tensor([[ 0.0000,  1.0000],</span>
+<span class="sd">                [-2.5000,  0.0000]])</span>
+<span class="sd">        x:</span>
+<span class="sd">        tensor([[1.0000, 0.0000],</span>
+<span class="sd">                [3.5000, 1.0000]], requires_grad=True)</span>
+<span class="sd">        ---</span>
+<span class="sd">        grad (q=1.0)</span>
+<span class="sd">        tensor([[0., 0.],</span>
+<span class="sd">                [0., 0.]])</span>
+<span class="sd">        x:</span>
+<span class="sd">        tensor([[1., 1.],</span>
+<span class="sd">                [1., 1.]], requires_grad=True)</span>
+<span class="sd">        ---</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">defaults</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">defaults</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">defaults</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>
+        <span class="n">defaults</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;dq&quot;</span><span class="p">,</span> <span class="n">dq</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">params</span><span class="p">,</span>
+            <span class="n">InnerOpt</span><span class="o">=</span><span class="n">InnerOpt</span><span class="p">,</span>
+            <span class="n">defaults</span><span class="o">=</span><span class="n">defaults</span><span class="p">,</span>
+            <span class="n">param_ndim</span><span class="o">=</span><span class="n">param_ndim</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">inner_opt_kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">check_param_group_value</span><span class="p">(</span>
+            <span class="s2">&quot;q&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_groups</span><span class="p">,</span> <span class="n">optional</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">min_</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">max_</span><span class="o">=</span><span class="mf">1.0</span>
+        <span class="p">)</span>
+        <span class="n">check_param_group_value</span><span class="p">(</span>
+            <span class="s2">&quot;dq&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_groups</span><span class="p">,</span> <span class="n">optional</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">min_</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">max_</span><span class="o">=</span><span class="mf">1.0</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_generator</span> <span class="o">=</span> <span class="n">value_check</span><span class="p">(</span><span class="s2">&quot;generator&quot;</span><span class="p">,</span> <span class="n">generator</span><span class="p">,</span> <span class="n">type_</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">Generator</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_pre_step_transform_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">optim_group</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">grad</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+            <span class="k">return</span>
+
+        <span class="n">q</span> <span class="o">=</span> <span class="n">optim_group</span><span class="p">[</span><span class="s2">&quot;q&quot;</span><span class="p">]</span>
+        <span class="n">dq</span> <span class="o">=</span> <span class="n">optim_group</span><span class="p">[</span><span class="s2">&quot;dq&quot;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">dq</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="n">_qlow</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">q</span> <span class="o">-</span> <span class="n">dq</span><span class="p">)</span>
+            <span class="n">_qhigh</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">q</span> <span class="o">+</span> <span class="n">dq</span><span class="p">)</span>
+
+            <span class="n">q</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">_qhigh</span> <span class="o">-</span> <span class="n">_qlow</span><span class="p">)</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">generator</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_generator</span><span class="p">)</span> <span class="o">+</span> <span class="n">_qlow</span>
+                <span class="k">if</span> <span class="n">dq</span> <span class="ow">and</span> <span class="p">(</span><span class="n">_qlow</span> <span class="o">&lt;</span> <span class="n">q</span> <span class="ow">or</span> <span class="n">_qhigh</span> <span class="o">&gt;</span> <span class="n">q</span><span class="p">)</span>
+                <span class="k">else</span> <span class="n">q</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Convert percent to number of entries</span>
+        <span class="n">shp</span> <span class="o">=</span> <span class="n">param</span><span class="o">.</span><span class="n">grad</span><span class="o">.</span><span class="n">shape</span>
+
+        <span class="n">num_q</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">q</span>
+        <span class="n">num_q</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">num_q</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">shp</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span>
+
+        <span class="n">g</span> <span class="o">=</span> <span class="n">param</span><span class="o">.</span><span class="n">grad</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">num_q</span><span class="p">:</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">corners_q</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">topk</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">abs</span><span class="p">(),</span> <span class="n">num_q</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">batch_idx</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">num_q</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">shp</span><span class="p">[</span><span class="mi">0</span><span class="p">])])</span>
+            <span class="n">s</span><span class="p">[</span><span class="n">batch_idx</span><span class="p">,</span> <span class="n">corners_q</span><span class="p">]</span> <span class="o">=</span> <span class="n">g</span><span class="p">[</span><span class="n">batch_idx</span><span class="p">,</span> <span class="n">corners_q</span><span class="p">]</span>
+
+        <span class="n">param</span><span class="o">.</span><span class="n">grad</span><span class="p">[</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">shp</span><span class="p">)</span>  <span class="c1"># type: ignore</span></div>
+</pre></div>
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2022 Massachusetts Institute of Technology.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
+</html>

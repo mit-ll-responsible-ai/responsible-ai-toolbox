@@ -17,8 +17,9 @@ Base Optimizers
 .. autosummary::
    :toctree: generated/
 
-   GradientTransformerOptimizer
-   ProjectionMixin
+   ParamTransformingOptimizer
+   ChainedParamTransformingOptimizer
+
 
 ********************************
 Optimizers with Normed Gradients
@@ -32,6 +33,19 @@ Optimizers with Normed Gradients
    L2NormedGradientOptim
    SignedGradientOptim
    L1qNormedGradientOptim
+
+
+**********************************************
+Miscellaneous Gradient-Transforming Optimizers
+**********************************************
+.. currentmodule:: rai_toolbox.optim
+
+.. autosummary::
+   :toctree: generated/
+
+   TopQGradientOptimizer
+   ClampedGradientOptimizer
+   ClampedParameterOptimizer
 
 
 ************************************************

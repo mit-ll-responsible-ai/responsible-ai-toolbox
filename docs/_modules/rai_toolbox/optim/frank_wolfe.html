@@ -172,7 +172,7 @@
 <span class="kn">from</span> <span class="nn">rai_toolbox._utils</span> <span class="kn">import</span> <span class="n">check_param_group_value</span><span class="p">,</span> <span class="n">value_check</span>
 
 <span class="kn">from</span> <span class="nn">.lp_space</span> <span class="kn">import</span> <span class="n">L1qNormedGradientOptim</span><span class="p">,</span> <span class="n">L2NormedGradientOptim</span><span class="p">,</span> <span class="n">SignedGradientOptim</span>
-<span class="kn">from</span> <span class="nn">.optimizer</span> <span class="kn">import</span> <span class="n">GradientTransformerOptimizer</span>
+<span class="kn">from</span> <span class="nn">.optimizer</span> <span class="kn">import</span> <span class="n">ParamTransformingOptimizer</span>
 
 <span class="n">_TINY</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span><span class="o">.</span><span class="n">tiny</span>
 
@@ -304,41 +304,6 @@
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
 <span class="sd">    .. [1] https://en.wikipedia.org/wiki/Frank%E2%80%93Wolfe_algorithm#Algorithm</span>
-
-<span class="sd">    Examples</span>
-<span class="sd">    --------</span>
-<span class="sd">    Using `L1qFrankWolfe`, we&#39;ll sparsify the parameter&#39;s gradient to retain signs of</span>
-<span class="sd">    the top 70% elements, and we&#39;ll constrain the updated parameter to fall within a</span>
-<span class="sd">    :math:`L^1`-ball of radius `1.8`.</span>
-
-<span class="sd">    &gt;&gt;&gt; import torch as tr</span>
-<span class="sd">    &gt;&gt;&gt; from rai_toolbox.optim import L1qFrankWolfe</span>
-
-<span class="sd">    Creating a parameter for our optimizer to update, and our optimizer. We</span>
-<span class="sd">    specify `param_ndim=None` so that the sparsification/normalization occurs on the</span>
-<span class="sd">    gradient without any broadcasting.</span>
-
-<span class="sd">    &gt;&gt;&gt; x = tr.tensor([1.0, 1.0, 1.0], requires_grad=True)</span>
-<span class="sd">    &gt;&gt;&gt; optim = L1qFrankWolfe(</span>
-<span class="sd">    ...     [x],</span>
-<span class="sd">    ...     q=0.30,</span>
-<span class="sd">    ...     epsilon=1.8,</span>
-<span class="sd">    ...     param_ndim=None,</span>
-<span class="sd">    ... )</span>
-
-<span class="sd">    Performing a simple calculation with `x` and performing backprop to create</span>
-<span class="sd">    a gradient.</span>
-
-<span class="sd">    &gt;&gt;&gt; (tr.tensor([0.0, 1.0, 2.0]) * x).sum().backward()</span>
-
-<span class="sd">    Performing a step with our optimizer uses the Frank Wolfe algorithm to update</span>
-<span class="sd">    its parameters; the resulting parameter was updated with a LMO based on a</span>
-<span class="sd">    sparsified, sign-only gradient. Note that the parameter falls within/on the</span>
-<span class="sd">    L1-ball of radius `1.8`.</span>
-
-<span class="sd">    &gt;&gt;&gt; optim.step()</span>
-<span class="sd">    &gt;&gt;&gt; x  # the updated parameter; has a L1-norm of 1.8</span>
-<span class="sd">    tensor([ 0.0000, -0.9000, -0.9000], requires_grad=True)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="L1qFrankWolfe.__init__"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.L1qFrankWolfe.html#rai_toolbox.optim.L1qFrankWolfe.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -388,16 +353,16 @@
 <span class="sd">            for that parameter, which starts at 0.</span>
 
 <span class="sd">        param_ndim : Union[int, None], optional (default=-1)</span>
-<span class="sd">            Controls how `_inplace_grad_transform_` is broadcast onto the gradient</span>
-<span class="sd">            of a given parameter. This can be specified per param-group. By default,</span>
-<span class="sd">            the gradient transformation broadcasts over the first dimension in a</span>
-<span class="sd">            batch-like style.</span>
+<span class="sd">            Determines how a parameter and its gradient is temporarily reshaped prior</span>
+<span class="sd">            to being passed to both `_pre_step_transform_` and `_post_step_transform_`.</span>
+<span class="sd">            By default,the transformation broadcasts over the tensor&#39;s first dimension</span>
+<span class="sd">            in a batch-like style. This can be specified per param-group</span>
 
-<span class="sd">            - A positive number determines the dimensionality of the gradient that the transformation will act on.</span>
-<span class="sd">            - A negative number indicates the &#39;offset&#39; from the dimensionality of the gradient. E.g. `-1` leads to batch-style broadcasting.</span>
-<span class="sd">            - `None` means that the transformation will be applied directly to the gradient without any broadcasting.</span>
+<span class="sd">            - A positive number determines the dimensionality of the tensor that the transformation will act on.</span>
+<span class="sd">            - A negative number indicates the &#39;offset&#39; from the dimensionality of the tensor (see &quot;Notes&quot; for examples).</span>
+<span class="sd">            - `None` means that the transformation will be applied directly to the tensor without any broadcasting.</span>
 
-<span class="sd">            See `GradientTransformerOptimizer` for more details and examples</span>
+<span class="sd">            See `ParamTransformingOptimizer` for more details and examples</span>
 
 <span class="sd">        defaults : Optional[Dict[str, Any]]</span>
 <span class="sd">            Specifies default parameters for all parameter groups.</span>
@@ -407,6 +372,41 @@
 
 <span class="sd">        generator : torch.Generator, optional (default=`torch.default_generator`)</span>
 <span class="sd">            Controls the RNG source.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        Using `L1qFrankWolfe`, we&#39;ll sparsify the parameter&#39;s gradient to retain signs of</span>
+<span class="sd">        the top 70% elements, and we&#39;ll constrain the updated parameter to fall within a</span>
+<span class="sd">        :math:`L^1`-ball of radius `1.8`.</span>
+
+<span class="sd">        &gt;&gt;&gt; import torch as tr</span>
+<span class="sd">        &gt;&gt;&gt; from rai_toolbox.optim import L1qFrankWolfe</span>
+
+<span class="sd">        Creating a parameter for our optimizer to update, and our optimizer. We</span>
+<span class="sd">        specify `param_ndim=None` so that the sparsification/normalization occurs on the</span>
+<span class="sd">        gradient without any broadcasting.</span>
+
+<span class="sd">        &gt;&gt;&gt; x = tr.tensor([1.0, 1.0, 1.0], requires_grad=True)</span>
+<span class="sd">        &gt;&gt;&gt; optim = L1qFrankWolfe(</span>
+<span class="sd">        ...     [x],</span>
+<span class="sd">        ...     q=0.30,</span>
+<span class="sd">        ...     epsilon=1.8,</span>
+<span class="sd">        ...     param_ndim=None,</span>
+<span class="sd">        ... )</span>
+
+<span class="sd">        Performing a simple calculation with `x` and performing backprop to create</span>
+<span class="sd">        a gradient.</span>
+
+<span class="sd">        &gt;&gt;&gt; (tr.tensor([0.0, 1.0, 2.0]) * x).sum().backward()</span>
+
+<span class="sd">        Performing a step with our optimizer uses the Frank Wolfe algorithm to update</span>
+<span class="sd">        its parameters; the resulting parameter was updated with a LMO based on a</span>
+<span class="sd">        sparsified, sign-only gradient. Note that the parameter falls within/on the</span>
+<span class="sd">        L1-ball of radius `1.8`.</span>
+
+<span class="sd">        &gt;&gt;&gt; optim.step()</span>
+<span class="sd">        &gt;&gt;&gt; x  # the updated parameter; has a L1-norm of 1.8</span>
+<span class="sd">        tensor([ 0.0000, -0.9000, -0.9000], requires_grad=True)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">params</span><span class="p">,</span>
@@ -422,13 +422,13 @@
         <span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="L1FrankWolfe"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.L1FrankWolfe.html#rai_toolbox.optim.L1FrankWolfe">[docs]</a><span class="k">class</span> <span class="nc">L1FrankWolfe</span><span class="p">(</span><span class="n">GradientTransformerOptimizer</span><span class="p">):</span>
+<div class="viewcode-block" id="L1FrankWolfe"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.L1FrankWolfe.html#rai_toolbox.optim.L1FrankWolfe">[docs]</a><span class="k">class</span> <span class="nc">L1FrankWolfe</span><span class="p">(</span><span class="n">ParamTransformingOptimizer</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;A Frank-Wolfe [1]_ optimizer that constrains each updated parameter to fall</span>
 <span class="sd">    within an :math:`\epsilon`-sized ball in :math:`L^1` space, centered on the origin.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
-<span class="sd">    The method `L1NormedGradientOptim._inplace_grad_transform_` is responsible for</span>
+<span class="sd">    The method `L1NormedGradientOptim._pre_step_transform_` is responsible for</span>
 <span class="sd">    computing the *negative* linear minimization oracle for a parameter and storing it</span>
 <span class="sd">    on `param.grad`.</span>
 
@@ -442,34 +442,7 @@
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
 <span class="sd">    .. [1] https://en.wikipedia.org/wiki/Frank%E2%80%93Wolfe_algorithm#Algorithm</span>
-
-<span class="sd">    Examples</span>
-<span class="sd">    --------</span>
-<span class="sd">    Using `L1FrankWolfe`, we&#39;ll constrain the updated parameter to fall within a</span>
-<span class="sd">    :math:`L^1`-ball of radius `1.8`.</span>
-
-<span class="sd">    &gt;&gt;&gt; import torch as tr</span>
-<span class="sd">    &gt;&gt;&gt; from rai_toolbox.optim import L1FrankWolfe</span>
-
-<span class="sd">    Creating a parameter for our optimizer to update, and our optimizer. We</span>
-<span class="sd">    specify `param_ndim=None` so that the constrain occurs on the parameter without any</span>
-<span class="sd">    broadcasting.</span>
-
-<span class="sd">    &gt;&gt;&gt; x = tr.tensor([1.0, 1.0], requires_grad=True)</span>
-<span class="sd">    &gt;&gt;&gt; optim = L1FrankWolfe([x], epsilon=1.8, param_ndim=None)</span>
-
-<span class="sd">    Performing a simple calculation with `x` and performing backprop to create</span>
-<span class="sd">    a gradient.</span>
-
-<span class="sd">    &gt;&gt;&gt; (tr.tensor([1.0, 2.0]) * x).sum().backward()</span>
-
-<span class="sd">    Performing a step with our optimizer uses the Frank Wolfe algorithm to update</span>
-<span class="sd">    its parameters. Note that the updated parameter falls within/on the</span>
-<span class="sd">    :math:`L^1`-ball of radius `1.8`.</span>
-
-<span class="sd">    &gt;&gt;&gt; optim.step()</span>
-<span class="sd">    &gt;&gt;&gt; x</span>
-<span class="sd">    tensor([ 0.0000, -1.8000], requires_grad=True)&quot;&quot;&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="L1FrankWolfe.__init__"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.L1FrankWolfe.html#rai_toolbox.optim.L1FrankWolfe.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -503,19 +476,47 @@
 <span class="sd">            for that parameter, which starts at 0.</span>
 
 <span class="sd">        param_ndim : Union[int, None], optional (default=-1)</span>
-<span class="sd">            Controls how `_inplace_grad_transform_` is broadcast onto the gradient</span>
-<span class="sd">            of a given parameter. This can be specified per param-group. By default,</span>
-<span class="sd">            the gradient transformation broadcasts over the first dimension in a</span>
-<span class="sd">            batch-like style.</span>
+<span class="sd">            Determines how a parameter and its gradient is temporarily reshaped prior</span>
+<span class="sd">            to being passed to both `_pre_step_transform_` and `_post_step_transform_`.</span>
+<span class="sd">            By default,the transformation broadcasts over the tensor&#39;s first dimension</span>
+<span class="sd">            in a batch-like style. This can be specified per param-group</span>
 
-<span class="sd">            - A positive number determines the dimensionality of the gradient that the transformation will act on.</span>
-<span class="sd">            - A negative number indicates the &#39;offset&#39; from the dimensionality of the gradient. E.g. `-1` leads to batch-style broadcasting.</span>
-<span class="sd">            - `None` means that the transformation will be applied directly to the gradient without any broadcasting.</span>
+<span class="sd">            - A positive number determines the dimensionality of the tensor that the transformation will act on.</span>
+<span class="sd">            - A negative number indicates the &#39;offset&#39; from the dimensionality of the tensor (see &quot;Notes&quot; for examples).</span>
+<span class="sd">            - `None` means that the transformation will be applied directly to the tensor without any broadcasting.</span>
 
-<span class="sd">            See `GradientTransformerOptimizer` for more details and examples.</span>
+<span class="sd">            See `ParamTransformingOptimizer` for more details and examples</span>
 
 <span class="sd">        div_by_zero_eps : float, optional (default=`torch.finfo(torch.float32).tiny`)</span>
 <span class="sd">            Prevents div-by-zero error in learning rate schedule.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        Using `L1FrankWolfe`, we&#39;ll constrain the updated parameter to fall within a</span>
+<span class="sd">        :math:`L^1`-ball of radius `1.8`.</span>
+
+<span class="sd">        &gt;&gt;&gt; import torch as tr</span>
+<span class="sd">        &gt;&gt;&gt; from rai_toolbox.optim import L1FrankWolfe</span>
+
+<span class="sd">        Creating a parameter for our optimizer to update, and our optimizer. We</span>
+<span class="sd">        specify `param_ndim=None` so that the constrain occurs on the parameter without</span>
+<span class="sd">        any broadcasting.</span>
+
+<span class="sd">        &gt;&gt;&gt; x = tr.tensor([1.0, 1.0], requires_grad=True)</span>
+<span class="sd">        &gt;&gt;&gt; optim = L1FrankWolfe([x], epsilon=1.8, param_ndim=None)</span>
+
+<span class="sd">        Performing a simple calculation with `x` and performing backprop to create</span>
+<span class="sd">        a gradient.</span>
+
+<span class="sd">        &gt;&gt;&gt; (tr.tensor([1.0, 2.0]) * x).sum().backward()</span>
+
+<span class="sd">        Performing a step with our optimizer uses the Frank Wolfe algorithm to update</span>
+<span class="sd">        its parameters. Note that the updated parameter falls within/on the</span>
+<span class="sd">        :math:`L^1`-ball of radius `1.8`.</span>
+
+<span class="sd">        &gt;&gt;&gt; optim.step()</span>
+<span class="sd">        &gt;&gt;&gt; x</span>
+<span class="sd">        tensor([ 0.0000, -1.8000], requires_grad=True)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">params</span><span class="p">,</span>
@@ -527,7 +528,7 @@
             <span class="n">div_by_zero_eps</span><span class="o">=</span><span class="n">div_by_zero_eps</span><span class="p">,</span>
         <span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">_inplace_grad_transform_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="o">**</span><span class="n">_unused_kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_pre_step_transform_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="o">**</span><span class="n">_unused_kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">grad</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
             <span class="k">return</span>
         <span class="c1"># Computes the negative linear minimization oracle and sets it to</span>
@@ -544,7 +545,7 @@
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
-<span class="sd">    The method `L2NormedGradientOptim._inplace_grad_transform_` is responsible for</span>
+<span class="sd">    The method `L2NormedGradientOptim._pre_step_transform_` is responsible for</span>
 <span class="sd">    computing the *negative* linear minimization oracle for a parameter and storing it</span>
 <span class="sd">    on `param.grad`.</span>
 
@@ -558,34 +559,7 @@
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
 <span class="sd">    .. [1] https://en.wikipedia.org/wiki/Frank%E2%80%93Wolfe_algorithm#Algorithm</span>
-
-<span class="sd">    Examples</span>
-<span class="sd">    --------</span>
-<span class="sd">    Using `L2FrankWolfe`, we&#39;ll constrain the updated parameter to fall within a</span>
-<span class="sd">    :math:`L^2`-ball of radius `1.8`.</span>
-
-<span class="sd">    &gt;&gt;&gt; import torch as tr</span>
-<span class="sd">    &gt;&gt;&gt; from rai_toolbox.optim import L2FrankWolfe</span>
-
-<span class="sd">    Creating a parameter for our optimizer to update, and our optimizer. We</span>
-<span class="sd">    specify `param_ndim=None` so that the constrain occurs on the parameter without any</span>
-<span class="sd">    broadcasting.</span>
-
-<span class="sd">    &gt;&gt;&gt; x = tr.tensor([1.0, 1.0], requires_grad=True)</span>
-<span class="sd">    &gt;&gt;&gt; optim = L2FrankWolfe([x], epsilon=1.8, param_ndim=None)</span>
-
-<span class="sd">    Performing a simple calculation with `x` and performing backprop to create</span>
-<span class="sd">    a gradient.</span>
-
-<span class="sd">    &gt;&gt;&gt; (tr.tensor([1.0, 2.0]) * x).sum().backward()</span>
-
-<span class="sd">    Performing a step with our optimizer uses the Frank Wolfe algorithm to update</span>
-<span class="sd">    its parameters. Note that the updated parameter falls within/on the</span>
-<span class="sd">    :math:`L^2`-ball of radius `1.8`.</span>
-
-<span class="sd">    &gt;&gt;&gt; optim.step()</span>
-<span class="sd">    &gt;&gt;&gt; x</span>
-<span class="sd">    tensor([-0.8050, -1.6100], requires_grad=True)&quot;&quot;&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="L2FrankWolfe.__init__"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.L2FrankWolfe.html#rai_toolbox.optim.L2FrankWolfe.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -619,19 +593,47 @@
 <span class="sd">            for that parameter, which starts at 0.</span>
 
 <span class="sd">        param_ndim : Union[int, None], optional (default=-1)</span>
-<span class="sd">            Controls how `_inplace_grad_transform_` is broadcast onto the gradient</span>
-<span class="sd">            of a given parameter. This can be specified per param-group. By default,</span>
-<span class="sd">            the gradient transformation broadcasts over the first dimension in a</span>
-<span class="sd">            batch-like style.</span>
+<span class="sd">            Determines how a parameter and its gradient is temporarily reshaped prior</span>
+<span class="sd">            to being passed to both `_pre_step_transform_` and `_post_step_transform_`.</span>
+<span class="sd">            By default,the transformation broadcasts over the tensor&#39;s first dimension</span>
+<span class="sd">            in a batch-like style. This can be specified per param-group</span>
 
-<span class="sd">            - A positive number determines the dimensionality of the gradient that the transformation will act on.</span>
-<span class="sd">            - A negative number indicates the &#39;offset&#39; from the dimensionality of the gradient. E.g. `-1` leads to batch-style broadcasting.</span>
-<span class="sd">            - `None` means that the transformation will be applied directly to the gradient without any broadcasting.</span>
+<span class="sd">            - A positive number determines the dimensionality of the tensor that the transformation will act on.</span>
+<span class="sd">            - A negative number indicates the &#39;offset&#39; from the dimensionality of the tensor (see &quot;Notes&quot; for examples).</span>
+<span class="sd">            - `None` means that the transformation will be applied directly to the tensor without any broadcasting.</span>
 
-<span class="sd">            See `GradientTransformerOptimizer` for more details and examples.</span>
+<span class="sd">            See `ParamTransformingOptimizer` for more details and examples</span>
 
 <span class="sd">        div_by_zero_eps : float, optional (default=`torch.finfo(torch.float32).tiny`)</span>
 <span class="sd">            Prevents div-by-zero error in learning rate schedule.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        Using `L2FrankWolfe`, we&#39;ll constrain the updated parameter to fall within a</span>
+<span class="sd">        :math:`L^2`-ball of radius `1.8`.</span>
+
+<span class="sd">        &gt;&gt;&gt; import torch as tr</span>
+<span class="sd">        &gt;&gt;&gt; from rai_toolbox.optim import L2FrankWolfe</span>
+
+<span class="sd">        Creating a parameter for our optimizer to update, and our optimizer. We</span>
+<span class="sd">        specify `param_ndim=None` so that the constrain occurs on the parameter without any</span>
+<span class="sd">        broadcasting.</span>
+
+<span class="sd">        &gt;&gt;&gt; x = tr.tensor([1.0, 1.0], requires_grad=True)</span>
+<span class="sd">        &gt;&gt;&gt; optim = L2FrankWolfe([x], epsilon=1.8, param_ndim=None)</span>
+
+<span class="sd">        Performing a simple calculation with `x` and performing backprop to create</span>
+<span class="sd">        a gradient.</span>
+
+<span class="sd">        &gt;&gt;&gt; (tr.tensor([1.0, 2.0]) * x).sum().backward()</span>
+
+<span class="sd">        Performing a step with our optimizer uses the Frank Wolfe algorithm to update</span>
+<span class="sd">        its parameters. Note that the updated parameter falls within/on the</span>
+<span class="sd">        :math:`L^2`-ball of radius `1.8`.</span>
+
+<span class="sd">        &gt;&gt;&gt; optim.step()</span>
+<span class="sd">        &gt;&gt;&gt; x</span>
+<span class="sd">        tensor([-0.8050, -1.6100], requires_grad=True)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">params</span><span class="p">,</span>
@@ -650,7 +652,7 @@
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
-<span class="sd">    The method `SignedGradientOptim._inplace_grad_transform_` is responsible for</span>
+<span class="sd">    The method `SignedGradientOptim._pre_step_transform_` is responsible for</span>
 <span class="sd">    computing the *negative* linear minimization oracle for a parameter and storing it</span>
 <span class="sd">    on `param.grad`.</span>
 
@@ -725,16 +727,16 @@
 <span class="sd">            for that parameter, which starts at 0.</span>
 
 <span class="sd">        param_ndim : Union[int, None], optional (default=-1)</span>
-<span class="sd">            Controls how `_inplace_grad_transform_` is broadcast onto the gradient</span>
-<span class="sd">            of a given parameter. This can be specified per param-group. By default,</span>
-<span class="sd">            the gradient transformation broadcasts over the first dimension in a</span>
-<span class="sd">            batch-like style.</span>
+<span class="sd">            Determines how a parameter and its gradient is temporarily reshaped prior</span>
+<span class="sd">            to being passed to both `_pre_step_transform_` and `_post_step_transform_`.</span>
+<span class="sd">            By default,the transformation broadcasts over the tensor&#39;s first dimension</span>
+<span class="sd">            in a batch-like style. This can be specified per param-group</span>
 
-<span class="sd">            - A positive number determines the dimensionality of the gradient that the transformation will act on.</span>
-<span class="sd">            - A negative number indicates the &#39;offset&#39; from the dimensionality of the gradient. E.g. `-1` leads to batch-style broadcasting.</span>
-<span class="sd">            - `None` means that the transformation will be applied directly to the gradient without any broadcasting.</span>
+<span class="sd">            - A positive number determines the dimensionality of the tensor that the transformation will act on.</span>
+<span class="sd">            - A negative number indicates the &#39;offset&#39; from the dimensionality of the tensor (see &quot;Notes&quot; for examples).</span>
+<span class="sd">            - `None` means that the transformation will be applied directly to the tensor without any broadcasting.</span>
 
-<span class="sd">            See `GradientTransformerOptimizer` for more details and examples.</span>
+<span class="sd">            See `ParamTransformingOptimizer` for more details and examples</span>
 
 <span class="sd">        div_by_zero_eps : float, optional (default=`torch.finfo(torch.float32).tiny`)</span>
 <span class="sd">            Prevents div-by-zero error in learning rate schedule.</span>

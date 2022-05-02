@@ -1,0 +1,531 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>rai_toolbox.optim.TopQGradientOptimizer &#8212; rai-toolbox  documentation</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/tabs.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="rai_toolbox.optim.ClampedGradientOptimizer" href="rai_toolbox.optim.ClampedGradientOptimizer.html" />
+    <link rel="prev" title="rai_toolbox.optim.L1qNormedGradientOptim" href="rai_toolbox.optim.L1qNormedGradientOptim.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="../index.html">
+<p class="title">rai-toolbox</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../tutorials.html">
+  Tutorials
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../how_tos.html">
+  How-To Guides
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../explanation.html">
+  Explanation
+ </a>
+</li>
+
+<li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="../api_reference.html">
+  Reference
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../changes.html">
+  Changelog
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    <p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Contents:
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1 current active has-children">
+  <a class="reference internal" href="../ref_optim.html">
+   Optimizers
+  </a>
+  <input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul class="current">
+   <li class="toctree-l2">
+    <a class="reference internal" href="rai_toolbox.optim.ParamTransformingOptimizer.html">
+     rai_toolbox.optim.ParamTransformingOptimizer
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="rai_toolbox.optim.ChainedParamTransformingOptimizer.html">
+     rai_toolbox.optim.ChainedParamTransformingOptimizer
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="rai_toolbox.optim.L1NormedGradientOptim.html">
+     rai_toolbox.optim.L1NormedGradientOptim
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="rai_toolbox.optim.L2NormedGradientOptim.html">
+     rai_toolbox.optim.L2NormedGradientOptim
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="rai_toolbox.optim.SignedGradientOptim.html">
+     rai_toolbox.optim.SignedGradientOptim
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="rai_toolbox.optim.L1qNormedGradientOptim.html">
+     rai_toolbox.optim.L1qNormedGradientOptim
+    </a>
+   </li>
+   <li class="toctree-l2 current active">
+    <a class="current reference internal" href="#">
+     rai_toolbox.optim.TopQGradientOptimizer
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="rai_toolbox.optim.ClampedGradientOptimizer.html">
+     rai_toolbox.optim.ClampedGradientOptimizer
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="rai_toolbox.optim.ClampedParameterOptimizer.html">
+     rai_toolbox.optim.ClampedParameterOptimizer
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="rai_toolbox.optim.L2ProjectedOptim.html">
+     rai_toolbox.optim.L2ProjectedOptim
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="rai_toolbox.optim.LinfProjectedOptim.html">
+     rai_toolbox.optim.LinfProjectedOptim
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="rai_toolbox.optim.FrankWolfe.html">
+     rai_toolbox.optim.FrankWolfe
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="rai_toolbox.optim.L1FrankWolfe.html">
+     rai_toolbox.optim.L1FrankWolfe
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="rai_toolbox.optim.L2FrankWolfe.html">
+     rai_toolbox.optim.L2FrankWolfe
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="rai_toolbox.optim.LinfFrankWolfe.html">
+     rai_toolbox.optim.LinfFrankWolfe
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="rai_toolbox.optim.L1qFrankWolfe.html">
+     rai_toolbox.optim.L1qFrankWolfe
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="rai_toolbox.optim.L1qNormedGradientOptim.html">
+     rai_toolbox.optim.L1qNormedGradientOptim
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../ref_perturbation.html">
+   Perturbations
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../ref_datasets.html">
+   Datasets
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../ref_augmentations.html">
+   Augmentations
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../ref_losses.html">
+   Losses
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../ref_mushin.html">
+   Mushin
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../ref_utils.html">
+   General Utilities
+  </a>
+ </li>
+</ul>
+
+  </div>
+</nav>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+
+<nav id="bd-toc-nav">
+    
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <section id="rai-toolbox-optim-topqgradientoptimizer">
+<h1>rai_toolbox.optim.TopQGradientOptimizer<a class="headerlink" href="#rai-toolbox-optim-topqgradientoptimizer" title="Permalink to this headline">#</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="rai_toolbox.optim.TopQGradientOptimizer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rai_toolbox.optim.</span></span><span class="sig-name descname"><span class="pre">TopQGradientOptimizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">InnerOpt=&lt;class</span> <span class="pre">'torch.optim.sgd.SGD'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q=&lt;required</span> <span class="pre">parameter&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dq=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_ndim=-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defaults=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generator=&lt;torch._C.Generator</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**inner_opt_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/optim/misc.html#TopQGradientOptimizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.optim.TopQGradientOptimizer" title="Permalink to this definition">#</a></dt>
+<dd><p>A gradient-tranforming  optimizer that zeros the elements of a gradient whose
+absolue magnitudes fall below the Qth percentile. <code class="xref py py-obj docutils literal notranslate"><span class="pre">InnerOp.step</span></code> is then to update
+the corresponding parameter.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="rai_toolbox.optim.L1qNormedGradientOptim.html#rai_toolbox.optim.L1qNormedGradientOptim" title="rai_toolbox.optim.L1qNormedGradientOptim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">L1qNormedGradientOptim</span></code></a></dt><dd></dd>
+<dt><a class="reference internal" href="rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer" title="rai_toolbox.optim.ParamTransformingOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParamTransformingOptimizer</span></code></a></dt><dd></dd>
+</dl>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="rai_toolbox.optim.TopQGradientOptimizer.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">InnerOpt=&lt;class</span> <span class="pre">'torch.optim.sgd.SGD'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q=&lt;required</span> <span class="pre">parameter&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dq=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_ndim=-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defaults=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generator=&lt;torch._C.Generator</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**inner_opt_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/optim/misc.html#TopQGradientOptimizer.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.optim.TopQGradientOptimizer.__init__" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>params</strong><span class="classifier">Sequence[Tensor] | Iterable[Mapping[str, Any]]</span></dt><dd><p>Iterable of parameters or dicts defining parameter groups.</p>
+</dd>
+<dt><strong>InnerOpt</strong><span class="classifier">Type[Optimizer] | Partial[Optimizer], optional (default=`torch.nn.optim.SGD`)</span></dt><dd><p>The optimizer that updates the parameters after their gradients have
+been transformed.</p>
+</dd>
+<dt><strong>q</strong><span class="classifier">float</span></dt><dd><p>Specifies the (fractional) percentile of absolute-largest gradient elements
+to retain when sparsifying the gradient. E.g <code class="xref py py-obj docutils literal notranslate"><span class="pre">q=0.9</span></code> means that only the
+gradient elements within the 90th-percentile will be retained.</p>
+<p>Must be within <code class="xref py py-obj docutils literal notranslate"><span class="pre">[0.0,</span> <span class="pre">1.0]</span></code>. The sparsification is applied to the gradient
+in accordance to <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim</span></code>.</p>
+</dd>
+<dt><strong>dq</strong><span class="classifier">float, optional (default=0.0)</span></dt><dd><p>If specified, the sparsity factor for each gradient transformation will
+be drawn from a uniform distribution over <span class="math notranslate nohighlight">\([q - dq, q + dq] \in [0.0, 1.0]\)</span>.</p>
+</dd>
+<dt><strong>param_ndim</strong><span class="classifier">Union[int, None], optional (default=-1)</span></dt><dd><p>Determines how a parameter and its gradient is temporarily reshaped prior
+to being passed to both <code class="xref py py-obj docutils literal notranslate"><span class="pre">_pre_step_transform_</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">_post_step_transform_</span></code>.
+By default,the transformation broadcasts over the tensor’s first dimension
+in a batch-like style. This can be specified per param-group</p>
+<ul class="simple">
+<li><p>A positive number determines the dimensionality of the tensor that the transformation will act on.</p></li>
+<li><p>A negative number indicates the ‘offset’ from the dimensionality of the tensor (see “Notes” for examples).</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> means that the transformation will be applied directly to the tensor without any broadcasting.</p></li>
+</ul>
+<p>See <a class="reference internal" href="rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer" title="rai_toolbox.optim.ParamTransformingOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParamTransformingOptimizer</span></code></a> for more details and examples</p>
+</dd>
+<dt><strong>grad_scale</strong><span class="classifier">float, optional (default=1.0)</span></dt><dd><p>Multiplies each gradient in-place after the in-place transformation is
+performed. This can be specified per param-group.</p>
+</dd>
+<dt><strong>grad_bias</strong><span class="classifier">float, optional (default=0.0)</span></dt><dd><p>Added to each gradient in-place after the in-place transformation is
+performed. This can be specified per param-group.</p>
+</dd>
+<dt><strong>defaults</strong><span class="classifier">Optional[Dict[str, Any]]</span></dt><dd><p>Specifies default parameters for all parameter groups.</p>
+</dd>
+<dt><strong>generator</strong><span class="classifier">torch.Generator, optional (default=`torch.default_generator`)</span></dt><dd><p>Controls the RNG source.</p>
+</dd>
+<dt><strong>**inner_opt_kwargs</strong><span class="classifier">Any</span></dt><dd><p>Named arguments used to initialize <code class="xref py py-obj docutils literal notranslate"><span class="pre">InnerOpt</span></code>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Let’s use <a class="reference internal" href="#rai_toolbox.optim.TopQGradientOptimizer" title="rai_toolbox.optim.TopQGradientOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TopQGradientOptimizer</span></code></a> along with a standard SGD-step with a learning
+rate of <code class="xref py py-obj docutils literal notranslate"><span class="pre">1.0</span></code>. We’ll sparsify the gradient of a 2D parameter using varying
+percentile values. We set <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim=None</span></code> so that no broadcasting occurs.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">torch</span> <span class="k">as</span> <span class="nn">tr</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">rai_toolbox.optim</span> <span class="kn">import</span> <span class="n">TopQGradientOptim</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">gradient</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="mf">0.5</span><span class="p">,</span>   <span class="mf">1.0</span><span class="p">],</span>
+<span class="gp">... </span>                      <span class="p">[</span><span class="o">-</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">0.30</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.75</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]:</span>
+<span class="gp">... </span>    <span class="n">x</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">optim</span> <span class="o">=</span> <span class="n">TopQGradientOptim</span><span class="p">(</span><span class="n">params</span><span class="o">=</span><span class="p">[</span><span class="n">x</span><span class="p">],</span> <span class="n">lr</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="n">q</span><span class="p">,</span> <span class="n">param_ndim</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">x</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">gradient</span><span class="o">=</span><span class="n">gradient</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">optim</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;grad (q=</span><span class="si">{</span><span class="n">q</span><span class="si">}</span><span class="s2">)</span><span class="se">\n</span><span class="si">{</span><span class="n">x</span><span class="o">.</span><span class="n">grad</span><span class="si">}</span><span class="se">\n</span><span class="s2">x:</span><span class="se">\n</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="se">\n</span><span class="s2">---&quot;</span><span class="p">)</span>
+<span class="go">grad (q=0.0)</span>
+<span class="go">tensor([[ 0.5000,  1.0000],</span>
+<span class="go">        [-2.5000,  0.3000]])</span>
+<span class="go">x:</span>
+<span class="go">tensor([[0.5000, 0.0000],</span>
+<span class="go">        [3.5000, 0.7000]], requires_grad=True)</span>
+<span class="go">---</span>
+<span class="go">grad (q=0.25)</span>
+<span class="go">tensor([[ 0.5000,  1.0000],</span>
+<span class="go">        [-2.5000,  0.0000]])</span>
+<span class="go">x:</span>
+<span class="go">tensor([[0.5000, 0.0000],</span>
+<span class="go">        [3.5000, 1.0000]], requires_grad=True)</span>
+<span class="go">---</span>
+<span class="go">grad (q=0.5)</span>
+<span class="go">tensor([[ 0.0000,  1.0000],</span>
+<span class="go">        [-2.5000,  0.0000]])</span>
+<span class="go">x:</span>
+<span class="go">tensor([[1.0000, 0.0000],</span>
+<span class="go">        [3.5000, 1.0000]], requires_grad=True)</span>
+<span class="go">---</span>
+<span class="go">grad (q=0.75)</span>
+<span class="go">tensor([[ 0.0000,  0.0000],</span>
+<span class="go">        [-2.5000,  0.0000]])</span>
+<span class="go">x:</span>
+<span class="go">tensor([[1.0000, 1.0000],</span>
+<span class="go">        [3.5000, 1.0000]], requires_grad=True)</span>
+<span class="go">---</span>
+<span class="go">grad (q=1.0)</span>
+<span class="go">tensor([[0., 0.],</span>
+<span class="go">        [0., 0.]])</span>
+<span class="go">x:</span>
+<span class="go">tensor([[1., 1.],</span>
+<span class="go">        [1., 1.]], requires_grad=True)</span>
+<span class="go">---</span>
+</pre></div>
+</div>
+<p>We’ll repeat this exercise using <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim=1</span></code> so that the top-Q
+sparsification is applied to each row independently (i.e. it is “broadcast”
+over each 1D sub-tensor in our gradient).</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">gradient</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="mf">0.5</span><span class="p">,</span>   <span class="mf">1.0</span><span class="p">],</span>
+<span class="gp">... </span>                      <span class="p">[</span><span class="o">-</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">0.30</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]:</span>
+<span class="gp">... </span>    <span class="n">x</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">optim</span> <span class="o">=</span> <span class="n">TopQGradientOptim</span><span class="p">(</span><span class="n">params</span><span class="o">=</span><span class="p">[</span><span class="n">x</span><span class="p">],</span> <span class="n">lr</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="n">q</span><span class="p">,</span> <span class="n">param_ndim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">x</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">gradient</span><span class="o">=</span><span class="n">gradient</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">optim</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;grad (q=</span><span class="si">{</span><span class="n">q</span><span class="si">}</span><span class="s2">)</span><span class="se">\n</span><span class="si">{</span><span class="n">x</span><span class="o">.</span><span class="n">grad</span><span class="si">}</span><span class="se">\n</span><span class="s2">x:</span><span class="se">\n</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="se">\n</span><span class="s2">---&quot;</span><span class="p">)</span>
+<span class="go">grad (q=0.0)</span>
+<span class="go">tensor([[ 0.5000,  1.0000],</span>
+<span class="go">        [-2.5000,  0.3000]])</span>
+<span class="go">x:</span>
+<span class="go">tensor([[0.5000, 0.0000],</span>
+<span class="go">        [3.5000, 0.7000]], requires_grad=True)</span>
+<span class="go">---</span>
+<span class="go">grad (q=0.5)</span>
+<span class="go">tensor([[ 0.0000,  1.0000],</span>
+<span class="go">        [-2.5000,  0.0000]])</span>
+<span class="go">x:</span>
+<span class="go">tensor([[1.0000, 0.0000],</span>
+<span class="go">        [3.5000, 1.0000]], requires_grad=True)</span>
+<span class="go">---</span>
+<span class="go">grad (q=1.0)</span>
+<span class="go">tensor([[0., 0.],</span>
+<span class="go">        [0., 0.]])</span>
+<span class="go">x:</span>
+<span class="go">tensor([[1., 1.],</span>
+<span class="go">        [1., 1.]], requires_grad=True)</span>
+<span class="go">---</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="autosummary longtable table autosummary">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#rai_toolbox.optim.TopQGradientOptimizer.__init__" title="rai_toolbox.optim.TopQGradientOptimizer.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(params[, InnerOpt, q, dq, ...])</p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</section>
+
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="rai_toolbox.optim.L1qNormedGradientOptim.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">rai_toolbox.optim.L1qNormedGradientOptim</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="rai_toolbox.optim.ClampedGradientOptimizer.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">rai_toolbox.optim.ClampedGradientOptimizer</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2022 Massachusetts Institute of Technology.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
+</html>

@@ -155,13 +155,13 @@
   </label>
   <ul class="current">
    <li class="toctree-l2">
-    <a class="reference internal" href="rai_toolbox.optim.GradientTransformerOptimizer.html">
-     rai_toolbox.optim.GradientTransformerOptimizer
+    <a class="reference internal" href="rai_toolbox.optim.ParamTransformingOptimizer.html">
+     rai_toolbox.optim.ParamTransformingOptimizer
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="rai_toolbox.optim.ProjectionMixin.html">
-     rai_toolbox.optim.ProjectionMixin
+    <a class="reference internal" href="rai_toolbox.optim.ChainedParamTransformingOptimizer.html">
+     rai_toolbox.optim.ChainedParamTransformingOptimizer
     </a>
    </li>
    <li class="toctree-l2">
@@ -182,6 +182,21 @@
    <li class="toctree-l2">
     <a class="reference internal" href="rai_toolbox.optim.L1qNormedGradientOptim.html">
      rai_toolbox.optim.L1qNormedGradientOptim
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="rai_toolbox.optim.TopQGradientOptimizer.html">
+     rai_toolbox.optim.TopQGradientOptimizer
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="rai_toolbox.optim.ClampedGradientOptimizer.html">
+     rai_toolbox.optim.ClampedGradientOptimizer
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="rai_toolbox.optim.ClampedParameterOptimizer.html">
+     rai_toolbox.optim.ClampedParameterOptimizer
     </a>
    </li>
    <li class="toctree-l2">
@@ -251,26 +266,9 @@
    Mushin
   </a>
  </li>
-</ul>
-<ul class="nav bd-sidenav">
  <li class="toctree-l1">
-  <a class="reference internal" href="rai_toolbox.evaluating.html">
-   rai_toolbox.evaluating
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="rai_toolbox.freeze.html">
-   rai_toolbox.freeze
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="rai_toolbox.frozen.html">
-   rai_toolbox.frozen
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="rai_toolbox.negate.html">
-   rai_toolbox.negate
+  <a class="reference internal" href="../ref_utils.html">
+   General Utilities
   </a>
  </li>
 </ul>
@@ -326,8 +324,8 @@ corresponding parameter.</p>
 <dl class="simple">
 <dt><a class="reference internal" href="rai_toolbox.optim.L1NormedGradientOptim.html#rai_toolbox.optim.L1NormedGradientOptim" title="rai_toolbox.optim.L1NormedGradientOptim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">L1NormedGradientOptim</span></code></a></dt><dd></dd>
 <dt><a class="reference internal" href="rai_toolbox.optim.SignedGradientOptim.html#rai_toolbox.optim.SignedGradientOptim" title="rai_toolbox.optim.SignedGradientOptim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SignedGradientOptim</span></code></a></dt><dd></dd>
-<dt><a class="reference internal" href="rai_toolbox.optim.ProjectionMixin.html#rai_toolbox.optim.ProjectionMixin" title="rai_toolbox.optim.ProjectionMixin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProjectionMixin</span></code></a></dt><dd></dd>
-<dt><a class="reference internal" href="rai_toolbox.optim.GradientTransformerOptimizer.html#rai_toolbox.optim.GradientTransformerOptimizer" title="rai_toolbox.optim.GradientTransformerOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GradientTransformerOptimizer</span></code></a></dt><dd></dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProjectionMixin</span></code></dt><dd></dd>
+<dt><a class="reference internal" href="rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer" title="rai_toolbox.optim.ParamTransformingOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParamTransformingOptimizer</span></code></a></dt><dd></dd>
 </dl>
 </div>
 <p class="rubric">Examples</p>
@@ -371,16 +369,16 @@ a gradient.</p>
 <dt><strong>InnerOpt</strong><span class="classifier">Type[Optimizer] | Partial[Optimizer], optional (default=`torch.nn.optim.SGD`)</span></dt><dd><p>The optimizer that updates the parameters after their gradients have
 been transformed.</p>
 </dd>
-<dt><strong>param_ndim</strong><span class="classifier">Optional[int]</span></dt><dd><p>Controls how <code class="xref py py-obj docutils literal notranslate"><span class="pre">_inplace_grad_transform_</span></code> is broadcast onto the gradient
-of a given parameter. This can be specified per param-group. By default,
-the gradient transformation broadcasts over the first dimension in a
-batch-like style.</p>
+<dt><strong>param_ndim</strong><span class="classifier">Optional[int]</span></dt><dd><p>Determines how a parameter and its gradient is temporarily reshaped prior
+to being passed to both <code class="xref py py-obj docutils literal notranslate"><span class="pre">_pre_step_transform_</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">_post_step_transform_</span></code>.
+By default,the transformation broadcasts over the tensor’s first dimension
+in a batch-like style. This can be specified per param-group</p>
 <ul class="simple">
-<li><p>A positive number determines the dimensionality of the gradient that the transformation will act on.</p></li>
-<li><p>A negative number indicates the ‘offset’ from the dimensionality of the gradient (see “Notes” for examples).</p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> means that the transformation will be applied directly to the gradient without any broadcasting.</p></li>
+<li><p>A positive number determines the dimensionality of the tensor that the transformation will act on.</p></li>
+<li><p>A negative number indicates the ‘offset’ from the dimensionality of the tensor (see “Notes” for examples).</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> means that the transformation will be applied directly to the tensor without any broadcasting.</p></li>
 </ul>
-<p>See <a class="reference internal" href="rai_toolbox.optim.GradientTransformerOptimizer.html#rai_toolbox.optim.GradientTransformerOptimizer" title="rai_toolbox.optim.GradientTransformerOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GradientTransformerOptimizer</span></code></a> for more details and examples.</p>
+<p>See <a class="reference internal" href="rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer" title="rai_toolbox.optim.ParamTransformingOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParamTransformingOptimizer</span></code></a> for more details and examples</p>
 </dd>
 <dt><strong>grad_scale</strong><span class="classifier">float, optional (default=1.0)</span></dt><dd><p>Multiplies each gradient in-place after the in-place transformation is
 performed. This can be specified per param-group.</p>

@@ -39,7 +39,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="rai_toolbox.optim.LinfProjectedOptim" href="rai_toolbox.optim.LinfProjectedOptim.html" />
-    <link rel="prev" title="rai_toolbox.optim.L1qNormedGradientOptim" href="rai_toolbox.optim.L1qNormedGradientOptim.html" />
+    <link rel="prev" title="rai_toolbox.optim.ClampedParameterOptimizer" href="rai_toolbox.optim.ClampedParameterOptimizer.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -155,13 +155,13 @@
   </label>
   <ul class="current">
    <li class="toctree-l2">
-    <a class="reference internal" href="rai_toolbox.optim.GradientTransformerOptimizer.html">
-     rai_toolbox.optim.GradientTransformerOptimizer
+    <a class="reference internal" href="rai_toolbox.optim.ParamTransformingOptimizer.html">
+     rai_toolbox.optim.ParamTransformingOptimizer
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="rai_toolbox.optim.ProjectionMixin.html">
-     rai_toolbox.optim.ProjectionMixin
+    <a class="reference internal" href="rai_toolbox.optim.ChainedParamTransformingOptimizer.html">
+     rai_toolbox.optim.ChainedParamTransformingOptimizer
     </a>
    </li>
    <li class="toctree-l2">
@@ -182,6 +182,21 @@
    <li class="toctree-l2">
     <a class="reference internal" href="rai_toolbox.optim.L1qNormedGradientOptim.html">
      rai_toolbox.optim.L1qNormedGradientOptim
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="rai_toolbox.optim.TopQGradientOptimizer.html">
+     rai_toolbox.optim.TopQGradientOptimizer
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="rai_toolbox.optim.ClampedGradientOptimizer.html">
+     rai_toolbox.optim.ClampedGradientOptimizer
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="rai_toolbox.optim.ClampedParameterOptimizer.html">
+     rai_toolbox.optim.ClampedParameterOptimizer
     </a>
    </li>
    <li class="toctree-l2 current active">
@@ -251,26 +266,9 @@
    Mushin
   </a>
  </li>
-</ul>
-<ul class="nav bd-sidenav">
  <li class="toctree-l1">
-  <a class="reference internal" href="rai_toolbox.evaluating.html">
-   rai_toolbox.evaluating
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="rai_toolbox.freeze.html">
-   rai_toolbox.freeze
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="rai_toolbox.frozen.html">
-   rai_toolbox.frozen
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="rai_toolbox.negate.html">
-   rai_toolbox.negate
+  <a class="reference internal" href="../ref_utils.html">
+   General Utilities
   </a>
  </li>
 </ul>
@@ -316,7 +314,7 @@
 <h1>rai_toolbox.optim.L2ProjectedOptim<a class="headerlink" href="#rai-toolbox-optim-l2projectedoptim" title="Permalink to this headline">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="rai_toolbox.optim.L2ProjectedOptim">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rai_toolbox.optim.</span></span><span class="sig-name descname"><span class="pre">L2ProjectedOptim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">InnerOpt=&lt;class</span> <span class="pre">'torch.optim.sgd.SGD'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_ndim=-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grad_scale=1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grad_bias=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defaults=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">div_by_zero_eps=1.1754943508222875e-38</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**inner_opt_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/optim/lp_space.html#L2ProjectedOptim"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.optim.L2ProjectedOptim" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rai_toolbox.optim.</span></span><span class="sig-name descname"><span class="pre">L2ProjectedOptim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">InnerOpt=&lt;class</span> <span class="pre">'torch.optim.sgd.SGD'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon=&lt;required</span> <span class="pre">parameter&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_ndim=-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grad_scale=1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grad_bias=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defaults=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">div_by_zero_eps=1.1754943508222875e-38</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**inner_opt_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/optim/lp_space.html#L2ProjectedOptim"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.optim.L2ProjectedOptim" title="Permalink to this definition">#</a></dt>
 <dd><p>A gradient-tranforming optimizer that constrains the updated parameters
 to lie within an <span class="math notranslate nohighlight">\(\epsilon\)</span>-sized ball in <span class="math notranslate nohighlight">\(L^2\)</span> space centered on the
 origin.</p>
@@ -330,10 +328,50 @@ with <code class="xref py py-obj docutils literal notranslate"><span class="pre"
 <dl class="simple">
 <dt><a class="reference internal" href="rai_toolbox.optim.L2NormedGradientOptim.html#rai_toolbox.optim.L2NormedGradientOptim" title="rai_toolbox.optim.L2NormedGradientOptim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">L2NormedGradientOptim</span></code></a></dt><dd></dd>
 <dt><a class="reference internal" href="rai_toolbox.optim.LinfProjectedOptim.html#rai_toolbox.optim.LinfProjectedOptim" title="rai_toolbox.optim.LinfProjectedOptim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LinfProjectedOptim</span></code></a></dt><dd></dd>
-<dt><a class="reference internal" href="rai_toolbox.optim.ProjectionMixin.html#rai_toolbox.optim.ProjectionMixin" title="rai_toolbox.optim.ProjectionMixin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProjectionMixin</span></code></a></dt><dd></dd>
-<dt><a class="reference internal" href="rai_toolbox.optim.GradientTransformerOptimizer.html#rai_toolbox.optim.GradientTransformerOptimizer" title="rai_toolbox.optim.GradientTransformerOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GradientTransformerOptimizer</span></code></a></dt><dd></dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProjectionMixin</span></code></dt><dd></dd>
+<dt><a class="reference internal" href="rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer" title="rai_toolbox.optim.ParamTransformingOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParamTransformingOptimizer</span></code></a></dt><dd></dd>
 </dl>
 </div>
+<dl class="py method">
+<dt class="sig sig-object py" id="rai_toolbox.optim.L2ProjectedOptim.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">InnerOpt=&lt;class</span> <span class="pre">'torch.optim.sgd.SGD'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon=&lt;required</span> <span class="pre">parameter&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_ndim=-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grad_scale=1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grad_bias=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defaults=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">div_by_zero_eps=1.1754943508222875e-38</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**inner_opt_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/optim/lp_space.html#L2ProjectedOptim.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.optim.L2ProjectedOptim.__init__" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>params</strong><span class="classifier">Sequence[Tensor] | Iterable[Mapping[str, Any]]</span></dt><dd><p>Iterable of parameters or dicts defining parameter groups.</p>
+</dd>
+<dt><strong>InnerOpt</strong><span class="classifier">Type[Optimizer] | Partial[Optimizer], optional (default=`torch.nn.optim.SGD`)</span></dt><dd><p>The optimizer that updates the parameters after their gradients have
+been transformed.</p>
+</dd>
+<dt><strong>epsilon</strong><span class="classifier">float</span></dt><dd><p>Specifies the size of the L2-space ball that all parameters will be
+projected into, post optimization step.</p>
+</dd>
+<dt><strong>param_ndim</strong><span class="classifier">Union[int, None], optional (default=-1)</span></dt><dd><p>Determines how a parameter and its gradient is temporarily reshaped prior
+to being passed to both <code class="xref py py-obj docutils literal notranslate"><span class="pre">_pre_step_transform_</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">_post_step_transform_</span></code>.
+By default,the transformation broadcasts over the tensor’s first dimension
+in a batch-like style. This can be specified per param-group</p>
+<ul class="simple">
+<li><p>A positive number determines the dimensionality of the tensor that the transformation will act on.</p></li>
+<li><p>A negative number indicates the ‘offset’ from the dimensionality of the tensor (see “Notes” for examples).</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> means that the transformation will be applied directly to the tensor without any broadcasting.</p></li>
+</ul>
+<p>See <a class="reference internal" href="rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer" title="rai_toolbox.optim.ParamTransformingOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParamTransformingOptimizer</span></code></a> for more details and examples</p>
+</dd>
+<dt><strong>grad_scale</strong><span class="classifier">float, optional (default=1.0)</span></dt><dd><p>Multiplies each gradient in-place after the in-place transformation is
+performed. This can be specified per param-group.</p>
+</dd>
+<dt><strong>grad_bias</strong><span class="classifier">float, optional (default=0.0)</span></dt><dd><p>Added to each gradient in-place after the in-place transformation is
+performed. This can be specified per param-group.</p>
+</dd>
+<dt><strong>defaults</strong><span class="classifier">Optional[Dict[str, Any]]</span></dt><dd><p>Specifies default parameters for all parameter groups.</p>
+</dd>
+<dt><strong>div_by_zero_eps</strong><span class="classifier">float, optional (default=`torch.finfo(torch.float32).tiny`)</span></dt><dd><p>A lower bound used to clamp the normalization factor to prevent div-by-zero.</p>
+</dd>
+<dt><strong>**inner_opt_kwargs</strong><span class="classifier">Any</span></dt><dd><p>Named arguments used to initialize <code class="xref py py-obj docutils literal notranslate"><span class="pre">InnerOpt</span></code>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
 <p class="rubric">Examples</p>
 <p>Let’s create an optimizer that normalizes all parameter gradients using
 their <span class="math notranslate nohighlight">\(L^2\)</span>-norm, and then updates the parameters with a standard
@@ -370,46 +408,6 @@ the constraint set.</p>
 <span class="go">0.800000011920929</span>
 </pre></div>
 </div>
-<dl class="py method">
-<dt class="sig sig-object py" id="rai_toolbox.optim.L2ProjectedOptim.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">InnerOpt=&lt;class</span> <span class="pre">'torch.optim.sgd.SGD'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_ndim=-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grad_scale=1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grad_bias=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defaults=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">div_by_zero_eps=1.1754943508222875e-38</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**inner_opt_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/optim/lp_space.html#L2ProjectedOptim.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.optim.L2ProjectedOptim.__init__" title="Permalink to this definition">#</a></dt>
-<dd><dl class="field-list">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl>
-<dt><strong>params</strong><span class="classifier">Sequence[Tensor] | Iterable[Mapping[str, Any]]</span></dt><dd><p>Iterable of parameters or dicts defining parameter groups.</p>
-</dd>
-<dt><strong>InnerOpt</strong><span class="classifier">Type[Optimizer] | Partial[Optimizer], optional (default=`torch.nn.optim.SGD`)</span></dt><dd><p>The optimizer that updates the parameters after their gradients have
-been transformed.</p>
-</dd>
-<dt><strong>epsilon</strong><span class="classifier">float</span></dt><dd><p>Specifies the size of the L2-space ball that all parameters will be
-projected into, post optimization step.</p>
-</dd>
-<dt><strong>param_ndim</strong><span class="classifier">Union[int, None], optional (default=-1)</span></dt><dd><p>Controls how <code class="xref py py-obj docutils literal notranslate"><span class="pre">_inplace_grad_transform_</span></code> is broadcast onto the gradient
-of a given parameter. This can be specified per param-group. By default,
-the gradient transformation broadcasts over the first dimension in a
-batch-like style.</p>
-<ul class="simple">
-<li><p>A positive number determines the dimensionality of the gradient that the transformation will act on.</p></li>
-<li><p>A negative number indicates the ‘offset’ from the dimensionality of the gradient. E.g. <code class="xref py py-obj docutils literal notranslate"><span class="pre">-1</span></code> leads to batch-style broadcasting.</p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> means that the transformation will be applied directly to the gradient without any broadcasting.</p></li>
-</ul>
-<p>See <a class="reference internal" href="rai_toolbox.optim.GradientTransformerOptimizer.html#rai_toolbox.optim.GradientTransformerOptimizer" title="rai_toolbox.optim.GradientTransformerOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GradientTransformerOptimizer</span></code></a> for more details and examples</p>
-</dd>
-<dt><strong>grad_scale</strong><span class="classifier">float, optional (default=1.0)</span></dt><dd><p>Multiplies each gradient in-place after the in-place transformation is
-performed. This can be specified per param-group.</p>
-</dd>
-<dt><strong>grad_bias</strong><span class="classifier">float, optional (default=0.0)</span></dt><dd><p>Added to each gradient in-place after the in-place transformation is
-performed. This can be specified per param-group.</p>
-</dd>
-<dt><strong>defaults</strong><span class="classifier">Optional[Dict[str, Any]]</span></dt><dd><p>Specifies default parameters for all parameter groups.</p>
-</dd>
-<dt><strong>div_by_zero_eps</strong><span class="classifier">float, optional (default=`torch.finfo(torch.float32).tiny`)</span></dt><dd><p>A lower bound used to clamp the normalization factor to prevent div-by-zero.</p>
-</dd>
-<dt><strong>**inner_opt_kwargs</strong><span class="classifier">Any</span></dt><dd><p>Named arguments used to initialize <code class="xref py py-obj docutils literal notranslate"><span class="pre">InnerOpt</span></code>.</p>
-</dd>
-</dl>
-</dd>
-</dl>
 </dd></dl>
 
 <p class="rubric">Methods</p>
@@ -419,7 +417,7 @@ performed. This can be specified per param-group.</p>
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#rai_toolbox.optim.L2ProjectedOptim.__init__" title="rai_toolbox.optim.L2ProjectedOptim.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(params[, InnerOpt, param_ndim, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#rai_toolbox.optim.L2ProjectedOptim.__init__" title="rai_toolbox.optim.L2ProjectedOptim.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(params[, InnerOpt, epsilon, ...])</p></td>
 <td><p><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p></p></dd>
@@ -438,11 +436,11 @@ performed. This can be specified per param-group.</p>
               
               <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-    <a class='left-prev' id="prev-link" href="rai_toolbox.optim.L1qNormedGradientOptim.html" title="previous page">
+    <a class='left-prev' id="prev-link" href="rai_toolbox.optim.ClampedParameterOptimizer.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title">rai_toolbox.optim.L1qNormedGradientOptim</p>
+            <p class="prev-next-title">rai_toolbox.optim.ClampedParameterOptimizer</p>
         </div>
     </a>
     <a class='right-next' id="next-link" href="rai_toolbox.optim.LinfProjectedOptim.html" title="next page">

@@ -39,7 +39,7 @@
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="rai_toolbox.optim.GradientTransformerOptimizer" href="generated/rai_toolbox.optim.GradientTransformerOptimizer.html" />
+    <link rel="next" title="rai_toolbox.optim.ParamTransformingOptimizer" href="generated/rai_toolbox.optim.ParamTransformingOptimizer.html" />
     <link rel="prev" title="Reference" href="api_reference.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
@@ -156,13 +156,13 @@
   </label>
   <ul>
    <li class="toctree-l2">
-    <a class="reference internal" href="generated/rai_toolbox.optim.GradientTransformerOptimizer.html">
-     rai_toolbox.optim.GradientTransformerOptimizer
+    <a class="reference internal" href="generated/rai_toolbox.optim.ParamTransformingOptimizer.html">
+     rai_toolbox.optim.ParamTransformingOptimizer
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="generated/rai_toolbox.optim.ProjectionMixin.html">
-     rai_toolbox.optim.ProjectionMixin
+    <a class="reference internal" href="generated/rai_toolbox.optim.ChainedParamTransformingOptimizer.html">
+     rai_toolbox.optim.ChainedParamTransformingOptimizer
     </a>
    </li>
    <li class="toctree-l2">
@@ -183,6 +183,21 @@
    <li class="toctree-l2">
     <a class="reference internal" href="generated/rai_toolbox.optim.L1qNormedGradientOptim.html">
      rai_toolbox.optim.L1qNormedGradientOptim
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/rai_toolbox.optim.TopQGradientOptimizer.html">
+     rai_toolbox.optim.TopQGradientOptimizer
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/rai_toolbox.optim.ClampedGradientOptimizer.html">
+     rai_toolbox.optim.ClampedGradientOptimizer
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/rai_toolbox.optim.ClampedParameterOptimizer.html">
+     rai_toolbox.optim.ClampedParameterOptimizer
     </a>
    </li>
    <li class="toctree-l2">
@@ -252,26 +267,9 @@
    Mushin
   </a>
  </li>
-</ul>
-<ul class="nav bd-sidenav">
  <li class="toctree-l1">
-  <a class="reference internal" href="generated/rai_toolbox.evaluating.html">
-   rai_toolbox.evaluating
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="generated/rai_toolbox.freeze.html">
-   rai_toolbox.freeze
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="generated/rai_toolbox.frozen.html">
-   rai_toolbox.frozen
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="generated/rai_toolbox.negate.html">
-   rai_toolbox.negate
+  <a class="reference internal" href="ref_utils.html">
+   General Utilities
   </a>
  </li>
 </ul>
@@ -305,6 +303,11 @@
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#optimizers-with-normed-gradients">
    Optimizers with Normed Gradients
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#miscellaneous-gradient-transforming-optimizers">
+   Miscellaneous Gradient-Transforming Optimizers
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
@@ -349,11 +352,11 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/rai_toolbox.optim.GradientTransformerOptimizer.html#rai_toolbox.optim.GradientTransformerOptimizer" title="rai_toolbox.optim.GradientTransformerOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GradientTransformerOptimizer</span></code></a>(params[, ...])</p></td>
-<td><p>An optimizer that performs an in-place transformation to the gradient of each parameter, before performing the gradient-based update on each parameter.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer" title="rai_toolbox.optim.ParamTransformingOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParamTransformingOptimizer</span></code></a>([params, ...])</p></td>
+<td><p>An optimizer that performs an in-place transformation to the each parameter, both before and after performing the gradient-based update on each parameter.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/rai_toolbox.optim.ProjectionMixin.html#rai_toolbox.optim.ProjectionMixin" title="rai_toolbox.optim.ProjectionMixin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProjectionMixin</span></code></a>()</p></td>
-<td><p>A mixin that adds a parameter-projection method to an optimizer.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/rai_toolbox.optim.ChainedParamTransformingOptimizer.html#rai_toolbox.optim.ChainedParamTransformingOptimizer" title="rai_toolbox.optim.ChainedParamTransformingOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ChainedParamTransformingOptimizer</span></code></a>(...[, ...])</p></td>
+<td><p>Chains together an arbitrary number of parameter-transforming optimizers, composing their pre and post-step transformation functions to modify the parameters (and their gradients) in-place.</p></td>
 </tr>
 </tbody>
 </table>
@@ -377,6 +380,26 @@
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/rai_toolbox.optim.L1qNormedGradientOptim.html#rai_toolbox.optim.L1qNormedGradientOptim" title="rai_toolbox.optim.L1qNormedGradientOptim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">L1qNormedGradientOptim</span></code></a>(params[, InnerOpt, ...])</p></td>
 <td><p>A gradient-transforming optimizer that sparsifies a parameter's gradient and normalizes the gradient to have an <span class="math notranslate nohighlight">\(L^1\)</span>-norm of <code class="xref py py-obj docutils literal notranslate"><span class="pre">grad_scale</span></code>, prior to updating the parameter using <code class="xref py py-obj docutils literal notranslate"><span class="pre">InnerOpt.step</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="miscellaneous-gradient-transforming-optimizers">
+<h2>Miscellaneous Gradient-Transforming Optimizers<a class="headerlink" href="#miscellaneous-gradient-transforming-optimizers" title="Permalink to this headline">#</a></h2>
+<table class="autosummary longtable table autosummary">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/rai_toolbox.optim.TopQGradientOptimizer.html#rai_toolbox.optim.TopQGradientOptimizer" title="rai_toolbox.optim.TopQGradientOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TopQGradientOptimizer</span></code></a>(params[, InnerOpt, q, ...])</p></td>
+<td><p>A gradient-tranforming  optimizer that zeros the elements of a gradient whose absolue magnitudes fall below the Qth percentile.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/rai_toolbox.optim.ClampedGradientOptimizer.html#rai_toolbox.optim.ClampedGradientOptimizer" title="rai_toolbox.optim.ClampedGradientOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ClampedGradientOptimizer</span></code></a>([params, InnerOpt, ...])</p></td>
+<td><p>A gradient-tranforming  optimizer that clamps the elements of a gradient to fall within user-specified bounds <strong>prior</strong> to using <code class="xref py py-obj docutils literal notranslate"><span class="pre">InnerOp.step</span></code> to update the corresponding parameter.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/rai_toolbox.optim.ClampedParameterOptimizer.html#rai_toolbox.optim.ClampedParameterOptimizer" title="rai_toolbox.optim.ClampedParameterOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ClampedParameterOptimizer</span></code></a>([params, ...])</p></td>
+<td><p>A parameter optimizer that clamps the elements of a parameter to fall within user-specified bounds <strong>after</strong> <code class="xref py py-obj docutils literal notranslate"><span class="pre">InnerOp.step</span></code> has updated the parameter</p></td>
 </tr>
 </tbody>
 </table>
@@ -442,10 +465,10 @@
             <p class="prev-next-title">Reference</p>
         </div>
     </a>
-    <a class='right-next' id="next-link" href="generated/rai_toolbox.optim.GradientTransformerOptimizer.html" title="next page">
+    <a class='right-next' id="next-link" href="generated/rai_toolbox.optim.ParamTransformingOptimizer.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">rai_toolbox.optim.GradientTransformerOptimizer</p>
+        <p class="prev-next-title">rai_toolbox.optim.ParamTransformingOptimizer</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>

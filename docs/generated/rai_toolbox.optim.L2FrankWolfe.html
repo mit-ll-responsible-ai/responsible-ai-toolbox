@@ -155,13 +155,13 @@
   </label>
   <ul class="current">
    <li class="toctree-l2">
-    <a class="reference internal" href="rai_toolbox.optim.GradientTransformerOptimizer.html">
-     rai_toolbox.optim.GradientTransformerOptimizer
+    <a class="reference internal" href="rai_toolbox.optim.ParamTransformingOptimizer.html">
+     rai_toolbox.optim.ParamTransformingOptimizer
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="rai_toolbox.optim.ProjectionMixin.html">
-     rai_toolbox.optim.ProjectionMixin
+    <a class="reference internal" href="rai_toolbox.optim.ChainedParamTransformingOptimizer.html">
+     rai_toolbox.optim.ChainedParamTransformingOptimizer
     </a>
    </li>
    <li class="toctree-l2">
@@ -182,6 +182,21 @@
    <li class="toctree-l2">
     <a class="reference internal" href="rai_toolbox.optim.L1qNormedGradientOptim.html">
      rai_toolbox.optim.L1qNormedGradientOptim
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="rai_toolbox.optim.TopQGradientOptimizer.html">
+     rai_toolbox.optim.TopQGradientOptimizer
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="rai_toolbox.optim.ClampedGradientOptimizer.html">
+     rai_toolbox.optim.ClampedGradientOptimizer
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="rai_toolbox.optim.ClampedParameterOptimizer.html">
+     rai_toolbox.optim.ClampedParameterOptimizer
     </a>
    </li>
    <li class="toctree-l2">
@@ -251,26 +266,9 @@
    Mushin
   </a>
  </li>
-</ul>
-<ul class="nav bd-sidenav">
  <li class="toctree-l1">
-  <a class="reference internal" href="rai_toolbox.evaluating.html">
-   rai_toolbox.evaluating
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="rai_toolbox.freeze.html">
-   rai_toolbox.freeze
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="rai_toolbox.frozen.html">
-   rai_toolbox.frozen
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="rai_toolbox.negate.html">
-   rai_toolbox.negate
+  <a class="reference internal" href="../ref_utils.html">
+   General Utilities
   </a>
  </li>
 </ul>
@@ -329,13 +327,49 @@ within an <span class="math notranslate nohighlight">\(\epsilon\)</span>-sized b
 </dl>
 </div>
 <p class="rubric">Notes</p>
-<p>The method <code class="xref py py-obj docutils literal notranslate"><span class="pre">L2NormedGradientOptim._inplace_grad_transform_</span></code> is responsible for
+<p>The method <code class="xref py py-obj docutils literal notranslate"><span class="pre">L2NormedGradientOptim._pre_step_transform_</span></code> is responsible for
 computing the <em>negative</em> linear minimization oracle for a parameter and storing it
 on <code class="xref py py-obj docutils literal notranslate"><span class="pre">param.grad</span></code>.</p>
 <p class="rubric">References</p>
 <dl class="citation">
 <dt class="label" id="ra856166c660b-1"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
 <dd><p><a class="reference external" href="https://en.wikipedia.org/wiki/Frank%E2%80%93Wolfe_algorithm#Algorithm">https://en.wikipedia.org/wiki/Frank%E2%80%93Wolfe_algorithm#Algorithm</a></p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="rai_toolbox.optim.L2FrankWolfe.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_default_lr_schedule</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_ndim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">div_by_zero_eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.1754943508222875e-38</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/optim/frank_wolfe.html#L2FrankWolfe.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.optim.L2FrankWolfe.__init__" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>params</strong><span class="classifier">Sequence[Tensor] | Iterable[Mapping[str, Any]]</span></dt><dd><p>Iterable of parameters or dicts defining parameter groups.</p>
+</dd>
+<dt><strong>epsilon</strong><span class="classifier">float</span></dt><dd><p>The radius of the of the L2 ball to which each updated parameter will be
+constrained. Can be specified per parameter-group.</p>
+</dd>
+<dt><strong>lr</strong><span class="classifier">float, optional (default=2.0)</span></dt><dd><p>Indicates the weight with which the LMO contributes to the parameter
+update. See <code class="xref py py-obj docutils literal notranslate"><span class="pre">use_default_lr_schedule</span></code> for additional details. If
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">use_default_lr_schedule=False</span></code> then <code class="xref py py-obj docutils literal notranslate"><span class="pre">lr</span></code> must be be in the
+domain <code class="xref py py-obj docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">1]</span></code>.</p>
+</dd>
+<dt><strong>use_default_lr_schedule</strong><span class="classifier">bool, optional (default=True)</span></dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code>, then the per-parameter “learning rate” is scaled
+by <span class="math notranslate nohighlight">\(\hat{l_r} = l_r / (l_r + k)\)</span> where k is the update index
+for that parameter, which starts at 0.</p>
+</dd>
+<dt><strong>param_ndim</strong><span class="classifier">Union[int, None], optional (default=-1)</span></dt><dd><p>Determines how a parameter and its gradient is temporarily reshaped prior
+to being passed to both <code class="xref py py-obj docutils literal notranslate"><span class="pre">_pre_step_transform_</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">_post_step_transform_</span></code>.
+By default,the transformation broadcasts over the tensor’s first dimension
+in a batch-like style. This can be specified per param-group</p>
+<ul class="simple">
+<li><p>A positive number determines the dimensionality of the tensor that the transformation will act on.</p></li>
+<li><p>A negative number indicates the ‘offset’ from the dimensionality of the tensor (see “Notes” for examples).</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> means that the transformation will be applied directly to the tensor without any broadcasting.</p></li>
+</ul>
+<p>See <a class="reference internal" href="rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer" title="rai_toolbox.optim.ParamTransformingOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParamTransformingOptimizer</span></code></a> for more details and examples</p>
+</dd>
+<dt><strong>div_by_zero_eps</strong><span class="classifier">float, optional (default=`torch.finfo(torch.float32).tiny`)</span></dt><dd><p>Prevents div-by-zero error in learning rate schedule.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -365,42 +399,6 @@ its parameters. Note that the updated parameter falls within/on the
 <span class="go">tensor([-0.8050, -1.6100], requires_grad=True)</span>
 </pre></div>
 </div>
-<dl class="py method">
-<dt class="sig sig-object py" id="rai_toolbox.optim.L2FrankWolfe.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_default_lr_schedule</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_ndim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">div_by_zero_eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.1754943508222875e-38</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/optim/frank_wolfe.html#L2FrankWolfe.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.optim.L2FrankWolfe.__init__" title="Permalink to this definition">#</a></dt>
-<dd><dl class="field-list">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl>
-<dt><strong>params</strong><span class="classifier">Sequence[Tensor] | Iterable[Mapping[str, Any]]</span></dt><dd><p>Iterable of parameters or dicts defining parameter groups.</p>
-</dd>
-<dt><strong>epsilon</strong><span class="classifier">float</span></dt><dd><p>The radius of the of the L2 ball to which each updated parameter will be
-constrained. Can be specified per parameter-group.</p>
-</dd>
-<dt><strong>lr</strong><span class="classifier">float, optional (default=2.0)</span></dt><dd><p>Indicates the weight with which the LMO contributes to the parameter
-update. See <code class="xref py py-obj docutils literal notranslate"><span class="pre">use_default_lr_schedule</span></code> for additional details. If
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">use_default_lr_schedule=False</span></code> then <code class="xref py py-obj docutils literal notranslate"><span class="pre">lr</span></code> must be be in the
-domain <code class="xref py py-obj docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">1]</span></code>.</p>
-</dd>
-<dt><strong>use_default_lr_schedule</strong><span class="classifier">bool, optional (default=True)</span></dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code>, then the per-parameter “learning rate” is scaled
-by <span class="math notranslate nohighlight">\(\hat{l_r} = l_r / (l_r + k)\)</span> where k is the update index
-for that parameter, which starts at 0.</p>
-</dd>
-<dt><strong>param_ndim</strong><span class="classifier">Union[int, None], optional (default=-1)</span></dt><dd><p>Controls how <code class="xref py py-obj docutils literal notranslate"><span class="pre">_inplace_grad_transform_</span></code> is broadcast onto the gradient
-of a given parameter. This can be specified per param-group. By default,
-the gradient transformation broadcasts over the first dimension in a
-batch-like style.</p>
-<ul class="simple">
-<li><p>A positive number determines the dimensionality of the gradient that the transformation will act on.</p></li>
-<li><p>A negative number indicates the ‘offset’ from the dimensionality of the gradient. E.g. <code class="xref py py-obj docutils literal notranslate"><span class="pre">-1</span></code> leads to batch-style broadcasting.</p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> means that the transformation will be applied directly to the gradient without any broadcasting.</p></li>
-</ul>
-<p>See <a class="reference internal" href="rai_toolbox.optim.GradientTransformerOptimizer.html#rai_toolbox.optim.GradientTransformerOptimizer" title="rai_toolbox.optim.GradientTransformerOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GradientTransformerOptimizer</span></code></a> for more details and examples.</p>
-</dd>
-<dt><strong>div_by_zero_eps</strong><span class="classifier">float, optional (default=`torch.finfo(torch.float32).tiny`)</span></dt><dd><p>Prevents div-by-zero error in learning rate schedule.</p>
-</dd>
-</dl>
-</dd>
-</dl>
 </dd></dl>
 
 <p class="rubric">Methods</p>
