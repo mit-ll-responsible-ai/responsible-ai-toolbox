@@ -21,42 +21,39 @@ The pretrained models for this experiment can be found here(WILL ADD LINK LATER)
 Reproduce last column of "CIFAR10 L2-robust accuracy" table from https://github.com/MadryLab/robustness by executing PGD with multiple $\epsilon$ values and the robustly trained ResNet-50 model.  These results are for 20-step PGD with step size of `2.5 * ε-test / num_steps`.
 
 ```
-PYTHONPATH=$PWD:$PYTHONPATH python run.py ckpt=mitll_cifar_l2_1_0.pt steps=20 epsilon=\'0,0.25,0.5,1.0,2.0\'
+PYTHONPATH=$PWD:$PYTHONPATH python run.py ckpt=mitll_cifar_l2_1_0.pt steps=20 epsilon=[0,0.25,0.5,1.0,2.0]
 ```
 
 or in an interactive python environment such as a notebook:
 
 ```python
-from pathlib import Path
+import os
 
-from configs import Config
-from run import MadryLabRobustness
-from hydra_zen import launch
+import configs
+import hydra
+import pytorch_lightning as pl
+from rai_toolbox.mushin.workflows import RobustnessCurve
 
-ckpt = "mitll_cifar_l2_1_0.pt"
-(jobs,) = launch(
-    Config,
-    MadryLabRobustness.run,
-    [
-        f"ckpt={ckpt}",
-        "strategy=dp",  # DDP does not work in notebook
-        "dataset=cifar10",
-        "model=cifar10_resnet50",
-        "steps=20",
-        "epsilon=0,0.25,0.5,1.0,2.0",
-    ],
-    multirun=True,
+# Need add current working directory to the python path
+os.environ["PYTHONPATH"] = f"{os.getcwd()}:{os.getenv('PYTHONPATH')}"
+
+# Implement the evaluation task for RobustnessCurv
+class MadryLabRobustness(RobustnessCurve):
+    @staticmethod
+    def evaluation_task(
+        seed: int, trainer: pl.Trainer, module: pl.LightningModule
+    ) -> dict:
+        pl.seed_everything(seed)
+        trainer.test(module)
+        assert Path("test_metrics.pt").exists()
+        return tr.load("test_metrics.pt")
+
+robustness_job = MadryLabRobustness(configs.Config)
+robustness_job.run(
+    epsilon=[0, 0.25, 0.5, 1.0, 2.0],
+    ckpt="mitll_cifar_l2_1_0.pt"
 )
-
-# Extract the results
-import torch
-
-test_accuracies = [
-    torch.load(list(Path(j.working_dir).glob("**/test_metrics.pt"))[0])[
-        "Test/Accuracy"
-    ][0]
-    for j in jobs
-]
+robustness_job.plot("Test/Accuracy")
 ```
 
 #### Results

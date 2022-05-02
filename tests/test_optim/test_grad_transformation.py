@@ -19,8 +19,8 @@ from torch.testing import assert_allclose
 from rai_toolbox import to_batch
 from rai_toolbox._typing import Partial
 from rai_toolbox.optim import (
+    ClampedGradientOptimizer,
     FrankWolfe,
-    GradientTransformerOptimizer,
     L1FrankWolfe,
     L1NormedGradientOptim,
     L1qFrankWolfe,
@@ -30,7 +30,9 @@ from rai_toolbox.optim import (
     L2ProjectedOptim,
     LinfFrankWolfe,
     LinfProjectedOptim,
+    ParamTransformingOptimizer,
     SignedGradientOptim,
+    TopQGradientOptimizer,
 )
 from rai_toolbox.optim.lp_space import _LpNormOptimizer
 
@@ -105,6 +107,8 @@ def test_closure_is_called_by_step(
         partial(L1FrankWolfe, epsilon=1.0, lr=0.5),
         partial(L2FrankWolfe, epsilon=1.0, lr=0.5),
         partial(LinfFrankWolfe, epsilon=1.0, lr=0.5),
+        partial(ClampedGradientOptimizer, clamp_min=-1e6, lr=0.1),
+        partial(TopQGradientOptimizer, q=0.0, lr=0.1),
     ],
 )
 @pytest.mark.parametrize("device", [tr.device("cpu"), tr.device("cuda", index=0)])
@@ -252,7 +256,7 @@ def test_projected_value_is_in_constraint_set(
     scaling_factor=st.floats(0, 1e3),
 )
 def test_step_scales_linearly_with_stepsize(
-    Step: Type[GradientTransformerOptimizer],
+    Step: Type[ParamTransformingOptimizer],
     tensors: Tuple[Tensor, Tensor],
     step_size: float,
     scaling_factor: float,
@@ -295,7 +299,7 @@ def test_step_scales_linearly_with_stepsize(
     scaling_factor=st.floats(1e-3, 1e3),
 )
 def test_transform_gradient_step_is_invariant_to_grad_scale(
-    Step: Type[GradientTransformerOptimizer],
+    Step: Type[ParamTransformingOptimizer],
     tensors: Tuple[Tensor, Tensor],
     step_size: float,
     scaling_factor: float,
@@ -343,7 +347,7 @@ def normed(x: Tensor) -> Tensor:
     step_size=st.floats(1e-3, 1e3),
 )
 def test_step_is_parallel_to_grad(
-    Step: Type[GradientTransformerOptimizer],
+    Step: Type[ParamTransformingOptimizer],
     sign_only: bool,
     tensors: Tuple[Tensor, Tensor],
     step_size: float,
@@ -365,32 +369,6 @@ def test_step_is_parallel_to_grad(
         assert tr.all((dx * -grad) >= 0)
     else:
         assert tr.allclose(normed(dx), -normed(grad), atol=1e-3, rtol=1e-3)
-
-
-def test_LpNormProjectedOptimizer_requires_p():
-    class MyOptim(_LpNormOptimizer):
-        # does not set _p
-        pass
-
-    with pytest.raises(TypeError):
-        MyOptim([], SGD)
-
-
-@given(p=st.none() | st.text() | st.lists(st.integers()))
-def test_non_numeric_p_raises(p):
-    class MyOptim(_LpNormOptimizer):
-        _p = p
-
-    with pytest.raises(TypeError):
-        MyOptim([], SGD)
-
-
-@given(lr=st.floats().filter(lambda x: not 0 <= x <= 1))
-def test_fw_lr_validation_when_lr_sched_is_disabled(lr):
-    x = tr.tensor([1.0], requires_grad=True)
-
-    with pytest.raises(ValueError):
-        FrankWolfe([x], lr=lr, use_default_lr_schedule=False)
 
 
 @given(
@@ -423,7 +401,7 @@ def test_fw_lr_disabled_lr_sched(start: float, n: int, epsilon: float):
     "Optim, p",
     [
         (L1FrankWolfe, 1),
-        (partial(L1qFrankWolfe, q=1.0), 1),
+        (partial(L1qFrankWolfe, q=0.0), 1),
         (L2FrankWolfe, 2),
         (LinfFrankWolfe, float("inf")),
     ],
@@ -566,38 +544,6 @@ def test_param_ndim_0(shape):
     assert out.shape == (tr.numel(p), 1)
 
 
-@given(
-    param=hnp.arrays(
-        dtype="float64",
-        shape=hnp.array_shapes(min_dims=0, max_dims=4),
-        elements=st.just(0),
-    ).map(lambda x: tr.tensor(x, requires_grad=True)),
-    data=st.data(),
-)
-def test_param_ndim_validation(param: Tensor, data: st.DataObject):
-    param_ndim = data.draw(
-        st.integers().filter(lambda x: abs(x) > param.ndim) | st.floats()
-    )
-
-    with pytest.raises((ValueError, TypeError)):
-        L2NormedGradientOptim([param], lr=1.0, param_ndim=param_ndim)  # type: ignore
-
-
-def test_gradient_transform_that_overwrites_grad_raises():
-    class BadOptim(GradientTransformerOptimizer):
-        def _inplace_grad_transform_(self, param: Tensor, optim_group) -> None:
-            if param.grad is None:
-                return
-            param.grad = param.grad + 2  # overwrites gradient
-
-    x = tr.tensor([1.0], requires_grad=True)
-    optim = BadOptim([x], lr=1.0)
-    (2 * x).backward()
-
-    with pytest.raises(ValueError):
-        optim.step()
-
-
 @pytest.mark.parametrize(
     "Optimizer",
     [
@@ -650,7 +596,7 @@ def test_l1q_with_dq_draws_from_user_provided_rng(seed: Optional[int]):
     if seed:
         assert len(saved_grads) == 1
     else:
-        assert len(saved_grads) == 3
+        assert len(saved_grads) == 4
 
 
 @pytest.mark.parametrize(
@@ -659,7 +605,7 @@ def test_l1q_with_dq_draws_from_user_provided_rng(seed: Optional[int]):
         L2NormedGradientOptim,
         L1NormedGradientOptim,
         SignedGradientOptim,
-        partial(L1qNormedGradientOptim, q=1.0),
+        partial(L1qNormedGradientOptim, q=0.0),
         partial(L2ProjectedOptim, epsilon=1e6),
         partial(LinfProjectedOptim, epsilon=1e6),
     ],
@@ -679,7 +625,7 @@ def test_grad_scale_and_bias(
     biases: Tuple[float, float, float],
     via_defaults: bool,
     x: np.ndarray,
-    Optim: Type[GradientTransformerOptimizer],
+    Optim: Type[ParamTransformingOptimizer],
 ):
     x1 = tr.tensor(x.copy(), requires_grad=True)
     x2 = tr.tensor(x.copy(), requires_grad=True)
@@ -725,41 +671,3 @@ def test_grad_scale_and_bias(
 
     if b1 != b3 or s1 != s3:
         assert tr.any(x1 != x3), (x1, x3)
-
-
-_params = [tr.tensor(1.0, requires_grad=True)]
-
-
-@pytest.mark.parametrize(
-    "bad_optim",
-    [
-        pytest.param(
-            partial(
-                L2NormedGradientOptim,
-                [{"params": _params, "grad_scale": 1.0}],
-            ),
-            marks=pytest.mark.xfail(reason="valid input", strict=True),
-        ),
-        partial(
-            L2NormedGradientOptim,
-            [{"params": _params, "grad_scale": "apple"}],
-        ),
-        partial(
-            L2NormedGradientOptim,
-            [{"params": _params, "grad_bias": "apple"}],
-        ),
-        partial(
-            L2NormedGradientOptim,
-            _params,
-            grad_scale="apple",
-        ),
-        partial(L2NormedGradientOptim, _params, grad_bias="apple"),
-        pytest.param(
-            partial(L2NormedGradientOptim, _params, grad_bias=2.0),
-            marks=pytest.mark.xfail(reason="valid input", strict=True),
-        ),
-    ],
-)
-def test_bad_grad_scale_bias(bad_optim):
-    with pytest.raises(TypeError):
-        bad_optim(lr=1.0, param_ndim=None)

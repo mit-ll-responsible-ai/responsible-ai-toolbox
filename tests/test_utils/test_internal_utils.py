@@ -5,7 +5,7 @@ from typing import Union
 
 import hypothesis.strategies as st
 import pytest
-from hypothesis import assume, given
+from hypothesis import assume, given, settings
 
 from rai_toolbox._utils import Unsatisfiable, value_check
 
@@ -21,6 +21,7 @@ def everything_except(excluded_types):
 any_types = st.from_type(type)
 
 
+@settings(max_examples=10)
 @given(
     name=st.sampled_from(["name_a", "name_b"]),
     target_type=st.shared(any_types, key="target_type"),
@@ -109,6 +110,12 @@ def test_min_max_ordering(kwargs):
         pytest.param(dict(value=1, max_=1, incl_max=True), id="value:1 <= upper:1"),
         pytest.param(
             dict(value=1, min_=1, max_=1, incl_min=True, incl_max=True),
+            id="lower:1 <= value:1 <= upper:1",
+        ),
+        pytest.param(
+            dict(
+                value=None, min_=1, max_=1, incl_min=True, incl_max=True, optional=True
+            ),
             id="lower:1 <= value:1 <= upper:1",
         ),
     ],

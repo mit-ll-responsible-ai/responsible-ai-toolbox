@@ -15,7 +15,6 @@ from rai_toolbox._typing import Optimizer, OptimizerType, Partial
 from rai_toolbox._utils.itertools import flatten_params
 from rai_toolbox.optim import (
     FrankWolfe,
-    GradientTransformerOptimizer,
     L1FrankWolfe,
     L1NormedGradientOptim,
     L1qFrankWolfe,
@@ -25,6 +24,7 @@ from rai_toolbox.optim import (
     L2ProjectedOptim,
     LinfFrankWolfe,
     LinfProjectedOptim,
+    ParamTransformingOptimizer,
     SignedGradientOptim,
 )
 
@@ -59,7 +59,7 @@ def check_optim_compatibilities():
     f(L2ProjectedOptim)
     f(SignedGradientOptim)
     f(LinfProjectedOptim)
-    f(GradientTransformerOptimizer)
+    f(ParamTransformingOptimizer)
 
 
 def check_negate():

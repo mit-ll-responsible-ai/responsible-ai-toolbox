@@ -24,16 +24,4 @@ DISCUSSION ABOUT MAIN MODULES OF TOOLBOX
    ref_augmentations
    ref_losses
    ref_mushin
-
-*************************
-General PyTorch Utilities
-*************************
-.. currentmodule:: rai_toolbox
-
-.. autosummary::
-   :toctree: generated/
-
-   evaluating
-   freeze
-   frozen
-   negate
+   ref_utils
