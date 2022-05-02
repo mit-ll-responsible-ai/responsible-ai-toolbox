@@ -133,7 +133,7 @@ class ClampedGradientOptimizer(_ClampedOptim):
     def _pre_step_transform_(
         self, param: Tensor, optim_group: ClampedParamGroup
     ) -> None:
-        if param.grad is None:
+        if param.grad is None:  # pragma: no cover
             return
         param.grad.clamp_(min=optim_group["clamp_min"], max=optim_group["clamp_max"])
 
@@ -148,8 +148,7 @@ class ClampedParameterOptimizer(_ClampedOptim):
 
     Examples
     --------
-    Let's clamp each element of the parameter's gradient to `[-1, 3]` prior to
-    performing a step with `SGD` using a learning rate of `1.0`.
+    Let's perform a step with `SGD` using a learning rate of `1.0` to each of our parameters and then clamp their parameters to `[-1.0, 3.0]`.
 
     >>> import torch as tr
     >>> from rai_toolbox.optim import ClampedParameterOptimizer

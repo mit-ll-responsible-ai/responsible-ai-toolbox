@@ -103,7 +103,7 @@ def value_check(
         err_msg = f"`{name}` must satisfy"
 
         if min_ is not None:
-            if lower_name:
+            if lower_name:  # pragma: no cover
                 min_ = f"{lower_name}(= {min_})"  # type: ignore
             err_msg += f" {min_} {lsymb}"
 
