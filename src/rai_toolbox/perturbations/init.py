@@ -28,7 +28,7 @@ def uniform_like_l1_n_ball_(
         similar shape and on the same device.
 
         By default, each of the N shape-(D, ...) subtensors are initialized
-        intependently. See `param_ndim` to contol this behavior.
+        independently. See `param_ndim` to contol this behavior.
 
     epsilon : float, optional (default=1)
         Determines the radius of the ball.
@@ -57,19 +57,19 @@ def uniform_like_l1_n_ball_(
     >>> import torch as tr
     >>> from rai_toolbox.perturbations.init import uniform_like_l1_n_ball_
 
-    Drawing two 3D tensors from an :math:`\epsilon=2` sized L1 ball.
+    Drawing two shape(3,) tensors from an :math:`\epsilon=2` sized L1 ball.
 
     >>> x = tr.zeros(2, 3)
-    >>> uniform_like_l1_n_ball_(x, epsilon=2.0)
+    >>> uniform_like_l1_n_ball_(x, epsilon=2.0) # default: param_ndim=-1
     >>> x
     tensor([[0.3301, 0.8459, 0.7071],
             [0.3470, 0.5077, 0.0977]])
     >>> tr.linalg.norm(x, dim=1, ord=1) < 2.0
     tensor([True, True])
 
-    Drawing one tensor from a :math:`\epsilon=2` sized 6D ball, and storing it in `x`
-    as a shape-(2, 3) tensor. We specify `param_ndim=2` (or `param_ndim=None`) to
-    achieve this.
+    Drawing one tensor shape-(6,) tensor from a :math:`\epsilon=2` sized 6D ball, and
+    storing it in `x`as a shape-(2, 3) tensor. We specify `param_ndim=2` (or
+    `param_ndim=None`) to achieve this.
 
     >>> x = tr.zeros(2, 3)
     >>> uniform_like_l1_n_ball_(x, epsilon=2.0, param_ndim=2)
@@ -110,7 +110,7 @@ def uniform_like_l2_n_ball_(
         similar shape and on the same device.
 
         By default, each of the N shape-(D, ...) subtensors are initialized
-        intependently. See `param_ndim` to contol this behavior.
+        independently. See `param_ndim` to contol this behavior.
 
     epsilon : float, optional (default=1)
         Determines the radius of the ball.
@@ -144,19 +144,19 @@ def uniform_like_l2_n_ball_(
     >>> import torch as tr
     >>> from rai_toolbox.perturbations.init import uniform_like_l2_n_ball_
 
-    Drawing two tensors from an :math:`\epsilon=2`-sized L2 3D ball.
+    Drawing two shape-(3,) tensors from an :math:`\epsilon=2`-sized L2 3D-ball.
 
     >>> x = tr.zeros(2, 3)
-    >>> uniform_like_l2_n_ball_(x, epsilon=2.0, param_ndim=2)
+    >>> uniform_like_l2_n_ball_(x, epsilon=2.0, param_ndim=1)
     >>> x
     tensor([[0.3030, 1.4269, 0.3927],
             [1.4015, 0.4913, 1.3028]])
     >>> tr.linalg.norm(x, dim=1, ord=2) < 2.0
     tensor([True, True])
 
-    Drawing one tensor from a :math:`\epsilon=2`-sized L2 6D ball, and storing it in
-    `x`  as a shape-(2, 3) tensor. We specify `param_ndim=2` (or `param_ndim=None`) to
-    achieve this.
+    Drawing one shape-(6, ) tensor from a :math:`\epsilon=2`-sized L2 6D ball, and
+    storing it in `x`  as a shape-(2, 3) tensor. We specify `param_ndim=2` (or
+    `param_ndim=None`) to achieve this.
 
     >>> x = tr.zeros(2, 3)
     >>> uniform_like_l2_n_ball_(x, epsilon=2.0, param_ndim=2)
