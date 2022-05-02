@@ -17,9 +17,8 @@ Base Optimizers
 .. autosummary::
    :toctree: generated/
 
-   GradientTransformerOptimizer
+   ParamTransformingOptimizer
    ChainedGradTransformerOptimizer
-   ProjectionMixin
 
 
 ********************************

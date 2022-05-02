@@ -14,15 +14,15 @@ from rai_toolbox._typing import Optimizer
 from rai_toolbox.optim import (
     ChainedGradTransformerOptimizer,
     ClampedGradientOptimizer,
-    GradientTransformerOptimizer,
     L2NormedGradientOptim,
     L2ProjectedOptim,
+    ParamTransformingOptimizer,
     SignedGradientOptim,
 )
 
 
 def _check_consistency(
-    optim: GradientTransformerOptimizer, other: Optional[Optimizer] = None
+    optim: ParamTransformingOptimizer, other: Optional[Optimizer] = None
 ) -> None:
     if other is None:
         other = optim.inner_opt
@@ -33,7 +33,7 @@ def _check_consistency(
     assert optim.__getstate__() == other.__getstate__()  # type: ignore
 
 
-def test_GradientTransformerOptimizer_state_mirrors_InnerOpt():
+def test_ParamTransformingOptimizer_state_mirrors_InnerOpt():
     x1 = tr.tensor(1.0, requires_grad=True)
     x2 = tr.tensor(1.0, requires_grad=True)
     x3 = tr.tensor(1.0, requires_grad=True)

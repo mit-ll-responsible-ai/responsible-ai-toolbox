@@ -20,7 +20,6 @@ from rai_toolbox._typing import Partial
 from rai_toolbox.optim import (
     ClampedGradientOptimizer,
     FrankWolfe,
-    GradientTransformerOptimizer,
     L1FrankWolfe,
     L1NormedGradientOptim,
     L1qFrankWolfe,
@@ -30,6 +29,7 @@ from rai_toolbox.optim import (
     L2ProjectedOptim,
     LinfFrankWolfe,
     LinfProjectedOptim,
+    ParamTransformingOptimizer,
     SignedGradientOptim,
     TopQGradientOptimizer,
 )
@@ -256,7 +256,7 @@ def test_projected_value_is_in_constraint_set(
     scaling_factor=st.floats(0, 1e3),
 )
 def test_step_scales_linearly_with_stepsize(
-    Step: Type[GradientTransformerOptimizer],
+    Step: Type[ParamTransformingOptimizer],
     tensors: Tuple[Tensor, Tensor],
     step_size: float,
     scaling_factor: float,
@@ -299,7 +299,7 @@ def test_step_scales_linearly_with_stepsize(
     scaling_factor=st.floats(1e-3, 1e3),
 )
 def test_transform_gradient_step_is_invariant_to_grad_scale(
-    Step: Type[GradientTransformerOptimizer],
+    Step: Type[ParamTransformingOptimizer],
     tensors: Tuple[Tensor, Tensor],
     step_size: float,
     scaling_factor: float,
@@ -347,7 +347,7 @@ def normed(x: Tensor) -> Tensor:
     step_size=st.floats(1e-3, 1e3),
 )
 def test_step_is_parallel_to_grad(
-    Step: Type[GradientTransformerOptimizer],
+    Step: Type[ParamTransformingOptimizer],
     sign_only: bool,
     tensors: Tuple[Tensor, Tensor],
     step_size: float,
@@ -625,7 +625,7 @@ def test_grad_scale_and_bias(
     biases: Tuple[float, float, float],
     via_defaults: bool,
     x: np.ndarray,
-    Optim: Type[GradientTransformerOptimizer],
+    Optim: Type[ParamTransformingOptimizer],
 ):
     x1 = tr.tensor(x.copy(), requires_grad=True)
     x2 = tr.tensor(x.copy(), requires_grad=True)

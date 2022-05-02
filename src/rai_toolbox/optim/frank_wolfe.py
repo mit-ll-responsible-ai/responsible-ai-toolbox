@@ -11,7 +11,7 @@ from rai_toolbox._typing import OptimParams
 from rai_toolbox._utils import check_param_group_value, value_check
 
 from .lp_space import L1qNormedGradientOptim, L2NormedGradientOptim, SignedGradientOptim
-from .optimizer import GradientTransformerOptimizer
+from .optimizer import ParamTransformingOptimizer
 
 _TINY = torch.finfo(torch.float32).tiny
 
@@ -192,7 +192,7 @@ class L1qFrankWolfe(L1qNormedGradientOptim):
             for that parameter, which starts at 0.
 
         param_ndim : Union[int, None], optional (default=-1)
-            Controls how `_inplace_grad_transform_` is broadcast onto the gradient
+            Controls how `_pre_step_transform_` is broadcast onto the gradient
             of a given parameter. This can be specified per param-group. By default,
             the gradient transformation broadcasts over the first dimension in a
             batch-like style.
@@ -201,7 +201,7 @@ class L1qFrankWolfe(L1qNormedGradientOptim):
             - A negative number indicates the 'offset' from the dimensionality of the gradient. E.g. `-1` leads to batch-style broadcasting.
             - `None` means that the transformation will be applied directly to the gradient without any broadcasting.
 
-            See `GradientTransformerOptimizer` for more details and examples
+            See `ParamTransformingOptimizer` for more details and examples
 
         defaults : Optional[Dict[str, Any]]
             Specifies default parameters for all parameter groups.
@@ -261,13 +261,13 @@ class L1qFrankWolfe(L1qNormedGradientOptim):
         )
 
 
-class L1FrankWolfe(GradientTransformerOptimizer):
+class L1FrankWolfe(ParamTransformingOptimizer):
     r"""A Frank-Wolfe [1]_ optimizer that constrains each updated parameter to fall
     within an :math:`\epsilon`-sized ball in :math:`L^1` space, centered on the origin.
 
     Notes
     -----
-    The method `L1NormedGradientOptim._inplace_grad_transform_` is responsible for
+    The method `L1NormedGradientOptim._pre_step_transform_` is responsible for
     computing the *negative* linear minimization oracle for a parameter and storing it
     on `param.grad`.
 
@@ -315,7 +315,7 @@ class L1FrankWolfe(GradientTransformerOptimizer):
             for that parameter, which starts at 0.
 
         param_ndim : Union[int, None], optional (default=-1)
-            Controls how `_inplace_grad_transform_` is broadcast onto the gradient
+            Controls how `_pre_step_transform_` is broadcast onto the gradient
             of a given parameter. This can be specified per param-group. By default,
             the gradient transformation broadcasts over the first dimension in a
             batch-like style.
@@ -324,7 +324,7 @@ class L1FrankWolfe(GradientTransformerOptimizer):
             - A negative number indicates the 'offset' from the dimensionality of the gradient. E.g. `-1` leads to batch-style broadcasting.
             - `None` means that the transformation will be applied directly to the gradient without any broadcasting.
 
-            See `GradientTransformerOptimizer` for more details and examples.
+            See `ParamTransformingOptimizer` for more details and examples.
 
         div_by_zero_eps : float, optional (default=`torch.finfo(torch.float32).tiny`)
             Prevents div-by-zero error in learning rate schedule.
@@ -338,8 +338,8 @@ class L1FrankWolfe(GradientTransformerOptimizer):
         >>> from rai_toolbox.optim import L1FrankWolfe
 
         Creating a parameter for our optimizer to update, and our optimizer. We
-        specify `param_ndim=None` so that the constrain occurs on the parameter without any
-        broadcasting.
+        specify `param_ndim=None` so that the constrain occurs on the parameter without
+        any broadcasting.
 
         >>> x = tr.tensor([1.0, 1.0], requires_grad=True)
         >>> optim = L1FrankWolfe([x], epsilon=1.8, param_ndim=None)
@@ -367,7 +367,7 @@ class L1FrankWolfe(GradientTransformerOptimizer):
             div_by_zero_eps=div_by_zero_eps,
         )
 
-    def _inplace_grad_transform_(self, param: torch.Tensor, **_unused_kwargs) -> None:
+    def _pre_step_transform_(self, param: torch.Tensor, **_unused_kwargs) -> None:
         if param.grad is None:  # pragma: no cover
             return
         # Computes the negative linear minimization oracle and sets it to
@@ -384,7 +384,7 @@ class L2FrankWolfe(L2NormedGradientOptim):
 
     Notes
     -----
-    The method `L2NormedGradientOptim._inplace_grad_transform_` is responsible for
+    The method `L2NormedGradientOptim._pre_step_transform_` is responsible for
     computing the *negative* linear minimization oracle for a parameter and storing it
     on `param.grad`.
 
@@ -432,7 +432,7 @@ class L2FrankWolfe(L2NormedGradientOptim):
             for that parameter, which starts at 0.
 
         param_ndim : Union[int, None], optional (default=-1)
-            Controls how `_inplace_grad_transform_` is broadcast onto the gradient
+            Controls how `_pre_step_transform_` is broadcast onto the gradient
             of a given parameter. This can be specified per param-group. By default,
             the gradient transformation broadcasts over the first dimension in a
             batch-like style.
@@ -441,7 +441,7 @@ class L2FrankWolfe(L2NormedGradientOptim):
             - A negative number indicates the 'offset' from the dimensionality of the gradient. E.g. `-1` leads to batch-style broadcasting.
             - `None` means that the transformation will be applied directly to the gradient without any broadcasting.
 
-            See `GradientTransformerOptimizer` for more details and examples.
+            See `ParamTransformingOptimizer` for more details and examples.
 
         div_by_zero_eps : float, optional (default=`torch.finfo(torch.float32).tiny`)
             Prevents div-by-zero error in learning rate schedule.
@@ -491,7 +491,7 @@ class LinfFrankWolfe(SignedGradientOptim):
 
     Notes
     -----
-    The method `SignedGradientOptim._inplace_grad_transform_` is responsible for
+    The method `SignedGradientOptim._pre_step_transform_` is responsible for
     computing the *negative* linear minimization oracle for a parameter and storing it
     on `param.grad`.
 
@@ -566,7 +566,7 @@ class LinfFrankWolfe(SignedGradientOptim):
             for that parameter, which starts at 0.
 
         param_ndim : Union[int, None], optional (default=-1)
-            Controls how `_inplace_grad_transform_` is broadcast onto the gradient
+            Controls how `_pre_step_transform_` is broadcast onto the gradient
             of a given parameter. This can be specified per param-group. By default,
             the gradient transformation broadcasts over the first dimension in a
             batch-like style.
@@ -575,7 +575,7 @@ class LinfFrankWolfe(SignedGradientOptim):
             - A negative number indicates the 'offset' from the dimensionality of the gradient. E.g. `-1` leads to batch-style broadcasting.
             - `None` means that the transformation will be applied directly to the gradient without any broadcasting.
 
-            See `GradientTransformerOptimizer` for more details and examples.
+            See `ParamTransformingOptimizer` for more details and examples.
 
         div_by_zero_eps : float, optional (default=`torch.finfo(torch.float32).tiny`)
             Prevents div-by-zero error in learning rate schedule.

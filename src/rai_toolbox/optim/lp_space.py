@@ -19,8 +19,7 @@ from .optimizer import (
     REQUIRED,
     ChainedGradTransformerOptimizer,
     DatumParamGroup,
-    GradientTransformerOptimizer,
-    ProjectionMixin,
+    ParamTransformingOptimizer,
 )
 
 __all__ = [
@@ -39,7 +38,7 @@ class _HasEpsilon(DatumParamGroup):
     epsilon: float
 
 
-class _LpNormOptimizer(GradientTransformerOptimizer):
+class _LpNormOptimizer(ParamTransformingOptimizer):
     r"""A base optimizer whose step normalizes based on the p-norm:
 
     .. math::
@@ -75,7 +74,7 @@ class _LpNormOptimizer(GradientTransformerOptimizer):
             been transformed.
 
         param_ndim : Optional[int]
-            Controls how `_inplace_grad_transform_` is broadcast onto the gradient
+            Controls how `_pre_step_transform_` is broadcast onto the gradient
             of a given parameter. This can be specified per param-group. By default,
             the gradient transformation broadcasts over the first dimension in a
             batch-like style.
@@ -84,7 +83,7 @@ class _LpNormOptimizer(GradientTransformerOptimizer):
             - A negative number indicates the 'offset' from the dimensionality of the gradient (see "Notes" for examples).
             - `None` means that the transformation will be applied directly to the gradient without any broadcasting.
 
-            See `GradientTransformerOptimizer` for more details and examples.
+            See `ParamTransformingOptimizer` for more details and examples.
 
         grad_scale : float, optional (default=1.0)
             Multiplies each gradient in-place after the in-place transformation is
@@ -130,7 +129,7 @@ class _LpNormOptimizer(GradientTransformerOptimizer):
     def per_datum_norm(self, x: torch.Tensor) -> torch.Tensor:
         return torch.norm(x, p=self.p, dim=1)  # type: ignore
 
-    def _inplace_grad_transform_(self, param: Tensor, **_unused_kwargs) -> None:
+    def _pre_step_transform_(self, param: Tensor, **_unused_kwargs) -> None:
         if param.grad is None:  # pragma: no cover
             return
 
@@ -139,7 +138,7 @@ class _LpNormOptimizer(GradientTransformerOptimizer):
         param.grad /= torch.clamp(g_norm, self.div_by_zero_eps, None)
 
 
-class SignedGradientOptim(GradientTransformerOptimizer):
+class SignedGradientOptim(ParamTransformingOptimizer):
     r"""A gradient-tranforming optimizer that takes the elementwise sign
     of a parameter's gradient prior to using `InnerOp.step` to update the
     corresponding parameter.
@@ -149,7 +148,7 @@ class SignedGradientOptim(GradientTransformerOptimizer):
     L1NormedGradientOptim
     L2NormedGradientOptim
     ProjectionMixin
-    GradientTransformerOptimizer
+    ParamTransformingOptimizer
     """
 
     def __init__(
@@ -184,7 +183,7 @@ class SignedGradientOptim(GradientTransformerOptimizer):
         defaults : Optional[Dict[str, Any]]
 
         param_ndim : Optional[int]
-            Controls how `_inplace_grad_transform_` is broadcast onto the gradient
+            Controls how `_pre_step_transform_` is broadcast onto the gradient
             of a given parameter. This has no effect for `SignedGradientOptim`.
             Specifies default parameters for all parameter groups.
 
@@ -229,7 +228,7 @@ class SignedGradientOptim(GradientTransformerOptimizer):
             **inner_opt_kwargs,
         )
 
-    def _inplace_grad_transform_(self, param: Tensor, **_unused_kwargs) -> None:
+    def _pre_step_transform_(self, param: Tensor, **_unused_kwargs) -> None:
         if param.grad is None:  # pragma: no cover
             return
 
@@ -246,7 +245,7 @@ class L1NormedGradientOptim(_LpNormOptimizer):
     L2NormedGradientOptim
     SignedGradientOptim
     ProjectionMixin
-    GradientTransformerOptimizer
+    ParamTransformingOptimizer
 
     Examples
     --------
@@ -294,7 +293,7 @@ class L2NormedGradientOptim(_LpNormOptimizer):
     L1NormedGradientOptim
     SignedGradientOptim
     ProjectionMixin
-    GradientTransformerOptimizer
+    ParamTransformingOptimizer
 
     Examples
     --------
@@ -330,7 +329,7 @@ class L2NormedGradientOptim(_LpNormOptimizer):
     _p: Final = 2
 
 
-class L2ProjectedOptim(ProjectionMixin, L2NormedGradientOptim):
+class L2ProjectedOptim(L2NormedGradientOptim):
     r"""A gradient-tranforming optimizer that constrains the updated parameters
     to lie within an :math:`\epsilon`-sized ball in :math:`L^2` space centered on the
     origin.
@@ -347,7 +346,7 @@ class L2ProjectedOptim(ProjectionMixin, L2NormedGradientOptim):
     L2NormedGradientOptim
     LinfProjectedOptim
     ProjectionMixin
-    GradientTransformerOptimizer
+    ParamTransformingOptimizer
     """
 
     def __init__(
@@ -378,7 +377,7 @@ class L2ProjectedOptim(ProjectionMixin, L2NormedGradientOptim):
             projected into, post optimization step.
 
         param_ndim : Union[int, None], optional (default=-1)
-            Controls how `_inplace_grad_transform_` is broadcast onto the gradient
+            Controls how `_pre_step_transform_` is broadcast onto the gradient
             of a given parameter. This can be specified per param-group. By default,
             the gradient transformation broadcasts over the first dimension in a
             batch-like style.
@@ -387,7 +386,7 @@ class L2ProjectedOptim(ProjectionMixin, L2NormedGradientOptim):
             - A negative number indicates the 'offset' from the dimensionality of the gradient. E.g. `-1` leads to batch-style broadcasting.
             - `None` means that the transformation will be applied directly to the gradient without any broadcasting.
 
-            See `GradientTransformerOptimizer` for more details and examples
+            See `ParamTransformingOptimizer` for more details and examples
 
         grad_scale : float, optional (default=1.0)
             Multiplies each gradient in-place after the in-place transformation is
@@ -460,12 +459,12 @@ class L2ProjectedOptim(ProjectionMixin, L2NormedGradientOptim):
         )
         check_param_group_value("epsilon", self.param_groups, min_=0.0)
 
-    def _project_parameter_(self, param: Tensor, optim_group: _HasEpsilon) -> None:
+    def _post_step_transform_(self, param: Tensor, optim_group: _HasEpsilon) -> None:
         """Applies an in-place projection on the given parameter"""
         param.renorm_(p=self.p, dim=0, maxnorm=optim_group["epsilon"])
 
 
-class LinfProjectedOptim(ProjectionMixin, SignedGradientOptim):
+class LinfProjectedOptim(SignedGradientOptim):
     r"""A gradient-tranforming optimizer that constrains the updated parameter values to fall within :math:`[-\epsilon, \epsilon]`.
 
     A step with this optimizer takes the elementwise sign of a parameter's gradient
@@ -477,7 +476,7 @@ class LinfProjectedOptim(ProjectionMixin, SignedGradientOptim):
     L2NormedGradientOptim
     LinfProjectedOptim
     ProjectionMixin
-    GradientTransformerOptimizer
+    ParamTransformingOptimizer
     """
 
     def __init__(
@@ -570,10 +569,9 @@ class LinfProjectedOptim(ProjectionMixin, SignedGradientOptim):
 
         check_param_group_value("epsilon", self.param_groups, min_=0.0)
 
-    def _project_parameter_(self, param: Tensor, optim_group: _HasEpsilon) -> None:
+    def _post_step_transform_(self, param: Tensor, optim_group: _HasEpsilon) -> None:
         epsilon = optim_group["epsilon"]
         param.clamp_(min=-epsilon, max=epsilon)
-
 
 
 class L1qNormedGradientOptim(ChainedGradTransformerOptimizer):
@@ -590,7 +588,7 @@ class L1qNormedGradientOptim(ChainedGradTransformerOptimizer):
     L1NormedGradientOptim
     L2NormedGradientOptim
     TopQGradientOptimizer
-    GradientTransformerOptimizer
+    ParamTransformingOptimizer
     """
 
     def __init__(
@@ -631,7 +629,7 @@ class L1qNormedGradientOptim(ChainedGradTransformerOptimizer):
             be drawn from a uniform distribution over :math:`[q - dq, q + dq] \in [0.0, 1.0]`.
 
         param_ndim : Union[int, None], optional (default=-1)
-            Controls how `_inplace_grad_transform_` is broadcast onto the gradient
+            Controls how `_pre_step_transform_` is broadcast onto the gradient
             of a given parameter. This can be specified per param-group. By default,
             the gradient transformation broadcasts over the first dimension in a
             batch-like style.
@@ -640,7 +638,7 @@ class L1qNormedGradientOptim(ChainedGradTransformerOptimizer):
             - A negative number indicates the 'offset' from the dimensionality of the gradient. E.g. `-1` leads to batch-style broadcasting.
             - `None` means that the transformation will be applied directly to the gradient without any broadcasting.
 
-            See `GradientTransformerOptimizer` for more details and examples
+            See `ParamTransformingOptimizer` for more details and examples
 
 
         grad_scale : float, optional (default=1.0)

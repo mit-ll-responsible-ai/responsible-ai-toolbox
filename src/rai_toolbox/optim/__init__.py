@@ -18,11 +18,7 @@ from .lp_space import (
     SignedGradientOptim,
 )
 from .misc import ClampedGradientOptimizer, TopQGradientOptimizer
-from .optimizer import (
-    ChainedGradTransformerOptimizer,
-    GradientTransformerOptimizer,
-    ProjectionMixin,
-)
+from .optimizer import ChainedGradTransformerOptimizer, ParamTransformingOptimizer
 
 __all__ = [
     "L1FrankWolfe",
@@ -36,8 +32,7 @@ __all__ = [
     "L2ProjectedOptim",
     "SignedGradientOptim",
     "LinfProjectedOptim",
-    "GradientTransformerOptimizer",
-    "ProjectionMixin",
+    "ParamTransformingOptimizer",
     "TopQGradientOptimizer",
     "ClampedGradientOptimizer",
     "ChainedGradTransformerOptimizer",

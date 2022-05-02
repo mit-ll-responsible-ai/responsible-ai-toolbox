@@ -13,7 +13,7 @@ from rai_toolbox._typing import Optimizer as Opt
 from rai_toolbox._typing import OptimizerType, OptimParams, Partial
 from rai_toolbox._utils import check_param_group_value, value_check
 
-from .optimizer import REQUIRED, DatumParamGroup, GradientTransformerOptimizer
+from .optimizer import REQUIRED, DatumParamGroup, ParamTransformingOptimizer
 
 __all__ = ["ClampedGradientOptimizer", "TopQGradientOptimizer"]
 
@@ -23,7 +23,7 @@ class ClampedParamGroup(DatumParamGroup):
     clamp_max: Optional[float]
 
 
-class ClampedGradientOptimizer(GradientTransformerOptimizer):
+class ClampedGradientOptimizer(ParamTransformingOptimizer):
     """A gradient-tranforming  optimizer that clamps the elements of a gradient to
     fall within user-specified bounds, prior to using `InnerOp.step` to update the
     corresponding parameter."""
@@ -74,8 +74,10 @@ class ClampedGradientOptimizer(GradientTransformerOptimizer):
             Specifies default parameters for all parameter groups.
 
         param_ndim : Optional[int]
-            Controls how `_inplace_grad_transform_` is broadcast onto the gradient
-            of a given parameter. This has no effect for `ClampedGradientOptimizer`.
+            Controles how `_pre_step_transform_` and `_post_step_transform_`  are
+            broadcast onto a given parameter. This has no effect for
+            `ClampedGradientOptimizer`.
+
             Specifies default parameters for all parameter groups.
 
         **inner_opt_kwargs : Any
@@ -120,7 +122,7 @@ class ClampedGradientOptimizer(GradientTransformerOptimizer):
                     upper_name="max_clamp",
                 )
 
-    def _inplace_grad_transform_(
+    def _pre_step_transform_(
         self, param: Tensor, optim_group: ClampedParamGroup
     ) -> None:
         if param.grad is None:
@@ -128,7 +130,7 @@ class ClampedGradientOptimizer(GradientTransformerOptimizer):
         param.grad.clamp_(min=optim_group["clamp_min"], max=optim_group["clamp_max"])
 
 
-class TopQGradientOptimizer(GradientTransformerOptimizer):
+class TopQGradientOptimizer(ParamTransformingOptimizer):
     """A gradient-tranforming  optimizer that zeros the elements of a gradient whose
     absolue magnitudes fall below the Qth percentile. `InnerOp.step` is then to update
     the corresponding parameter.
@@ -136,7 +138,7 @@ class TopQGradientOptimizer(GradientTransformerOptimizer):
     See Also
     --------
     L1qNormedGradientOptim
-    GradientTransformerOptimizer"""
+    ParamTransformingOptimizer"""
 
     def __init__(
         self,
@@ -174,16 +176,16 @@ class TopQGradientOptimizer(GradientTransformerOptimizer):
             be drawn from a uniform distribution over :math:`[q - dq, q + dq] \in [0.0, 1.0]`.
 
         param_ndim : Union[int, None], optional (default=-1)
-            Controls how `_inplace_grad_transform_` is broadcast onto the gradient
-            of a given parameter. This can be specified per param-group. By default,
-            the gradient transformation broadcasts over the first dimension in a
+            Controls how `_pre_step_transform_` and `_post_step_transform_`  are
+            broadcast onto a given parameter. This can be specified per param-group. By
+            default, the transformation broadcasts over the first dimension in a
             batch-like style.
 
             - A positive number determines the dimensionality of the gradient that the transformation will act on.
             - A negative number indicates the 'offset' from the dimensionality of the gradient. E.g. `-1` leads to batch-style broadcasting.
             - `None` means that the transformation will be applied directly to the gradient without any broadcasting.
 
-            See `GradientTransformerOptimizer` for more details and examples
+            See `ParamTransformingOptimizer` for more details and examples
 
         grad_scale : float, optional (default=1.0)
             Multiplies each gradient in-place after the in-place transformation is
@@ -309,9 +311,7 @@ class TopQGradientOptimizer(GradientTransformerOptimizer):
         )
         self._generator = value_check("generator", generator, type_=torch.Generator)
 
-    def _inplace_grad_transform_(
-        self, param: Tensor, optim_group: Dict[str, Any]
-    ) -> None:
+    def _pre_step_transform_(self, param: Tensor, optim_group: Dict[str, Any]) -> None:
 
         if param.grad is None:  # pragma: no cover
             return

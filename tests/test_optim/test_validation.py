@@ -15,8 +15,8 @@ from rai_toolbox.optim import (
     ChainedGradTransformerOptimizer,
     ClampedGradientOptimizer,
     FrankWolfe,
-    GradientTransformerOptimizer,
     L2NormedGradientOptim,
+    ParamTransformingOptimizer,
 )
 from rai_toolbox.optim.lp_space import _LpNormOptimizer
 
@@ -101,8 +101,8 @@ def test_param_ndim_validation(param: Tensor, data: st.DataObject):
 
 
 def test_gradient_transform_that_overwrites_grad_raises():
-    class BadOptim(GradientTransformerOptimizer):
-        def _inplace_grad_transform_(self, param: Tensor, optim_group) -> None:
+    class BadOptim(ParamTransformingOptimizer):
+        def _pre_step_transform_(self, param: Tensor, optim_group) -> None:
             if param.grad is None:
                 return
             param.grad = param.grad + 2  # overwrites gradient
