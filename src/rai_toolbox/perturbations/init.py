@@ -19,7 +19,7 @@ def uniform_like_l1_n_ball_(
     param_ndim: Union[int, None] = -1,
     generator: Generator = default_generator,
 ) -> None:
-    r"""Uniform sampling of a epsilon-sized n-ball for :math:`L^1:-norm, where `n` is controlled by `x.shape` and `param_ndim`. The result overwrites `x` in-place.
+    r"""Uniform sampling of a epsilon-sized n-ball for :math:`L^1`-norm, where `n` is controlled by `x.shape` and `param_ndim`. The result overwrites `x` in-place.
 
     Parameters
     ----------
@@ -100,7 +100,7 @@ def uniform_like_l2_n_ball_(
     param_ndim: Union[int, None] = -1,
     generator: Generator = default_generator,
 ) -> None:
-    r"""Uniform sampling within an epsilon-sized n-ball for :math:`L^2:-norm, where `n`
+    r"""Uniform sampling within an epsilon-sized n-ball for :math:`L^2`-norm, where `n`
     is controlled by `x.shape` and `param_ndim`. The result overwrites `x` in-place.
 
     Parameters
@@ -183,8 +183,8 @@ def uniform_like_linf_n_ball_(
     param_ndim: Optional[int] = None,
     generator: Generator = default_generator,
 ) -> None:
-    r"""Uniform sampling within an epsilon-sized n-ball for :math:`L^{\infty}:-norm. The
-    result overwrites `x` in-place.
+    r"""Uniform sampling within an epsilon-sized n-ball for :math:`L^{\infty}`-norm.
+    The result overwrites `x` in-place.
 
     Parameters
     ----------

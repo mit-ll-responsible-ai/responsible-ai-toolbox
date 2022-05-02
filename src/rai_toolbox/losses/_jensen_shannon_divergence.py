@@ -7,23 +7,26 @@ from typing import Optional
 import torch as tr
 import torch.nn.functional as F
 
+from rai_toolbox._typing import ArrayLike
+
 
 def jensen_shannon_divergence(
-    *probs: tr.Tensor, weight: Optional[float] = None
+    *probs: ArrayLike, weight: Optional[float] = None
 ) -> tr.Tensor:
-    """Computes the Jensen-Shannon divergence between n distributions:
+    """Computes the Jensen-Shannon divergence [1]_ between n distributions:
                       JSD(P1, P2, ..., Pn)
 
     This loss is symmetric and is bounded by 0 <= JSD(P1, P2, ..., Pn) <= ln(n)
 
     Parameters
     ----------
-    probs : tr.Tensor, shape-(N, D)
+    probs : ArrayLike, shape-(N, D)
         A collection of n probability distributions. Each conveys of batch of N
         distributions over D categories.
 
     weight : Optional[float]
         A scaling factor that will be applied to the consistency loss.
+
 
     Returns
     -------
@@ -37,7 +40,26 @@ def jensen_shannon_divergence(
 
     References
     ----------
-    https://en.wikipedia.org/wiki/Jensen%E2%80%93Shannon_divergence"""
+    .. [1] https://en.wikipedia.org/wiki/Jensen%E2%80%93Shannon_divergence
+
+    Examples
+    --------
+    Let's measure the divergence between three discrete distributions of length-two.
+
+    >>> from rai_toolbox.losses import jensen_shannon_divergence
+    >>> P1 = [[0.0, 1.0]]
+    >>> P2 = [[1.0, 0.0]]
+    >>> P3 = [[0.5, 0.5]]
+    >>> jensen_shannon_divergence(P1, P2, P3)
+    tensor(0.4621)
+
+    The divergence is symmetric.
+
+    >>> jensen_shannon_divergence(P1, P3, P2)
+    tensor(0.4621)
+    """
+
+    probs = tuple(tr.as_tensor(p) for p in probs)
 
     if len(probs) < 2 or any(
         not isinstance(p, tr.Tensor) or p.dim() != 2 for p in probs

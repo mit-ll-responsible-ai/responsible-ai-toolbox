@@ -310,9 +310,11 @@ def random_restart(
     `L(δ; x) = |x + δ|` w.r.t `δ`. Our perturbation will randomly initialize `δ1` and `δ2` and we will re-run the solver three times – retaining the best perturbation of `x1` and `x2` respectively
 
     >>> from functools import partial
+    >>> import torch as tr
     >>> from torch.optim import SGD
     >>> from rai_toolbox.perturbations.init import uniform_like_l1_n_ball_
     >>> from rai_toolbox.perturbations import AdditivePerturbation, gradient_ascent, random_restart
+    >>>
     >>> def verbose_abs_diff(model_out, target):
     ...     # used to print out loss at each solver step (for purpose of example)
     ...     out =  (model_out - target).abs()
@@ -321,7 +323,8 @@ def random_restart(
 
     Configuring a peturbation model to randomly initialize the perturbations.
 
-    >>> PertModel = partial(AdditivePerturbation, init_fn=uniform_like_l1_n_ball_)
+    >>> RNG = tr.Generator().manual_seed(0)
+    >>> PertModel = partial(AdditivePerturbation, init_fn=uniform_like_l1_n_ball_, generator=RNG)
 
     Creating and running repeating solver.
 
@@ -337,21 +340,21 @@ def random_restart(
     ...    lr=0.1,
     ...    steps=1,
     ... )
-    tensor([0.2807, 2.1413], grad_fn=<AbsBackward0>)
-    tensor([0.3807, 2.2413])
-    tensor([0.9298, 2.1458], grad_fn=<AbsBackward0>)
-    tensor([1.0298, 2.2458])
-    tensor([0.4909, 2.9649], grad_fn=<AbsBackward0>)
-    tensor([0.5909, 3.0649])
+    tensor([0.5037, 2.7682], grad_fn=<AbsBackward0>)
+    tensor([0.6037, 2.8682])
+    tensor([0.9115, 2.1320], grad_fn=<AbsBackward0>)
+    tensor([1.0115, 2.2320])
+    tensor([0.6926, 2.6341], grad_fn=<AbsBackward0>)
+    tensor([0.7926, 2.7341])
 
-    See that for `x1` the highest loss is `1.0298`, and for `x2` it is `3.0649`. This
+    See that for `x1` the highest loss is `1.0115`, and for `x2` it is `2.8682`. This
     should be reflected `losses` and `perturbed_data` that were retained across the
     restarts.
 
     >>> losses
-    tensor([1.0298, 3.0649])
+    tensor([1.0115, 2.8682])
     >>> perturbed_data
-    tensor([-1.0298,  3.0649])
+    tensor([-1.0115,  2.8682])
     """
     value_check("repeats", repeats, min_=1, incl_min=True)
 
