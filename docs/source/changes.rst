@@ -16,9 +16,10 @@ chronological order. All previous releases should still be available on pip.
 
 This is a pre-release. You can install it with: 
 
-```console
-pip install rai-toolbox[mushin] --pre
-```
+.. code:: console
+
+   $ pip install rai-toolbox[mushin] --pre
+
 
 This is rAI-toolbox's first stable release on PyPI! Please check out the rest of our 
 docs to see what the toolbox has to offer.
