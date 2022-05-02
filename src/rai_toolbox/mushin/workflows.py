@@ -269,6 +269,56 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
 
     The evaluation task is expected to return a dictionary that maps
     `metric-name (str) -> value (number | Sequence[number])`
+
+    Examples
+    --------
+    Let's create a simple workflow where we perform a multirun over a parameter,
+    epsilon, and evaluate a task function that computes an accuracy based on that
+    epsilon value.
+
+    >>> from rai_toolbox.mushin.workflows import MultiRunMetricsWorkflow
+    >>> from rai_toolbox.mushin import multirun
+    >>> import torch as tr
+    >>> class LocalRobustness(MultiRunMetricsWorkflow):
+    ...     @staticmethod
+    ...     def evaluation_task(epsilon):
+    ...         val = 100 - epsilon**2
+    ...
+    ...         result = dict(accuracies=val+2)
+    ...
+    ...         tr.save(result, "test_metrics.pt")
+    ...         return result
+
+    >>> wf = LocalRobustness()
+    >>> wf.run(epsilon=multirun([1.0, 2.0, 3.0]))
+    [2022-05-01 12:01:00,451][HYDRA] Launching 3 jobs locally
+    [2022-05-01 12:01:00,451][HYDRA] 	#0 : +epsilon=1.0
+    [2022-05-01 12:01:00,543][HYDRA] 	#1 : +epsilon=2.0
+    [2022-05-01 12:01:00,640][HYDRA] 	#2 : +epsilon=3.0
+
+    Now that this workflow has run, we can view the results as an xarray-dataset.
+
+    >>> ds = wf.to_xarray()
+    >>> ds
+    <xarray.Dataset>
+    Dimensions:     (x: 3)
+    Coordinates:
+        epsilon     (x) float64 1.0 2.0 3.0
+    Dimensions without coordinates: x
+    Data variables:
+        accuracies  (x) float64 101.0 98.0 93.0
+
+    We can also load this workflow by providing the working directory where it was run.
+
+    >>> loaded = LocalRobustness().load_from_dir(wf.working_dir)
+    >>> loaded.to_xarray()
+    <xarray.Dataset>
+    Dimensions:     (x: 3)
+    Coordinates:
+        epsilon     (x) float64 1.0 2.0 3.0
+    Dimensions without coordinates: x
+    Data variables:
+        accuracies  (x) float64 101.0 98.0 93.0
     """
 
     @abstractstaticmethod

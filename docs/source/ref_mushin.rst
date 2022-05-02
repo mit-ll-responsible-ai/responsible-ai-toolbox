@@ -19,6 +19,7 @@ Workflows
    :toctree: generated/
 
    BaseWorkflow
+   MultiRunMetricsWorkflow
    RobustnessCurve
 
 
