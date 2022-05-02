@@ -45,6 +45,7 @@ Miscellaneous Gradient-Transforming Optimizers
 
    TopQGradientOptimizer
    ClampedGradientOptimizer
+   ClampedParameterOptimizer
 
 
 ************************************************

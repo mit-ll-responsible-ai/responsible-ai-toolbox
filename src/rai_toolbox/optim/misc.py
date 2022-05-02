@@ -23,11 +23,7 @@ class ClampedParamGroup(DatumParamGroup):
     clamp_max: Optional[float]
 
 
-class ClampedGradientOptimizer(ParamTransformingOptimizer):
-    """A gradient-tranforming  optimizer that clamps the elements of a gradient to
-    fall within user-specified bounds, prior to using `InnerOp.step` to update the
-    corresponding parameter."""
-
+class _ClampedOptim(ParamTransformingOptimizer):
     param_groups: List[ClampedParamGroup]
 
     def __init__(
@@ -82,21 +78,6 @@ class ClampedGradientOptimizer(ParamTransformingOptimizer):
 
         **inner_opt_kwargs : Any
             Named arguments used to initialize `InnerOpt`.
-
-        Examples
-        --------
-        Let's clamp each element of the parameter's gradient to `[-1, 3]` prior to
-        performing a step with `SGD` using a learning rate of `1.0`.
-
-        >>> x = tr.ones(2, requires_grad=True)
-        >>> optim = ClampedGradientOptimizer(params=[x], lr=1.0, clamp_min=-1.0, clamp_max=3.0)
-
-        >>> x.backward(gradient=tr.tensor([-0.5, 10]))
-        >>> optim.step()
-        >>> x.grad
-        tensor([-0.5000,  3.0000])
-        >>> x
-        tensor([ 1.5000, -2.0000], requires_grad=True)
         """
         if defaults is None:
             defaults = {}
@@ -122,12 +103,68 @@ class ClampedGradientOptimizer(ParamTransformingOptimizer):
                     upper_name="max_clamp",
                 )
 
+
+class ClampedGradientOptimizer(_ClampedOptim):
+    """A gradient-tranforming  optimizer that clamps the elements of a gradient to
+    fall within user-specified bounds **prior** to using `InnerOp.step` to update the
+    corresponding parameter.
+
+    See Also
+    --------
+    ClampedParameterOptimizer
+
+    Examples
+    --------
+    Let's clamp each element of the parameter's gradient to `[-1, 3]` prior to
+    performing a step with `SGD` using a learning rate of `1.0`.
+
+    >>> import torch as tr
+    >>> from rai_toolbox.optim import ClampedGradientOptimizer
+    >>> x = tr.ones(2, requires_grad=True)
+    >>> optim = ClampedGradientOptimizer(params=[x], lr=1.0, clamp_min=-1.0, clamp_max=3.0)
+
+    >>> x.backward(gradient=tr.tensor([-0.5, 10]))
+    >>> optim.step()
+    >>> x.grad
+    tensor([-0.5000,  3.0000])
+    >>> x
+    tensor([ 1.5000, -2.0000], requires_grad=True)"""
+
     def _pre_step_transform_(
         self, param: Tensor, optim_group: ClampedParamGroup
     ) -> None:
         if param.grad is None:
             return
         param.grad.clamp_(min=optim_group["clamp_min"], max=optim_group["clamp_max"])
+
+
+class ClampedParameterOptimizer(_ClampedOptim):
+    """A parameter optimizer that clamps the elements of a parameter to fall within
+    user-specified bounds **after** `InnerOp.step` has updated the parameter
+
+    See Also
+    --------
+    ClampedGradientOptimizer
+
+    Examples
+    --------
+    Let's clamp each element of the parameter's gradient to `[-1, 3]` prior to
+    performing a step with `SGD` using a learning rate of `1.0`.
+
+    >>> import torch as tr
+    >>> from rai_toolbox.optim import ClampedParameterOptimizer
+    >>> x = tr.ones(2, requires_grad=True)
+    >>> optim = ClampedParameterOptimizer(params=[x], lr=1.0, clamp_min=-1.0, clamp_max=3.0)
+
+    >>> x.backward(gradient=tr.tensor([0.5, -10.0]))
+    >>> optim.step()
+    >>> x
+    tensor([0.5000, 3.0000], requires_grad=True)"""
+
+    def _post_step_transform_(
+        self, param: Tensor, optim_group: ClampedParamGroup
+    ) -> None:
+        param.clamp_(min=optim_group["clamp_min"], max=optim_group["clamp_max"])
 
 
 class TopQGradientOptimizer(ParamTransformingOptimizer):
