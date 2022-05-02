@@ -111,6 +111,12 @@ def test_min_max_ordering(kwargs):
             dict(value=1, min_=1, max_=1, incl_min=True, incl_max=True),
             id="lower:1 <= value:1 <= upper:1",
         ),
+        pytest.param(
+            dict(
+                value=None, min_=1, max_=1, incl_min=True, incl_max=True, optional=True
+            ),
+            id="lower:1 <= value:1 <= upper:1",
+        ),
     ],
 )
 def test_bad_inequality(kwargs):

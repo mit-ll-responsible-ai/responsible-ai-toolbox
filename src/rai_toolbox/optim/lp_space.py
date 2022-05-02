@@ -2,9 +2,9 @@
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 
+from functools import partial
 from typing import Any, Dict, Optional, Union
 
-import numpy as np
 import torch
 from torch import Generator, Tensor, default_generator
 from torch.optim import SGD
@@ -14,7 +14,13 @@ from rai_toolbox._typing import Optimizer as Opt
 from rai_toolbox._typing import OptimizerType, OptimParams, Partial
 from rai_toolbox._utils import check_param_group_value, value_check
 
-from .optimizer import DatumParamGroup, GradientTransformerOptimizer, ProjectionMixin
+from .misc import TopQGradientOptimizer
+from .optimizer import (
+    REQUIRED,
+    ChainedParamTransformingOptimizer,
+    DatumParamGroup,
+    ParamTransformingOptimizer,
+)
 
 __all__ = [
     "L1NormedGradientOptim",
@@ -32,7 +38,7 @@ class _HasEpsilon(DatumParamGroup):
     epsilon: float
 
 
-class _LpNormOptimizer(GradientTransformerOptimizer):
+class _LpNormOptimizer(ParamTransformingOptimizer):
     r"""A base optimizer whose step normalizes based on the p-norm:
 
     .. math::
@@ -68,16 +74,16 @@ class _LpNormOptimizer(GradientTransformerOptimizer):
             been transformed.
 
         param_ndim : Optional[int]
-            Controls how `_inplace_grad_transform_` is broadcast onto the gradient
-            of a given parameter. This can be specified per param-group. By default,
-            the gradient transformation broadcasts over the first dimension in a
-            batch-like style.
+            Determines how a parameter and its gradient is temporarily reshaped prior
+            to being passed to both `_pre_step_transform_` and `_post_step_transform_`.
+            By default,the transformation broadcasts over the tensor's first dimension
+            in a batch-like style. This can be specified per param-group
 
-            - A positive number determines the dimensionality of the gradient that the transformation will act on.
-            - A negative number indicates the 'offset' from the dimensionality of the gradient (see "Notes" for examples).
-            - `None` means that the transformation will be applied directly to the gradient without any broadcasting.
+            - A positive number determines the dimensionality of the tensor that the transformation will act on.
+            - A negative number indicates the 'offset' from the dimensionality of the tensor (see "Notes" for examples).
+            - `None` means that the transformation will be applied directly to the tensor without any broadcasting.
 
-            See `GradientTransformerOptimizer` for more details and examples.
+            See `ParamTransformingOptimizer` for more details and examples
 
         grad_scale : float, optional (default=1.0)
             Multiplies each gradient in-place after the in-place transformation is
@@ -123,7 +129,7 @@ class _LpNormOptimizer(GradientTransformerOptimizer):
     def per_datum_norm(self, x: torch.Tensor) -> torch.Tensor:
         return torch.norm(x, p=self.p, dim=1)  # type: ignore
 
-    def _inplace_grad_transform_(self, param: Tensor, **_unused_kwargs) -> None:
+    def _pre_step_transform_(self, param: Tensor, **_unused_kwargs) -> None:
         if param.grad is None:  # pragma: no cover
             return
 
@@ -132,7 +138,7 @@ class _LpNormOptimizer(GradientTransformerOptimizer):
         param.grad /= torch.clamp(g_norm, self.div_by_zero_eps, None)
 
 
-class SignedGradientOptim(GradientTransformerOptimizer):
+class SignedGradientOptim(ParamTransformingOptimizer):
     r"""A gradient-tranforming optimizer that takes the elementwise sign
     of a parameter's gradient prior to using `InnerOp.step` to update the
     corresponding parameter.
@@ -142,37 +148,7 @@ class SignedGradientOptim(GradientTransformerOptimizer):
     L1NormedGradientOptim
     L2NormedGradientOptim
     ProjectionMixin
-    GradientTransformerOptimizer
-
-    Examples
-    --------
-    Let's create use `SignedGradientOptim` along with a SGD-step with a
-    learning rate of `1.0`.
-
-    >>> import torch as tr
-    >>> from rai_toolbox.optim import SignedGradientOptim
-
-    Creating a parameter for our optimizer to update, and our optimizer. We
-    want the norm to be computed over the entire gradient tensor – without
-    broadcasting – so we specify `param_ndim=None`.
-
-    >>> x = tr.tensor([-1.5, 1.5], requires_grad=True)
-    >>> optim = SignedGradientOptim([x], InnerOpt=tr.optim.SGD, lr=1.0)
-
-    Performing a simple calculation with `x` and performing backprop to create
-    a gradient.
-
-    >>> (tr.tensor([-2.0, 20.0]) * x).sum().backward()
-    >>> x.grad # the original gradient
-    tensor([-2., 20.])
-
-    Performing a step with our optimizer transforms the gradient in-place, and then updates the parameter using `SGD([x], lr=1.0).step()`.
-
-    >>> optim.step()
-    >>> x.grad # the normalized gradient
-    tensor([-1.,  1.])
-    >>> x  # the updated parameter
-    tensor([-0.5000,  0.5000], requires_grad=True)
+    ParamTransformingOptimizer
     """
 
     def __init__(
@@ -180,13 +156,13 @@ class SignedGradientOptim(GradientTransformerOptimizer):
         params: OptimParams,
         InnerOpt: Union[Partial[Opt], OptimizerType] = SGD,
         *,
-        param_ndim: Optional[int] = None,
         grad_scale: float = 1.0,
         grad_bias: float = 0.0,
         defaults: Optional[Dict[str, Any]] = None,
+        param_ndim: Optional[int] = None,
         **inner_opt_kwargs,
     ) -> None:
-        """
+        r"""
         Parameters
         ----------
         params : Sequence[Tensor] | Iterable[Mapping[str, Any]]
@@ -195,18 +171,6 @@ class SignedGradientOptim(GradientTransformerOptimizer):
         InnerOpt : Type[Optimizer] | Partial[Optimizer], optional (default=`torch.nn.optim.SGD`)
             The optimizer that updates the parameters after their gradients have
             been transformed.
-
-        param_ndim : Optional[int]
-            Controls how `_inplace_grad_transform_` is broadcast onto the gradient
-            of a given parameter. This can be specified per param-group. By default,
-            the gradient transformation broadcasts over the first dimension in a
-            batch-like style.
-
-            - A positive number determines the dimensionality of the gradient that the transformation will act on.
-            - A negative number indicates the 'offset' from the dimensionality of the gradient. E.g. `-1` leads to batch-style broadcasting.
-            - `None` means that the transformation will be applied directly to the gradient without any broadcasting.
-
-            See `GradientTransformerOptimizer` for more details and examples
 
         grad_scale : float, optional (default=1.0)
             Multiplies each gradient in-place after the in-place transformation is
@@ -217,10 +181,42 @@ class SignedGradientOptim(GradientTransformerOptimizer):
             performed. This can be specified per param-group.
 
         defaults : Optional[Dict[str, Any]]
+
+        param_ndim : Optional[int]
+            Controls how `_pre_step_transform_` is broadcast onto the gradient
+            of a given parameter. This has no effect for `SignedGradientOptim`.
             Specifies default parameters for all parameter groups.
 
         **inner_opt_kwargs : Any
             Named arguments used to initialize `InnerOpt`.
+
+        Examples
+        --------
+        Let's create use `SignedGradientOptim` along with a SGD-step with a
+        learning rate of `1.0`.
+
+        >>> import torch as tr
+        >>> from rai_toolbox.optim import SignedGradientOptim
+
+        Creating a parameter for our optimizer to update, and our optimizer.
+
+        >>> x = tr.tensor([-1.5, 1.5], requires_grad=True)
+        >>> optim = SignedGradientOptim([x], InnerOpt=tr.optim.SGD, lr=1.0)
+
+        Performing a simple calculation with `x` and performing backprop to create
+        a gradient.
+
+        >>> (tr.tensor([-2.0, 20.0]) * x).sum().backward()
+        >>> x.grad # the original gradient
+        tensor([-2., 20.])
+
+        Performing a step with our optimizer transforms the gradient in-place, and then updates the parameter using `SGD([x], lr=1.0).step()`.
+
+        >>> optim.step()
+        >>> x.grad # the normalized gradient
+        tensor([-1.,  1.])
+        >>> x  # the updated parameter
+        tensor([-0.5000,  0.5000], requires_grad=True)
         """
         super().__init__(
             params,
@@ -232,7 +228,7 @@ class SignedGradientOptim(GradientTransformerOptimizer):
             **inner_opt_kwargs,
         )
 
-    def _inplace_grad_transform_(self, param: Tensor, **_unused_kwargs) -> None:
+    def _pre_step_transform_(self, param: Tensor, **_unused_kwargs) -> None:
         if param.grad is None:  # pragma: no cover
             return
 
@@ -249,7 +245,7 @@ class L1NormedGradientOptim(_LpNormOptimizer):
     L2NormedGradientOptim
     SignedGradientOptim
     ProjectionMixin
-    GradientTransformerOptimizer
+    ParamTransformingOptimizer
 
     Examples
     --------
@@ -297,7 +293,7 @@ class L2NormedGradientOptim(_LpNormOptimizer):
     L1NormedGradientOptim
     SignedGradientOptim
     ProjectionMixin
-    GradientTransformerOptimizer
+    ParamTransformingOptimizer
 
     Examples
     --------
@@ -333,7 +329,7 @@ class L2NormedGradientOptim(_LpNormOptimizer):
     _p: Final = 2
 
 
-class L2ProjectedOptim(L2NormedGradientOptim, ProjectionMixin):
+class L2ProjectedOptim(L2NormedGradientOptim):
     r"""A gradient-tranforming optimizer that constrains the updated parameters
     to lie within an :math:`\epsilon`-sized ball in :math:`L^2` space centered on the
     origin.
@@ -350,44 +346,7 @@ class L2ProjectedOptim(L2NormedGradientOptim, ProjectionMixin):
     L2NormedGradientOptim
     LinfProjectedOptim
     ProjectionMixin
-    GradientTransformerOptimizer
-
-    Examples
-    --------
-    Let's create an optimizer that normalizes all parameter gradients using
-    their :math:`L^2`-norm, and then updates the parameters with a standard
-    SGD-step with a learning rate of `1.0`. After the step, each parameter
-    will be projected into a :math:`L^2`-ball of radius `0.8`.
-
-    >>> import torch as tr
-    >>> from rai_toolbox.optim import L2ProjectedOptim
-
-    Creating a parameter for our optimizer to update, and our optimizer. We
-    want the norm to be computed over the entire gradient tensor – without
-    broadcasting – so we specify `param_ndim=None`. This also controls the
-    projection behavior.
-
-    >>> x = tr.tensor([-1.0, 1.0], requires_grad=True)
-    >>> optim = L2ProjectedOptim([x], param_ndim=None, InnerOpt=tr.optim.SGD, lr=1.0, epsilon=0.8)
-
-    Performing a simple calculation with `x` and performing backprop to create
-    a gradient.
-
-    >>> (tr.tensor([2.0, 2.0]) * x).sum().backward()
-    >>> x.grad # the un-normed gradient
-    tensor([2., 2.])
-
-    Performing a step with our optimizer transforms the gradient in-place, updates the
-    parameter using `SGD([x], lr=1.0).step()`, and then projects the parameter into
-    the constraint set.
-
-    >>> optim.step()
-    >>> x.grad # the normalized gradient
-    tensor([0.7071, 0.7071])
-    >>> x  # the updated parameter
-    tensor([-0.7885,  0.1353], requires_grad=True)
-    >>> x.norm(p=2).item() # `x` lies on the L2-ball of radius 0.8
-    0.800000011920929
+    ParamTransformingOptimizer
     """
 
     def __init__(
@@ -395,7 +354,7 @@ class L2ProjectedOptim(L2NormedGradientOptim, ProjectionMixin):
         params: OptimParams,
         InnerOpt: Union[Partial[Opt], OptimizerType] = SGD,
         *,
-        epsilon: float,
+        epsilon: float = REQUIRED,
         param_ndim: Union[int, None] = -1,
         grad_scale: float = 1.0,
         grad_bias: float = 0.0,
@@ -403,7 +362,7 @@ class L2ProjectedOptim(L2NormedGradientOptim, ProjectionMixin):
         div_by_zero_eps: float = _TINY,
         **inner_opt_kwargs,
     ):
-        """
+        r"""
         Parameters
         ----------
         params : Sequence[Tensor] | Iterable[Mapping[str, Any]]
@@ -418,17 +377,16 @@ class L2ProjectedOptim(L2NormedGradientOptim, ProjectionMixin):
             projected into, post optimization step.
 
         param_ndim : Union[int, None], optional (default=-1)
-            Controls how `_inplace_grad_transform_` is broadcast onto the gradient
-            of a given parameter. This can be specified per param-group. By default,
-            the gradient transformation broadcasts over the first dimension in a
-            batch-like style.
+            Determines how a parameter and its gradient is temporarily reshaped prior
+            to being passed to both `_pre_step_transform_` and `_post_step_transform_`.
+            By default,the transformation broadcasts over the tensor's first dimension
+            in a batch-like style. This can be specified per param-group
 
-            - A positive number determines the dimensionality of the gradient that the transformation will act on.
-            - A negative number indicates the 'offset' from the dimensionality of the gradient. E.g. `-1` leads to batch-style broadcasting.
-            - `None` means that the transformation will be applied directly to the gradient without any broadcasting.
+            - A positive number determines the dimensionality of the tensor that the transformation will act on.
+            - A negative number indicates the 'offset' from the dimensionality of the tensor (see "Notes" for examples).
+            - `None` means that the transformation will be applied directly to the tensor without any broadcasting.
 
-            See `GradientTransformerOptimizer` for more details and examples
-
+            See `ParamTransformingOptimizer` for more details and examples
 
         grad_scale : float, optional (default=1.0)
             Multiplies each gradient in-place after the in-place transformation is
@@ -446,6 +404,43 @@ class L2ProjectedOptim(L2NormedGradientOptim, ProjectionMixin):
 
         **inner_opt_kwargs : Any
             Named arguments used to initialize `InnerOpt`.
+
+        Examples
+        --------
+        Let's create an optimizer that normalizes all parameter gradients using
+        their :math:`L^2`-norm, and then updates the parameters with a standard
+        SGD-step with a learning rate of `1.0`. After the step, each parameter
+        will be projected into a :math:`L^2`-ball of radius `0.8`.
+
+        >>> import torch as tr
+        >>> from rai_toolbox.optim import L2ProjectedOptim
+
+        Creating a parameter for our optimizer to update, and our optimizer. We
+        want the norm to be computed over the entire gradient tensor – without
+        broadcasting – so we specify `param_ndim=None`. This also controls the
+        projection behavior.
+
+        >>> x = tr.tensor([-1.0, 1.0], requires_grad=True)
+        >>> optim = L2ProjectedOptim([x], param_ndim=None, InnerOpt=tr.optim.SGD, lr=1.0, epsilon=0.8)
+
+        Performing a simple calculation with `x` and performing backprop to create
+        a gradient.
+
+        >>> (tr.tensor([2.0, 2.0]) * x).sum().backward()
+        >>> x.grad # the un-normed gradient
+        tensor([2., 2.])
+
+        Performing a step with our optimizer transforms the gradient in-place, updates the
+        parameter using `SGD([x], lr=1.0).step()`, and then projects the parameter into
+        the constraint set.
+
+        >>> optim.step()
+        >>> x.grad # the normalized gradient
+        tensor([0.7071, 0.7071])
+        >>> x  # the updated parameter
+        tensor([-0.7885,  0.1353], requires_grad=True)
+        >>> x.norm(p=2).item() # `x` lies on the L2-ball of radius 0.8
+        0.800000011920929
         """
 
         if defaults is None:
@@ -464,18 +459,12 @@ class L2ProjectedOptim(L2NormedGradientOptim, ProjectionMixin):
         )
         check_param_group_value("epsilon", self.param_groups, min_=0.0)
 
-    def _project_parameter_(self, param: Tensor, optim_group: _HasEpsilon) -> None:
+    def _post_step_transform_(self, param: Tensor, optim_group: _HasEpsilon) -> None:
         """Applies an in-place projection on the given parameter"""
         param.renorm_(p=self.p, dim=0, maxnorm=optim_group["epsilon"])
 
-    @torch.no_grad()
-    def step(self, closure=None):
-        loss = super().step(closure)
-        self.project()
-        return loss
 
-
-class LinfProjectedOptim(SignedGradientOptim, ProjectionMixin):
+class LinfProjectedOptim(SignedGradientOptim):
     r"""A gradient-tranforming optimizer that constrains the updated parameter values to fall within :math:`[-\epsilon, \epsilon]`.
 
     A step with this optimizer takes the elementwise sign of a parameter's gradient
@@ -487,38 +476,7 @@ class LinfProjectedOptim(SignedGradientOptim, ProjectionMixin):
     L2NormedGradientOptim
     LinfProjectedOptim
     ProjectionMixin
-    GradientTransformerOptimizer
-
-    Examples
-    --------
-    Let's use `LinfProjectedOptim` along with a standard SGD-step with a learning rate
-    of `1.0`. After the step, each parameter will have its values clamped to :math:`[-1.8, 1.8]`.
-
-    >>> import torch as tr
-    >>> from rai_toolbox.optim import L2ProjectedOptim
-
-    Creating a parameter for our optimizer to update, and our optimizer. We
-    specify `epsilon=1.8` so that the parameters are projected to the desired domain.
-
-    >>> x = tr.tensor([-1.0, 0.5], requires_grad=True)
-    >>> optim = LinfProjectedOptim([x], epsilon=1.8, InnerOpt=tr.optim.SGD, lr=1.0)
-
-    Performing a simple calculation with `x` and performing backprop to create
-    a gradient.
-
-    >>> (tr.tensor([2.0, -2.0]) * x).sum().backward()
-    >>> x.grad # the un-normed gradient
-    tensor([2., -2.])
-
-    Performing a step with our optimizer transforms the gradient in-place, updates the
-    parameter using `SGD([x], lr=1.0).step()`, and then projects the parameter into
-    the constraint set.
-
-    >>> optim.step()
-    >>> x.grad # the normalized gradient
-    tensor([1.0, -1.0])
-    >>> x  # the updated parameter
-    tensor([-1.8000,  1.5000], requires_grad=True)
+    ParamTransformingOptimizer
     """
 
     def __init__(
@@ -526,14 +484,14 @@ class LinfProjectedOptim(SignedGradientOptim, ProjectionMixin):
         params: OptimParams,
         InnerOpt: Union[Partial[Opt], OptimizerType] = SGD,
         *,
-        epsilon: float,
+        epsilon: float = REQUIRED,
         param_ndim=None,
         grad_scale: float = 1.0,
         grad_bias: float = 0.0,
         defaults: Optional[Dict[str, Any]] = None,
         **inner_opt_kwargs,
     ):
-        """
+        r"""
         Parameters
         ----------
         params : Sequence[Tensor] | Iterable[Mapping[str, Any]]
@@ -563,11 +521,41 @@ class LinfProjectedOptim(SignedGradientOptim, ProjectionMixin):
 
         **inner_opt_kwargs : Any
             Named arguments used to initialize `InnerOpt`.
+
+        Examples
+        --------
+        Let's use `LinfProjectedOptim` along with a standard SGD-step with a learning rate
+        of `1.0`. After the step, each parameter will have its values clamped to :math:`[-1.8, 1.8]`.
+
+        >>> import torch as tr
+        >>> from rai_toolbox.optim import L2ProjectedOptim
+
+        Creating a parameter for our optimizer to update, and our optimizer. We
+        specify `epsilon=1.8` so that the parameters are projected to the desired domain.
+
+        >>> x = tr.tensor([-1.0, 0.5], requires_grad=True)
+        >>> optim = LinfProjectedOptim([x], epsilon=1.8, InnerOpt=tr.optim.SGD, lr=1.0)
+
+        Performing a simple calculation with `x` and performing backprop to create
+        a gradient.
+
+        >>> (tr.tensor([2.0, -2.0]) * x).sum().backward()
+        >>> x.grad # the un-normed gradient
+        tensor([2., -2.])
+
+        Performing a step with our optimizer transforms the gradient in-place, updates the
+        parameter using `SGD([x], lr=1.0).step()`, and then projects the parameter into
+        the constraint set.
+
+        >>> optim.step()
+        >>> x.grad # the normalized gradient
+        tensor([1.0, -1.0])
+        >>> x  # the updated parameter
+        tensor([-1.8000,  1.5000], requires_grad=True)
         """
-        assert epsilon >= 0
         if defaults is None:
             defaults = {}
-        defaults["epsilon"] = defaults.get("epsilon", epsilon)
+        defaults.setdefault("epsilon", epsilon)
 
         super().__init__(
             params,
@@ -581,18 +569,12 @@ class LinfProjectedOptim(SignedGradientOptim, ProjectionMixin):
 
         check_param_group_value("epsilon", self.param_groups, min_=0.0)
 
-    def _project_parameter_(self, param: Tensor, optim_group: _HasEpsilon) -> None:
+    def _post_step_transform_(self, param: Tensor, optim_group: _HasEpsilon) -> None:
         epsilon = optim_group["epsilon"]
         param.clamp_(min=-epsilon, max=epsilon)
 
-    @torch.no_grad()
-    def step(self, closure=None):
-        loss = super().step(closure)
-        self.project()
-        return loss
 
-
-class L1qNormedGradientOptim(GradientTransformerOptimizer):
+class L1qNormedGradientOptim(ChainedParamTransformingOptimizer):
     r"""A gradient-transforming optimizer that sparsifies a parameter's gradient and
     normalizes the gradient to have an :math:`L^1`-norm of `grad_scale`, prior to
     updating the parameter using `InnerOpt.step`.
@@ -605,45 +587,8 @@ class L1qNormedGradientOptim(GradientTransformerOptimizer):
     --------
     L1NormedGradientOptim
     L2NormedGradientOptim
-    GradientTransformerOptimizer
-
-    Examples
-    --------
-    Let's use `L1qNormedGradientOptim` along with a standard SGD-step with a learning
-    rate of `1.0`. We'll sparsify the gradient to retain the top 70% elements of the
-    tensor, and we'll normalize the sparse gradient to have a :math:`L^1`-norm of `1.8`.
-
-    >>> import torch as tr
-    >>> from rai_toolbox.optim import L1qNormedGradientOptim
-
-    Creating a parameter for our optimizer to update, and our optimizer. We
-    specify `param_ndim=None` so that the sparsification/normalization occurs on the
-    gradient without any broadcasting.
-
-    >>> x = tr.tensor([1.0, 1.0, 1.0], requires_grad=True)
-    >>> optim = L1qNormedGradientOptim(
-    ...     [x],
-    ...     q=0.30,
-    ...     grad_scale=1.8,
-    ...     InnerOpt=tr.optim.SGD,
-    ...     lr=1.0,
-    ...     param_ndim=None,
-    ... )
-
-    Performing a simple calculation with `x` and performing backprop to create
-    a gradient.
-
-    >>> (tr.tensor([0.0, 1.0, 2.0]) * x).sum().backward()
-    >>> x.grad # the original gradient
-    tensor([0., 1., 2.])
-
-    Performing a step with our optimizer sparsifies and normalizes the gradient in-place, and then updates the parameter using `SGD([x], lr=1.0).step()`.
-
-    >>> optim.step()
-    >>> x.grad # the signed, sparsified, and normalized gradient
-    tensor([0.0000, 0.9000, 0.9000])
-    >>> x  # the updated parameter
-    tensor([1.0000, 0.1000, 0.1000], requires_grad=True)
+    TopQGradientOptimizer
+    ParamTransformingOptimizer
     """
 
     def __init__(
@@ -651,7 +596,7 @@ class L1qNormedGradientOptim(GradientTransformerOptimizer):
         params: OptimParams,
         InnerOpt: Union[Partial[Opt], OptimizerType] = SGD,
         *,
-        q: float,
+        q: float = REQUIRED,
         dq: float = 0.0,
         param_ndim: Union[int, None] = -1,
         grad_scale: float = 1.0,
@@ -673,7 +618,7 @@ class L1qNormedGradientOptim(GradientTransformerOptimizer):
 
         q : float
             Specifies the (fractional) percentile of absolute-largest gradient elements
-            to retain when sparsifying the gradient. E.g `q=0.9`means that only the
+            to retain when sparsifying the gradient. E.g `q=0.9` means that only the
             gradient elements within the 90th-percentile will be retained.
 
             Must be within `[0.0, 1.0]`. The sparsification is applied to the gradient
@@ -684,17 +629,16 @@ class L1qNormedGradientOptim(GradientTransformerOptimizer):
             be drawn from a uniform distribution over :math:`[q - dq, q + dq] \in [0.0, 1.0]`.
 
         param_ndim : Union[int, None], optional (default=-1)
-            Controls how `_inplace_grad_transform_` is broadcast onto the gradient
-            of a given parameter. This can be specified per param-group. By default,
-            the gradient transformation broadcasts over the first dimension in a
-            batch-like style.
+            Determines how a parameter and its gradient is temporarily reshaped prior
+            to being passed to both `_pre_step_transform_` and `_post_step_transform_`.
+            By default,the transformation broadcasts over the tensor's first dimension
+            in a batch-like style. This can be specified per param-group
 
-            - A positive number determines the dimensionality of the gradient that the transformation will act on.
-            - A negative number indicates the 'offset' from the dimensionality of the gradient. E.g. `-1` leads to batch-style broadcasting.
-            - `None` means that the transformation will be applied directly to the gradient without any broadcasting.
+            - A positive number determines the dimensionality of the tensor that the transformation will act on.
+            - A negative number indicates the 'offset' from the dimensionality of the tensor (see "Notes" for examples).
+            - `None` means that the transformation will be applied directly to the tensor without any broadcasting.
 
-            See `GradientTransformerOptimizer` for more details and examples
-
+            See `ParamTransformingOptimizer` for more details and examples
 
         grad_scale : float, optional (default=1.0)
             Multiplies each gradient in-place after the in-place transformation is
@@ -715,9 +659,50 @@ class L1qNormedGradientOptim(GradientTransformerOptimizer):
 
         **inner_opt_kwargs : Any
             Named arguments used to initialize `InnerOpt`.
+
+        Examples
+        --------
+        Let's use `L1qNormedGradientOptim` along with a standard SGD-step with a learning
+        rate of `1.0`. We'll sparsify the gradient to retain the top 70% elements of the
+        tensor, and we'll normalize the sparse gradient to have a :math:`L^1`-norm of `1.8`.
+
+        >>> import torch as tr
+        >>> from rai_toolbox.optim import L1qNormedGradientOptim
+
+        Creating a parameter for our optimizer to update, and our optimizer. We
+        specify `param_ndim=None` so that the sparsification/normalization occurs on the
+        gradient without any broadcasting.
+
+        >>> x = tr.tensor([1.0, 1.0, 1.0], requires_grad=True)
+        >>> optim = L1qNormedGradientOptim(
+        ...     [x],
+        ...     q=0.30,
+        ...     grad_scale=1.8,
+        ...     InnerOpt=tr.optim.SGD,
+        ...     lr=1.0,
+        ...     param_ndim=None,
+        ... )
+
+        Performing a simple calculation with `x` and performing backprop to create
+        a gradient.
+
+        >>> x.backward(gradient=tr.tensor([0.0, 1.0, 2.0]))
+        >>> x.grad # the original gradient
+        tensor([0., 1., 2.])
+
+        Performing a step with our optimizer sparsifies and normalizes the gradient in-place, and then updates the parameter using `SGD([x], lr=1.0).step()`.
+
+        >>> optim.step()
+        >>> x.grad # the signed, sparsified, and normalized gradient
+        tensor([0.0000, 0.9000, 0.9000])
+        >>> x  # the updated parameter
+        tensor([1.0000, 0.1000, 0.1000], requires_grad=True)
         """
         super().__init__(
-            params,
+            SignedGradientOptim,
+            partial(TopQGradientOptimizer, q=q, dq=dq, generator=generator),
+            partial(L1NormedGradientOptim, div_by_zero_eps=div_by_zero_eps),
+            params=params,
             InnerOpt=InnerOpt,
             defaults=defaults,
             param_ndim=param_ndim,
@@ -725,47 +710,3 @@ class L1qNormedGradientOptim(GradientTransformerOptimizer):
             grad_bias=grad_bias,
             **inner_opt_kwargs,
         )
-
-        self.div_by_zero_eps = value_check("div_by_zero_eps", div_by_zero_eps, min_=0.0)
-        self.q = value_check("q", q, min_=0.0, max_=1.0)
-        self.dq = value_check("dq", dq, min_=0.0, max_=1.0)
-        self._generator = value_check("generator", generator, type_=torch.Generator)
-
-        self._qlow = max(0.0, q - dq)
-        self._qhigh = min(1.0, q + dq)
-
-    def _inplace_grad_transform_(
-        self, param: Tensor, optim_group: Dict[str, Any]
-    ) -> None:
-        del optim_group
-
-        if param.grad is None:  # pragma: no cover
-            return
-
-        q = (
-            (self._qhigh - self._qlow) * torch.rand(1, generator=self._generator)
-            + self._qlow
-            if self.dq and (self._qlow < self.q or self._qhigh > self.q)
-            else self.q
-        )
-
-        # Convert percent to number of pixels
-        shp = param.grad.shape
-        nb = shp[0]
-
-        num_pix = np.prod(shp[1:])
-        num_q = 1.0 - q
-        num_q = max(1, int(num_q * num_pix))
-
-        g = param.grad.flatten(1)
-
-        batch_idx = torch.tensor([[i] * num_q for i in range(nb)])
-
-        _, corners_q = torch.topk(g.abs(), num_q, dim=1)
-        s = torch.zeros_like(g)
-        s[batch_idx, corners_q] = g.sign()[batch_idx, corners_q]
-
-        s_norm = torch.norm(s, dim=1, p=1, keepdim=True)  # type: ignore
-        s /= torch.clamp(s_norm, self.div_by_zero_eps, None)
-
-        param.grad[...] = s.view(shp)  # type: ignore
