@@ -85,6 +85,13 @@ def gradient_ascent(
         If `perturbation_model` is a type, then it will be instantiated as
         `perturbation_model(data)`.
 
+    criterion : Optional[Callable[[Tensor, Tensor], Tensor]]
+        The criterion to use for calculating the loss **per-datum**.  I.e. for a
+        shape-(N, ...) batch of data, `criterion` should return a shape-(N,) tensor of
+        loss values – one for each datum in the batch.
+
+        If `None` then `CrossEntropyLoss(reduction=None)` is used.
+
     targeted : bool (default: False)
         If `True`, then perturb towards the defined `target` otherwise move away from
         `target`.
@@ -94,12 +101,9 @@ def gradient_ascent(
         Note: Requires criterion to output a loss per sample, e.g., set
         `reduction="none"`
 
-    criterion : Optional[Callable[[Tensor, Tensor], Tensor]]
-        The criterion to use for calculating the loss.  If `None` then
-        `CrossEntropyLoss` is used.
-
-    reduction_fn : Callable[[Tensor], Tensor], optional (default=tr.sum)
-        Used to reduce the shape-(N,) per-datum loss to a scalar.
+    reduction_fn : Callable[[Tensor], Tensor], optional (default=torch.sum)
+        Used to reduce the shape-(N,) per-datum loss to a scalar. This should be
+        set to `torch.mean` when solving for a "universal" perturbation.
 
     **optim_kwargs : Any
        Keyword arguments passed to `optimizer` when it is instatiated.
@@ -113,15 +117,20 @@ def gradient_ascent(
         The loss for each perturbed data point, if `use_best==True` then this is the
         best loss across all steps.
 
+    Notes
+    -----
+    `model` is automatically set to eval-mode and its parameters are set to `requires_grad=False` within the context of this function.
+
     Examples
     --------
-    Let's perturb two data points, x=-1.0 and x=2.0, to maximize `L(x) = |x|`. We will
+    Let's perturb two data points, x1=-1.0 and x2=2.0, to maximize `L(x) = |x|`. We will
     use five standard gradient steps, using a learning rate of 0.1. The default
     perturbation model is simply additive: `x -> x + δ`.
 
-    This solver is refining `δ`, whose initial value is 0 by default, to maximize
-    `L(x) = |x|`. Thus we should find that our solved perturbations modify our data as:
-    `-1.0 -> -1.5` and `2.0 -> 2.5`, respectively.
+    This solver is refining `δ1` and `δ2`, whose initial values are 0 by default, to
+    maximize `L(x) = |x|` for `x1` and `x2`, respectively. Thus we should find that our
+    solved perturbations modify our data as: `x-1.0 -> -1.5` and `2.0 -> 2.5`,
+    respectively.
 
     >>> from rai_toolbox.perturbations import gradient_ascent
     >>> from torch.optim import SGD
@@ -157,6 +166,32 @@ def gradient_ascent(
     ... )
     >>> perturbed_data
     tensor([-0.5000,  1.5000])
+
+    **Accessing the perturbations**
+
+    To gain direct access to the solved perturbations, we can provide our own
+    perturbation model to the solver. Let's solve the same optimization problem, but provide our own instance of `AdditivePerturbation`
+
+    >>> from rai_toolbox.perturbations import AdditivePerturbation
+    >>> pert_model = AdditivePerturbation(data_or_shape=(2,))
+    >>> perturbed_data, losses = gradient_ascent(
+    ...    perturbation_model=pert_model,
+    ...    data=[-1.0, 2.0],
+    ...    target=0.0,
+    ...    model=identity_model,
+    ...    criterion=abs_diff,
+    ...    optimizer=SGD,
+    ...    lr=0.1,
+    ...    steps=5,
+    ... )
+    >>> perturbed_data
+    tensor([-1.5000,  2.5000])
+
+    Now we can access the values that were solved for `δ1` and `δ2`.
+
+    >>> pert_model.delta
+    Parameter containing:
+    tensor([-0.5000,  0.5000], requires_grad=True)
     """
     data = tr.as_tensor(data)
     target = tr.as_tensor(target)
