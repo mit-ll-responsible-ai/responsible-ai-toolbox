@@ -61,6 +61,13 @@ def jensen_shannon_divergence(
 
     probs = tuple(tr.as_tensor(p) for p in probs)
 
+    if len(probs) < 2 or any(
+        not isinstance(p, tr.Tensor) or p.dim() != 2 for p in probs
+    ):
+        raise ValueError(
+            f"*probs must consist of at least two Tensors, and each tensor must have a shape of (N, D). Got {probs}"
+        )
+
     zero = tr.tensor(0.0).type_as(probs[0])
     # Clamp mixture distribution to avoid exploding KL divergence
     log_p_mixture = tr.clamp(sum(probs, zero) / len(probs), 1e-7, 1).log()

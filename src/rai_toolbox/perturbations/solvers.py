@@ -314,6 +314,7 @@ def random_restart(
     >>> from torch.optim import SGD
     >>> from rai_toolbox.perturbations.init import uniform_like_l1_n_ball_
     >>> from rai_toolbox.perturbations import AdditivePerturbation, gradient_ascent, random_restart
+    >>>
     >>> def verbose_abs_diff(model_out, target):
     ...     # used to print out loss at each solver step (for purpose of example)
     ...     out =  (model_out - target).abs()
