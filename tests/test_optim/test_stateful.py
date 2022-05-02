@@ -12,7 +12,7 @@ from torch.testing import assert_allclose
 
 from rai_toolbox._typing import Optimizer
 from rai_toolbox.optim import (
-    ChainedGradTransformerOptimizer,
+    ChainedParamTransformingOptimizer,
     ClampedGradientOptimizer,
     L2NormedGradientOptim,
     L2ProjectedOptim,
@@ -81,12 +81,12 @@ def test_ParamTransformingOptimizer_state_mirrors_InnerOpt():
     assert all(p.grad is None for p in [x1, x2, x3])
 
 
-def test_ChainedGradTransformerOptimizer_state_mirrors_InnerOpt():
+def test_ChainedParamTransformingOptimizer_state_mirrors_InnerOpt():
     x1 = tr.tensor([[1.0, -1.0]], requires_grad=True)
     x2 = tr.tensor([[1.0, -1.0]], requires_grad=True)
     x3 = tr.tensor([[1.0, -1.0]], requires_grad=True)
 
-    optim1 = ChainedGradTransformerOptimizer(
+    optim1 = ChainedParamTransformingOptimizer(
         partial(ClampedGradientOptimizer, clamp_min=-10000),
         L2NormedGradientOptim,
         params=[x1],
@@ -125,7 +125,7 @@ def test_ChainedGradTransformerOptimizer_state_mirrors_InnerOpt():
 
     # check load_state_dict:
 
-    optim2 = ChainedGradTransformerOptimizer(
+    optim2 = ChainedParamTransformingOptimizer(
         partial(ClampedGradientOptimizer, clamp_min=-10000),
         L2NormedGradientOptim,
         params=[{"params": [x1]}, {"params": [x2]}, {"params": [x3]}],
@@ -154,7 +154,7 @@ def test_custom_repr():
 
 
 def test_custom_repr_for_chained():
-    opt = ChainedGradTransformerOptimizer(
+    opt = ChainedParamTransformingOptimizer(
         SignedGradientOptim,
         partial(ClampedGradientOptimizer, clamp_min=1.0),
         params=[tr.tensor([1.0], requires_grad=True)],

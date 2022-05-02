@@ -17,7 +17,7 @@ from rai_toolbox._utils import check_param_group_value, value_check
 from .misc import TopQGradientOptimizer
 from .optimizer import (
     REQUIRED,
-    ChainedGradTransformerOptimizer,
+    ChainedParamTransformingOptimizer,
     DatumParamGroup,
     ParamTransformingOptimizer,
 )
@@ -74,10 +74,10 @@ class _LpNormOptimizer(ParamTransformingOptimizer):
             been transformed.
 
         param_ndim : Optional[int]
-            Controls how `_pre_step_transform_` is broadcast onto the gradient
-            of a given parameter. This can be specified per param-group. By default,
-            the gradient transformation broadcasts over the first dimension in a
-            batch-like style.
+            Determines how a parameter and its gradient is temporarily reshaped prior
+            to being passed to both `_pre_step_transform_` and `_post_step_transform_`.
+            By default,the transformation broadcasts over the tensor's first dimension
+            in a batch-like style.
 
             - A positive number determines the dimensionality of the gradient that the transformation will act on.
             - A negative number indicates the 'offset' from the dimensionality of the gradient (see "Notes" for examples).
@@ -377,13 +377,13 @@ class L2ProjectedOptim(L2NormedGradientOptim):
             projected into, post optimization step.
 
         param_ndim : Union[int, None], optional (default=-1)
-            Controls how `_pre_step_transform_` is broadcast onto the gradient
-            of a given parameter. This can be specified per param-group. By default,
-            the gradient transformation broadcasts over the first dimension in a
-            batch-like style.
+            Determines how a parameter and its gradient is temporarily reshaped prior
+            to being passed to both `_pre_step_transform_` and `_post_step_transform_`.
+            By default,the transformation broadcasts over the tensor's first dimension
+            in a batch-like style.
 
             - A positive number determines the dimensionality of the gradient that the transformation will act on.
-            - A negative number indicates the 'offset' from the dimensionality of the gradient. E.g. `-1` leads to batch-style broadcasting.
+            - A negative number indicates the 'offset' from the dimensionality of the gradient (see "Notes" for examples).
             - `None` means that the transformation will be applied directly to the gradient without any broadcasting.
 
             See `ParamTransformingOptimizer` for more details and examples
@@ -574,7 +574,7 @@ class LinfProjectedOptim(SignedGradientOptim):
         param.clamp_(min=-epsilon, max=epsilon)
 
 
-class L1qNormedGradientOptim(ChainedGradTransformerOptimizer):
+class L1qNormedGradientOptim(ChainedParamTransformingOptimizer):
     r"""A gradient-transforming optimizer that sparsifies a parameter's gradient and
     normalizes the gradient to have an :math:`L^1`-norm of `grad_scale`, prior to
     updating the parameter using `InnerOpt.step`.

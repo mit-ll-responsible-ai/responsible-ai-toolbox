@@ -17,7 +17,7 @@ from rai_toolbox._typing import OptimizerType, OptimParams, Partial, instantiate
 
 _T = TypeVar("_T", bound=Optional[Union[Tensor, float]])
 
-__all__ = ["ParamTransformingOptimizer", "ChainedGradTransformerOptimizer"]
+__all__ = ["ParamTransformingOptimizer", "ChainedParamTransformingOptimizer"]
 
 
 REQUIRED: Any = inspect.signature(SGD).parameters["lr"].default
@@ -150,13 +150,13 @@ class ParamTransformingOptimizer(Optimizer, metaclass=ABCMeta):
     `param_groups`, `defaults`, and `state` are always in sync.
 
     `ParamTransformingOptimizer` is designed to be combined with other,
-    standard gradient-based optimizers (e.g. Adam) via encapsulation, rather
-    then through inheritance. I.e., `ParamTransformingOptimizer(InnerOpt=<...>)`
-    will apply a in-place gradient transform on a parameter, before using `InnerOpt.step(...)` to update said parameter.
+    standard gradient-based optimizers (e.g. Adam) via encapsulation, rather than
+    through inheritance. I.e., `ParamTransformingOptimizer(InnerOpt=<...>)`will apply a
+    in-place gradient transform on a parameter, before using `InnerOpt.step(...)` to
+    update said parameter.
 
-    If a closure is supplied to the `.step(...)` method, then the in-place
-    gradient transformation is applied after the closure call and prior to
-    the parameter steps.
+    If a closure is supplied to the `.step(...)` method, then the `_pre_step_transform_`
+    is applied after the closure call and prior to the parameter steps.
 
     Methods
     -------
@@ -194,9 +194,9 @@ class ParamTransformingOptimizer(Optimizer, metaclass=ABCMeta):
             By default,the transformation broadcasts over the tensor's first dimension
             in a batch-like style.
 
-            - A positive number determines the dimensionality of the gradient that the transformation will act on.
-            - A negative number indicates the 'offset' from the dimensionality of the gradient (see "Notes" for examples).
-            - `None` means that the transformation will be applied directly to the gradient without any broadcasting.
+            - A positive number determines the dimensionality of the tensor that the transformation will act on.
+            - A negative number indicates the 'offset' from the dimensionality of the tensor (see "Notes" for examples).
+            - `None` means that the transformation will be applied directly to the tensor without any broadcasting.
 
         See "Notes" for more details.
 
@@ -243,7 +243,6 @@ class ParamTransformingOptimizer(Optimizer, metaclass=ABCMeta):
 
         Examples
         --------
-
         **Creating a gradient-transforming optimizer**
 
         Let's create a gradient-transforming optimizer that replaces the gradient
@@ -444,8 +443,7 @@ class ParamTransformingOptimizer(Optimizer, metaclass=ABCMeta):
             shape-`(N, d0, ...)` where `(d0, ...)` contains `param_ndim` entries.
 
         optim_group : Dict[str, Any]
-            The parameter group associated with `param`; contains per-parameter
-            configured values that can affect the gradient transformation.
+            The parameter group associated with `param`.
 
         Notes
         -----
@@ -481,8 +479,7 @@ class ParamTransformingOptimizer(Optimizer, metaclass=ABCMeta):
             shape-`(N, d0, ...)` where `(d0, ...)` contains `param_ndim` entries.
 
         optim_group : Dict[str, Any]
-            The parameter group associated with `param`; contains per-parameter
-            configured values that can affect the gradient transformation.
+            The parameter group associated with `param`.
 
         Notes
         -----
@@ -545,17 +542,15 @@ class ParamTransformingOptimizer(Optimizer, metaclass=ABCMeta):
                     )
 
     @torch.no_grad()
-    def _create_gradient_transforming_closure(
-        self, closure: Callable[[], _T]
-    ) -> Callable[[], Optional[_T]]:
-        def grad_transforming_closure():
+    def _create_closure(self, closure: Callable[[], _T]) -> Callable[[], Optional[_T]]:
+        def new_closure():
             with torch.enable_grad():
                 loss = closure()
 
             self._apply_pre_step_transform_()
             return loss
 
-        return grad_transforming_closure
+        return new_closure
 
     @overload
     def step(self, closure: Callable[[], _T]) -> _T:  # pragma: no cover
@@ -574,7 +569,7 @@ class ParamTransformingOptimizer(Optimizer, metaclass=ABCMeta):
     @torch.no_grad()
     def step(self, closure=None):
         if closure is not None:
-            closure = self._create_gradient_transforming_closure(closure)
+            closure = self._create_closure(closure)
             loss = self.inner_opt.step(closure)  # type: ignore
         else:
             self._apply_pre_step_transform_()
@@ -585,20 +580,24 @@ class ParamTransformingOptimizer(Optimizer, metaclass=ABCMeta):
         return loss
 
 
-class ChainedGradTransformerOptimizer(ParamTransformingOptimizer):
+class ChainedParamTransformingOptimizer(ParamTransformingOptimizer):
     """Chains together an arbitrary number of parameter-transforming optimizers,
     composing their pre and post-step transformation functions to modify the parameters (and their gradients) in-place. `InnerOpt.step()` applies the gradient-based update
     to each parameter.
 
-    I.e. Passing `Opt1, Opt2, ..., OptN` to `ChainedGradTransformerOptimizer` will
+    I.e. Passing `Opt1, Opt2, ..., OptN` to `ChainedParamTransformingOptimizer` will
     update a parameter using: `OptN.fn_(...(Opt2.fn_(Opt1.fn_(param)))`,
     where `fn_` is a shorthand for `_pre_step_transform_` / `_post_step_transform_`.
 
     Notes
     -----
-    `ChainedGradTransformerOptimizer` mirrors state with `InnerOpt`, and with all of
+    `ChainedParamTransformingOptimizer` mirrors state with `InnerOpt`, and with all of
     the user-specified chained gradient-trasnformers, so that their `param_groups`,
     `defaults`, and `state` are always in sync.
+
+    See Also
+    --------
+    ParamTransformingOptimizer
     """
 
     def __init__(
@@ -616,7 +615,7 @@ class ChainedGradTransformerOptimizer(ParamTransformingOptimizer):
         Parameters
         ----------
         *transforming_optimizers: InstantiatesTo[ParamTransformingOptimizer],
-            An arbitrary number of gradient-transforming optimizers, whose
+            An arbitrary number of parameter-transforming optimizers, whose
             `_pre_step_transform_` and `_post_step_transform_` methods, respectively,
             will be composed from left to right –
             `Opt1, Opt2, ..., OptN -> fN_(...f2_(f1_(grad)))` – to modify a parameter prior to / after being updated by `InnerOpt.step`
@@ -625,17 +624,17 @@ class ChainedGradTransformerOptimizer(ParamTransformingOptimizer):
             iterable of parameters to optimize or dicts defining parameter groups
 
         InnerOpt : Type[Optimizer] | Partial[Optimizer], optional (default=`torch.nn.optim.SGD`)
-            The optimizer that updates the parameters after their gradients have
-            been transformed.
+            The optimizer that updates the parameters after `_pre_step_transform_` has been applied to each of them.
 
         param_ndim : int | None, optional (default=-1)
-            Controls how `_pre_step_transform_` and `_post_step_transform_` is broadcast onto a given parameter. This can be specified per param-group. By default,
-            the parameter transformation broadcasts over the first dimension in a
-            batch-like style.
+            Determines how a parameter and its gradient is temporarily reshaped prior
+            to being passed to both `_pre_step_transform_` and `_post_step_transform_`.
+            By default,the transformation broadcasts over the tensor's first dimension
+            in a batch-like style.
 
-            - A positive number determines the dimensionality of the parameterthat the transformation will act on.
-            - A negative number indicates the 'offset' from the dimensionality of the parameter (see "Notes" for examples).
-            - `None` means that the transformation will be applied directly to the parameter without any broadcasting.
+            - A positive number determines the dimensionality of the tensor that the transformation will act on.
+            - A negative number indicates the 'offset' from the dimensionality of the tensor (see "Notes" for examples).
+            - `None` means that the transformation will be applied directly to the tensor without any broadcasting.
 
         grad_scale : float, optional (default=1.0)
             Multiplies each gradient in-place after the in-place transformation is
@@ -675,7 +674,7 @@ class ChainedGradTransformerOptimizer(ParamTransformingOptimizer):
         `TopQGradientOptim` and `ClampedGradientOptimizer`
 
         >>> from rai_toolbox.optim import (
-        ... ChainedGradTransformerOptimizer,
+        ... ChainedParamTransformingOptimizer,
         ... ClampedGradientOptimizer,
         ... TopQGradientOptim,
         ... )
@@ -694,7 +693,7 @@ class ChainedGradTransformerOptimizer(ParamTransformingOptimizer):
         transformations are applied in order from left to right. Providing per-optimizer
         defaults is achieved most naturally using :py:func:`functools.partial`.
 
-        >>> optim = ChainedGradTransformerOptimizer(
+        >>> optim = ChainedParamTransformingOptimizer(
         ...     partial(TopQGradientOptim, q=0.33),
         ...     partial(ClampedGradientOptimizer, clamp_max=2.8),
         ...     params=[x1],
