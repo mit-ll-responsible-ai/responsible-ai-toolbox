@@ -699,8 +699,8 @@ class L1qNormedGradientOptim(ChainedParamTransformingOptimizer):
         tensor([1.0000, 0.1000, 0.1000], requires_grad=True)
         """
         super().__init__(
-            SignedGradientOptim,
             partial(TopQGradientOptimizer, q=q, dq=dq, generator=generator),
+            SignedGradientOptim,
             partial(L1NormedGradientOptim, div_by_zero_eps=div_by_zero_eps),
             params=params,
             InnerOpt=InnerOpt,
