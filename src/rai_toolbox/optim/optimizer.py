@@ -164,6 +164,10 @@ class ParamTransformingOptimizer(Optimizer, metaclass=ABCMeta):
     _pre_step_transform_
     _post_step_transform_
     project
+
+    See Also
+    --------
+    ChainedParamTransformingOptimizer
     """
 
     param_groups: List[DatumParamGroup]

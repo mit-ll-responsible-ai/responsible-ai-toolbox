@@ -18,7 +18,7 @@ Base Optimizers
    :toctree: generated/
 
    ParamTransformingOptimizer
-   ChainedGradTransformerOptimizer
+   ChainedParamTransformingOptimizer
 
 
 ********************************
