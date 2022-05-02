@@ -41,6 +41,9 @@ In part, these serve to greatly simplify the process of organizing and running j
 ***************************
 PyTorch-Lightning Utilities
 ***************************
+
+Tools and utilities that make PyTorch-Lightning easy to use for our work. Some of these utilities also enable much-needed compatibility between PyTorch-Lightning and Hydra.
+
 .. currentmodule:: rai_toolbox.mushin
 
 .. autosummary::
