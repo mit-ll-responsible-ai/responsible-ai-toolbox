@@ -123,9 +123,10 @@ def gradient_ascent(
 
     Examples
     --------
-    Let's perturb two data points, x1=-1.0 and x2=2.0, to maximize `L(x) = |x|`. We will
-    use five standard gradient steps, using a learning rate of 0.1. The default
-    perturbation model is simply additive: `x -> x + δ`.
+    Let's perturb two data points, `x1=-1.0` and `x2=2.0`, to maximize
+    `L(δ; x) = |x + δ|` w.r.t `δ`. We will use five standard gradient steps, using a
+    learning  rate of 0.1. The default perturbation model is simply additive:
+    `x -> x + δ`.
 
     This solver is refining `δ1` and `δ2`, whose initial values are 0 by default, to
     maximize `L(x) = |x|` for `x1` and `x2`, respectively. Thus we should find that our
@@ -170,7 +171,7 @@ def gradient_ascent(
     **Accessing the perturbations**
 
     To gain direct access to the solved perturbations, we can provide our own
-    perturbation model to the solver. Let's solve the same optimization problem, but provide our own instance of `AdditivePerturbation`
+        perturbation model to the solver. Let's solve the same optimization problem, but provide our own instance of `AdditivePerturbation`
 
     >>> from rai_toolbox.perturbations import AdditivePerturbation
     >>> pert_model = AdditivePerturbation(data_or_shape=(2,))
@@ -288,12 +289,12 @@ def random_restart(
     solver: Callable[..., Tuple[Tensor, Tensor]],
     repeats: int,
 ) -> Callable[..., Tuple[Tensor, Tensor]]:
-    """Executes a solver function multiple times saving out the best perturbation.
+    """Executes a solver function multiple times saving out the best perturbations.
 
     Parameters
     ----------
     solver : Callable[..., Tuple[Tensor, Tensor]]
-        The perturbation function, e.g., projected_gradient_perturbation.
+        The solver whose execution will be repeated.
 
     repeats : int
         The number of times to run perturber
@@ -302,6 +303,55 @@ def random_restart(
     -------
     random_restart_fn : Callable[..., Tuple[Tensor, Tensor]]
         Wrapped function that will execute `perturber` `repeats` times.
+
+    Examples
+    --------
+    Let's perturb two data points, `x1=-1.0` and `x2=2.0`, to maximize
+    `L(δ; x) = |x + δ|` w.r.t `δ`. Our perturbation will randomly initialize `δ1` and `δ2` and we will re-run the solver three times – retaining the best perturbation of `x1` and `x2` respectively
+
+    >>> from functools import partial
+    >>> from torch.optim import SGD
+    >>> from rai_toolbox.perturbations.init import uniform_like_l1_n_ball_
+    >>> from rai_toolbox.perturbations import AdditivePerturbation, gradient_ascent, random_restart
+    >>> def verbose_abs_diff(model_out, target):
+    ...     # used to print out loss at each solver step (for purpose of example)
+    ...     out =  (model_out - target).abs()
+    ...     print(out)
+    ...     return out
+
+    Configuring a peturbation model to randomly initialize the perturbations.
+
+    >>> PertModel = partial(AdditivePerturbation, init_fn=uniform_like_l1_n_ball_)
+
+    Creating and running repeating solver.
+
+    >>> gradient_ascent_with_restart = random_restart(gradient_ascent, 3)
+
+    >>> perturbed_data, losses = gradient_ascent_with_restart(
+    ...    perturbation_model=PertModel,
+    ...    data=[-1.0, 2.0],
+    ...    target=0.0,
+    ...    model=lambda data: data,
+    ...    criterion=verbose_abs_diff,
+    ...    optimizer=SGD,
+    ...    lr=0.1,
+    ...    steps=1,
+    ... )
+    tensor([0.2807, 2.1413], grad_fn=<AbsBackward0>)
+    tensor([0.3807, 2.2413])
+    tensor([0.9298, 2.1458], grad_fn=<AbsBackward0>)
+    tensor([1.0298, 2.2458])
+    tensor([0.4909, 2.9649], grad_fn=<AbsBackward0>)
+    tensor([0.5909, 3.0649])
+
+    See that for `x1` the highest loss is `1.0298`, and for `x2` it is `3.0649`. This
+    should be reflected `losses` and `perturbed_data` that were retained across the
+    restarts.
+
+    >>> losses
+    tensor([1.0298, 3.0649])
+    >>> perturbed_data
+    tensor([-1.0298,  3.0649])
     """
     value_check("repeats", repeats, min_=1, incl_min=True)
 
