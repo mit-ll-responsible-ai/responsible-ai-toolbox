@@ -151,7 +151,7 @@ def test_ddp_with_hydra_runjob(num_jobs, testing):
 
     # Make sure config.yaml was created for each job
     yamls = list(Path.cwd().glob("**/config.yaml"))
-    assert len(yamls) == num_jobs
+    assert len(yamls) == 2 * num_jobs
 
     # Make sure the parameter was set and used
     for yaml in yamls:

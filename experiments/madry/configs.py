@@ -2,16 +2,13 @@
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 
-from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
 
 import pytorch_lightning as pl
 import torch
 from hydra.core.config_store import ConfigStore
 from hydra_zen import MISSING, make_config, make_custom_builds_fn
 from lightning import EvaluateModule
-from omegaconf import II
 from torch import nn
 from torch.optim import SGD
 from torchvision import datasets, models, transforms
@@ -20,13 +17,9 @@ from rai_experiments.models.small_resnet import resnet50 as cifar_resnet50
 from rai_toolbox import datasets as rai_datasets
 from rai_toolbox.mushin import load_from_checkpoint
 from rai_toolbox.mushin.lightning import HydraDDP, MetricsCallback
-from rai_toolbox.mushin.workflows import RobustnessCurve
 from rai_toolbox.optim import L2ProjectedOptim
 from rai_toolbox.perturbations import AdditivePerturbation, gradient_ascent
 from rai_toolbox.perturbations.init import uniform_like_l2_n_ball_
-
-# parameter populated by robustness-curve generation
-EPSILON = II(RobustnessCurve.EPSILON_NAME)
 
 ###############
 # Custom Builds
@@ -113,12 +106,12 @@ def get_stepsize(factor, steps, epsilon):
 L2PGOpt = pbuilds(
     L2ProjectedOptim,
     InnerOpt=SGD,
-    lr=builds(get_stepsize, factor=2.5, steps="${steps}", epsilon=EPSILON),
-    epsilon=EPSILON,
+    lr=builds(get_stepsize, factor=2.5, steps="${steps}", epsilon="${epsilon}"),
+    epsilon="${epsilon}",
 )
 
 PGDModel = pbuilds(
-    AdditivePerturbation, init_fn=pbuilds(uniform_like_l2_n_ball_, epsilon=EPSILON)
+    AdditivePerturbation, init_fn=pbuilds(uniform_like_l2_n_ball_, epsilon="${epsilon}")
 )
 
 L2PGD = pbuilds(
@@ -140,9 +133,10 @@ L2PGD = pbuilds(
 ############
 Trainer = builds(
     pl.Trainer,
-    accelerator="auto",
+    num_nodes=1,
+    accelerator="gpu",
     devices="${gpus}",
-    strategy="${strategy}",
+    strategy=builds(HydraDDP),
     callbacks=[builds(MetricsCallback)],
     populate_full_signature=True,
 )
@@ -178,25 +172,19 @@ ModelCfg = make_config(
 )
 
 PerturbationCfg = make_config(steps=7, perturbation=MISSING)
-TrainerCfg = make_config(
-    strategy=builds(HydraDDP), gpus=NUM_GPUS, trainer=Trainer, module=Evaluator
-)
+TrainerCfg = make_config(gpus=NUM_GPUS, trainer=Trainer, module=Evaluator)
 
-_Config = make_config(
+Config = make_config(
     defaults=[
         "_self_",
         {"perturbation": "l2pgd"},
         {"dataset": "cifar10"},
         {"model": "cifar10_resnet50"},
     ],
+    seed=12219,
+    epsilon=0.0,
     bases=(DatasetCfg, ModelCfg, PerturbationCfg, TrainerCfg),
 )
-
-
-@dataclass
-class Config(_Config):  # type: ignore
-    job_epsilons: Any = MISSING
-    seed: int = 12219
 
 
 ###################

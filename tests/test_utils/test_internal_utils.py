@@ -5,7 +5,7 @@ from typing import Union
 
 import hypothesis.strategies as st
 import pytest
-from hypothesis import assume, given
+from hypothesis import assume, given, settings
 
 from rai_toolbox._utils import Unsatisfiable, value_check
 
@@ -21,6 +21,7 @@ def everything_except(excluded_types):
 any_types = st.from_type(type)
 
 
+@settings(max_examples=10)
 @given(
     name=st.sampled_from(["name_a", "name_b"]),
     target_type=st.shared(any_types, key="target_type"),

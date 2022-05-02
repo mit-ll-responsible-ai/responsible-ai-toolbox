@@ -27,7 +27,7 @@ INSTALL_REQUIRES = [
     "torchvision >= 0.10.0",
     "torch >= 1.9.0",
     "torchmetrics >= 0.6.0",
-    "typing-extensions >= 3.10.0.1",
+    "typing-extensions >= 4.1.1",
 ]
 TESTS_REQUIRE = [
     "pytest >= 3.8",
@@ -77,6 +77,7 @@ setup(
             "pytorch-lightning >= 1.5.0",
             "hydra-zen >= 0.6.0",
             "xarray >= 0.19.0",
+            "matplotlib >= 3.3",
         ],
     },
 )
