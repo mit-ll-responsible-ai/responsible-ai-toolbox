@@ -671,3 +671,14 @@ def test_grad_scale_and_bias(
 
     if b1 != b3 or s1 != s3:
         assert tr.any(x1 != x3), (x1, x3)
+
+
+def test_l1q_regression():
+
+    g = tr.tensor([-1.0, -2.0, 3.0, 0.5])
+    p = tr.ones_like(g, requires_grad=True)
+
+    opt = L1qNormedGradientOptim([p], q=0.5, param_ndim=1, lr=1)
+    p.backward(g)
+    opt.step()
+    assert_allclose(actual=p.grad, expected=tr.tensor([0.0, -0.5, 0.5, 0.0]))
