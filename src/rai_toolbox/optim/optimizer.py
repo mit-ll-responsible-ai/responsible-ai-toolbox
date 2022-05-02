@@ -135,10 +135,10 @@ def _to_batch(p: Tensor, param_ndim: Optional[int]) -> Tensor:
 class ParamTransformingOptimizer(Optimizer, metaclass=ABCMeta):
     r"""An optimizer that performs an in-place transformation to the
     each parameter, both before and after performing the gradient-based update on each
-    parameter::
+    parameter via `InnerOptim.step`::
 
        _pre_step_transform_(param)
-       param = step(param, ...)
+       param = InnerOptim.step(param, ...)
        _post_step_transform_(param)
 
     Note that `_pre_step_transform_` and `_post_step_transform_` can be used to update
