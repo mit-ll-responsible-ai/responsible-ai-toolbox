@@ -20,6 +20,7 @@ Solvers
    :toctree: generated/
 
    gradient_ascent
+   random_restart
 
 
 ******
