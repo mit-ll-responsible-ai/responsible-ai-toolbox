@@ -40,11 +40,11 @@ def jensen_shannon_divergence(
 
     References
     ----------
-    [1] .. https://en.wikipedia.org/wiki/Jensen%E2%80%93Shannon_divergence
+    .. [1] https://en.wikipedia.org/wiki/Jensen%E2%80%93Shannon_divergence
 
     Examples
     --------
-    Let's measure the divergence between three length-two discrete distributiones
+    Let's measure the divergence between three discrete distributions of length-two.
 
     >>> from rai_toolbox.losses import jensen_shannon_divergence
     >>> P1 = [[0.0, 1.0]]
