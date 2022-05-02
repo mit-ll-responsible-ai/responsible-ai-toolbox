@@ -273,52 +273,59 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
     Examples
     --------
     Let's create a simple workflow where we perform a multirun over a parameter,
-    epsilon, and evaluate a task function that computes an accuracy based on that
-    epsilon value.
+    epsilon, and evaluate a task function that computes an accuracy and loss based on
+    that epsilon value and a specified scale.
 
     >>> from rai_toolbox.mushin.workflows import MultiRunMetricsWorkflow
     >>> from rai_toolbox.mushin import multirun
     >>> import torch as tr
-    >>> class LocalRobustness(MultiRunMetricsWorkflow):
+    ... class LocalRobustness(MultiRunMetricsWorkflow):
     ...     @staticmethod
-    ...     def evaluation_task(epsilon):
+    ...     def evaluation_task(epsilon: float, scale: float) -> dict:
+    ...         epsilon *= scale
     ...         val = 100 - epsilon**2
-    ...
-    ...         result = dict(accuracies=val+2)
-    ...
+    ...         result = dict(accuracies=val+2, loss=epsilon**2)
     ...         tr.save(result, "test_metrics.pt")
     ...         return result
 
-    >>> wf = LocalRobustness()
-    >>> wf.run(epsilon=multirun([1.0, 2.0, 3.0]))
-    [2022-05-01 12:01:00,451][HYDRA] Launching 3 jobs locally
-    [2022-05-01 12:01:00,451][HYDRA] 	#0 : +epsilon=1.0
-    [2022-05-01 12:01:00,543][HYDRA] 	#1 : +epsilon=2.0
-    [2022-05-01 12:01:00,640][HYDRA] 	#2 : +epsilon=3.0
+    We'll run this workflow for six total configurations of three epsilon values and two scale values. This will launch a Hydra multirun job and aggregate the results.
 
-    Now that this workflow has run, we can view the results as an xarray-dataset.
+    >>> wf = LocalRobustness()
+    >>> wf.run(epsilon=multirun([1.0, 2.0, 3.0]), scale=multirun([0.1, 1.0]))
+    [2022-05-02 11:57:59,219][HYDRA] Launching 6 jobs locally
+    [2022-05-02 11:57:59,220][HYDRA] 	#0 : +epsilon=1.0 +scale=0.1
+    [2022-05-02 11:57:59,312][HYDRA] 	#1 : +epsilon=1.0 +scale=1.0
+    [2022-05-02 11:57:59,405][HYDRA] 	#2 : +epsilon=2.0 +scale=0.1
+    [2022-05-02 11:57:59,498][HYDRA] 	#3 : +epsilon=2.0 +scale=1.0
+    [2022-05-02 11:57:59,590][HYDRA] 	#4 : +epsilon=3.0 +scale=0.1
+    [2022-05-02 11:57:59,683][HYDRA] 	#5 : +epsilon=3.0 +scale=1.0
+
+    Now that this workflow has run, we can view the results as an xarray-dataset whose
+    coordinates reflect the multirun parameters that were varied, and whose data-variables are our recorded metrics: "accuracy" and "loss"
 
     >>> ds = wf.to_xarray()
     >>> ds
     <xarray.Dataset>
-    Dimensions:     (x: 3)
+    Dimensions:     (epsilon: 3, scale: 2)
     Coordinates:
-        epsilon     (x) float64 1.0 2.0 3.0
-    Dimensions without coordinates: x
+    * epsilon     (epsilon) float64 1.0 2.0 3.0
+    * scale       (scale) float64 0.1 1.0
     Data variables:
-        accuracies  (x) float64 101.0 98.0 93.0
+        accuracies  (epsilon, scale) float64 102.0 101.0 102.0 98.0 101.9 93.0
+        loss        (epsilon, scale) float64 0.01 1.0 0.04 4.0 0.09 9.0
 
     We can also load this workflow by providing the working directory where it was run.
 
     >>> loaded = LocalRobustness().load_from_dir(wf.working_dir)
     >>> loaded.to_xarray()
     <xarray.Dataset>
-    Dimensions:     (x: 3)
+    Dimensions:     (epsilon: 3, scale: 2)
     Coordinates:
-        epsilon     (x) float64 1.0 2.0 3.0
-    Dimensions without coordinates: x
+    * epsilon     (epsilon) float64 1.0 2.0 3.0
+    * scale       (scale) float64 0.1 1.0
     Data variables:
-        accuracies  (x) float64 101.0 98.0 93.0
+        accuracies  (epsilon, scale) float64 102.0 101.0 102.0 98.0 101.9 93.0
+        loss        (epsilon, scale) float64 0.01 1.0 0.04 4.0 0.09 9.0
     """
 
     @abstractstaticmethod
