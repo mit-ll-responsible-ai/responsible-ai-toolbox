@@ -218,7 +218,10 @@ def to_batch(p: tr.Tensor, param_ndim: Optional[int]) -> tr.Tensor:
     >>> to_batch(x, param_ndim=2).shape
     torch.Size([3, 5, 2])
 
-    >>> to_batch(x, param_ndim=None).shape
+    >>> to_batch(x, param_ndim=3).shape
+    torch.Size([1, 3, 5, 2])
+
+    >>> to_batch(x, param_ndim=None).shape  # same as `param_ndim=x.ndim`
     torch.Size([1, 3, 5, 2])
 
     >>> to_batch(x, param_ndim=-1).shape
