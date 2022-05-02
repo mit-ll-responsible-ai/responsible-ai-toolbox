@@ -151,9 +151,9 @@ class ParamTransformingOptimizer(Optimizer, metaclass=ABCMeta):
 
     `ParamTransformingOptimizer` is designed to be combined with other,
     standard gradient-based optimizers (e.g. Adam) via encapsulation, rather than
-    through inheritance. I.e., `ParamTransformingOptimizer(InnerOpt=<...>)`will apply a
-    in-place gradient transform on a parameter, before using `InnerOpt.step(...)` to
-    update said parameter.
+    through inheritance. I.e., `ParamTransformingOptimizer(InnerOpt=<...>)` will apply
+    `_pre_step_transform_` on a parameter, and then use `InnerOpt.step(...)` to update
+    said parameter, and finally will apply `_post_step_transform_` to the parameter.
 
     If a closure is supplied to the `.step(...)` method, then the `_pre_step_transform_`
     is applied after the closure call and prior to the parameter steps.
