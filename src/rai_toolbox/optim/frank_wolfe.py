@@ -129,7 +129,7 @@ class L1qFrankWolfe(L1qNormedGradientOptim):
     parameter's gradient. Each updated parameter is constrained to fall within an
     :math:`\epsilon`-sized ball in :math:`L^1` space, centered on the origin.
 
-    The sparsification process retains only the signs (i.e. :math:`\pm 1`) of the
+    The sparsification process retains only the signs (i.e., :math:`\pm 1`) of the
     gradient's elements. The transformation is applied to the gradient in accordance
     with `param_ndim`.
 
@@ -166,7 +166,7 @@ class L1qFrankWolfe(L1qNormedGradientOptim):
 
         q : float
             Specifies the (fractional) percentile of absolute-largest gradient elements
-            to retain when sparsifying the gradient. E.g `q=0.9`means that only the
+            to retain when sparsifying the gradient. E.g., `q=0.9`means that only the
             gradient elements within the 90th-percentile will be retained.
 
             Must be within `[0.0, 1.0]`. The sparsification is applied to the gradient
@@ -201,7 +201,7 @@ class L1qFrankWolfe(L1qNormedGradientOptim):
             - A negative number indicates the 'offset' from the dimensionality of the tensor (see "Notes" for examples).
             - `None` means that the transformation will be applied directly to the tensor without any broadcasting.
 
-            See `ParamTransformingOptimizer` for more details and examples
+            See `ParamTransformingOptimizer` for more details and examples.
 
         defaults : Optional[Dict[str, Any]]
             Specifies default parameters for all parameter groups.
@@ -238,10 +238,10 @@ class L1qFrankWolfe(L1qNormedGradientOptim):
 
         >>> (tr.tensor([0.0, 1.0, 2.0]) * x).sum().backward()
 
-        Performing a step with our optimizer uses the Frank Wolfe algorithm to update
+        Performing a step with our optimizer uses the Frank-Wolfe algorithm to update
         its parameters; the resulting parameter was updated with a LMO based on a
         sparsified, sign-only gradient. Note that the parameter falls within/on the
-        L1-ball of radius `1.8`.
+        :math:`L^1`-ball of radius `1.8`.
 
         >>> optim.step()
         >>> x  # the updated parameter; has a L1-norm of 1.8
@@ -324,7 +324,7 @@ class L1FrankWolfe(ParamTransformingOptimizer):
             - A negative number indicates the 'offset' from the dimensionality of the tensor (see "Notes" for examples).
             - `None` means that the transformation will be applied directly to the tensor without any broadcasting.
 
-            See `ParamTransformingOptimizer` for more details and examples
+            See `ParamTransformingOptimizer` for more details and examples.
 
         div_by_zero_eps : float, optional (default=`torch.finfo(torch.float32).tiny`)
             Prevents div-by-zero error in learning rate schedule.
@@ -349,7 +349,7 @@ class L1FrankWolfe(ParamTransformingOptimizer):
 
         >>> (tr.tensor([1.0, 2.0]) * x).sum().backward()
 
-        Performing a step with our optimizer uses the Frank Wolfe algorithm to update
+        Performing a step with our optimizer uses the Frank-Wolfe algorithm to update
         its parameters. Note that the updated parameter falls within/on the
         :math:`L^1`-ball of radius `1.8`.
 
@@ -441,7 +441,7 @@ class L2FrankWolfe(L2NormedGradientOptim):
             - A negative number indicates the 'offset' from the dimensionality of the tensor (see "Notes" for examples).
             - `None` means that the transformation will be applied directly to the tensor without any broadcasting.
 
-            See `ParamTransformingOptimizer` for more details and examples
+            See `ParamTransformingOptimizer` for more details and examples.
 
         div_by_zero_eps : float, optional (default=`torch.finfo(torch.float32).tiny`)
             Prevents div-by-zero error in learning rate schedule.
@@ -466,7 +466,7 @@ class L2FrankWolfe(L2NormedGradientOptim):
 
         >>> (tr.tensor([1.0, 2.0]) * x).sum().backward()
 
-        Performing a step with our optimizer uses the Frank Wolfe algorithm to update
+        Performing a step with our optimizer uses the Frank-Wolfe algorithm to update
         its parameters. Note that the updated parameter falls within/on the
         :math:`L^2`-ball of radius `1.8`.
 
@@ -509,7 +509,7 @@ class LinfFrankWolfe(SignedGradientOptim):
     Examples
     --------
     Using `LinfFrankWolfe`, we'll constrain the updated parameter to fall within a
-    :math:`L^infty`-ball of radius `1.8`.
+    :math:`L^\infty`-ball of radius `1.8`.
 
     >>> import torch as tr
     >>> from rai_toolbox.optim import LinfFrankWolfe
@@ -526,7 +526,7 @@ class LinfFrankWolfe(SignedGradientOptim):
 
     >>> (tr.tensor([1.0, 2.0]) * x).sum().backward()
 
-    Performing a step with our optimizer uses the Frank Wolfe algorithm to update
+    Performing a step with our optimizer uses the Frank-Wolfe algorithm to update
     its parameters. Note that the updated parameter falls within/on the
     :math:`L^\infty`-ball of radius `1.8`.
 
@@ -575,7 +575,7 @@ class LinfFrankWolfe(SignedGradientOptim):
             - A negative number indicates the 'offset' from the dimensionality of the tensor (see "Notes" for examples).
             - `None` means that the transformation will be applied directly to the tensor without any broadcasting.
 
-            See `ParamTransformingOptimizer` for more details and examples
+            See `ParamTransformingOptimizer` for more details and examples.
 
         div_by_zero_eps : float, optional (default=`torch.finfo(torch.float32).tiny`)
             Prevents div-by-zero error in learning rate schedule.

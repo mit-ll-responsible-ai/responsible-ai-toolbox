@@ -72,9 +72,7 @@ class _ClampedOptim(ParamTransformingOptimizer):
         param_ndim : Optional[int]
             Controles how `_pre_step_transform_` and `_post_step_transform_`  are
             broadcast onto a given parameter. This has no effect for
-            `ClampedGradientOptimizer`.
-
-            Specifies default parameters for all parameter groups.
+            `ClampedGradientOptimizer` and `ClampedParameterOptimizer`.
 
         **inner_opt_kwargs : Any
             Named arguments used to initialize `InnerOpt`.
@@ -201,7 +199,7 @@ class TopQGradientOptimizer(ParamTransformingOptimizer):
 
         q : float
             Specifies the (fractional) percentile of absolute-largest gradient elements
-            to retain when sparsifying the gradient. E.g `q=0.9` means that only the
+            to retain when sparsifying the gradient. E.g., `q=0.9` means that only the
             gradient elements within the 90th-percentile will be retained.
 
             Must be within `[0.0, 1.0]`. The sparsification is applied to the gradient
@@ -221,7 +219,7 @@ class TopQGradientOptimizer(ParamTransformingOptimizer):
             - A negative number indicates the 'offset' from the dimensionality of the tensor (see "Notes" for examples).
             - `None` means that the transformation will be applied directly to the tensor without any broadcasting.
 
-            See `ParamTransformingOptimizer` for more details and examples
+            See `ParamTransformingOptimizer` for more details and examples.
 
         grad_scale : float, optional (default=1.0)
             Multiplies each gradient in-place after the in-place transformation is
@@ -247,13 +245,13 @@ class TopQGradientOptimizer(ParamTransformingOptimizer):
         percentile values. We set `param_ndim=None` so that no broadcasting occurs.
 
         >>> import torch as tr
-        >>> from rai_toolbox.optim import TopQGradientOptim
+        >>> from rai_toolbox.optim import TopQGradientOptimizer
 
         >>> gradient = tr.tensor([[0.5,   1.0],
         ...                       [-2.5, 0.30]])
         >>> for q in [0.0, 0.25, 0.5, 0.75, 1.0]:
         ...     x = tr.ones((2, 2), requires_grad=True)
-        ...     optim = TopQGradientOptim(params=[x], lr=1.0, q=q, param_ndim=None)
+        ...     optim = TopQGradientOptimizer(params=[x], lr=1.0, q=q, param_ndim=None)
         ...     x.backward(gradient=gradient)
         ...     optim.step()
         ...     print(f"grad (q={q})\n{x.grad}\nx:\n{x}\n---")
@@ -301,7 +299,7 @@ class TopQGradientOptimizer(ParamTransformingOptimizer):
         ...                       [-2.5, 0.30]])
         >>> for q in [0.0, 0.5, 1.0]:
         ...     x = tr.ones((2, 2), requires_grad=True)
-        ...     optim = TopQGradientOptim(params=[x], lr=1.0, q=q, param_ndim=1)
+        ...     optim = TopQGradientOptimizer(params=[x], lr=1.0, q=q, param_ndim=1)
         ...     x.backward(gradient=gradient)
         ...     optim.step()
         ...     print(f"grad (q={q})\n{x.grad}\nx:\n{x}\n---")

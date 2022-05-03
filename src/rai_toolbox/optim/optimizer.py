@@ -133,7 +133,7 @@ def _to_batch(p: Tensor, param_ndim: Optional[int]) -> Tensor:
 
 
 class ParamTransformingOptimizer(Optimizer, metaclass=ABCMeta):
-    r"""An optimizer that performs an in-place transformation to the
+    r"""An optimizer that performs an in-place transformation to
     each parameter, both before and after performing the gradient-based update on each
     parameter via `InnerOptim.step`::
 
@@ -152,7 +152,7 @@ class ParamTransformingOptimizer(Optimizer, metaclass=ABCMeta):
     `param_groups`, `defaults`, and `state` are always in sync.
 
     `ParamTransformingOptimizer` is designed to be combined with other,
-    standard gradient-based optimizers (e.g. Adam) via encapsulation, rather than
+    standard gradient-based optimizers (e.g., Adam) via encapsulation, rather than
     through inheritance. I.e., `ParamTransformingOptimizer(InnerOpt=<...>)` will apply
     `_pre_step_transform_` on a parameter, and then use `InnerOpt.step(...)` to update
     said parameter, and finally will apply `_post_step_transform_` to the parameter.
@@ -188,23 +188,23 @@ class ParamTransformingOptimizer(Optimizer, metaclass=ABCMeta):
         Parameters
         ----------
         params : Sequence[Tensor] | Iterable[ParamGroup]
-            iterable of parameters to optimize or dicts defining parameter groups
+            Iterable of parameters to optimize or dicts defining parameter groups
 
         InnerOpt : Type[Optimizer] | Partial[Optimizer], optional (default=`torch.nn.optim.SGD`)
             The optimizer that updates the parameters after their gradients have
             been transformed.
 
         param_ndim : int | None, optional (default=-1)
-            Determines how a parameter and its gradient is temporarily reshaped prior
+            Determines how a parameter and its gradient are temporarily reshaped prior
             to being passed to both `_pre_step_transform_` and `_post_step_transform_`.
-            By default,the transformation broadcasts over the tensor's first dimension
+            By default, the transformation broadcasts over the tensor's first dimension
             in a batch-like style.
 
             - A positive number determines the dimensionality of the tensor that the transformation will act on.
             - A negative number indicates the 'offset' from the dimensionality of the tensor (see "Notes" for examples).
             - `None` means that the transformation will be applied directly to the tensor without any broadcasting.
 
-        See "Notes" for more details.
+            See "Notes" for more details.
 
         grad_scale : float, optional (default=1.0)
             Multiplies each gradient in-place after the in-place transformation is
@@ -226,6 +226,10 @@ class ParamTransformingOptimizer(Optimizer, metaclass=ABCMeta):
 
         Consider a parameter of shape `(d0, d1, d2, d4)`.
 
+        If `param_ndim=0`, then the parameter and its gradient will be temporarily
+        reshaped to a shape-`(d0 * d1 * d2 * d3, 1)` so that the transformation will be
+        applied elementwise to the tensor.
+
         If `param_ndim=1` (or `param_ndim=-3`), then the parameter and its gradient
         will be temporarily reshaped to a shape-`(d0 * d1 * d2, d3)` so that the
         transformation will be broadcast over each shape-(d3,) sub-tensor.
@@ -238,21 +242,17 @@ class ParamTransformingOptimizer(Optimizer, metaclass=ABCMeta):
         will be temporarily reshaped to a shape-`(d0, d1, d2, d3)` so that the
         transformation will be broadcast over each shape-(d1, d2, d3) sub-tensor.
 
-        If `param_ndim=None` or `param_ndim=4`, then the parameter and its gradient
+        If `param_ndim=4` (or `param_ndim=None`), then the parameter and its gradient
         will be temporarily reshaped to a shape-`(1, d0, d1, d2, d3)` so that the
         transformation will be applied to the shape-(d0, d1, d2, d3) tensor without
         broadcasting.
-
-        If `param_ndim=0`, then the parameter and its gradient will be temporarily
-        reshaped to a shape-`(d0 * d1 * d2 * d3, 1)` so that the transformation will be
-        applied elementwise to the tensor.
 
         Examples
         --------
         **Creating a gradient-transforming optimizer**
 
         Let's create a gradient-transforming optimizer that replaces the gradient
-        of each parameter with the elementwise sign of the gradient (:math:`\pm 1`) prior to performing the step of the inner optimizer:
+        of each parameter with the elementwise sign (:math:`\pm 1`) of the gradient prior to performing the step of the inner optimizer:
 
         >>> import torch as tr
         >>> from rai_toolbox.optim import ParamTransformingOptimizer
@@ -263,7 +263,7 @@ class ParamTransformingOptimizer(Optimizer, metaclass=ABCMeta):
         ...             return
         ...         tr.sign(param.grad, out=param.grad)  # operates in-place
 
-        Now we'll use this optimizer – with `torch.nn.optim.AdamW` providing the actual
+        Now we'll use this optimizer – with `torch.optim.AdamW` providing the actual
         parameter-update functionality – to update the parameter.
 
         >>> x = tr.tensor([-10.0, 10.0], requires_grad=True)
@@ -299,7 +299,7 @@ class ParamTransformingOptimizer(Optimizer, metaclass=ABCMeta):
         ...         param.grad /= tr.clamp(max_norms, 1e-20, None)  # clamp to prevent div by 0
 
         Note that we design `_pre_step_transform_` to operate in-place on the gradient
-        and that treat the gradient as if it has a shape `(N, d1, ..., dm)`, where we
+        and that we treat the gradient as if it has a shape `(N, d1, ..., dm)`, where we
         want to compute the max over each of the `N` sub-tensors of
         shape-`(d1, ..., dm)`.
 
@@ -309,7 +309,7 @@ class ParamTransformingOptimizer(Optimizer, metaclass=ABCMeta):
         to reshape the parameter and its gradient appropriately prior to calling
         `_pre_step_transform_`.
 
-        Now we will create a shape-(2, 2) parameter to see how `MaxNormedGradientOptim`
+        Now we will create a shape-`(2, 2)` parameter to see how `MaxNormedGradientOptim`
         can compute the max-norm over various dimensions of the parameter. Let's print
         out the transformed gradient when we use each of `param_ndim`: `0`, `1`, or `2`.
 
@@ -341,7 +341,7 @@ class ParamTransformingOptimizer(Optimizer, metaclass=ABCMeta):
 
         **Creating a parameter-constraining optimizer**
 
-        Let's create a optimizer that clamps each parameter's values so that
+        Let's create an optimizer that clamps each parameter's values so that
         they all fall within `[-1, 1]` after performing it's gradient-based step on the parameter.
 
         >>> import torch as tr
@@ -449,16 +449,16 @@ class ParamTransformingOptimizer(Optimizer, metaclass=ABCMeta):
         Notes
         -----
         This transform should *always* be designed to broadcast over the leading
-        dimension of the tensor being modified. That is, each parameter/gradient should be assumed to have the shape-(N, d0, ...) and the transformation should be
-        applied - in-place - to each shape-(d0, ...) sub-tensor.
+        dimension of the tensor being modified. That is, each parameter/gradient should be assumed to have the shape-`(N, d0, ...)` and the transformation should be
+        applied - in-place - to each shape-`(d0, ...)` sub-tensor.
 
         Prior to calling `_pre_step_transform_`, `ParamTransformingOptimizer`
         will temporarily reshape each parameter and its gradient to have the appropriate
         shape – in accordance with the value specified for `param_ndim` – such that
-        the shape (d0, ...) contains `param_ndim` entries.
+        the shape-`(d0, ...)` tensor contains `param_ndim` entries.
 
         In the case where `param_ndim=0`, the transformation will be applied to a
-        shape-(T, 1) tensor, where `T` corresponds to the total number of elements
+        shape-`(T, 1)` tensor, where `T` corresponds to the total number of elements
         in the tensor."""
         del param
         del optim_group
@@ -486,15 +486,15 @@ class ParamTransformingOptimizer(Optimizer, metaclass=ABCMeta):
         -----
         This transform should *always* be designed to broadcast over the leading
         dimension of the tensor being modified. That is, each parameter/gradient should be assumed to have the shape-(N, d0, ...) and the transformation should be
-        applied - in-place - to each shape-(d0, ...) sub-tensor.
+        applied - in-place - to each shape-`(d0, ...)` sub-tensor.
 
         Prior to calling `_post_step_transform_`, `ParamTransformingOptimizer`
         will temporarily reshape each parameter and its gradient to have the appropriate
         shape – in accordance with the value specified for `param_ndim` – such that
-        the shape (d0, ...) contains `param_ndim` entries.
+        the shape-`(d0, ...)` tensor contains `param_ndim` entries.
 
         In the case where `param_ndim=0`, the transformation will be applied to a
-        shape-(T, 1) tensor, where `T` corresponds to the total number of elements
+        shape-`(T, 1)` tensor, where `T` corresponds to the total number of elements
         in the tensor.
         """
         del param
@@ -583,10 +583,10 @@ class ParamTransformingOptimizer(Optimizer, metaclass=ABCMeta):
 
 class ChainedParamTransformingOptimizer(ParamTransformingOptimizer):
     """Chains together an arbitrary number of parameter-transforming optimizers,
-    composing their pre and post-step transformation functions to modify the parameters (and their gradients) in-place. `InnerOpt.step()` applies the gradient-based update
+    composing their pre- and post-step transformation functions to modify the parameters (and their gradients) in-place. `InnerOpt.step()` applies the gradient-based update
     to each parameter.
 
-    I.e. Passing `Opt1, Opt2, ..., OptN` to `ChainedParamTransformingOptimizer` will
+    I.e., passing `Opt1, Opt2, ..., OptN` to `ChainedParamTransformingOptimizer` will
     update a parameter using: `OptN.fn_(...(Opt2.fn_(Opt1.fn_(param)))`,
     where `fn_` is a shorthand for `_pre_step_transform_` / `_post_step_transform_`.
 
@@ -622,7 +622,7 @@ class ChainedParamTransformingOptimizer(ParamTransformingOptimizer):
             `Opt1, Opt2, ..., OptN -> fN_(...f2_(f1_(grad)))` – to modify a parameter prior to / after being updated by `InnerOpt.step`
 
         params : Optional[Sequence[Tensor] | Iterable[ParamGroup]]
-            iterable of parameters to optimize or dicts defining parameter groups
+            Iterable of parameters to optimize or dicts defining parameter groups
 
         InnerOpt : Type[Optimizer] | Partial[Optimizer], optional (default=`torch.nn.optim.SGD`)
             The optimizer that updates the parameters after `_pre_step_transform_` has been applied to each of them.
@@ -637,7 +637,7 @@ class ChainedParamTransformingOptimizer(ParamTransformingOptimizer):
             - A negative number indicates the 'offset' from the dimensionality of the tensor (see "Notes" for examples).
             - `None` means that the transformation will be applied directly to the tensor without any broadcasting.
 
-            See `ParamTransformingOptimizer` for more details.
+            See `ParamTransformingOptimizer` for more details and examples.
 
         grad_scale : float, optional (default=1.0)
             Multiplies each gradient in-place after the in-place transformation is
@@ -653,33 +653,17 @@ class ChainedParamTransformingOptimizer(ParamTransformingOptimizer):
         **inner_opt_kwargs : Any
             Named arguments used to initialize `InnerOpt`.
 
-        Notes
-        -----
-        Additional Explanation of `param_ndim`:
-
-        If the parameter has a shape `(d0, d1, d2)` and `param_ndim=1` then the
-        transformation will be broadcast over each shape-(d2,) sub-tensor in the
-        parameter (of which there are `d0 * d1`).
-
-        If a parameter has a shape `(d0, d1, d2, d3)`, and if `param_ndim=-1`,
-        then the transformation will broadcast over each shape-`(d1, d2, d3)`
-        sub-tensor in the parameter (of which there are d0). This is equivalent
-        to `param_ndim=3`.
-
-        If `param_ndim=0` then the transformation is applied elementwise to the
-        parameter by temporarily reshaping the parameter to a shape-(T, 1) tensor.
-
         Examples
         --------
         **Basic Example**
 
         Let's chain together two gradient-transforming optimizers supplied by rAI-toolbox:
-        `TopQGradientOptim` and `ClampedGradientOptimizer`
+        `TopQGradientOptimizer` and `ClampedGradientOptimizer`
 
         >>> from rai_toolbox.optim import (
         ... ChainedParamTransformingOptimizer,
         ... ClampedGradientOptimizer,
-        ... TopQGradientOptim,
+        ... TopQGradientOptimizer,
         ... )
         >>> import torch as tr
         >>> from functools import partial
@@ -692,18 +676,18 @@ class ChainedParamTransformingOptimizer(ParamTransformingOptimizer):
         optimizer will be used, with `lr=1.0`, to update the parameter(s) using the
         transformed gradients.
 
-        We specify `TopQGradientOptim` and then `ClampedGradientOptimizer`; the
+        We specify `TopQGradientOptimizer` and then `ClampedGradientOptimizer`; the
         transformations are applied in order from left to right. Providing per-optimizer
         defaults is achieved most naturally using :py:func:`functools.partial`.
 
         >>> optim = ChainedParamTransformingOptimizer(
-        ...     partial(TopQGradientOptim, q=0.33),
+        ...     partial(TopQGradientOptimizer, q=0.33),
         ...     partial(ClampedGradientOptimizer, clamp_max=2.8),
         ...     params=[x1],
         ...     lr=1.0,
         ...     param_ndim=None, # we don't want any broadcasting to occur
         ... )
-        ClampedGradientOptimizer ○ TopQGradientOptim [SGD](
+        ClampedGradientOptimizer ○ TopQGradientOptimizer [SGD](
         Parameter Group 0
             clamp_max: 2.8
             clamp_min: None

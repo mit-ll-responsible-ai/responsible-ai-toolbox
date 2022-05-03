@@ -83,7 +83,7 @@ class _LpNormOptimizer(ParamTransformingOptimizer):
             - A negative number indicates the 'offset' from the dimensionality of the tensor (see "Notes" for examples).
             - `None` means that the transformation will be applied directly to the tensor without any broadcasting.
 
-            See `ParamTransformingOptimizer` for more details and examples
+            See `ParamTransformingOptimizer` for more details and examples.
 
         grad_scale : float, optional (default=1.0)
             Multiplies each gradient in-place after the in-place transformation is
@@ -147,7 +147,6 @@ class SignedGradientOptim(ParamTransformingOptimizer):
     --------
     L1NormedGradientOptim
     L2NormedGradientOptim
-    ProjectionMixin
     ParamTransformingOptimizer
     """
 
@@ -181,11 +180,11 @@ class SignedGradientOptim(ParamTransformingOptimizer):
             performed. This can be specified per param-group.
 
         defaults : Optional[Dict[str, Any]]
+            Specifies default parameters for all parameter groups.
 
         param_ndim : Optional[int]
             Controls how `_pre_step_transform_` is broadcast onto the gradient
             of a given parameter. This has no effect for `SignedGradientOptim`.
-            Specifies default parameters for all parameter groups.
 
         **inner_opt_kwargs : Any
             Named arguments used to initialize `InnerOpt`.
@@ -236,7 +235,7 @@ class SignedGradientOptim(ParamTransformingOptimizer):
 
 
 class L1NormedGradientOptim(_LpNormOptimizer):
-    r"""A gradient-tranforming  optimizer that normalizes the each gradient by
+    r"""A gradient-tranforming optimizer that normalizes the gradient by
     its :math:`L^1`-norm prior to using `InnerOp.step` to update the
     corresponding parameter.
 
@@ -244,7 +243,6 @@ class L1NormedGradientOptim(_LpNormOptimizer):
     --------
     L2NormedGradientOptim
     SignedGradientOptim
-    ProjectionMixin
     ParamTransformingOptimizer
 
     Examples
@@ -282,7 +280,7 @@ class L1NormedGradientOptim(_LpNormOptimizer):
 
 
 class L2NormedGradientOptim(_LpNormOptimizer):
-    r"""A gradient-tranforming  optimizer that normalizes the each gradient by
+    r"""A gradient-tranforming optimizer that normalizes the gradient by
     its :math:`L^2`-norm prior to using `InnerOp.step` to update the
     corresponding parameter.
 
@@ -292,7 +290,6 @@ class L2NormedGradientOptim(_LpNormOptimizer):
     --------
     L1NormedGradientOptim
     SignedGradientOptim
-    ProjectionMixin
     ParamTransformingOptimizer
 
     Examples
@@ -334,7 +331,7 @@ class L2ProjectedOptim(L2NormedGradientOptim):
     to lie within an :math:`\epsilon`-sized ball in :math:`L^2` space centered on the
     origin.
 
-    A step with this optimizer normalizes the each gradient by its :math:`L^2`-norm
+    A step with this optimizer normalizes the gradient by its :math:`L^2`-norm
     prior to using `InnerOp.step` to update the corresponding parameter. Each parameter
     is then projected into the constraint set.
 
@@ -345,7 +342,6 @@ class L2ProjectedOptim(L2NormedGradientOptim):
     --------
     L2NormedGradientOptim
     LinfProjectedOptim
-    ProjectionMixin
     ParamTransformingOptimizer
     """
 
@@ -386,7 +382,7 @@ class L2ProjectedOptim(L2NormedGradientOptim):
             - A negative number indicates the 'offset' from the dimensionality of the tensor (see "Notes" for examples).
             - `None` means that the transformation will be applied directly to the tensor without any broadcasting.
 
-            See `ParamTransformingOptimizer` for more details and examples
+            See `ParamTransformingOptimizer` for more details and examples.
 
         grad_scale : float, optional (default=1.0)
             Multiplies each gradient in-place after the in-place transformation is
@@ -475,7 +471,6 @@ class LinfProjectedOptim(SignedGradientOptim):
     --------
     L2NormedGradientOptim
     LinfProjectedOptim
-    ProjectionMixin
     ParamTransformingOptimizer
     """
 
@@ -579,7 +574,7 @@ class L1qNormedGradientOptim(ChainedParamTransformingOptimizer):
     normalizes the gradient to have an :math:`L^1`-norm of `grad_scale`, prior to
     updating the parameter using `InnerOpt.step`.
 
-    The sparsification process retains only the signs (i.e. :math:`\pm 1`) of the
+    The sparsification process retains only the signs (i.e., :math:`\pm 1`) of the
     gradient's elements. The transformation is applied to the gradient in accordance
     with `param_ndim`.
 
@@ -618,7 +613,7 @@ class L1qNormedGradientOptim(ChainedParamTransformingOptimizer):
 
         q : float
             Specifies the (fractional) percentile of absolute-largest gradient elements
-            to retain when sparsifying the gradient. E.g `q=0.9` means that only the
+            to retain when sparsifying the gradient. E.g., `q=0.9` means that only the
             gradient elements within the 90th-percentile will be retained.
 
             Must be within `[0.0, 1.0]`. The sparsification is applied to the gradient
@@ -638,7 +633,7 @@ class L1qNormedGradientOptim(ChainedParamTransformingOptimizer):
             - A negative number indicates the 'offset' from the dimensionality of the tensor (see "Notes" for examples).
             - `None` means that the transformation will be applied directly to the tensor without any broadcasting.
 
-            See `ParamTransformingOptimizer` for more details and examples
+            See `ParamTransformingOptimizer` for more details and examples.
 
         grad_scale : float, optional (default=1.0)
             Multiplies each gradient in-place after the in-place transformation is
