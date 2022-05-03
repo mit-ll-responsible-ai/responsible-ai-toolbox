@@ -1,16 +1,14 @@
 .. meta::
-   :description: An explanation of our approach to data optimization problems.
+   :description: An explanation of the responsible AI approach to data optimization problems.
 
 
-==============================
-Approach to Data Perturbations
-==============================
+=====================
+On Data Perturbations
+=====================
 
-The rai-toolbox facilitates solving for optimizations over data perturbations by strictly
-adhering to `PyTorch <https://pytorch.org/>`_ APIs. A perturbation model is defined as a 
-`torch.nn.Module`, and its optimizer as `torch.optim.Optimizer`. This allows us to
-leverage PyTorch's `automatic differentiation <https://pytorch.org/tutorials/beginner/blitz/autograd_tutorial.html>`_
-engine to solve for optimal perturbations to data.
+The rai-toolbox facilitates solving for :ref:`optimizations <optim-reference>` over :ref:`data perturbations <pert-referenc>` by strictly
+adhering to `PyTorch <https://pytorch.org/>`_ APIs. 
+A perturbation model is defined as a `torch.nn.Module`, and its optimizer as `torch.optim.Optimizer`. This allows us to leverage PyTorch's `automatic differentiation <https://pytorch.org/tutorials/beginner/blitz/autograd_tutorial.html>`_ engine to solve for optimal perturbations to data.
 
 
 Model optimization vs. data optimization
