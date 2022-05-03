@@ -164,6 +164,14 @@ and solve for perturbation via:
 
    # solved perturbations are stored in `pert_model`
 
+We can then use `pert_model` to apply these optimized perturbations to new data
+
+.. code-block:: python
+   :caption: Peturbing data
+
+   data = # some tensor of data
+   pert_data = pert_model(data)  # applies optimized peturbation to `data`
+
 The abstractions provided by a perturbation model and a perturbation optimizer yields a natural delegation of functionality, which makes it easy for us to modify the critical implementation details of this problem. E.g., One can modify the optimizer to adjust how the perturbation is constrained, or how its gradient is normalized; the perturbation model controls the random initialization of the perturbation and how the perturbation broadcasts over a batch of data. None of these adjustments require any modification to the process by which we actually solve for the perturbations; i.e., we can continue to use `standard_trainer` or any gradient-based solver.
 `~rai_toolbox.optim.ParamTransformingOptimizer` and `~rai_toolbox.perturbations.AdditivePerturbation` represent concrete implementations of this design; the reader is advised to consult their reference documentation for further insights into the rAI-toolbox's approach to solving for data perturbations.
 
