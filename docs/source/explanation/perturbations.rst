@@ -7,9 +7,9 @@ Approach to Data Perturbations
 ==============================
 
 The rai-toolbox facilitates solving for optimizations over data perturbations by strictly
-adhering to `PyTorch <https://pytorch.org/>` APIs. A perturbation model is defined as a 
+adhering to `PyTorch <https://pytorch.org/>`_ APIs. A perturbation model is defined as a 
 `torch.nn.Module`, and its optimizer as `torch.optim.Optimizer`. This allows us to
-leverage PyTorch's `automatic differentiation <https://pytorch.org/tutorials/beginner/blitz/autograd_tutorial.html>`
+leverage PyTorch's `automatic differentiation <https://pytorch.org/tutorials/beginner/blitz/autograd_tutorial.html>`_
 engine to solve for optimal perturbations to data.
 
 
@@ -155,8 +155,8 @@ where :math:`g_\delta` represents a model for transforming data, parameterized b
 
 The rai-toolbox is designed to support all of the flavors of analysis represented by
 the above workflows. Users can immediately leverage our in-house perturbation
-`models <https://mit-ll-responsible-ai.github.io/responsible-ai-toolbox/ref_perturbation.html#models>`,
-`optimizers <https://mit-ll-responsible-ai.github.io/responsible-ai-toolbox/ref_optim.html>`,
-and `solvers <https://mit-ll-responsible-ai.github.io/responsible-ai-toolbox/ref_perturbation.html#solvers>`,
+`models <https://mit-ll-responsible-ai.github.io/responsible-ai-toolbox/ref_perturbation.html#models>`_,
+`optimizers <https://mit-ll-responsible-ai.github.io/responsible-ai-toolbox/ref_optim.html>`_,
+and `solvers <https://mit-ll-responsible-ai.github.io/responsible-ai-toolbox/ref_perturbation.html#solvers>`_,
 or build their own in a manner that can be easily composed with other existing tools
 from the PyTorch ecosystem for creating distributed and scalable Responsible AI workflows.
