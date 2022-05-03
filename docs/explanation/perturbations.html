@@ -1,0 +1,460 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<meta content="An explanation of the responsible AI approach to data optimization problems." name="description" />
+
+    <title>On Data Perturbations &#8212; rai-toolbox  documentation</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/tabs.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Reference" href="../api_reference.html" />
+    <link rel="prev" title="Explanation" href="../explanation.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="../index.html">
+<p class="title">rai-toolbox</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../tutorials.html">
+  Tutorials
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../how_tos.html">
+  How-To Guides
+ </a>
+</li>
+
+<li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="../explanation.html">
+  Explanation
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../api_reference.html">
+  Reference
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../changes.html">
+  Changelog
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    <p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Contents:
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   On Data Perturbations
+  </a>
+ </li>
+</ul>
+
+  </div>
+</nav>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#model-optimization-vs-data-optimization">
+   Model optimization vs. data optimization
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#solvers-for-data-perturbations">
+   Solvers for data perturbations
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#common-data-related-workflows-supported-by-rai-toolbox">
+   Common data-related workflows supported by
+   <code class="xref py py-obj docutils literal notranslate">
+    <span class="pre">
+     rai-toolbox
+    </span>
+   </code>
+  </a>
+ </li>
+</ul>
+
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <section id="on-data-perturbations">
+<h1>On Data Perturbations<a class="headerlink" href="#on-data-perturbations" title="Permalink to this headline">#</a></h1>
+<p>This article provides an overview of common data optimization problems, using model-dependent criteria, that are relevant for assessing and enhancing robustness in machine learning models.
+We present a broad picture of how we have designed the rAI-toolbox to solve these problems, and provide pseudo-code that illustrates how <a class="reference internal" href="../ref_optim.html#optim-reference"><span class="std std-ref">optimizations</span></a> over <a class="reference internal" href="../ref_perturbation.html#pert-reference"><span class="std std-ref">data perturbations</span></a> adhere strictly
+adhering core <a class="reference external" href="https://pytorch.org/">PyTorch</a> APIs; i.e,
+a perturbation model is defined as a <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.nn.Module</span></code>, and its optimizer as <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.optim.Optimizer</span></code>.</p>
+<section id="model-optimization-vs-data-optimization">
+<h2>Model optimization vs. data optimization<a class="headerlink" href="#model-optimization-vs-data-optimization" title="Permalink to this headline">#</a></h2>
+<p>Standard machine learning model-training frameworks are designed to refine
+the parameters of the machine learning model (i.e., its architecture and weights), while methods for studying
+the robustness and explainability of the model naturally involve analyses of and
+optimizations over the data (i.e., inputs to the model and representations extracted
+by the model). This optimization over the data space increases the complexity of
+responsible AI workflows over that of the standard setting.</p>
+<p>For example, consider the standard optimization objective for training a model,
+<span class="math notranslate nohighlight">\(f_\theta\)</span>, parameterized by <span class="math notranslate nohighlight">\(\theta\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\min\limits_{\theta \in \Theta} \mathbb{E}_{(x,y)\sim D} [\mathcal{L}(f_\theta(x),y)],\]</div>
+<p>where <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(y\)</span> represent the data input and corresponding output,
+respectively, sampled from a data distribution, <span class="math notranslate nohighlight">\(D\)</span>, and <span class="math notranslate nohighlight">\(\mathcal{L}\)</span>
+is the loss function to be minimized. Note that here, the data samples are fixed,
+and the search is done over the model’s weight space.</p>
+<p>In contrast, consider the optimization objective for solving for an adversarial
+example to fool the model into producing an incorrect output, which is a common
+practice for assessing the robustness of the model:</p>
+<div class="math notranslate nohighlight">
+\[\max\limits_{\delta \in \Delta} \mathcal{L}(f_\theta(x + \delta),y),\]</div>
+<p>where a perturbation, <span class="math notranslate nohighlight">\(\delta\)</span>, is optimized to maximize loss against the true
+output, subject to a constraint set, <span class="math notranslate nohighlight">\(\Delta\)</span>. Here, the model parameters
+are held fixed, and the search is conducted over the data space.</p>
+<p>A plethora of approaches for solving this objective under different loss
+configurations and constraint sets have been proposed by the Robust AI research
+community. One popular approach is to use iterative project gradient descent
+(PGD) on the negative cross-entropy loss, with an <span class="math notranslate nohighlight">\(L^p\)</span>-ball of radius
+<span class="math notranslate nohighlight">\(\epsilon\)</span> and <span class="math notranslate nohighlight">\(p=1,2,\)</span> or <span class="math notranslate nohighlight">\(\infty\)</span> as the constraint set.</p>
+</section>
+<section id="solvers-for-data-perturbations">
+<h2>Solvers for data perturbations<a class="headerlink" href="#solvers-for-data-perturbations" title="Permalink to this headline">#</a></h2>
+<p>A variety of other tools exist that implement large libraries of techniques
+proposed by the research community (such as PGD) in a framework-agnostic API.
+Their perturbation solvers are often written from scratch and look something like this:</p>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">Notional perturbation solver</span><a class="headerlink" href="#id1" title="Permalink to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">perturbation_solver</span><span class="p">(</span>
+    <span class="n">model</span><span class="p">:</span> <span class="n">callable</span><span class="p">,</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">target</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">lr</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">steps</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">criterion</span><span class="p">:</span> <span class="n">callable</span><span class="p">,</span>
+    <span class="n">initialize_fn</span><span class="p">:</span> <span class="n">callable</span><span class="p">,</span>
+    <span class="n">project_fn</span><span class="p">:</span> <span class="n">callable</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+    <span class="c1"># initialize perturbation parameter</span>
+    <span class="n">delta</span> <span class="o">=</span> <span class="n">initialize_fn</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">steps</span><span class="p">):</span>
+        <span class="c1"># perturbation applied manually / in-line</span>
+        <span class="n">perturbed_data</span> <span class="o">=</span> <span class="n">data</span> <span class="o">+</span> <span class="n">delta</span>
+
+        <span class="c1"># calculate loss</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">model</span><span class="p">(</span><span class="n">perturbed_data</span><span class="p">),</span> <span class="n">target</span><span class="p">)</span>
+
+        <span class="c1"># optimize</span>
+        <span class="n">grad</span> <span class="o">=</span> <span class="n">autograd</span><span class="p">(</span><span class="n">loss</span><span class="p">,</span> <span class="n">delta</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">no_grad</span><span class="p">():</span>
+            <span class="n">delta</span> <span class="o">=</span> <span class="n">delta</span> <span class="o">+</span> <span class="n">lr</span> <span class="o">*</span> <span class="n">grad</span>  <span class="c1"># perturbation updated manually / in-line</span>
+            <span class="n">delta</span> <span class="o">=</span> <span class="n">project_fn</span><span class="p">(</span><span class="n">delta</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">delta</span>
+</pre></div>
+</div>
+</div>
+<p>Note that the code for applying the perturbation and taking an optimization
+step is embedded within the for loop of the solver. If a user wanted to swap
+out the optimizer methodology or use a different perturbation model, one would
+need to write an entirely new solver.</p>
+<p>By adhering to PyTorch APIs, the rAI-toolbox frames the process of solving for a perturbation in the standard workflow for training ML models. I.e., we specify perturbation models, which are responsible for initializing, storing, and applying perturbations, and perturbation optimizers, which update the perturbations based on their gradients while also applying normalizations and constraints to the perturbations and their gradients.</p>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">rAI-toolbox approach to solving for perturbations</span><a class="headerlink" href="#id2" title="Permalink to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">Module</span>
+<span class="kn">from</span> <span class="nn">torch.optim</span> <span class="kn">import</span> <span class="n">Optimizer</span>
+
+<span class="c1"># Implements PyTorch Module API</span>
+<span class="k">class</span> <span class="nc">PerturbationModel</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span>
+   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+      <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+      <span class="c1"># initialize parameters of perturbation model</span>
+
+   <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+      <span class="n">perturbed_data</span> <span class="o">=</span> <span class="c1"># use model&#39;s parameters to perturb data</span>
+      <span class="k">return</span> <span class="n">perturbed_data</span>
+
+<span class="c1"># Implements PyTorch Optimizer API</span>
+<span class="k">class</span> <span class="nc">PerturbationOptimizer</span><span class="p">(</span><span class="n">Optimizer</span><span class="p">):</span>
+   <span class="k">def</span> <span class="nf">_pre_step_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">):</span> <span class="c1"># e.g. perform gradient-normalization</span>
+   <span class="k">def</span> <span class="nf">_step_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">):</span> <span class="c1"># perform gradient-based update on parameter</span>
+   <span class="k">def</span> <span class="nf">_post_step_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">grad</span><span class="p">):</span> <span class="c1"># e.g. project updated parameter into constraint set</span>
+
+   <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+      <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_params</span><span class="p">:</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">_pre_step_</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">_step_</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="n">param</span><span class="o">.</span><span class="n">grad</span><span class="p">)</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">_post_step_</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Having framed the perturbation process as a <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.nn.Module</span></code>, whose parameters (e.g. the perturbation itself) are optimized and constrained via the <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.optim.Optimizer</span></code> API, we can take any standard trainer, e.g.</p>
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text">A standard PyTorch trainer</span><a class="headerlink" href="#id3" title="Permalink to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">standard_trainer</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">steps</span><span class="p">,</span> <span class="n">criterion</span><span class="p">):</span>
+   <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">steps</span><span class="p">):</span>
+      <span class="c1"># calculate loss</span>
+      <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">model</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">target</span><span class="p">)</span>
+
+      <span class="c1"># optimize</span>
+      <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+      <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+      <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<p>and solve for perturbation via:</p>
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-text">Solving for perturbations using a standard PyTorch trainer</span><a class="headerlink" href="#id4" title="Permalink to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">Sequential</span>
+<span class="kn">from</span> <span class="nn">rai_toolbox</span> <span class="kn">import</span> <span class="n">freeze</span>
+
+<span class="n">pert_model</span> <span class="o">=</span> <span class="n">PerturbationModel</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="n">optim</span> <span class="o">=</span> <span class="n">PerturbationOptimizer</span><span class="p">(</span><span class="n">pert_model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="o">...</span><span class="p">)</span>
+
+<span class="n">ml_model</span> <span class="o">=</span> <span class="n">MyNeuralNetwork</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+
+<span class="c1"># model(data) -&gt; ml_model(pert_model(data))</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">Sequential</span><span class="p">([</span><span class="n">pert_model</span><span class="p">,</span> <span class="n">freeze</span><span class="p">(</span><span class="n">ml_model</span><span class="o">.</span><span class="n">eval</span><span class="p">())])</span>
+
+<span class="c1"># solve for perturbations</span>
+<span class="n">standard_trainer</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">optimizer</span><span class="o">=</span><span class="n">optim</span><span class="p">,</span> <span class="n">data</span><span class="o">=...</span><span class="p">,</span> <span class="n">target</span><span class="o">=...</span><span class="p">,</span> <span class="n">steps</span><span class="o">=...</span><span class="p">,</span> <span class="n">criterion</span><span class="o">=...</span><span class="p">)</span>
+
+<span class="c1"># solved perturbations are stored in `pert_model`</span>
+</pre></div>
+</div>
+</div>
+<p>The abstractions provided by a perturbation model and a perturbation optimizer yields a natural delegation of functionality, which makes it easy for us to modify the critical implementation details of this problem. E.g., One can modify the optimizer to adjust how the perturbation is constrained, or how its gradient is normalized; the perturbation model controls the random initialization of the perturbation and how the perturbation broadcasts over a batch of data. None of these adjustments require any modification to the process by which we actually solve for the perturbations; i.e., we can continue to use <code class="xref py py-obj docutils literal notranslate"><span class="pre">standard_trainer</span></code> or any gradient-based solver.
+<a class="reference internal" href="../generated/rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer" title="rai_toolbox.optim.ParamTransformingOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParamTransformingOptimizer</span></code></a> and <a class="reference internal" href="../generated/rai_toolbox.perturbations.AdditivePerturbation.html#rai_toolbox.perturbations.AdditivePerturbation" title="rai_toolbox.perturbations.AdditivePerturbation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AdditivePerturbation</span></code></a> represent concrete implementations of this design; the reader is advised to consult their reference documentation for further insights into the rAI-toolbox’s approach to solving for data perturbations.</p>
+</section>
+<section id="common-data-related-workflows-supported-by-rai-toolbox">
+<h2>Common data-related workflows supported by <code class="xref py py-obj docutils literal notranslate"><span class="pre">rai-toolbox</span></code><a class="headerlink" href="#common-data-related-workflows-supported-by-rai-toolbox" title="Permalink to this headline">#</a></h2>
+<p>A wide range of responsible AI techniques involve optimizing parameters of data
+transformations, often in addition to optimizations over model parameters:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>Data augmentations / corruptions: <span class="math notranslate nohighlight">\(g_\delta(x)\)</span></dt><dd><ul>
+<li><p>Model-independent</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Adversarial examples: <span class="math notranslate nohighlight">\(\max\limits_{\delta \in \Delta} \mathcal{L}(f_\theta(g_{\delta}(x)),y)\)</span></dt><dd><ul>
+<li><p>Optimize transformation over single data point</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Universal adversarial perturbations: <span class="math notranslate nohighlight">\(\max\limits_{\delta \in \Delta} \mathbb{E}_{(x,y)\sim D} [\mathcal{L}(f_\theta(g_\delta(x)),y)]\)</span></dt><dd><ul>
+<li><p>Optimize transformation over data distribution</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Adversarial (robust) training: <span class="math notranslate nohighlight">\(\min\limits_{\theta \in \Theta} \mathbb{E}_{(x,y)\sim D} [ \max\limits_{\delta \in \Delta} \mathcal{L}(f_\theta(g_\delta(x)),y) ]\)</span></dt><dd><ul>
+<li><p>Optimize model on transformed data</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>“Universal” adversarial training: <span class="math notranslate nohighlight">\(\min\limits_{\theta \in \Theta} \max\limits_{\delta \in \Delta} \mathbb{E}_{(x,y)\sim D} [\mathcal{L}(f_\theta(g_\delta(x)),y) ]\)</span></dt><dd><ul>
+<li><p>Optimize model on transformed data distribution</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p>where <span class="math notranslate nohighlight">\(g_\delta\)</span> represents a model for transforming data, parameterized by
+<span class="math notranslate nohighlight">\(\delta\)</span>.</p>
+<p>The rai-toolbox is designed to support all of the flavors of analysis represented by
+the above workflows. Users can immediately leverage the toolbox’s perturbation
+<a class="reference internal" href="../ref_perturbation.html#pert-models"><span class="std std-ref">models</span></a>, <a class="reference internal" href="../ref_optim.html#optim-reference"><span class="std std-ref">optimizers</span></a>,
+and <a class="reference internal" href="../ref_perturbation.html#pert-solvers"><span class="std std-ref">solvers</span></a>, or build their own in a manner that can be easily composed with other existing tools from the PyTorch ecosystem for creating distributed and scalable Responsible AI workflows.</p>
+</section>
+</section>
+
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="../explanation.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">Explanation</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="../api_reference.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Reference</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2022 Massachusetts Institute of Technology.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
+</html>

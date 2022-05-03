@@ -13,7 +13,7 @@ All reference documentation includes detailed Examples sections. Please scroll t
 bottom of any given reference page to see the examples.
 
 Wherever possible, the features provided by the rAI-toolbox are designed to: 1) adhere to common PyTorch APIs – for natural compatibility with popular machine learning frameworks and libraries – and 2) to be agnostic to the domain of application.
-E.g., our APIs for :ref:`optimizing data perturbations <pert-reference>` are compatible with any tensor-based data; we do not asaugsume that users are interested only in computer vision and natural language processing applications.
+E.g., our APIs for :ref:`optimizing data perturbations <pert-reference>` are compatible with any tensor-based data; we do not assume that users are interested only in computer vision and natural language processing applications.
 
 
 .. toctree::

@@ -383,7 +383,9 @@
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
-<span class="sd">        Additional Explanation of `param_ndim`:</span>
+<span class="sd">        .. _param-ndim-add:</span>
+
+<span class="sd">        **Additional Explanation of `param_ndim`**</span>
 
 <span class="sd">        Consider a parameter of shape `(d0, d1, d2, d4)`.</span>
 
@@ -413,7 +415,8 @@
 <span class="sd">        **Creating a gradient-transforming optimizer**</span>
 
 <span class="sd">        Let&#39;s create a gradient-transforming optimizer that replaces the gradient</span>
-<span class="sd">        of each parameter with the elementwise sign of the gradient (:math:`\pm 1`) prior to performing the step of the inner optimizer:</span>
+<span class="sd">        of each parameter with the elementwise sign of the gradient (:math:`\pm 1`)</span>
+<span class="sd">        prior to performing the step of the inner optimizer:</span>
 
 <span class="sd">        &gt;&gt;&gt; import torch as tr</span>
 <span class="sd">        &gt;&gt;&gt; from rai_toolbox.optim import ParamTransformingOptimizer</span>
@@ -482,7 +485,7 @@
 <span class="sd">        ...     loss = (x * x).sum()</span>
 <span class="sd">        ...     loss.backward()</span>
 <span class="sd">        ...     optim.step()</span>
-<span class="sd">        ...     print(&quot;param_ndim: {param_ndim}, normed grad:\n{x.grad}\n..&quot;)</span>
+<span class="sd">        ...     print(f&quot;param_ndim: {param_ndim}, normed grad:\n{x.grad}\n..&quot;)</span>
 <span class="sd">        ...     optim.zero_grad()</span>
 <span class="sd">        param_ndim: 0, normed grad:</span>
 <span class="sd">        tensor([[1., 1.],</span>

@@ -1,0 +1,487 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<meta content="A guide for using the rAI-toolbox to create a parameter-transforming PyTorch Optimizer" name="description" />
+
+    <title>Create a Parameter-Transforming Optimizer &#8212; rai-toolbox  documentation</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/tabs.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Run PyTorch Lightning DDP in Hydra" href="hydraddp.html" />
+    <link rel="prev" title="How-To Guides" href="../how_tos.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="../index.html">
+<p class="title">rai-toolbox</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../tutorials.html">
+  Tutorials
+ </a>
+</li>
+
+<li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="../how_tos.html">
+  How-To Guides
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../explanation.html">
+  Explanation
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../api_reference.html">
+  Reference
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../changes.html">
+  Changelog
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    <p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  How to...
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   Create a Parameter-Transforming Optimizer
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="hydraddp.html">
+   Run PyTorch Lightning DDP in Hydra
+  </a>
+ </li>
+</ul>
+
+  </div>
+</nav>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#designing-the-optimizer">
+   Designing the optimizer
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#using-the-optimizer">
+   Using the optimizer
+  </a>
+ </li>
+</ul>
+
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <section id="create-a-parameter-transforming-optimizer">
+<span id="how-to-optim"></span><h1>Create a Parameter-Transforming Optimizer<a class="headerlink" href="#create-a-parameter-transforming-optimizer" title="Permalink to this headline">#</a></h1>
+<p>Popular techniques for creating adversarial or targeted perturbations often entail solving for the perturbations using gradients that have been normalized in a particular manner, as well as ensuring that the resulting perturbations are constrained within a particular domain. In the rAI-toolbox, PyTorch optimizers are used to solve for perturbations in this way.</p>
+<p>In this How-To, we will use the <a class="reference internal" href="../generated/rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer" title="rai_toolbox.optim.ParamTransformingOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParamTransformingOptimizer</span></code></a> to design an optimizer, which is particularly well-suited for optimizing perturbations, that has the following properties:</p>
+<ol class="arabic simple">
+<li><p>It encapsulates another optimizer, which is responsible for performing the gradient-based updates to the optimized parameters.</p></li>
+<li><p>Prior to updating the parameter, it normalizes each parameter’s gradient by their max-value, .</p></li>
+<li><p>After each parameter is updated, its elements are to clamped fall within some configurable domain bounds: <code class="xref py py-obj docutils literal notranslate"><span class="pre">[clamp_min,</span> <span class="pre">clamp_max]</span></code></p></li>
+</ol>
+<p>We will then see how we can control how this optimizer applies (or “broadcasts”) these parameter transformations via the optimizer’s <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim</span></code> value.</p>
+<section id="designing-the-optimizer">
+<h2>Designing the optimizer<a class="headerlink" href="#designing-the-optimizer" title="Permalink to this headline">#</a></h2>
+<p>By inheriting from <a class="reference internal" href="../generated/rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer" title="rai_toolbox.optim.ParamTransformingOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParamTransformingOptimizer</span></code></a> our main task is to implement two methods: <a class="reference internal" href="../generated/rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer._pre_step_transform_" title="rai_toolbox.optim.ParamTransformingOptimizer._pre_step_transform_"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_pre_step_transform_</span></code></a> and <a class="reference internal" href="../generated/rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer._post_step_transform_" title="rai_toolbox.optim.ParamTransformingOptimizer._post_step_transform_"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_post_step_transform_</span></code></a>.</p>
+<p>The <a class="reference internal" href="../generated/rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer.__init__" title="rai_toolbox.optim.ParamTransformingOptimizer.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a> method for our optimizer will accept <code class="xref py py-obj docutils literal notranslate"><span class="pre">clamp_min</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">clamp_max</span></code> as configurable options;
+these bounds need to be added to the <code class="xref py py-obj docutils literal notranslate"><span class="pre">defaults</span></code> that are passed to the to the base class so that all of the optimizer’s parameter groups have access to them.
+Additionally, <code class="xref py py-obj docutils literal notranslate"><span class="pre">InnerOpt</span></code>, which is the optimizer whose <code class="xref py py-obj docutils literal notranslate"><span class="pre">step()</span></code> method actually performs the gradient-based updates to the parameters, will have <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.optim.SGD</span></code> as its default; <code class="xref py py-obj docutils literal notranslate"><span class="pre">**inner_opt_kwargs</span></code> will ultimately be passed to <code class="xref py py-obj docutils literal notranslate"><span class="pre">InnerOpt(...)</span></code>.
+Lastly, <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim</span></code> is an important parameter, which will control how our max-normalization is applied to each gradient.</p>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">Defining the interface to our optimizer.</span><a class="headerlink" href="#id1" title="Permalink to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+
+<span class="kn">from</span> <span class="nn">rai_toolbox.optim</span> <span class="kn">import</span> <span class="n">ParamTransformingOptimizer</span>
+
+<span class="kn">import</span> <span class="nn">torch</span> <span class="k">as</span> <span class="nn">tr</span>
+<span class="kn">from</span> <span class="nn">torch.optim</span> <span class="kn">import</span> <span class="n">SGD</span>
+
+<span class="k">class</span> <span class="nc">CustomOptim</span><span class="p">(</span><span class="n">ParamTransformingOptimizer</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">params</span><span class="p">,</span>
+        <span class="n">InnerOpt</span> <span class="o">=</span> <span class="n">SGD</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">clamp_min</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">clamp_max</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">defaults</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">param_ndim</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">inner_opt_kwargs</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">defaults</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">defaults</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="n">defaults</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;clamp_min&quot;</span><span class="p">,</span> <span class="n">clamp_min</span><span class="p">)</span>
+        <span class="n">defaults</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;clamp_max&quot;</span><span class="p">,</span> <span class="n">clamp_max</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">params</span><span class="p">,</span>
+            <span class="n">InnerOpt</span><span class="p">,</span>
+            <span class="n">defaults</span><span class="o">=</span><span class="n">defaults</span><span class="p">,</span>
+            <span class="n">param_ndim</span><span class="o">=</span><span class="n">param_ndim</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">inner_opt_kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Prior to updating its parameters during the “step” process, our optimizer will normalize each parameter’s gradient by the gradient’s max-value; this will be performed by <a class="reference internal" href="../generated/rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer._pre_step_transform_" title="rai_toolbox.optim.ParamTransformingOptimizer._pre_step_transform_"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_pre_step_transform_</span></code></a>.
+Note that we will design this method with the assumption that each parameter has a shape <code class="xref py py-obj docutils literal notranslate"><span class="pre">(N,</span> <span class="pre">d1,</span> <span class="pre">...,</span> <span class="pre">dm)</span></code>, where <code class="xref py py-obj docutils literal notranslate"><span class="pre">N</span></code> is a batch dimension and where we want to compute <code class="xref py py-obj docutils literal notranslate"><span class="pre">N</span></code> max values — over each of the shape-<code class="xref py py-obj docutils literal notranslate"><span class="pre">(d1,</span> <span class="pre">...,</span> <span class="pre">dm)</span></code> subtensors.
+By adhering to this standard, <a class="reference internal" href="../generated/rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer" title="rai_toolbox.optim.ParamTransformingOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParamTransformingOptimizer</span></code></a> will be able to subsequently control how <a class="reference internal" href="../generated/rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer._pre_step_transform_" title="rai_toolbox.optim.ParamTransformingOptimizer._pre_step_transform_"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_pre_step_transform_</span></code></a> is applied to each parameter via <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim</span></code>; this is an inherited capability that we are leveraging. Note that we don’t need to use <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim</span></code> directly at all.</p>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">Defining <code class="xref py py-obj docutils literal notranslate"><span class="pre">_pre_step_transform_</span></code> to max-norm a parameter’s gradient</span><a class="headerlink" href="#id2" title="Permalink to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">_pre_step_transform_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">:</span> <span class="n">tr</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">optim_group</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="c1"># assume param has shape-(N, d1, ..., dm)</span>
+    <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">grad</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span>
+
+    <span class="c1"># (N, d1, ..., dm) -&gt; (N, d1 * ... * dm)</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">param</span><span class="o">.</span><span class="n">grad</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">max_norms</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>  <span class="c1"># computes N max values</span>
+    <span class="n">max_norms</span> <span class="o">=</span> <span class="n">max_norms</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">*</span><span class="p">([</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">ndim</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)))</span>  <span class="c1"># make broadcastable</span>
+    <span class="n">param</span><span class="o">.</span><span class="n">grad</span> <span class="o">/=</span> <span class="n">tr</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="n">max_norms</span><span class="p">,</span> <span class="mf">1e-20</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>  <span class="c1"># gradient is modified *in-place*</span>
+</pre></div>
+</div>
+</div>
+<p>Once a parameter has been updated, we want to ensure that its elements are clamped to fall within user-specified bounds via <a class="reference internal" href="../generated/rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer._post_step_transform_" title="rai_toolbox.optim.ParamTransformingOptimizer._post_step_transform_"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_post_step_transform_</span></code></a>. These bounds are provided via the <code class="xref py py-obj docutils literal notranslate"><span class="pre">optim_group</span></code> dictionary that is passed to the method.</p>
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text">Defining <code class="xref py py-obj docutils literal notranslate"><span class="pre">_post_step_transform_</span></code> to constrain the updated parameter</span><a class="headerlink" href="#id3" title="Permalink to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">_post_step_transform_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">:</span> <span class="n">tr</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">optim_group</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="c1"># note that the clamp is applied *in-place* to the parameter</span>
+    <span class="n">param</span><span class="o">.</span><span class="n">clamp_</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="n">optim_group</span><span class="p">[</span><span class="s2">&quot;clamp_min&quot;</span><span class="p">],</span> <span class="nb">max</span><span class="o">=</span><span class="n">optim_group</span><span class="p">[</span><span class="s2">&quot;clamp_max&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<p>An advantage of accessing the clamp-bounds via <code class="xref py py-obj docutils literal notranslate"><span class="pre">optim_group</span></code> rather than via instance-attributes is that they can then be configured on a per parameter group basis.
+Note that we do not need to worry about doing any parameter reshaping for this method, since clamp occurs elementwise, and not over particular axes/dimensions of the tensor.</p>
+<p>Putting it all together, our custom optimizer is given by</p>
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-text">The full definition of <code class="xref py py-obj docutils literal notranslate"><span class="pre">CustomOptim</span></code></span><a class="headerlink" href="#id4" title="Permalink to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+
+<span class="kn">from</span> <span class="nn">rai_toolbox.optim</span> <span class="kn">import</span> <span class="n">ParamTransformingOptimizer</span>
+
+<span class="kn">import</span> <span class="nn">torch</span> <span class="k">as</span> <span class="nn">tr</span>
+<span class="kn">from</span> <span class="nn">torch.optim</span> <span class="kn">import</span> <span class="n">SGD</span>
+
+<span class="k">class</span> <span class="nc">CustomOptim</span><span class="p">(</span><span class="n">ParamTransformingOptimizer</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">params</span><span class="p">,</span>
+        <span class="n">InnerOpt</span> <span class="o">=</span> <span class="n">SGD</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">clamp_min</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">clamp_max</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">defaults</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">param_ndim</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">inner_opt_kwargs</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">defaults</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">defaults</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="n">defaults</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;clamp_min&quot;</span><span class="p">,</span> <span class="n">clamp_min</span><span class="p">)</span>
+        <span class="n">defaults</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;clamp_max&quot;</span><span class="p">,</span> <span class="n">clamp_max</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">params</span><span class="p">,</span>
+            <span class="n">InnerOpt</span><span class="p">,</span>
+            <span class="n">defaults</span><span class="o">=</span><span class="n">defaults</span><span class="p">,</span>
+            <span class="n">param_ndim</span><span class="o">=</span><span class="n">param_ndim</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">inner_opt_kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_pre_step_transform_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">:</span> <span class="n">tr</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">optim_group</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># assume param has shape-(N, d1, ..., dm)</span>
+        <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">grad</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="c1"># (N, d1, ..., dm) -&gt; (N, d1 * ... * dm)</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">param</span><span class="o">.</span><span class="n">grad</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">max_norms</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>  <span class="c1"># computes N max values</span>
+        <span class="n">max_norms</span> <span class="o">=</span> <span class="n">max_norms</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">*</span><span class="p">([</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">ndim</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)))</span>  <span class="c1"># make broadcastable</span>
+        <span class="n">param</span><span class="o">.</span><span class="n">grad</span> <span class="o">/=</span> <span class="n">tr</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="n">max_norms</span><span class="p">,</span> <span class="mf">1e-20</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>  <span class="c1"># gradient is modified *in-place*</span>
+
+
+    <span class="k">def</span> <span class="nf">_post_step_transform_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">:</span> <span class="n">tr</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">optim_group</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># note that the clamp is applied *in-place* to the parameter</span>
+        <span class="n">param</span><span class="o">.</span><span class="n">clamp_</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="n">optim_group</span><span class="p">[</span><span class="s2">&quot;clamp_min&quot;</span><span class="p">],</span> <span class="nb">max</span><span class="o">=</span><span class="n">optim_group</span><span class="p">[</span><span class="s2">&quot;clamp_max&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="using-the-optimizer">
+<h2>Using the optimizer<a class="headerlink" href="#using-the-optimizer" title="Permalink to this headline">#</a></h2>
+<p>First, we’ll study the effect of <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim</span></code> on our optimizer’s behavior.
+Let’s create a simple shape-<code class="xref py py-obj docutils literal notranslate"><span class="pre">(2,</span> <span class="pre">2)</span></code> tensor, which will be the sole parameter that our optimizer will update. We will clamp the parameter’s elements to fill within <span class="math notranslate nohighlight">\((-\infty, 18.75]\)</span>.
+The actual gradient-based parameter update will be performed by <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.optim.SGD</span></code> with <code class="xref py py-obj docutils literal notranslate"><span class="pre">lr=1.0</span></code>.</p>
+<p>We’ll perform a single update to our parameter, but with using <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim</span></code> values of 0, 1, and 2 respectively.</p>
+<div class="literal-block-wrapper docutils container" id="id5">
+<div class="code-block-caption"><span class="caption-text">Exercising our optimizer using varying <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim</span></code> values.</span><a class="headerlink" href="#id5" title="Permalink to this code">#</a></div>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">param_ndim</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]:</span>
+<span class="gp">... </span>    <span class="n">x</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">],</span>
+<span class="gp">... </span>                   <span class="p">[</span><span class="mf">20.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">]],</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">... </span>    <span class="n">optim</span> <span class="o">=</span> <span class="n">CustomOptim</span><span class="p">([</span><span class="n">x</span><span class="p">],</span> <span class="n">param_ndim</span><span class="o">=</span><span class="n">param_ndim</span><span class="p">,</span> <span class="n">clamp_min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">clamp_max</span><span class="o">=</span><span class="mf">18.75</span><span class="p">,</span>  <span class="n">lr</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">... </span>    <span class="n">loss</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="n">optim</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>  <span class="c1"># max-norm grad -&gt; update param -&gt; clamp param</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;param_ndim=</span><span class="si">{</span><span class="n">param_ndim</span><span class="si">}</span><span class="se">\n</span><span class="s2">Normed grad:</span><span class="se">\n</span><span class="si">{</span><span class="n">x</span><span class="o">.</span><span class="n">grad</span><span class="si">}</span><span class="se">\n</span><span class="s2">Updated x:</span><span class="se">\n</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="se">\n</span><span class="s2">..&quot;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">optim</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+<span class="go">param_ndim=0</span>
+<span class="go">Normed grad:</span>
+<span class="go">tensor([[1., 1.],</span>
+<span class="go">        [1., 1.]])</span>
+<span class="go">Updated x:</span>
+<span class="go">tensor([[ 0.0000,  1.0000],</span>
+<span class="go">        [18.7500,  9.0000]], requires_grad=True)</span>
+<span class="go">..</span>
+<span class="go">param_ndim=1</span>
+<span class="go">Normed grad:</span>
+<span class="go">tensor([[0.5000, 1.0000],</span>
+<span class="go">        [1.0000, 0.5000]])</span>
+<span class="go">Updated x:</span>
+<span class="go">tensor([[ 0.5000,  1.0000],</span>
+<span class="go">        [18.7500,  9.5000]], requires_grad=True)</span>
+<span class="go">..</span>
+<span class="go">param_ndim=2</span>
+<span class="go">Normed grad:</span>
+<span class="go">tensor([[0.0500, 0.1000],</span>
+<span class="go">        [1.0000, 0.5000]])</span>
+<span class="go">Updated x:</span>
+<span class="go">tensor([[ 0.9500,  1.9000],</span>
+<span class="go">        [18.7500,  9.5000]], requires_grad=True)</span>
+<span class="go">..</span>
+</pre></div>
+</div>
+</div>
+<p>In each of these cases the parameter is then updated via <code class="xref py py-obj docutils literal notranslate"><span class="pre">SGD([x],</span> <span class="pre">lr=1.0).step()</span></code> using the max-normed gradient, and the resulting parameter is clamped to the desired domain.
+See that for <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim=0</span></code>, the max-norm is applied elementwise to the gradient; for <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim=1</span></code> the max-norm is applied independently to each 1D row; lastly, <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim=2</span></code> the max-norm is applied to over the entire 2D parameter.
+Controlling this behavior is important when our parameter represents a single datum (e.g. a “universal perturbation”) vs a batch-style tensor. See <a class="reference internal" href="../generated/rai_toolbox.optim.ParamTransformingOptimizer.html#param-ndim-add"><span class="std std-ref">these docs</span></a> for more details.</p>
+<p>See that we can easily swap out the <code class="xref py py-obj docutils literal notranslate"><span class="pre">SGD</span></code>-based inner optimizer for any other optimizer; let’s using Adam as the inner-optimizer:</p>
+<div class="literal-block-wrapper docutils container" id="id6">
+<div class="code-block-caption"><span class="caption-text">Using <code class="xref py py-obj docutils literal notranslate"><span class="pre">Adam</span></code> as the inner-optimizer</span><a class="headerlink" href="#id6" title="Permalink to this code">#</a></div>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">torch.optim</span> <span class="kn">import</span> <span class="n">Adam</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">optim</span> <span class="o">=</span> <span class="n">CustomOptim</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="n">x</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">InnerOpt</span><span class="o">=</span><span class="n">Adam</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">clamp_min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">clamp_max</span><span class="o">=</span><span class="mf">18.75</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">optim</span>
+<span class="go">CustomOptim [Adam](</span>
+<span class="go">Parameter Group 0</span>
+<span class="go">    amsgrad: False</span>
+<span class="go">    betas: (0.9, 0.999)</span>
+<span class="go">    clamp_max: 18.75</span>
+<span class="go">    clamp_min: None</span>
+<span class="go">    eps: 1e-08</span>
+<span class="go">    grad_bias: 0.0</span>
+<span class="go">    grad_scale: 1.0</span>
+<span class="go">    lr: 0.001</span>
+<span class="go">    maximize: False</span>
+<span class="go">    param_ndim: -1</span>
+<span class="go">    weight_decay: 0</span>
+<span class="go">)</span>
+</pre></div>
+</div>
+</div>
+<p>Great! We’ve designed our own parameter-transforming optimizer, which we could use to solve for novel data perturbations!</p>
+<div class="admonition-references admonition">
+<p class="admonition-title">References</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../ref_optim.html#built-in-optim"><span class="std std-ref">Off-the-shelf optimizers provided by the rAI-toolbox</span></a></p></li>
+<li><p><a class="reference internal" href="../generated/rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer" title="rai_toolbox.optim.ParamTransformingOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParamTransformingOptimizer</span></code></a></p></li>
+</ul>
+</div>
+</section>
+</section>
+
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="../how_tos.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">How-To Guides</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="hydraddp.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Run PyTorch Lightning DDP in Hydra</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2022 Massachusetts Institute of Technology.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
+</html>

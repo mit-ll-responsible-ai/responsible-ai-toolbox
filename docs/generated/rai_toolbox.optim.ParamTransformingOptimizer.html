@@ -397,7 +397,7 @@ performed. This can be specified per param-group.</p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
-<p>Additional Explanation of <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim</span></code>:</p>
+<p id="param-ndim-add"><strong>Additional Explanation of `param_ndim`</strong></p>
 <p>Consider a parameter of shape <code class="xref py py-obj docutils literal notranslate"><span class="pre">(d0,</span> <span class="pre">d1,</span> <span class="pre">d2,</span> <span class="pre">d4)</span></code>.</p>
 <p>If <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim=1</span></code> (or <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim=-3</span></code>), then the parameter and its gradient
 will be temporarily reshaped to a shape-<code class="xref py py-obj docutils literal notranslate"><span class="pre">(d0</span> <span class="pre">*</span> <span class="pre">d1</span> <span class="pre">*</span> <span class="pre">d2,</span> <span class="pre">d3)</span></code> so that the
@@ -418,7 +418,8 @@ applied elementwise to the tensor.</p>
 <p class="rubric">Examples</p>
 <p><strong>Creating a gradient-transforming optimizer</strong></p>
 <p>Let’s create a gradient-transforming optimizer that replaces the gradient
-of each parameter with the elementwise sign of the gradient (<span class="math notranslate nohighlight">\(\pm 1\)</span>) prior to performing the step of the inner optimizer:</p>
+of each parameter with the elementwise sign of the gradient (<span class="math notranslate nohighlight">\(\pm 1\)</span>)
+prior to performing the step of the inner optimizer:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">torch</span> <span class="k">as</span> <span class="nn">tr</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">rai_toolbox.optim</span> <span class="kn">import</span> <span class="n">ParamTransformingOptimizer</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">SignedGradientOptim</span><span class="p">(</span><span class="n">ParamTransformingOptimizer</span><span class="p">):</span>
@@ -482,7 +483,7 @@ out the transformed gradient when we use each of <code class="xref py py-obj doc
 <span class="gp">... </span>    <span class="n">loss</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 <span class="gp">... </span>    <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
 <span class="gp">... </span>    <span class="n">optim</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
-<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;param_ndim: </span><span class="si">{param_ndim}</span><span class="s2">, normed grad:</span><span class="se">\n</span><span class="si">{x.grad}</span><span class="se">\n</span><span class="s2">..&quot;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;param_ndim: </span><span class="si">{</span><span class="n">param_ndim</span><span class="si">}</span><span class="s2">, normed grad:</span><span class="se">\n</span><span class="si">{</span><span class="n">x</span><span class="o">.</span><span class="n">grad</span><span class="si">}</span><span class="se">\n</span><span class="s2">..&quot;</span><span class="p">)</span>
 <span class="gp">... </span>    <span class="n">optim</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
 <span class="go">param_ndim: 0, normed grad:</span>
 <span class="go">tensor([[1., 1.],</span>

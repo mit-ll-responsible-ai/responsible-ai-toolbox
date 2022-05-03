@@ -378,10 +378,8 @@ Here, the perturbations we solve for should modify our data as:
 </pre></div>
 </div>
 <p><strong>Accessing the perturbations</strong></p>
-<dl class="simple">
-<dt>To gain direct access to the solved perturbations, we can provide our own</dt><dd><p>perturbation model to the solver. Let’s solve the same optimization problem, but provide our own instance of <a class="reference internal" href="rai_toolbox.perturbations.AdditivePerturbation.html#rai_toolbox.perturbations.AdditivePerturbation" title="rai_toolbox.perturbations.AdditivePerturbation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AdditivePerturbation</span></code></a></p>
-</dd>
-</dl>
+<p>To gain direct access to the solved perturbations, we can provide our own
+perturbation model to the solver. Let’s solve the same optimization problem, but provide our own instance of <a class="reference internal" href="rai_toolbox.perturbations.AdditivePerturbation.html#rai_toolbox.perturbations.AdditivePerturbation" title="rai_toolbox.perturbations.AdditivePerturbation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AdditivePerturbation</span></code></a></p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">rai_toolbox.perturbations</span> <span class="kn">import</span> <span class="n">AdditivePerturbation</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pert_model</span> <span class="o">=</span> <span class="n">AdditivePerturbation</span><span class="p">(</span><span class="n">data_or_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">perturbed_data</span><span class="p">,</span> <span class="n">losses</span> <span class="o">=</span> <span class="n">gradient_ascent</span><span class="p">(</span>

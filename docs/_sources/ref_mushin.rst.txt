@@ -9,7 +9,10 @@ Mushin
 
 .. important:: The features provided by `rai_toolbox.mushin` are in early-beta phase and are subject to compatibility-breaking changes in the future.
 
-.. note:: `rai_toolbox.mushin` requires additional installation dependencies. These can be installed via `pip install rai-toolbox[mushin]`
+.. note:: `rai_toolbox.mushin` requires additional installation dependencies. These can be installed via
+   .. console:: 
+      
+      $ pip install rai-toolbox[mushin]
 
 `Mushin <https://en.wikipedia.org/wiki/Mushin_(mental_state)>`_ means, roughly, 
 *"no-mind"*;
