@@ -7,11 +7,13 @@
 Augmentations
 #############
 
-
+Methods and utilities for generating diverse data.
 
 *****************************************
 Fourier-Basis Augmentations and Utilities
 *****************************************
+Utilities derived from `Fourier-Based Augmentations for Improved Robustness and Uncertainty Calibration <https://arxiv.org/abs/2202.12412>`_.
+
 .. currentmodule:: rai_toolbox.augmentations.fourier
 
 .. autosummary::
@@ -25,6 +27,9 @@ Fourier-Basis Augmentations and Utilities
 **********************************
 Augmix Augmentations and Utilities
 **********************************
+
+Utilities derived from `AugMix: A Simple Data Processing Method to Improve Robustness and Uncertainty <https://arxiv.org/abs/1912.02781>`_.
+
 .. currentmodule:: rai_toolbox.augmentations.augmix
 
 .. autosummary::

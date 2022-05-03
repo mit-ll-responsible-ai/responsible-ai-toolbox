@@ -16,6 +16,7 @@ from torch import Tensor
 from torch.optim import SGD, Adam
 from torch.testing import assert_allclose
 
+from rai_toolbox import to_batch
 from rai_toolbox._typing import Partial
 from rai_toolbox.optim import (
     ClampedGradientOptimizer,
@@ -34,7 +35,6 @@ from rai_toolbox.optim import (
     TopQGradientOptimizer,
 )
 from rai_toolbox.optim.lp_space import _LpNormOptimizer
-from rai_toolbox.optim.optimizer import _to_batch
 
 simple_arrays = hnp.arrays(
     shape=hnp.array_shapes(min_dims=2, max_dims=4),
@@ -533,14 +533,14 @@ def test_l2_normed_grad_for_arbitrary_param_ndim(param, data: st.DataObject):
 )
 def test_to_batch_examples(param_ndim, expected_shape):
     p = tr.zeros((3, 5, 2))
-    out = _to_batch(p, param_ndim)
+    out = to_batch(p, param_ndim)
     assert out.shape == expected_shape
 
 
 @given(shape=hnp.array_shapes(min_dims=0, min_side=0, max_dims=10, max_side=5))
 def test_param_ndim_0(shape):
     p = tr.zeros(shape)
-    out = _to_batch(p, param_ndim=0)
+    out = to_batch(p, param_ndim=0)
     assert out.shape == (tr.numel(p), 1)
 
 
@@ -611,8 +611,8 @@ def test_l1q_with_dq_draws_from_user_provided_rng(seed: Optional[int]):
     ],
 )
 @given(
-    scales=st.tuples(*[st.floats(0.1, 3.0)] * 3),
-    biases=st.tuples(*[st.floats(-10, 10.0)] * 3),
+    scales=st.lists(st.floats(0.1, 3.0), min_size=3, max_size=3, unique=True),
+    biases=st.lists(st.floats(-10, 10.0), min_size=3, max_size=3, unique=True),
     via_defaults=st.booleans(),
     x=hnp.arrays(
         dtype=float,
@@ -671,3 +671,14 @@ def test_grad_scale_and_bias(
 
     if b1 != b3 or s1 != s3:
         assert tr.any(x1 != x3), (x1, x3)
+
+
+def test_l1q_regression():
+
+    g = tr.tensor([-1.0, -2.0, 3.0, 0.5])
+    p = tr.ones_like(g, requires_grad=True)
+
+    opt = L1qNormedGradientOptim([p], q=0.5, param_ndim=1, lr=1)
+    p.backward(g)
+    opt.step()
+    assert_allclose(actual=p.grad, expected=tr.tensor([0.0, -0.5, 0.5, 0.0]))

@@ -14,6 +14,7 @@ from typing_extensions import TypedDict
 from rai_toolbox._typing import InstantiatesTo
 from rai_toolbox._typing import Optimizer as Opt
 from rai_toolbox._typing import OptimizerType, OptimParams, Partial, instantiates_to
+from rai_toolbox._utils import validate_param_ndim as _validate_param_ndim
 
 _T = TypeVar("_T", bound=Optional[Union[Tensor, float]])
 
@@ -134,10 +135,10 @@ def _to_batch(p: Tensor, param_ndim: Optional[int]) -> Tensor:
 class ParamTransformingOptimizer(Optimizer, metaclass=ABCMeta):
     r"""An optimizer that performs an in-place transformation to the
     each parameter, both before and after performing the gradient-based update on each
-    parameter::
+    parameter via `InnerOptim.step`::
 
        _pre_step_transform_(param)
-       param = step(param, ...)
+       param = InnerOptim.step(param, ...)
        _post_step_transform_(param)
 
     Note that `_pre_step_transform_` and `_post_step_transform_` can be used to update
@@ -412,12 +413,7 @@ class ParamTransformingOptimizer(Optimizer, metaclass=ABCMeta):
 
             for p in group["params"]:
                 p: Tensor
-                if param_ndim is not None and p.ndim < abs(param_ndim):
-                    raise ValueError(
-                        f"`param_ndim={param_ndim}` specified for parameter "
-                        f"with ndim={p.ndim} is not valid. `abs(param_ndim) <= "
-                        f"ndim` must hold."
-                    )
+                _validate_param_ndim(param_ndim=param_ndim, p=p)
 
     def state_dict(self) -> dict:
         return self.inner_opt.state_dict()

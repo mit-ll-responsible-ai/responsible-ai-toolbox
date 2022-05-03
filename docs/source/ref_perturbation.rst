@@ -7,7 +7,13 @@
 Perturbations
 #############
 
-WHAT PERTURBATIONS ARE ALL ABOUT
+The rAI-toolbox provides utilities for applying perturbations to data and solving for optimal perturbations. A perturbation model is a `torch.nn.Module` whose parameters are used by its forward pass to perturb a datum or a batch of data.
+E.g. `~rai_toolbox.perturbations.AdditivePerturbation` applies the perturbation :math:`x \rightarrow x + \delta` via its forward pass, where :math:`\delta` is the sole learnable parameter of this perturbation model.
+
+Thus solving for perturbations is cast as a standard PyTorch optimization problem, where :ref:`optimizers <optim-reference>` are used to make gradient-based updates to the perturbations.
+In this way the rAI-toolbox enables adversarial perturbation work flows to be performed by standard training and testing frameworks (e.g. via `PyTorch-Lightning <https://www.pytorchlightning.ai/>`_).
+We also provide some custom solvers, e.g. `~rai_toolbox.perturbations.gradient_ascent`, to facilitate this line of work.
+
 
 *******
 Solvers
@@ -20,6 +26,7 @@ Solvers
    :toctree: generated/
 
    gradient_ascent
+   random_restart
 
 
 ******

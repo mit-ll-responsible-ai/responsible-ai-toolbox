@@ -43,36 +43,15 @@ Severity = Literal[1, 2, 3, 4, 5]
 
 
 class CIFAR10C(_CIFAR10Base):
-    """CIFAR10C(root: PathLike,
-             corruption: str,
-             severity: Literal[1, 2, 3, 4, 5],
-             transform: Optional[Callable[[Image.Image], Any]] = None,
-             target_transform: Optional[Callable] = None,
-             download: bool = False)
+    """
+    A CIFAR10-test-based dataset for benchmarking neural network robustness to common
+    corruptions [1]_. For each corruption and for each severity (`1-5`), the
+    dataset consists of the 10,000 test images from CIFAR10 with that corruption
+    applied to those images.
 
-    Parameters
+    References
     ----------
-    root: str
-        Root directory of dataset where directory
-            ``CIFAR-10-C`` exists or will be saved to if download is set to True.
-
-    corruption: str
-        The type of corruption, e.g. "fog". See `CIFAR10C.all_corruptions()` for a full
-        list of corruptions.
-
-    severity: Literal[1, 2, 3, 4, 5]
-        The severity-level of the corruption, ranging from 1 to 5.
-
-    transform:  Optional[Callable[[Image], Any]]
-        A function/transform that takes in an PIL image
-        and returns a transformed version. E.g, ``transforms.RandomCrop``
-
-    target_transform: Optional[Callable],
-
-    download: bool, optional (default=False)
-        If true, downloads the dataset from the internet and puts it in root directory.
-        If dataset is already downloaded, it is not downloaded again.
-
+    .. [1] https://zenodo.org/record/2535967#.YnAe_9rMKbg
     """
 
     url = "https://zenodo.org/record/2535967/files/CIFAR-10-C.tar"
@@ -165,6 +144,30 @@ class CIFAR10C(_CIFAR10Base):
         target_transform: Optional[Callable[[int], Any]] = None,
         download: bool = False,
     ) -> None:
+        """
+        CIFAR10C(root: PathLike, corruption: str, severity: Literal[1, 2, 3, 4, 5], transform: Optional[Callable[[Image.Image], Any]] = None, target_transform: Optional[Callable] = None, download: bool = False)
+
+        Parameters
+        ----------
+        root : PathLike
+            Root directory of dataset where directory
+                ``CIFAR-10-C`` exists or will be saved to if download is set to True.
+
+        corruption : str
+            The type of corruption, e.g. "fog". See `CIFAR10C.all_corruptions()` for a full list of corruptions.
+
+        severity : Literal[1, 2, 3, 4, 5]
+            The severity-level of the corruption, ranging from 1 to 5.
+
+        transform :  Optional[Callable[[Image], Any]]
+            A function/transform that takes in an PIL image
+            and returns a transformed version. E.g, ``transforms.RandomCrop``
+
+        target_transform : Optional[Callable]
+
+        download : bool, optional (default=False)
+            If true, downloads the dataset from the internet and puts it in root directory.
+            If dataset is already downloaded, it is not downloaded again."""
 
         super().__init__(
             root=str(root), transform=transform, target_transform=target_transform
@@ -186,7 +189,7 @@ class CIFAR10C(_CIFAR10Base):
         if not isinstance(severity, (int, Integral)) and 1 <= severity <= 5:
             raise ValueError(f"`severity` must be an integer in [1, 5]. Got {severity}")
 
-        severity -= 1
+        severity -= 1  # type: ignore
 
         mmap = np.load(self._root / (corruption + ".npy"), mmap_mode="r")
         size = len(mmap) // 5
@@ -223,36 +226,39 @@ class CIFAR10C(_CIFAR10Base):
 
 
 class CIFAR100C(CIFAR10C):
-    """CIFAR100C(root: PathLike,
-              corruption: str,
-              severity: Literal[1, 2, 3, 4, 5],
-              transform: Optional[Callable[[Image.Image], Any]] = None,
-              target_transform: Optional[Callable] = None,
-              download: bool = False)
+    """CIFAR100C(root: PathLike, corruption: str, severity: Literal[1, 2, 3, 4, 5], transform: Optional[Callable[[Image.Image], Any]] = None, target_transform: Optional[Callable] = None, download: bool = False)
+
+    A CIFAR100-test-based dataset for benchmarking neural network robustness to common
+    corruptions [1]_. For each corruption and for each severity (`1-5`), the
+    dataset consists of the 10,000 test images from CIFAR100 with that corruption
+    applied to those images.
 
     Parameters
     ----------
-    root: str
+    root : PathLike
         Root directory of dataset where directory
             ``CIFAR-100-C`` exists or will be saved to if download is set to True.
 
-    corruption: str
+    corruption : str
         The type of corruption, e.g. "fog". See `CIFAR100C.all_corruptions()` for a full
         list of corruptions.
 
-    severity: Literal[1, 2, 3, 4, 5]
+    severity : Literal[1, 2, 3, 4, 5]
         The severity-level of the corruption, ranging from 1 to 5.
 
-    transform:  Optional[Callable[[Image], Any]]
+    transform :  Optional[Callable[[Image], Any]]
         A function/transform that takes in an PIL image
         and returns a transformed version. E.g, ``transforms.RandomCrop``
 
-    target_transform: Optional[Callable],
+    target_transform : Optional[Callable]
 
     download: bool, optional (default=False)
         If true, downloads the dataset from the internet and puts it in root directory.
         If dataset is already downloaded, it is not downloaded again.
 
+    References
+    ----------
+    .. [1] https://zenodo.org/record/2535967#.YnAe_9rMKbg
     """
 
     url = "https://zenodo.org/record/3555552/files/CIFAR-100-C.tar"

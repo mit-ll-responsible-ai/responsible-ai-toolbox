@@ -18,6 +18,7 @@ from rai_toolbox._typing import (
     Partial,
     instantiates_to,
 )
+from rai_toolbox._utils import value_check
 from rai_toolbox._utils.stateful import evaluating, frozen
 from rai_toolbox.perturbations import AdditivePerturbation, PerturbationModel
 
@@ -84,6 +85,13 @@ def gradient_ascent(
         If `perturbation_model` is a type, then it will be instantiated as
         `perturbation_model(data)`.
 
+    criterion : Optional[Callable[[Tensor, Tensor], Tensor]]
+        The criterion to use for calculating the loss **per-datum**.  I.e. for a
+        shape-(N, ...) batch of data, `criterion` should return a shape-(N,) tensor of
+        loss values – one for each datum in the batch.
+
+        If `None` then `CrossEntropyLoss(reduction=None)` is used.
+
     targeted : bool (default: False)
         If `True`, then perturb towards the defined `target` otherwise move away from
         `target`.
@@ -93,12 +101,9 @@ def gradient_ascent(
         Note: Requires criterion to output a loss per sample, e.g., set
         `reduction="none"`
 
-    criterion : Optional[Callable[[Tensor, Tensor], Tensor]]
-        The criterion to use for calculating the loss.  If `None` then
-        `CrossEntropyLoss` is used.
-
-    reduction_fn : Callable[[Tensor], Tensor], optional (default=tr.sum)
-        Used to reduce the shape-(N,) per-datum loss to a scalar.
+    reduction_fn : Callable[[Tensor], Tensor], optional (default=torch.sum)
+        Used to reduce the shape-(N,) per-datum loss to a scalar. This should be
+        set to `torch.mean` when solving for a "universal" perturbation.
 
     **optim_kwargs : Any
        Keyword arguments passed to `optimizer` when it is instatiated.
@@ -112,15 +117,21 @@ def gradient_ascent(
         The loss for each perturbed data point, if `use_best==True` then this is the
         best loss across all steps.
 
+    Notes
+    -----
+    `model` is automatically set to eval-mode and its parameters are set to `requires_grad=False` within the context of this function.
+
     Examples
     --------
-    Let's perturb two data points, x=-1.0 and x=2.0, to maximize `L(x) = |x|`. We will
-    use five standard gradient steps, using a learning rate of 0.1. The default
-    perturbation model is simply additive: `x -> x + δ`.
+    Let's perturb two data points, `x1=-1.0` and `x2=2.0`, to maximize
+    `L(δ; x) = |x + δ|` w.r.t `δ`. We will use five standard gradient steps, using a
+    learning  rate of 0.1. The default perturbation model is simply additive:
+    `x -> x + δ`.
 
-    This solver is refining `δ`, whose initial value is 0 by default, to maximize
-    `L(x) = |x|`. Thus we should find that our solved perturbations modify our data as:
-    `-1.0 -> -1.5` and `2.0 -> 2.5`, respectively.
+    This solver is refining `δ1` and `δ2`, whose initial values are 0 by default, to
+    maximize `L(x) = |x|` for `x1` and `x2`, respectively. Thus we should find that our
+    solved perturbations modify our data as: `x-1.0 -> -1.5` and `2.0 -> 2.5`,
+    respectively.
 
     >>> from rai_toolbox.perturbations import gradient_ascent
     >>> from torch.optim import SGD
@@ -156,6 +167,32 @@ def gradient_ascent(
     ... )
     >>> perturbed_data
     tensor([-0.5000,  1.5000])
+
+    **Accessing the perturbations**
+
+    To gain direct access to the solved perturbations, we can provide our own
+        perturbation model to the solver. Let's solve the same optimization problem, but provide our own instance of `AdditivePerturbation`
+
+    >>> from rai_toolbox.perturbations import AdditivePerturbation
+    >>> pert_model = AdditivePerturbation(data_or_shape=(2,))
+    >>> perturbed_data, losses = gradient_ascent(
+    ...    perturbation_model=pert_model,
+    ...    data=[-1.0, 2.0],
+    ...    target=0.0,
+    ...    model=identity_model,
+    ...    criterion=abs_diff,
+    ...    optimizer=SGD,
+    ...    lr=0.1,
+    ...    steps=5,
+    ... )
+    >>> perturbed_data
+    tensor([-1.5000,  2.5000])
+
+    Now we can access the values that were solved for `δ1` and `δ2`.
+
+    >>> pert_model.delta
+    Parameter containing:
+    tensor([-0.5000,  0.5000], requires_grad=True)
     """
     data = tr.as_tensor(data)
     target = tr.as_tensor(target)
@@ -237,23 +274,27 @@ def gradient_ascent(
             losses = criterion(logits, target)
 
             if use_best:
-                losses, xadv = _replace_best(losses, best_loss, xadv, best_x)
+                # we negate the loss when `targeted=True` so min-loss is always best
+                losses, xadv = _replace_best(losses, best_loss, xadv, best_x, min=True)
 
     if not targeted:
+        # The returned loss is always relative to the original criterion.
+        # E.g. an adversarial perturbation with a "low" negated loss will yield
+        # a high loss.
         losses = -1 * losses
     return xadv.detach(), losses.detach()
 
 
 def random_restart(
-    perturber: Callable[..., Tuple[Tensor, Tensor]],
+    solver: Callable[..., Tuple[Tensor, Tensor]],
     repeats: int,
 ) -> Callable[..., Tuple[Tensor, Tensor]]:
-    """Executes a perturbation function multiple times saving out the best perturbation.
+    """Executes a solver function multiple times saving out the best perturbations.
 
     Parameters
     ----------
-    perturber : Callable[..., Tuple[Tensor, Tensor]]
-        The perturbation function, e.g., projected_gradient_perturbation.
+    solver : Callable[..., Tuple[Tensor, Tensor]]
+        The solver whose execution will be repeated.
 
     repeats : int
         The number of times to run perturber
@@ -263,36 +304,82 @@ def random_restart(
     random_restart_fn : Callable[..., Tuple[Tensor, Tensor]]
         Wrapped function that will execute `perturber` `repeats` times.
 
-    """
-    if repeats < 1:
-        raise ValueError(f"expected times >= 1, got {repeats}")
+    Examples
+    --------
+    Let's perturb two data points, `x1=-1.0` and `x2=2.0`, to maximize
+    `L(δ; x) = |x + δ|` w.r.t `δ`. Our perturbation will randomly initialize `δ1` and `δ2` and we will re-run the solver three times – retaining the best perturbation of `x1` and `x2` respectively
 
-    @functools.wraps(perturber)
+    >>> from functools import partial
+    >>> import torch as tr
+    >>> from torch.optim import SGD
+    >>> from rai_toolbox.perturbations.init import uniform_like_l1_n_ball_
+    >>> from rai_toolbox.perturbations import AdditivePerturbation, gradient_ascent, random_restart
+    >>>
+    >>> def verbose_abs_diff(model_out, target):
+    ...     # used to print out loss at each solver step (for purpose of example)
+    ...     out =  (model_out - target).abs()
+    ...     print(out)
+    ...     return out
+
+    Configuring a peturbation model to randomly initialize the perturbations.
+
+    >>> RNG = tr.Generator().manual_seed(0)
+    >>> PertModel = partial(AdditivePerturbation, init_fn=uniform_like_l1_n_ball_, generator=RNG)
+
+    Creating and running repeating solver.
+
+    >>> gradient_ascent_with_restart = random_restart(gradient_ascent, 3)
+
+    >>> perturbed_data, losses = gradient_ascent_with_restart(
+    ...    perturbation_model=PertModel,
+    ...    data=[-1.0, 2.0],
+    ...    target=0.0,
+    ...    model=lambda data: data,
+    ...    criterion=verbose_abs_diff,
+    ...    optimizer=SGD,
+    ...    lr=0.1,
+    ...    steps=1,
+    ... )
+    tensor([0.5037, 2.7682], grad_fn=<AbsBackward0>)
+    tensor([0.6037, 2.8682])
+    tensor([0.9115, 2.1320], grad_fn=<AbsBackward0>)
+    tensor([1.0115, 2.2320])
+    tensor([0.6926, 2.6341], grad_fn=<AbsBackward0>)
+    tensor([0.7926, 2.7341])
+
+    See that for `x1` the highest loss is `1.0115`, and for `x2` it is `2.8682`. This
+    should be reflected `losses` and `perturbed_data` that were retained across the
+    restarts.
+
+    >>> losses
+    tensor([1.0115, 2.8682])
+    >>> perturbed_data
+    tensor([-1.0115,  2.8682])
+    """
+    value_check("repeats", repeats, min_=1, incl_min=True)
+
+    @functools.wraps(solver)
     def random_restart_fn(*args, **kwargs) -> Tuple[Tensor, Tensor]:
         targeted = kwargs.get("targeted", False)
-        use_best = kwargs.get("use_best", False)
+
         best_x = None
         best_loss = None
 
         for _ in range(repeats):
             # run the attack
-            xadv, losses = perturber(*args, **kwargs)
+            xadv, losses = solver(*args, **kwargs)
 
             # Save best loss for each data point
-            if use_best:
-                best_loss, best_x = _replace_best(
-                    loss=losses,
-                    best_loss=best_loss,
-                    data=xadv,
-                    best_data=best_x,
-                    min=targeted,
-                )
-            else:
-                best_loss = losses
-                best_x = xadv
+            best_loss, best_x = _replace_best(
+                loss=losses,
+                best_loss=best_loss,
+                data=xadv,
+                best_data=best_x,
+                min=targeted,
+            )
 
-        assert isinstance(best_x, Tensor)
-        assert isinstance(best_loss, Tensor)
+        assert best_x is not None
+        assert best_loss is not None
         return best_x, best_loss
 
     return random_restart_fn

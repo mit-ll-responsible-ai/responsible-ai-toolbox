@@ -2,22 +2,37 @@
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 
+import hypothesis.extra.numpy as hnp
+import hypothesis.strategies as st
 import pytest
 import torch as tr
+from hypothesis import given, settings
 
+from rai_toolbox import to_batch
 from rai_toolbox.perturbations.init import (
     uniform_like_l1_n_ball_,
     uniform_like_l2_n_ball_,
+    uniform_like_linf_n_ball_,
 )
 
 
-@pytest.mark.parametrize("dshape", [(1,), (2,), (5,), (2, 3), (5, 2, 3)])
-def test_uniform_like_l2_n_ball(dshape):
+@pytest.mark.parametrize(
+    "dshape, param_ndim",
+    [
+        [(500, 1), -1],
+        [(500,), 0],
+        [(500, 2), -1],
+        [(500, 5), -1],
+        [(500, 2, 3), -1],
+        [(500, 5, 2, 3), -1],
+    ],
+)
+def test_uniform_like_l2_n_ball(dshape, param_ndim):
     # Test adapted from: https://github.com/nengo/nengo/blob/master/nengo/tests/test_dists.py
-    samples = tr.zeros(500, *dshape)
-    uniform_like_l2_n_ball_(samples)
+    samples = tr.zeros(dshape)
+    uniform_like_l2_n_ball_(samples, param_ndim=param_ndim)
 
-    samples = samples.flatten(1)
+    samples = to_batch(samples, param_ndim).flatten(1)
     n, d = samples.shape
     assert tr.allclose(samples.mean(dim=0), tr.tensor(0.0), atol=0.1)
 
@@ -60,3 +75,38 @@ def test_uniform_like_l1_n_ball(dshape):
     # assert norms.min() <= r_tol_min
     # r_tol_max = (1 - (1 - r_min_d) * (1 - q ** (1 / n))) ** (1 / d)
     # assert norms.max() >= r_tol_max
+
+
+@given(
+    x=hnp.array_shapes(min_dims=0, max_dims=5).map(tr.zeros),
+    epsilon=st.floats(1e-6, 1e6),
+)
+def test_uniform_like_linf_n_ball(x: tr.Tensor, epsilon: float):
+    uniform_like_linf_n_ball_(x, epsilon=epsilon)
+    assert tr.all(x.abs() < epsilon)
+
+
+@pytest.mark.parametrize(
+    "init_",
+    [uniform_like_l1_n_ball_, uniform_like_l2_n_ball_, uniform_like_linf_n_ball_],
+)
+@settings(max_examples=10)
+@given(st.none() | st.integers(10_000, 20_000))
+def test_init_draws_from_user_provided_rng(init_, seed: int):
+    # Providing a seeded generator should always produce the same results
+    saved = []
+    base_gen = tr.Generator().manual_seed(0)
+
+    for _ in range(10):
+        gen = tr.Generator().manual_seed(seed) if seed else base_gen
+        x = tr.zeros((100,))
+        init_(x, generator=gen)
+        saved.append(x)
+
+    first = saved[0]
+
+    for other in saved[1:]:
+        if seed is None:
+            assert not tr.all(first == other)
+        else:
+            assert tr.all(first == other)
