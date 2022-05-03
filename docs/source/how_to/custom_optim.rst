@@ -1,203 +1,240 @@
 .. meta::
-   :description: A description of how-to run PyTorch Lightning's DDP strategy with Hydra using rai-toolbox.
+   :description: A guide for using the rAI-toolbox to create a parameter-transforming PyTorch Optimizer
 
-.. admonition:: TL;DR
-   
-   Create a minimal PyTorch Lightning configuration with ``trainer`` and ``module`` 
-   fields, e.g.,
+.. _how-to-optim:
 
-   .. code-block:: python
+=========================================
+Create a Parameter-Transforming Optimizer
+=========================================
 
-      from pytorch_lightning import Trainer
-      from hydra_zen import builds, make_config
-      from rai_toolbox.mushin import HydraDDP
-      
-      MyLightningModule = # load/create your lightning module
+Popular techniques for creating adversarial or targeted perturbations often entail solving for the perturbations using gradients that have been normalized in a particular manner, as well as ensuring that the resulting perturbations are constrained within a particular domain. In the rAI-toolbox, PyTorch optimizers are used to solve for perturbations in this way.
 
-      Config = make_config(
-          module=builds(MyLightningModule)
-          trainer=builds(Trainer, gpus=2, strategy=builds(HydraDDP)),
-      )
+In this How-To, we will use the `~rai_toolbox.optim.ParamTransformingOptimizer` to design an optimizer, which is well-suited for refining perturbations, that has the following properties:
 
-   Define a task function: 
-   
-   .. code-block:: python
+1. It encapsulates another optimizer, which is responsible for performing the gradient-based updates to the optimized parameters.
+2. Prior to updating the parameter, it normalizes each parameter's gradient by their max-value, .
+3. After each parameter is updated, its elements are to clamped fall within some configurable domain bounds: `[clamp_min, clamp_max]`
 
-      from hydra_zen import instantiate
+We will then see how we can control how this optimizer applies (or "broadcasts") these parameter transformations via the optimizer's `param_ndim` value.
 
-      def task_fn(cfg):
-          obj = instantiate(cfg)
-          obj.trainer.fit(obj.module))
+Designing the optimizer
+=======================
+By inheriting from `~rai_toolbox.optim.ParamTransformingOptimizer` our main task is to implement two methods: `~rai_toolbox.optim.ParamTransformingOptimizer._pre_step_transform_` and `~rai_toolbox.optim.ParamTransformingOptimizer._post_step_transform_`.
 
-   Simply launch a PyTorch Lightning job, e.g., ``launch(Config, task_fn)``,
-   or `create a command line interface <https://mit-ll-responsible-ai.github.io/hydra-zen/tutorials/add_cli.html>`_ to run your job.
-
-.. tip::
-
-    Using :func:`~rai_toolbox.mushin.HydraDDP`, PyTorch Lightning's ddp-mode `Trainer <https://pytorch-lightning.readthedocs.io/en/latest/api_references.html#trainer/>`_
-    becomes compatible with interactive environments such as Jupyter Notebooks!
-
-.. _hydraddp:
-
-===================================
-Run PyTorch Lightning DDP in Hydra
-===================================
-
-Using Hydra to run `PyTorch Lightning's Distributed Data Parallel (DDP) Strategy <https://pytorch-lightning.readthedocs.io/en/latest/accelerators/gpu_expert.html#what-is-a-strategy/>`_ 
-often `has issues <https://github.com/PyTorchLightning/pytorch-lightning/issues/11300>`_
-, in part because the strategy launches subprocesses where the command is derived from 
-values in `sys.argv`.
-
-The rai-toolbox comes with a custom strategy, :func:`~rai_toolbox.mushin.HydraDDP`, 
-that addresses the challenge of running Hydra and Lightning together using DDP.
-
-In this How-To we will
-
-1. Define the requirements for a Hydra configuration.
-2. Build a `hydra-zen <https://github.com/mit-ll-responsible-ai/hydra-zen/>`_ configuration to execute a PyTorch Lightning multi-GPU training task.
-3. Launch the training task.
-4. Examine the logged files in the Hydra working directory.
-
-First, in order to use :func:`~rai_toolbox.mushin.HydraDDP`, the Hydra configuration 
-must contain the following two sub-configurations:
-
-.. code-block:: reStructuredText
-   :caption: 1: Define requirements for Hydra configuration
-   
-   Config
-    ├── trainer: A ``pytorch_lightning.Trainer`` configuration
-    ├── module: A ``pytorch_lightning.LightningModule`` configuration
-
-
-This configuration requirement enables :func:`~rai_toolbox.mushin.HydraDDP` to use a 
-toolbox-provided task function (``rai_toolbox.mushin.lightning._pl_main.py``) that is 
-launched for each subprocess:
+The `~rai_toolbox.optim.ParamTransformingOptimizer.__init__` method for our optimizer will accept `clamp_min` and `clamp_max` as configurable options;
+these bounds need to be added to the `defaults` that are passed to the to the base class so that all of the optimizer's parameter groups have access to them.
+Additionally, `InnerOpt`, which is the optimizer whose `.step()` method actually performs the gradient-based updates to the parameters, will have `torch.optim.SGD` as its default; `**inner_opt_kwargs` will ultimately be passed to `InnerOpt(...)`.
+Lastly, `param_ndim` is an important parameter, which will control how our max-normalization is applied to each gradient.
 
 .. code-block:: python
-   :caption: The task function automatically run by each HydraDDP subprocess
+   :caption: Defining the interface to our optimizer.
 
-   def task(trainer: Trainer, module: LightningModule, pl_testing: bool, pl_local_rank: int) -> None:
-       if pl_testing:
-           log.info(f"Rank {pl_local_rank}: Launched subprocess using Training.test")
-           trainer.test(module)
-       else:
-           log.info(f"Rank {pl_local_rank}: Launched subprocess using Training.fit")
-           trainer.fit(module)
+   from typing import Optional
 
-Note that the configuration flags for ``pl_testing`` and ``pl_local_rank`` are 
-automatically set by :func:`~rai_toolbox.mushin.HydraDDP` before execution.
+   from rai_toolbox.optim import ParamTransformingOptimizer
 
-Next let's create an example configuration and task function using `hydra-zen <https://github.com/mit-ll-responsible-ai/hydra-zen/>`_:
+   import torch as tr
+   from torch.optim import SGD
 
-.. code-block:: python
-   :caption: 2: Creating hydra-zen configuration and task function for leveraging HydraDDP
-   
-   import pytorch_lightning as pl
+   class CustomOptim(ParamTransformingOptimizer):
+       def __init__(
+           self,
+           params,
+           InnerOpt = SGD,
+           *,
+           clamp_min: Optional[float] = None,
+           clamp_max: Optional[float] = None,
+           defaults: Optional[dict] = None,
+           param_ndim: Optional[int] = -1,
+           **inner_opt_kwargs,
+       ) -> None:
+           if defaults is None:
+               defaults = {}
+           
+           defaults.setdefault("clamp_min", clamp_min)
+           defaults.setdefault("clamp_max", clamp_max)
 
-   from hydra_zen import builds, make_config, instantiate, launch
-   from rai_toolbox.mushin import HydraDDP
-   from rai_toolbox.mushin.testing.lightning import SimpleLightningModule
+           super().__init__(
+               params,
+               InnerOpt,
+               defaults=defaults,
+               param_ndim=param_ndim,
+               **inner_opt_kwargs,
+           )
 
-   TrainerConfig = builds(
-       pl.Trainer,
-       strategy=builds(HydraDDP),
-       populate_full_signature=True,
-   )
+Prior to updating its parameters during the "step" process, our optimizer will normalize each parameter's gradient by the gradient's max-value; this will be performed by `~rai_toolbox.optim.ParamTransformingOptimizer._pre_step_transform_`.
+Note that we will design this method with the assumption that each parameter has a shape `(N, d1, ..., dm)`, where `N` is a batch dimension and where we want to compute `N` max values — over each of the shape-`(d1, ..., dm)` subtensors.
+By adhering to this standard, `~rai_toolbox.optim.ParamTransformingOptimizer` will be able to subsequently control how `~rai_toolbox.optim.ParamTransformingOptimizer._pre_step_transform_` is applied to each parameter via `param_ndim`; this is an inherited capability that we are leveraging.
 
-   ModuleConfig = builds(SimpleLightningModule, populate_full_signature=True)
-
-   Config = make_config(
-       trainer=TrainerConfig,
-       module=ModuleConfig
-   )
-
-   def task_function(cfg):
-       obj = instantiate(cfg)
-       obj.trainer.fit(obj.module)
-
-Next, we launch the training job. For the purpose of this How-To, we will run only for 
-a single epoch and in "fast dev run" mode.  
 
 .. code-block:: python
-   :caption: 3: Execute a Hydra-compatible ddp job using two gpus
+   :caption: Defining `_pre_step_transform_` to max-norm a parameter's gradient
 
-   >>> job = launch(Config, task_function, 
-   ...              overrides=["trainer.gpus=2", 
-   ...                         "trainer.max_epochs=1",
-   ...                         "trainer.fast_dev_run=True",
-   ...                        ]
-   ...              )
-   GPU available: True, used: True
+   def _pre_step_transform_(self, param: tr.Tensor, optim_group: dict) -> None:
+       # assume param has shape-(N, d1, ..., dm)
+       if param.grad is None:
+           return   
+       
+       # (N, d1, ..., dm) -> (N, d1 * ... * dm)
+       g = param.grad.flatten(1) 
+       max_norms = tr.max(g, dim=1).values  # computes N max values
+       max_norms = max_norms.view(-1, *([1] * (param.ndim - 1)))  # make broadcastable
+       param.grad /= tr.clamp(max_norms, 1e-20, None)  # gradient is modified *in-place*
+
+Once a parameter has been updated, we want to ensure that its elements are clamped to fall within user-specified bounds via `~rai_toolbox.optim.ParamTransformingOptimizer._post_step_transform_`. These bounds are provided via the `optim_group` dictionary that is passed to the method.
+
+
+.. code-block:: python
+   :caption: Defining `_post_step_transform_` to constrain the updated parameter
+
+   def _post_step_transform_(self, param: tr.Tensor, optim_group: dict) -> None:
+       # note that the clamp is applied *in-place* to the parameter
+       param.clamp_(min=optim_group["clamp_min"], max=optim_group["clamp_max"])
+
+An advantage of accessing the clamp-bounds via `optim_group` rather than via instance-attributes is that they can then be configured on a per parameter group basis.
+Note that we do not need to worry about doing any parameter reshaping for this method, since clamp occurs elementwise, and not over particular axes/dimensions of the tensor.
+
+
+Putting it all together, our custom optimizer is given by
+
+.. code-block:: python
+   :caption: The full definition of `CustomOptim`
+
+   from typing import Optional
+
+   from rai_toolbox.optim import ParamTransformingOptimizer
+
+   import torch as tr
+   from torch.optim import SGD
+
+   class CustomOptim(ParamTransformingOptimizer):
+       def __init__(
+           self,
+           params,
+           InnerOpt = SGD,
+           *,
+           clamp_min: Optional[float] = None,
+           clamp_max: Optional[float] = None,
+           defaults: Optional[dict] = None,
+           param_ndim: Optional[int] = -1,
+           **inner_opt_kwargs,
+       ) -> None:
+           if defaults is None:
+               defaults = {}
+           
+           defaults.setdefault("clamp_min", clamp_min)
+           defaults.setdefault("clamp_max", clamp_max)
+
+           super().__init__(
+               params,
+               InnerOpt,
+               defaults=defaults,
+               param_ndim=param_ndim,
+               **inner_opt_kwargs,
+           )
+
+       def _pre_step_transform_(self, param: tr.Tensor, optim_group: dict) -> None:
+           # assume param has shape-(N, d1, ..., dm)
+           if param.grad is None:
+               return   
+           
+           # (N, d1, ..., dm) -> (N, d1 * ... * dm)
+           g = param.grad.flatten(1) 
+           max_norms = tr.max(g, dim=1).values  # computes N max values
+           max_norms = max_norms.view(-1, *([1] * (param.ndim - 1)))  # make broadcastable
+           param.grad /= tr.clamp(max_norms, 1e-20, None)  # gradient is modified *in-place*
+
+
+       def _post_step_transform_(self, param: tr.Tensor, optim_group: dict) -> None:
+           # note that the clamp is applied *in-place* to the parameter
+           param.clamp_(min=optim_group["clamp_min"], max=optim_group["clamp_max"])
+
+
+Using the optimizer
+===================
+
+First, we'll study the effect of `param_ndim` on our optimizer's behavior.
+Let's create a simple shape-`(2, 2)` tensor, which will be the sole parameter that our optimizer will update. We will clamp the parameter's elements to :math:`(-\infty, 18.75]` (picked arbitrarily for this How-To).
+The actual gradient-based parameter update will be performed by `torch.optim.SGD` with `lr=1.0`.
+
+We'll perform a single update to our parameter, but with using `param_ndim` values of 0, 1, and 2.
+
+.. code-block:: pycon
+   :caption: Exercising our optimizer using varying `param_ndim` values.
+
+   >>> for param_ndim in [0, 1, 2]:
+   ...     x = tr.tensor([[1.0, 2.0],
+   ...                    [20.0, 10.0]], requires_grad=True)
    ...
-
-Lastly, the Hydra working directory will contain these two items
-
-- The Hydra directory, ``.hydra``, storing the YAML configuration files
-- The file, ``zen_launch.log``, storing any logging outputs from the run
-
-The log file should contain the following information:
-
-.. code-block:: text
-   :caption: 4: Output of zen_launch.log
-
-   [2022-04-21 20:35:40,794][__main__][INFO] - Rank 1: Launched subprocess using Training.fit
-   [2022-04-21 20:35:42,800][torch.distributed.distributed_c10d][INFO] - Added key: store_based_barrier_key:1 to store for rank: 1
-   [2022-04-21 20:35:42,801][torch.distributed.distributed_c10d][INFO] - Added key: store_based_barrier_key:1 to store for rank: 0
-   [2022-04-21 20:35:42,802][torch.distributed.distributed_c10d][INFO] - Rank 0: Completed store-based barrier for key:store_based_barrier_key:1 with 2 nodes.
-   [2022-04-21 20:35:42,810][torch.distributed.distributed_c10d][INFO] - Rank 1: Completed store-based barrier for key:store_based_barrier_key:1 with 2 nodes.
-
-Here you can see that the first line in the logged output indicates that the subprocess was launched for the second (Rank 1) GPU as expected.
-
-
-
-Bonus: Adding Some Bells & Whistles to Our Hydra Application
-============================================================
-
-There are a couple of enhancements that we can add to our Hydra-based application, 
-which are beyond the scope of this How-To; it is simple to `add a command line interface to our code <https://mit-ll-responsible-ai.github.io/hydra-zen/tutorials/add_cli.html>`_ and to make the :func:`~rai_toolbox.mushin.HydraDDP` strategy available 
-as `a swappable configuration group <https://mit-ll-responsible-ai.github.io/hydra-zen/tutorials/config_groups.html>`_. We refer the reader to the linked tutorials for 
-further explanation and instruction.
-
-The code from this How-To has been modified accordingly and placed in the script 
-``pl_trainer.py``: 
-
-.. code-block:: python
-   :caption: Contents of ``pl_trainer.py``
-   
-   import hydra
-   from hydra.core.config_store import ConfigStore
-
-   import pytorch_lightning as pl
-
-   from hydra_zen import builds, make_config, instantiate
-   from rai_toolbox.mushin import HydraDDP
-   from rai_toolbox.mushin.testing.lightning import SimpleLightningModule
-
-   TrainerConfig = builds(pl.Trainer, populate_full_signature=True)
-   ModuleConfig = builds(SimpleLightningModule, populate_full_signature=True)
-
-   Config = make_config(trainer=TrainerConfig, module=ModuleConfig)
-
-   cs = ConfigStore.instance()
-   cs.store(group="trainer/strategy", 
-            name="hydra_ddp", 
-            node=builds(HydraDDP),
-   )
-   cs.store(name="pl_app", node=Config)
-
-
-   @hydra.main(config_path=None, config_name="pl_app")
-   def task_function(cfg):
-       obj = instantiate(cfg)
-       obj.trainer.fit(obj.module)
-   
-   if __name__ == "__main__":
-      task_function()
-
-We can configure and run this code from the command line:
-
-.. code-block:: console
-
-   $ python pl_trainer.py +trainer/strategy=hydra_ddp trainer.gpus=2 trainer.max_epochs=1 trainer.fast_dev_run=True
-   GPU available: True, used: True
+   ...     optim = CustomOptim([x], param_ndim=param_ndim, clamp_min=None, clamp_max=18.75,  lr=1.0)
    ...
+   ...     loss = (x**2).sum()
+   ...     loss.backward()
+   ...     optim.step()  # max-norm grad -> update param -> clamp param
+   ...     print(f"param_ndim={param_ndim}\nNormed grad:\n{x.grad}\nUpdated x:\n{x}\n..")
+   ...     optim.zero_grad()
+   param_ndim=0
+   Normed grad:
+   tensor([[1., 1.],
+           [1., 1.]])
+   Updated x:
+   tensor([[ 0.0000,  1.0000],
+           [18.7500,  9.0000]], requires_grad=True)
+   ..
+   param_ndim=1
+   Normed grad:
+   tensor([[0.5000, 1.0000],
+           [1.0000, 0.5000]])
+   Updated x:
+   tensor([[ 0.5000,  1.0000],
+           [18.7500,  9.5000]], requires_grad=True)
+   ..
+   param_ndim=2
+   Normed grad:
+   tensor([[0.0500, 0.1000],
+           [1.0000, 0.5000]])
+   Updated x:
+   tensor([[ 0.9500,  1.9000],
+           [18.7500,  9.5000]], requires_grad=True)
+   ..
+
+In each of these cases the parameter is then updated via `SGD([x], lr=1.0).step()` using the max-normed gradient, and the resulting parameter is clamped to the desired domain.
+See that for `param_ndim=0`, the max-norm is applied elementwise to the gradient; for `param_ndim=1` the max-norm is applied independently to each 1D row; lastly, `param_ndim=2` the max-norm is applied to over the entire 2D parameter.
+Controlling this behavior is important when our parameter represents a single datum (e.g. a "universal perturbation") vs a batch-style tensor. See :ref:`these docs <param-ndim-add>` for more details.
+
+See that we can easily swap out the `SGD`-based inner optimizer for any other optimizer; let's using Adam as the inner-optimizer:
+
+
+.. code-block:: pycon
+   :caption: Using `Adam` as the inner-optimizer
+   
+   >>> from torch.optim import Adam
+   >>> 
+   >>> optim = CustomOptim(
+   ...     [x],
+   ...     InnerOpt=Adam,
+   ...     clamp_min=None,
+   ...     clamp_max=18.75,
+   ... )
+   >>> optim
+   CustomOptim [Adam](
+   Parameter Group 0
+       amsgrad: False
+       betas: (0.9, 0.999)
+       clamp_max: 18.75
+       clamp_min: None
+       eps: 1e-08
+       grad_bias: 0.0
+       grad_scale: 1.0
+       lr: 0.001
+       maximize: False
+       param_ndim: -1
+       weight_decay: 0
+   )
+
+Great! We've designed our own parameter-transforming optimizer, which we could use to solve for novel data perturbations!
+
+.. admonition:: References
+
+   - :ref:`Off-the-shelf optimizers provided by the rAI-toolbox <built-in-optim>`
+   - `~rai_toolbox.optim.ParamTransformingOptimizer`

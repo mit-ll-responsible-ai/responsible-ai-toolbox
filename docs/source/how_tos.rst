@@ -12,6 +12,7 @@ towards concrete objectives.
 
 .. toctree::
    :maxdepth: 1
-   :caption: Contents:
+   :caption: How to...
 
+   how_to/custom_optim
    how_to/hydraddp
