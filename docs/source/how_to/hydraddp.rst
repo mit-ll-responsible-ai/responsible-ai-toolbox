@@ -51,7 +51,7 @@ values in `sys.argv`.
 The rai-toolbox comes with a custom strategy, :func:`~rai_toolbox.mushin.HydraDDP`, 
 that addresses the challenge of running Hydra and Lightning together using DDP.
 
-In this How-To we will
+In this How-To we will:
 
 1. Define the requirements for a Hydra configuration.
 2. Build a `hydra-zen <https://github.com/mit-ll-responsible-ai/hydra-zen/>`_ configuration to execute a PyTorch Lightning multi-GPU training task.
@@ -130,7 +130,7 @@ a single epoch and in "fast dev run" mode.
    GPU available: True, used: True
    ...
 
-Lastly, the Hydra working directory will contain these two items
+Lastly, the Hydra working directory will contain these two items:
 
 - The Hydra directory, ``.hydra``, storing the YAML configuration files
 - The file, ``zen_launch.log``, storing any logging outputs from the run
