@@ -171,7 +171,7 @@ def gradient_ascent(
     **Accessing the perturbations**
 
     To gain direct access to the solved perturbations, we can provide our own
-        perturbation model to the solver. Let's solve the same optimization problem, but provide our own instance of `AdditivePerturbation`
+    perturbation model to the solver. Let's solve the same optimization problem, but provide our own instance of `AdditivePerturbation`
 
     >>> from rai_toolbox.perturbations import AdditivePerturbation
     >>> pert_model = AdditivePerturbation(data_or_shape=(2,))
