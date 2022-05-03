@@ -6,11 +6,11 @@ Our Approach to Configurable, Reproducible, and Scalable AI
 ===========================================================
 
 One major objective of `rai_toolbox` is to provide a framework that not only enables the evaulation and 
-enhancement of responsible and explanaible AI, but to provide the tools via `rai_toolbox.mushin` and 
+enhancement of responsible and explainable AI, but to provide the tools via `rai_toolbox.mushin` and 
 `hydra-zen <https://github.com/mit-ll-responsible-ai/hydra-zen/>`_ that are:
 
 - **Configurable**: All aspects of an application—including deeply nested components—are configured from a single interface. 
-- **Repeatable**: Each run of the application is self-documenting; the full configuration of the software is logged for each run.
+- **Reproducible**: Each run of the application is self-documenting; the full configuration of the software is logged for each run.
 - **Scalable**: Multiple configurations of the application can be launched—to sweep or search over configuration subspaces—using local or distributed job launcher methods.
 
 Configurable
@@ -34,7 +34,7 @@ Here is an example using `hydra-zen` to build a configuration and show how the c
 
    >>> from hydra_zen import builds, to_yaml
    >>> from torch.optim import Adam
-   >>> OptimConfig = builds(Adam, ...)
+   >>> OptimConfig = builds(Adam, populate_full_signature=True)
    >>> print(to_yaml(OptimConfig))
    _target_: torch.optim.adam.Adam
    params: ???
@@ -50,16 +50,16 @@ To demonstrate the power of "swappable" configurations we will build an example 
 to allow for different configurations for the "optim" configuration.
 
 .. code-block:: python
-   :caption: `experiement.py`: A Hydra application with swappable configurations
+   :caption: `experiment.py`: A Hydra application with swappable configurations
 
    import hydra
    from hydra.core.config_store import ConfigStore
-   from hydra_zen import builds, make_config, MISSING, launch
+   from hydra_zen import builds, instantiate, make_config, MISSING, launch
    from torch.optim import Adam, SGD
    
    # Build multiple configurations for optimizers
    AdamConfig = builds(Adam, lr=0.1, zen_partial=True)
-   SGDConfig = builds(SGD, lr=0.01, zen_partial=True
+   SGDConfig = builds(SGD, lr=0.01, zen_partial=True)
 
    # Create experiment configuration
    Config = make_config(optim=MISSING)
@@ -74,7 +74,7 @@ to allow for different configurations for the "optim" configuration.
    @hydra.main(config_path=None, config_name="experiment_config")
    def task_fn(cfg):
       optim = instantiate(cfg.optim)
-      print(optim.__name__)
+      print(optim.func.__name__)
    
    if __name__ == "__main__":
       task_fn()
@@ -95,7 +95,7 @@ Using Hydra's CLI the application can be executed using different values for the
    workflow for dynamically populating and automatically validating configurations for one's entire software application.
 
 
-Repeatable
+Reproducible
 ==========
 
 Reproducibility is a natural consequence of the configurability: each job launched by Hydra is documented by—and can be fully
@@ -112,9 +112,9 @@ experiment directory::
 One method for repeating the experiment is to use `Hydra's CLI <https://hydra.cc/docs/tutorials/basic/your_first_app/simple_cli/>`_:
 
 .. code-block:: bash
-   :caption: Repeating an experiment using Hydra CLI and saved YAML configuration
+   :caption: Reproducing an experiment using Hydra CLI and saved YAML configuration
 
-   $ python experiment.py --config-path <YAML configuration directory> -config-name config
+   $ python experiment.py --config-path <YAML configuration directory> --config-name config
 
 
 Scalable
@@ -132,8 +132,8 @@ for multiple configurations and parameters, simply run
 
    $ python experiment.py +optim=sgd,adam optim.lr=0.1,0.2 --multirun
 
-Each experiment configuration and data will be logged in indvidual directories and therefore each experiment
-is repeatable without running all the experiments::
+Each experiment configuration and data will be logged in individual directories and therefore each experiment
+is reproducible without running all the experiments::
 
    ├── <multirun directory>
    │    ├── <experiment directory name: 0>
