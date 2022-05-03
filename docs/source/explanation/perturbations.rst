@@ -105,7 +105,7 @@ By adhering to PyTorch APIs, the rAI-toolbox frames the process of solving for a
    from torch.optim import Optimizer
    
    # Implements PyTorch Module API
-   class CustomPerturbationModel(Module):
+   class PerturbationModel(Module):
       def __init__(self, *args, **kwargs):
          super().__init__()
          # initialize parameters of perturbation model
