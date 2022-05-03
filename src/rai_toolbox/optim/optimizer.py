@@ -222,7 +222,9 @@ class ParamTransformingOptimizer(Optimizer, metaclass=ABCMeta):
 
         Notes
         -----
-        Additional Explanation of `param_ndim`:
+        .. _param-ndim-add:
+
+        **Additional Explanation of `param_ndim`**
 
         Consider a parameter of shape `(d0, d1, d2, d4)`.
 
@@ -252,7 +254,8 @@ class ParamTransformingOptimizer(Optimizer, metaclass=ABCMeta):
         **Creating a gradient-transforming optimizer**
 
         Let's create a gradient-transforming optimizer that replaces the gradient
-        of each parameter with the elementwise sign (:math:`\pm 1`) of the gradient prior to performing the step of the inner optimizer:
+        of each parameter with the elementwise sign of the gradient (:math:`\pm 1`)
+        prior to performing the step of the inner optimizer:
 
         >>> import torch as tr
         >>> from rai_toolbox.optim import ParamTransformingOptimizer
@@ -321,7 +324,7 @@ class ParamTransformingOptimizer(Optimizer, metaclass=ABCMeta):
         ...     loss = (x * x).sum()
         ...     loss.backward()
         ...     optim.step()
-        ...     print("param_ndim: {param_ndim}, normed grad:\n{x.grad}\n..")
+        ...     print(f"param_ndim: {param_ndim}, normed grad:\n{x.grad}\n..")
         ...     optim.zero_grad()
         param_ndim: 0, normed grad:
         tensor([[1., 1.],

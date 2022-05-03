@@ -24,6 +24,7 @@ Refer to `~rai_toolbox.optim.ParamTransformingOptimizer` for more details.
 
 All of our reference documentation features detailed Examples sections; scroll to the bottom of any given reference page to see them.
 
+.. _built-in-optim:
 
 ************************************** 
 Base Parameter-Transforming Optimizers
