@@ -222,6 +222,8 @@ class ParamTransformingOptimizer(Optimizer, metaclass=ABCMeta):
 
         Notes
         -----
+        .. _param-ndim-add:
+
         **Additional Explanation of `param_ndim`**
 
         Consider a parameter of shape `(d0, d1, d2, d4)`.
@@ -322,7 +324,7 @@ class ParamTransformingOptimizer(Optimizer, metaclass=ABCMeta):
         ...     loss = (x * x).sum()
         ...     loss.backward()
         ...     optim.step()
-        ...     print("param_ndim: {param_ndim}, normed grad:\n{x.grad}\n..")
+        ...     print(f"param_ndim: {param_ndim}, normed grad:\n{x.grad}\n..")
         ...     optim.zero_grad()
         param_ndim: 0, normed grad:
         tensor([[1., 1.],
