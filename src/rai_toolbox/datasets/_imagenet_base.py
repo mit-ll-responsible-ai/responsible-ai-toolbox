@@ -17,6 +17,28 @@ class ImageNet(folder.DatasetFolder):
         loader: Callable[[str], Any] = folder.default_loader,
         is_valid_file: Optional[Callable[[str], bool]] = None,
     ):
+        """
+        Parameters
+        ----------
+        root : Union[str, Path]
+            Root directory of dataset where
+            ImageNet folders exist.
+
+        transform :  Optional[Callable[[Image], Any]]
+            A function/transform that takes in a PIL image
+            and returns a transformed version. E.g., ``transforms.RandomCrop``
+
+        target_transform : Optional[Callable]
+            A function/transform that takes in a target
+            and returns a transformed version.
+
+        loader : Callable[[str], Any], optional (default=`folder.default_loader`)
+            A function to load a sample given its path.
+
+        is_valid_file : Optional[Callable[[str], bool]], optional (default=None)
+            A function that takes path of a file
+            and checks if the file is a valid file.
+        """
         super().__init__(
             root,
             loader,

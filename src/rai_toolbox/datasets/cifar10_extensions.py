@@ -44,8 +44,8 @@ class CIFAR10P1(_CIFAR10Base):
         Parameters
         ----------
         root : PathLike
-            Root directory of dataset where directory
-            CIFAR-10.1 files exists or will be saved to if download is set to True.
+            Root directory of dataset where
+            CIFAR-10.1 files exist or will be saved to if download is set to True.
 
         transform :  Optional[Callable[[Image], Any]]
             A function/transform that takes in a PIL image
