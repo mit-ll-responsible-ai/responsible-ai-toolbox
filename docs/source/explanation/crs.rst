@@ -5,16 +5,17 @@
 Our Approach to Configurable, Reproducible, and Scalable AI
 ===========================================================
 
-The rai_toolbox provides a framework that not only enables the evaluation and enhancement of robust and explainable AI, but also provides support—via `rai_toolbox.mushin` and `hydra-zen <https://github.com/mit-ll-responsible-ai/hydra-zen/>`_—to ensure that these responsible AI workflows are:
+The rAI-toolbox provides a framework that not only enables the evaluation and enhancement of robust and explainable AI, but also provides ensures—via `rai_toolbox.mushin` and `hydra-zen <https://github.com/mit-ll-responsible-ai/hydra-zen/>`_—to that these responsible AI workflows are:
 
 - **Configurable**: All aspects of an application—including deeply nested components—are configured from a single interface. 
 - **Reproducible**: Each run of the application is self-documenting; the full configuration of the software is logged for each run.
 - **Scalable**: Multiple configurations of the application can be launched—to sweep or search over configuration subspaces—using local or distributed job launcher methods.
 
+
 Configurable
 ============
 
-`Hydra's <https://hydra.cc/>`_ and `hydra-zen's <https://github.com/mit-ll-responsible-ai/hydra-zen/>`_ role is to:
+The roles of `Hydra's <https://hydra.cc/>`_ and `hydra-zen <https://github.com/mit-ll-responsible-ai/hydra-zen/>`_ role is to:
 
 - Remove boilerplate for Command Line Interfaces (CLI), configuration files, and logging
 - Provide a powerful configuration management that is extendable and dynamically composable to support large-scale, reproducible experimentation
