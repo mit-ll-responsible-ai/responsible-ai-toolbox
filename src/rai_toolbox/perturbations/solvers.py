@@ -39,7 +39,8 @@ def gradient_ascent(
     reduction_fn: Callable[[Tensor], Tensor] = tr.sum,
     **optim_kwargs: Any,
 ) -> Tuple[Tensor, Tensor]:
-    """Solve for a set of perturbations for a given set of data and a model.
+    """Solve for a set of perturbations for a given set of data and a model,
+    and then apply those perturbations to the data.
 
     This performs, for `steps` iterations, the following optimization::
 
@@ -49,7 +50,7 @@ def gradient_ascent(
        loss = (1 if targeted else -1) * loss  # default: targeted=False
        optim.step()
 
-    Note that, by default, this perturbs the data away from `target` (i.e. this performs
+    Note that, by default, this perturbs the data away from `target` (i.e., this performs
     gradient *ascent*), given a standard loss function that seeks to minimize the
     diffence between the model's output and the target. See `targeted` to toggle this
     behavior.
@@ -60,7 +61,7 @@ def gradient_ascent(
         Differentiable function that processes the (perturbed) data prior to computing
         the loss.
 
-        If `model` is a `torch.nn.Module` then its weights will be frozen and it will
+        If `model` is a `torch.nn.Module`, then its weights will be frozen and it will
         be set to eval mode during the perturbation-solve phase.
 
     data : Tensor, shape-(N, ...)
@@ -74,7 +75,7 @@ def gradient_ascent(
         The optimizer to use for updating the perturbation model
 
     steps : int
-        Number of projected gradient steps
+        Number of projected gradient steps.
 
     perturbation_model : PerturbationModel | Type[PerturbationModel], optional (default=AdditivePerturbation)
         A `torch.nn.Module` whose parameters are updated by the solver. Its forward-pass applies the perturbation to the data. Default is
@@ -86,20 +87,23 @@ def gradient_ascent(
         `perturbation_model(data)`.
 
     criterion : Optional[Callable[[Tensor, Tensor], Tensor]]
-        The criterion to use for calculating the loss **per-datum**.  I.e. for a
+        The criterion to use for calculating the loss **per-datum**.  I.e., for a
         shape-(N, ...) batch of data, `criterion` should return a shape-(N,) tensor of
         loss values – one for each datum in the batch.
 
-        If `None` then `CrossEntropyLoss(reduction=None)` is used.
+        If `None`, then `CrossEntropyLoss(reduction=None)` is used.
 
     targeted : bool (default: False)
-        If `True`, then perturb towards the defined `target` otherwise move away from
+        If `True`, then perturb towards the defined `target`, otherwise move away from
         `target`.
+
+        Note: Default (`targeted=False`) implements gradient *ascent*.
+        To perform gradient *descent*, set `targeted=True`.
 
     use_best : bool (default: True)
         Whether to only report the best perturbation over all steps.
         Note: Requires criterion to output a loss per sample, e.g., set
-        `reduction="none"`
+        `reduction="none"`.
 
     reduction_fn : Callable[[Tensor], Tensor], optional (default=torch.sum)
         Used to reduce the shape-(N,) per-datum loss to a scalar. This should be
@@ -289,7 +293,7 @@ def random_restart(
     solver: Callable[..., Tuple[Tensor, Tensor]],
     repeats: int,
 ) -> Callable[..., Tuple[Tensor, Tensor]]:
-    """Executes a solver function multiple times saving out the best perturbations.
+    """Executes a solver function multiple times, saving out the best perturbations.
 
     Parameters
     ----------
@@ -297,12 +301,12 @@ def random_restart(
         The solver whose execution will be repeated.
 
     repeats : int
-        The number of times to run perturber
+        The number of times to run `solver`
 
     Returns
     -------
     random_restart_fn : Callable[..., Tuple[Tensor, Tensor]]
-        Wrapped function that will execute `perturber` `repeats` times.
+        Wrapped function that will execute `solver` `repeats` times.
 
     Examples
     --------
