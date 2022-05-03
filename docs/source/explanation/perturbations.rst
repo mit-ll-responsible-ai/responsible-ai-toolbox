@@ -160,7 +160,7 @@ and solve for perturbation via:
    model = Sequential([pert_model, freeze(ml_model.eval())])
 
    # solve for perturbations
-   standard_trainer(model, optimizer=optim, data=..., target=..., , steps=..., criterion=...)
+   standard_trainer(model, optimizer=optim, data=..., target=..., steps=..., criterion=...)
 
    # solved perturbations are stored in `pert_model`
 
