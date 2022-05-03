@@ -5,8 +5,9 @@ robustness and the explainability of AI models in a way that is scalable and tha
 composes naturally with other popular ML frameworks.
 
 A key design principle of the rAI-toolbox is that it adheres strictly to the APIs 
-specified by the PyTorch machine learning framework. For example, the rAI-toolbox frames 
-adversarial training workflows solely in terms of the `torch.nn.Optimizer` and 
+specified by the [PyTorch](https://pytorch.org/) machine learning framework.
+For example, the rAI-toolbox frames the process of solving for an adversarial
+perturbation solely in terms of the `torch.nn.Optimizer` and 
 `torch.nn.Module` APIs. This makes it trivial to leverage other libraries and 
 frameworks from the PyTorch ecosystem to bolster your responsible AI R&D. For 
 instance, one can naturally leverage the rAI-toolbox together with
@@ -24,7 +25,7 @@ To install the basic toolbox, run:
 pip install rai-toolbox
 ```
 
-To include our "mushin" capabilities, which leverages [pytorch lightning](https://www.pytorchlightning.ai/) and [hydra-zen](https://github.com/mit-ll-responsible-ai/hydra-zen) for enhanced boilerplate-free ML, run:
+To include our "mushin" capabilities, which leverage [PyTorch Lightning](https://www.pytorchlightning.ai/) and [hydra-zen](https://github.com/mit-ll-responsible-ai/hydra-zen) for enhanced boilerplate-free ML, run:
 
 ```console
 pip install rai-toolbox[mushin]

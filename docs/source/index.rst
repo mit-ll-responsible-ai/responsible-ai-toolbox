@@ -28,15 +28,14 @@ and `experiments/ <https://github.com/mit-ll-responsible-ai/responsible-ai-toolb
 Installation
 ============
 
-hydra-zen is lightweight: its only dependencies are ``hydra-core`` and 
-``typing-extensions``. To install it, run:
+To install the basic toolbox, run:
 
 .. code:: console
 
    $ pip install rai-toolbox
 
 
-To include our "mushin" capabilities, which leverages `pytorch lightning <https://www.pytorchlightning.ai/>`_ 
+To include our "mushin" capabilities, which leverage `PyTorch Lightning <https://www.pytorchlightning.ai/>`_ 
 and `hydra-zen <https://github.com/mit-ll-responsible-ai/hydra-zen>`_ for enhanced boilerplate-free ML, run:
 
 .. code:: console
