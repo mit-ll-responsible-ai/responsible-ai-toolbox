@@ -44,9 +44,9 @@ Severity = Literal[1, 2, 3, 4, 5]
 
 class CIFAR10C(_CIFAR10Base):
     """
-    A CIFAR10-test-based dataset for benchmarking neural network robustness to common
+    A CIFAR-10-based test dataset for benchmarking neural network robustness to common
     corruptions [1]_. For each corruption and for each severity (`1-5`), the
-    dataset consists of the 10,000 test images from CIFAR10 with that corruption
+    dataset consists of the 10,000 test images from CIFAR-10 with that corruption
     applied to those images.
 
     References
@@ -145,25 +145,25 @@ class CIFAR10C(_CIFAR10Base):
         download: bool = False,
     ) -> None:
         """
-        CIFAR10C(root: PathLike, corruption: str, severity: Literal[1, 2, 3, 4, 5], transform: Optional[Callable[[Image.Image], Any]] = None, target_transform: Optional[Callable] = None, download: bool = False)
-
         Parameters
         ----------
         root : PathLike
             Root directory of dataset where directory
-                ``CIFAR-10-C`` exists or will be saved to if download is set to True.
+            ``CIFAR-10-C`` exists or will be saved to if download is set to True.
 
         corruption : str
-            The type of corruption, e.g. "fog". See `CIFAR10C.all_corruptions()` for a full list of corruptions.
+            The type of corruption, e.g., "fog". See `CIFAR10C.all_corruptions()` for a full list of corruptions.
 
         severity : Literal[1, 2, 3, 4, 5]
             The severity-level of the corruption, ranging from 1 to 5.
 
         transform :  Optional[Callable[[Image], Any]]
-            A function/transform that takes in an PIL image
-            and returns a transformed version. E.g, ``transforms.RandomCrop``
+            A function/transform that takes in a PIL image
+            and returns a transformed version. E.g., ``transforms.RandomCrop``
 
         target_transform : Optional[Callable]
+            A function/transform that takes in a target
+            and returns a transformed version.
 
         download : bool, optional (default=False)
             If true, downloads the dataset from the internet and puts it in root directory.
@@ -226,21 +226,20 @@ class CIFAR10C(_CIFAR10Base):
 
 
 class CIFAR100C(CIFAR10C):
-    """CIFAR100C(root: PathLike, corruption: str, severity: Literal[1, 2, 3, 4, 5], transform: Optional[Callable[[Image.Image], Any]] = None, target_transform: Optional[Callable] = None, download: bool = False)
-
-    A CIFAR100-test-based dataset for benchmarking neural network robustness to common
+    """
+    A CIFAR-100-based test dataset for benchmarking neural network robustness to common
     corruptions [1]_. For each corruption and for each severity (`1-5`), the
-    dataset consists of the 10,000 test images from CIFAR100 with that corruption
+    dataset consists of the 10,000 test images from CIFAR-100 with that corruption
     applied to those images.
 
     Parameters
     ----------
     root : PathLike
         Root directory of dataset where directory
-            ``CIFAR-100-C`` exists or will be saved to if download is set to True.
+        ``CIFAR-100-C`` exists or will be saved to if download is set to True.
 
     corruption : str
-        The type of corruption, e.g. "fog". See `CIFAR100C.all_corruptions()` for a full
+        The type of corruption, e.g., "fog". See `CIFAR100C.all_corruptions()` for a full
         list of corruptions.
 
     severity : Literal[1, 2, 3, 4, 5]
@@ -248,9 +247,11 @@ class CIFAR100C(CIFAR10C):
 
     transform :  Optional[Callable[[Image], Any]]
         A function/transform that takes in an PIL image
-        and returns a transformed version. E.g, ``transforms.RandomCrop``
+        and returns a transformed version. E.g., ``transforms.RandomCrop``
 
     target_transform : Optional[Callable]
+        A function/transform that takes in a target
+        and returns a transformed version.
 
     download: bool, optional (default=False)
         If true, downloads the dataset from the internet and puts it in root directory.

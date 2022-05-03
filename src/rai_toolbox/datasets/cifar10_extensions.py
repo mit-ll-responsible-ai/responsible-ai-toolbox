@@ -40,6 +40,24 @@ class CIFAR10P1(_CIFAR10Base):
         target_transform: Optional[Callable[[int], Any]] = None,
         download: bool = False,
     ) -> None:
+        """
+        Parameters
+        ----------
+        root : PathLike
+            Root directory of dataset where directory
+            CIFAR-10.1 files exists or will be saved to if download is set to True.
+
+        transform :  Optional[Callable[[Image], Any]]
+            A function/transform that takes in a PIL image
+            and returns a transformed version. E.g., ``transforms.RandomCrop``
+
+        target_transform : Optional[Callable]
+            A function/transform that takes in a target
+            and returns a transformed version.
+
+        download : bool, optional (default=False)
+            If true, downloads the dataset from the internet and puts it in root directory.
+            If dataset is already downloaded, it is not downloaded again."""
 
         super().__init__(
             root=str(root), transform=transform, target_transform=target_transform
