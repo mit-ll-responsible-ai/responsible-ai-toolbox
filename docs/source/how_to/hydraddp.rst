@@ -1,5 +1,5 @@
 .. meta::
-   :description: A description of how-to run PyTorch Lightning's DDP strategy with Hydra using rai-toolbox.
+   :description: A description of how-to run PyTorch Lightning's DDP strategy with Hydra using rAI-toolbox.
 
 .. admonition:: TL;DR
    
@@ -48,7 +48,7 @@ often `has issues <https://github.com/PyTorchLightning/pytorch-lightning/issues/
 , in part because the strategy launches subprocesses where the command is derived from 
 values in `sys.argv`.
 
-The rai-toolbox comes with a custom strategy, :func:`~rai_toolbox.mushin.HydraDDP`, 
+The rAI-toolbox comes with a custom strategy, :func:`~rai_toolbox.mushin.HydraDDP`,
 that addresses the challenge of running Hydra and Lightning together using DDP.
 
 In this How-To we will:
