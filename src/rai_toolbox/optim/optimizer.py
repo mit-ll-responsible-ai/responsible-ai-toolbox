@@ -222,6 +222,8 @@ class ParamTransformingOptimizer(Optimizer, metaclass=ABCMeta):
 
         Notes
         -----
+        .. _param-ndim-add:
+
         Additional Explanation of `param_ndim`:
 
         Consider a parameter of shape `(d0, d1, d2, d4)`.
