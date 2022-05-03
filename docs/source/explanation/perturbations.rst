@@ -6,16 +6,17 @@
 On Data Perturbations
 =====================
 
-The rai-toolbox facilitates solving for :ref:`optimizations <optim-reference>` over :ref:`data perturbations <pert-referenc>` by strictly
-adhering to `PyTorch <https://pytorch.org/>`_ APIs. 
-A perturbation model is defined as a `torch.nn.Module`, and its optimizer as `torch.optim.Optimizer`. This allows us to leverage PyTorch's `automatic differentiation <https://pytorch.org/tutorials/beginner/blitz/autograd_tutorial.html>`_ engine to solve for optimal perturbations to data.
+This article provides an overview of common data optimization problems, using model-dependent criteria, that are relevant for assessing and enhancing robustness in machine learning models.
+We present a broad picture of how we have designed the rAI-toolbox to solve these problems, and provide pseudo-code that illustrates how :ref:`optimizations <optim-reference>` over :ref:`data perturbations <pert-reference>` adhere strictly
+adhering core `PyTorch <https://pytorch.org/>`_ APIs; i.e, 
+a perturbation model is defined as a `torch.nn.Module`, and its optimizer as `torch.optim.Optimizer`. 
 
 
 Model optimization vs. data optimization
 ========================================
 
 Standard machine learning model-training frameworks are designed to refine
-the parameters of the ML model (i.e., architecture and weights), while methods for studying
+the parameters of the machine learning model (i.e., its architecture and weights), while methods for studying
 the robustness and explainability of the model naturally involve analyses of and
 optimizations over the data (i.e., inputs to the model and representations extracted
 by the model). This optimization over the data space increases the complexity of
@@ -42,7 +43,7 @@ practice for assessing the robustness of the model:
     \max\limits_{\delta \in \Delta} \mathcal{L}(f_\theta(x + \delta),y),
 
 where a perturbation, :math:`\delta`, is optimized to maximize loss against the true
-output, subject to a constraint set, :math:`\Delta`. Note that now, the model parameters
+output, subject to a constraint set, :math:`\Delta`. Here, the model parameters
 are held fixed, and the search is conducted over the data space.
 
 A plethora of approaches for solving this objective under different loss
@@ -59,76 +60,112 @@ proposed by the research community (such as PGD) in a framework-agnostic API.
 Their perturbation solvers are often written from scratch and look something like this:
 
 .. code-block:: python
-   :caption: Notional perturbation solver implementing PGD
+   :caption: Notional perturbation solver
 
-   def perturbation_solver(model, data, target, epsilon, lr, steps):
-      # initialize perturbation parameter
-      delta = initialize(data)
+   def perturbation_solver(
+       model: callable,
+       data: Tensor,
+       target: Tensor,
+       lr: float,
+       steps: int,
+       criterion: callable,
+       initialize_fn: callable,
+       project_fn: callable,
+   ) -> Tensor:
+       # initialize perturbation parameter
+       delta = initialize_fn(data)
+   
+       for _ in range(steps):
+           # perturbation applied manually / in-line
+           perturbed_data = data + delta
+   
+           # calculate loss
+           loss = criterion(model(perturbed_data), target)
+   
+           # optimize
+           grad = autograd(loss, delta)
+           with no_grad():
+               delta = delta + lr * grad  # perturbation updated manually / in-line
+               delta = project_fn(delta)
+       return delta
 
-      for i in range(steps):
-         # perturbation model
-         perturbed_data = data + delta
-         
-         # calculate loss
-         loss = criterion(model(perturbed_data), target)
-         
-         # optimize
-         grad = autograd(loss, delta)
-         with no_grad():
-            delta = delta + lr * grad
-            delta = project(delta, epsilon)
 
 Note that the code for applying the perturbation and taking an optimization
 step is embedded within the for loop of the solver. If a user wanted to swap
-out the optimizer or use a slightly different perturbation model, they would
-need to re-write an entirely new solver.
+out the optimizer methodology or use a different perturbation model, one would
+need to write an entirely new solver.
 
-By adhering to PyTorch APIs, the rai-toolbox provides a generic perturbation
-solver that looks similar to the standard workflow for training ML models,
-and enables users to easily swap out optimizers and perturbation modules:
+By adhering to PyTorch APIs, the rAI-toolbox frames the process of solving for a perturbation in the standard workflow for training ML models. I.e., we specify perturbation models, which are responsible for initializing, storing, and applying perturbations, and perturbation optimizers, which update the perturbations based on their gradients while also applying normalizations and constraints to the perturbations and their gradients.
+
 
 .. code-block:: python
-   :caption: rai-toolbox approach to implementing PGD
+   :caption: rAI-toolbox approach to solving for perturbations
    
    from torch.nn import Module
    from torch.optim import Optimizer
    
    # Implements PyTorch Module API
-   class AdditivePerturbation(Module):
-      def __init__(self, data):
+   class CustomPerturbationModel(Module):
+      def __init__(self, *args, **kwargs):
          super().__init__()
-         self.delta = initialize(data)
+         # initialize parameters of perturbation model
       
       def forward(self, x):
-         return x + self.delta
+         perturbed_data = # use model's parameters to perturb data 
+         return perturbed_data
 
    # Implements PyTorch Optimizer API
-   class ProjectedOptimizer(Optimizer):
-      def __init__(self, params, lr, epsilon):
-         super().__init__(params)
-         self.lr = lr
-         self.epsilon = epsilon
+   class PerturbationOptimizer(Optimizer):
+      def _pre_step_(self, param, **kwds): # e.g. perform gradient-normalization
+      def _step_(self, param, **kwds): # perform gradient-based update on parameter
+      def _post_step_(self, param, grad): # e.g. project updated parameter into constraint set
 
       def step(self):
-         update(params, self.lr)
-         project(params, self.epsilon)
+         for param in self.all_params:
+            self._pre_step_(param)
+            self._step_(param, param.grad)
+            self._post_step_(param)
 
-   def perturbation_solver(model, data, target, perturbation_model, optimizer, steps):
-      # initialize perturbation and optimizer
-      perturb = perturbation_model(data)
-      optim = optimizer(perturb.parameters())
 
-      for i in range(steps):
-         # perturbation model
-         perturbed_data = perturb(data)
+Having framed the perturbation process as a `torch.nn.Module`, whose parameters (e.g. the perturbation itself) are optimized and constrained via the `torch.optim.Optimizer` API, we can take any standard trainer, e.g.
 
+.. code-block:: python
+   :caption: A standard PyTorch trainer 
+
+   def standard_trainer(model, data, target, optimizer, steps, criterion):
+      for _ in range(steps):
          # calculate loss
-         loss = criterion(model(perturbed_data), target)
+         loss = criterion(model(data), target)
 
          # optimize
-         opt.zero_grad()
+         optimizer.zero_grad()
          loss.backward()
-         opt.step()
+         optimizer.step()
+
+
+and solve for perturbation via:
+
+.. code-block:: python
+   :caption: Solving for perturbations using a standard PyTorch trainer
+
+   from torch.nn import Sequential
+   from rai_toolbox import freeze
+
+   pert_model = PerturbationModel(...)
+   optim = PerturbationOptimizer(pert_model.parameters(), ...)
+
+   ml_model = MyNeuralNetwork(...)
+
+   # model(data) -> ml_model(pert_model(data))
+   model = Sequential([pert_model, freeze(ml_model.eval())])
+
+   # solve for perturbations
+   standard_trainer(model, optimizer=optim, data=..., target=..., , steps=..., criterion=...)
+
+   # solved perturbations are stored in `pert_model`
+
+The abstractions provided by a perturbation model and a perturbation optimizer yields a natural delegation of functionality, which makes it easy for us to modify the critical implementation details of this problem. E.g., One can modify the optimizer to adjust how the perturbation is constrained, or how its gradient is normalized; the perturbation model controls the random initialization of the perturbation and how the perturbation broadcasts over a batch of data. None of these adjustments require any modification to the process by which we actually solve for the perturbations; i.e., we can continue to use `standard_trainer` or any gradient-based solver.
+`~rai_toolbox.optim.ParamTransformingOptimizer` and `~rai_toolbox.perturbations.AdditivePerturbation` represent concrete implementations of this design; the reader is advised to consult their reference documentation for further insights into the rAI-toolbox's approach to solving for data perturbations.
 
 
 Common data-related workflows supported by `rai-toolbox`
@@ -152,9 +189,6 @@ where :math:`g_\delta` represents a model for transforming data, parameterized b
 :math:`\delta`.
 
 The rai-toolbox is designed to support all of the flavors of analysis represented by
-the above workflows. Users can immediately leverage our in-house perturbation
-`models <https://mit-ll-responsible-ai.github.io/responsible-ai-toolbox/ref_perturbation.html#models>`_,
-`optimizers <https://mit-ll-responsible-ai.github.io/responsible-ai-toolbox/ref_optim.html>`_,
-and `solvers <https://mit-ll-responsible-ai.github.io/responsible-ai-toolbox/ref_perturbation.html#solvers>`_,
-or build their own in a manner that can be easily composed with other existing tools
-from the PyTorch ecosystem for creating distributed and scalable Responsible AI workflows.
+the above workflows. Users can immediately leverage the toolbox's perturbation
+:ref:`models <pert-models>`, :ref:`optimizers <optim-reference>`,
+and :ref:`solvers <pert-solvers>`, or build their own in a manner that can be easily composed with other existing tools from the PyTorch ecosystem for creating distributed and scalable Responsible AI workflows.
