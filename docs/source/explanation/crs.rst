@@ -5,7 +5,7 @@
 Our Approach to Configurable, Reproducible, and Scalable AI
 ===========================================================
 
-One major objective of `rai_toolbox` is to provide a framework that not only enables the evaulation and 
+One major objective of `rai_toolbox` is to provide a framework that not only enables the evaluation and 
 enhancement of responsible and explainable AI, but to provide the tools via `rai_toolbox.mushin` and 
 `hydra-zen <https://github.com/mit-ll-responsible-ai/hydra-zen/>`_ that are:
 
@@ -19,7 +19,7 @@ Configurable
 `Hydra's <https://hydra.cc/>`_ and `hydra-zen's <https://github.com/mit-ll-responsible-ai/hydra-zen/>`_ role is to
 
 - Remove boilerplate for Command Line Interfaces (CLI), configuration files, and logging
-- Provide a powerful configuration management that is extendable and dynamically composable to support large-scale, repeatable, experimentation
+- Provide a powerful configuration management that is extendable and dynamically composable to support large-scale, reproducible experimentation
 - Support pluggable architectures to launch jobs on distributed clusters or sweep parameters and optimize hyper-parameters of a Machine Learning (ML) model
 
 `Hydra <https://hydra.cc/>`_ provides the tools to describe and configure hierarchical sturctures of Python-based software applications using YAML-based configuration.
@@ -79,7 +79,7 @@ to allow for different configurations for the "optim" configuration.
    if __name__ == "__main__":
       task_fn()
    
-Using Hydra's CLI the application can be executed using different values for the ``optim`` configuration.
+Using Hydra's CLI the application can be executed using different values for the ``optim`` configuration:
 
 .. code-block:: bash
    :caption: Using Hydra CLI to execute with different configurations
@@ -107,7 +107,9 @@ experiment directory::
    |    |    ├── config.yaml
    |    |    ├── hydra.yaml
    |    |    ├── overrides.yaml
-   |    ├── <logged data>
+   |    ├── <log_filename>
+   |    ├── <results_filename>
+
 
 One method for repeating the experiment is to use `Hydra's CLI <https://hydra.cc/docs/tutorials/basic/your_first_app/simple_cli/>`_:
 
@@ -125,7 +127,7 @@ configurations and configuration parameters and 2) by utilizing Hydra's ``launch
 multiprocessing and distributed jobs locally, on cluster architectures, and in the cloud.
 
 Hydra ``multirun`` allows one to launch multiple experiments via a simple interface.  For example, to launch experiments
-for multiple configurations and parameters, simply run
+for multiple configurations and parameters, simply run:
 
 .. code-block:: bash
    :caption: Using Hydra ``multirun`` to launch 4 different experiments.
@@ -133,20 +135,22 @@ for multiple configurations and parameters, simply run
    $ python experiment.py +optim=sgd,adam optim.lr=0.1,0.2 --multirun
 
 Each experiment configuration and data will be logged in individual directories and therefore each experiment
-is reproducible without running all the experiments::
+is reproducible without needing to run all the experiments::
 
    ├── <multirun directory>
+   |    ├── multirun.yaml
    │    ├── <experiment directory name: 0>
-   │    |    ├── <hydra output subdirectory: (default: .hydra)>
+   │    |    ├── <hydra configuration subdirectory: (default: .hydra)>
    |    |    |    ├── config.yaml
    |    |    |    ├── hydra.yaml
    |    |    |    ├── overrides.yaml
-   │    |    ├── <metrics_filename>
+   │    |    ├── <log_filename>
+   │    |    ├── <results_filename>
    │    ├── <experiment directory name: 1>
    |    |    ...
 
 
-For Hydra ``launcher`` capabilities, here a couple useful examples
+For Hydra ``launcher`` capabilities, here a couple useful examples:
 
 - Launching multiple parallel jobs using `JobLib.Parallel`: `Hydra JobLib Launcher <https://hydra.cc/docs/plugins/joblib_launcher/>`_
 - Launching on a `SLURM <https://slurm.schedmd.com/documentation.html/>`_ cluster: `Hydra Submitit Launcher <https://hydra.cc/docs/plugins/submitit_launcher/>`_
