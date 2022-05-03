@@ -9,7 +9,7 @@ Create a Parameter-Transforming Optimizer
 
 Popular techniques for creating adversarial or targeted perturbations often entail solving for the perturbations using gradients that have been normalized in a particular manner, as well as ensuring that the resulting perturbations are constrained within a particular domain. In the rAI-toolbox, PyTorch optimizers are used to solve for perturbations in this way.
 
-In this How-To, we will use the `~rai_toolbox.optim.ParamTransformingOptimizer` to design an optimizer, which is well-suited for refining perturbations, that has the following properties:
+In this How-To, we will use the `~rai_toolbox.optim.ParamTransformingOptimizer` to design an optimizer, which is particularly well-suited for optimizing perturbations, that has the following properties:
 
 1. It encapsulates another optimizer, which is responsible for performing the gradient-based updates to the optimized parameters.
 2. Prior to updating the parameter, it normalizes each parameter's gradient by their max-value, .
@@ -64,7 +64,7 @@ Lastly, `param_ndim` is an important parameter, which will control how our max-n
 
 Prior to updating its parameters during the "step" process, our optimizer will normalize each parameter's gradient by the gradient's max-value; this will be performed by `~rai_toolbox.optim.ParamTransformingOptimizer._pre_step_transform_`.
 Note that we will design this method with the assumption that each parameter has a shape `(N, d1, ..., dm)`, where `N` is a batch dimension and where we want to compute `N` max values — over each of the shape-`(d1, ..., dm)` subtensors.
-By adhering to this standard, `~rai_toolbox.optim.ParamTransformingOptimizer` will be able to subsequently control how `~rai_toolbox.optim.ParamTransformingOptimizer._pre_step_transform_` is applied to each parameter via `param_ndim`; this is an inherited capability that we are leveraging.
+By adhering to this standard, `~rai_toolbox.optim.ParamTransformingOptimizer` will be able to subsequently control how `~rai_toolbox.optim.ParamTransformingOptimizer._pre_step_transform_` is applied to each parameter via `param_ndim`; this is an inherited capability that we are leveraging. Note that we don't need to use `param_ndim` directly at all.
 
 
 .. code-block:: python
@@ -154,10 +154,10 @@ Using the optimizer
 ===================
 
 First, we'll study the effect of `param_ndim` on our optimizer's behavior.
-Let's create a simple shape-`(2, 2)` tensor, which will be the sole parameter that our optimizer will update. We will clamp the parameter's elements to :math:`(-\infty, 18.75]` (picked arbitrarily for this How-To).
+Let's create a simple shape-`(2, 2)` tensor, which will be the sole parameter that our optimizer will update. We will clamp the parameter's elements to fill within :math:`(-\infty, 18.75]`.
 The actual gradient-based parameter update will be performed by `torch.optim.SGD` with `lr=1.0`.
 
-We'll perform a single update to our parameter, but with using `param_ndim` values of 0, 1, and 2.
+We'll perform a single update to our parameter, but with using `param_ndim` values of 0, 1, and 2 respectively.
 
 .. code-block:: pycon
    :caption: Exercising our optimizer using varying `param_ndim` values.
