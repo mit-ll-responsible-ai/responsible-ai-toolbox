@@ -7,6 +7,9 @@
 Losses
 ######
 
+The rAI-toolbox provides implementations of loss functions that are not already provided
+by PyTorch (e.g., `torch.nn.CrossEntropyLoss`).
+
 .. currentmodule:: rai_toolbox.losses
 
 .. autosummary::

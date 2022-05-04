@@ -13,10 +13,11 @@ from rai_toolbox._typing import ArrayLike
 def jensen_shannon_divergence(
     *probs: ArrayLike, weight: Optional[float] = None
 ) -> tr.Tensor:
-    """Computes the Jensen-Shannon divergence [1]_ between n distributions:
-                      JSD(P1, P2, ..., Pn)
+    """
+    Computes the Jensen-Shannon divergence [1]_ between n distributions:
+    :math:`JSD(P_1, P_2, ..., P_n)`
 
-    This loss is symmetric and is bounded by 0 <= JSD(P1, P2, ..., Pn) <= ln(n)
+    This loss is symmetric and is bounded by :math:`0 <= JSD(P_1, P_2, ..., P_n) <= \ln(n)`
 
     Parameters
     ----------

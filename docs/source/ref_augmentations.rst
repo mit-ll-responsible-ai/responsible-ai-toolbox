@@ -7,7 +7,9 @@
 Augmentations
 #############
 
-Methods and utilities for generating diverse data.
+The rAI-toolbox provides methods and utilities for generating diverse data
+augmentations that are not readily available via other existing libraries
+(e.g., `torchvision.tranforms`, `kornia`).
 
 *****************************************
 Fourier-Basis Augmentations and Utilities
