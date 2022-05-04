@@ -25,7 +25,7 @@ Utilities derived from `Fourier-Based Augmentations for Improved Robustness and 
 
 
 **********************************
-Augmix Augmentations and Utilities
+AugMix Augmentations and Utilities
 **********************************
 
 Utilities derived from `AugMix: A Simple Data Processing Method to Improve Robustness and Uncertainty <https://arxiv.org/abs/1912.02781>`_.

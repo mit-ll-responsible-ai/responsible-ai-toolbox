@@ -15,7 +15,7 @@ class FourierBasis(NamedTuple):
 
     A * cos(2pi * freq_vector @ x + phase_shift)
 
-    Where `A` normalizes the 2D array to have an L2-norm of 1,
+    Where `A` normalizes the 2D array to have an :math:`L^2`-norm of 1,
     and `x` is evaluated on a grid of positions on [0, H] x [0, W].
 
     Parameters
@@ -25,7 +25,7 @@ class FourierBasis(NamedTuple):
 
     position : Tuple[int, int]
         The (k-row, k-col) coordinate in shifted k-space, where
-        the freq-0 component has been shifted to resides at the
+        the freq-0 component has been shifted to reside at the
         center of the shape-(H, W) "k-image".
 
     sym_position : Tuple[int, int]
@@ -34,7 +34,7 @@ class FourierBasis(NamedTuple):
 
     phase_shift : float
         The total phase-shift applied to the cosine-generated
-        planewave
+        planewave.
     """
 
     basis: np.ndarray
@@ -65,7 +65,7 @@ def generate_fourier_bases(
     dtype : DTypeLike
 
     factor_2pi_phase_shift : float (optional, default=0)
-        E.g. specifying ``0.5`` will induce a phase-shift of pi on all bases.
+        E.g., specifying ``0.5`` will induce a phase-shift of :math:`\pi` on all bases.
 
     row_col_coords : Optional[Iterable[Tuple[int, int]]]
         If provided, specifies the specific Fourier-bases to generate in terms of their
@@ -87,7 +87,7 @@ def generate_fourier_bases(
     Here we will visualize the collection of bases in Fourier space that support the
 
     >>> import numpy as np
-    >>> from ll_freq_analysis import generate_fourier_bases
+    >>> from rai_toolbox.augmentations.fourier import generate_fourier_bases
     >>> [np.round(out.basis, 2) for out in generate_fourier_bases(3, 3)]
     [array([[ 0.33,  0.12, -0.46],
         [ 0.12, -0.46,  0.33],

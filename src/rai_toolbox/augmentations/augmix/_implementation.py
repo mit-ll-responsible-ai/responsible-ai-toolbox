@@ -56,7 +56,8 @@ def augment_and_mix(
         upper (exclusive) bounds on a uniform integer-valued distribution from which the depth
         will be sampled for each augmentation chain.
 
-        E.g.
+        E.g.,
+
         - `mixture_depth=2` means that each augmentation chain will consist of two (randomly sampled) augmentations composed together.
         - `aug_chain_depth=(1, 4)` means depth of any given augmentation chain is uniformly sampled from [1, 4).
 
@@ -70,17 +71,17 @@ def augment_and_mix(
         chain.
 
     beta_params : Tuple[float, float]
-        The Beta distribution parameters to draw m, which weights that convex combination::
+        The Beta distribution parameters to draw `m`, which weights that convex combination::
 
                 (1 - m) * img_process_fn(datum) + m * img_process_fn(augment(datum))
 
         If a single value is specified, it is used as both parameters for the distribution.
 
     dirichlet_params : Union[float, Sequence[float]]
-        The Dirichlet distribution parameters used to weigh the `mixture_width` number of augmentation chains.
+        The Dirichlet distribution parameters used to weight the `mixture_width` number of augmentation chains.
         If a sequence is provided, its length must match `num_aug_chains`.
 
-    sample_probabilities : Optional[Sequence[float]]
+    augmentation_choice_probs : Optional[Sequence[float]]
         The probabilities associated with sampling each respective entry in `augmentations`.
         If not specified, a uniform distribution over all entries of `augmentation`.
 
@@ -101,8 +102,8 @@ def augment_and_mix(
     - m ~ Beta
     - [w1, ..., wN] ~ Dirichlet
 
-    Random values are drawn via NumPy's global random number generator. Thus `numpy.
-    random.seed` must be set in order to obtain reproducible results. Note that, until
+    Random values are drawn via NumPy's global random number generator. Thus `numpy.random.seed`
+    must be set in order to obtain reproducible results. Note that, until
     PyTorch 1.9.0, there was an issue with using NumPy's global RNG in conjunction with
     DataLoaders that used multiple workers, where identical seeds were being used
     across workers and the same seed was being set at the outset of each epoch.
@@ -111,8 +112,7 @@ def augment_and_mix(
 
     References
     ----------
-    .. [1] Hendrycks, Dan, et al. "Augmix: A simple data processing method to improve
-    robustness and uncertainty." arXiv preprint arXiv:1912.02781 (2019).
+    .. [1] Hendrycks, Dan, et al. "Augmix: A simple data processing method to improve robustness and uncertainty." arXiv preprint arXiv:1912.02781 (2019).
     """
     # See: https://numpy.org/doc/stable/reference/random/index.html?#module-numpy.random
     # for details about new rng methods in numpy
