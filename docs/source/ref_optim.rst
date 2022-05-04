@@ -79,7 +79,7 @@ Optimizers with Projections Onto Constraint Sets
 
 
 **********************
-Frank Wolfe Optimizers
+Frank-Wolfe Optimizers
 **********************
 .. currentmodule:: rai_toolbox.optim
 

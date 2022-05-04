@@ -14,22 +14,6 @@ Thus solving for perturbations is cast as a standard PyTorch optimization proble
 In this way, the rAI-toolbox enables adversarial perturbation workflows to be performed by standard training and testing frameworks (e.g. via `PyTorch-Lightning <https://www.pytorchlightning.ai/>`_).
 We also provide some custom solvers, e.g., `~rai_toolbox.perturbations.gradient_ascent`, to facilitate this line of work.
 
-.. _pert-solvers:
-
-*******
-Solvers
-*******
-
-
-.. currentmodule:: rai_toolbox.perturbations
-
-.. autosummary::
-   :toctree: generated/
-
-   gradient_ascent
-   random_restart
-
-
 .. _pert-models:
 
 ******
@@ -44,6 +28,22 @@ Models
 
    PerturbationModel
    AdditivePerturbation
+
+
+.. _pert-solvers:
+
+*******
+Solvers
+*******
+
+
+.. currentmodule:: rai_toolbox.perturbations
+
+.. autosummary::
+   :toctree: generated/
+
+   gradient_ascent
+   random_restart
 
 
 ************
