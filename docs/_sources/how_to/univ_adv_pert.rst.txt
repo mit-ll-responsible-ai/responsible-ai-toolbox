@@ -115,6 +115,7 @@ We will use an `SGD` step with `lr=0.1` and a momentum of 0.9; we pick :math:`\e
 
 
 Finally, we run `~rai_toolbox.perturbations.gradient_ascent` for ten steps to solve for our UAP.
+By default, this uses cross-entropy loss.
 Note that we must reduce our loss using `torch.mean`, not the default `torch.sum`, so that the gradient of our single perturbation is not scaled by batch-size.
 
 

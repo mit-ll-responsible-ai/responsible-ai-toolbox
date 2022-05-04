@@ -314,6 +314,7 @@ We will use an <code class="xref py py-obj docutils literal notranslate"><span c
 </div>
 </div>
 <p>Finally, we run <a class="reference internal" href="../generated/rai_toolbox.perturbations.gradient_ascent.html#rai_toolbox.perturbations.gradient_ascent" title="rai_toolbox.perturbations.gradient_ascent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gradient_ascent</span></code></a> for ten steps to solve for our UAP.
+By default, this uses cross-entropy loss.
 Note that we must reduce our loss using <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.mean</span></code>, not the default <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.sum</span></code>, so that the gradient of our single perturbation is not scaled by batch-size.</p>
 <div class="literal-block-wrapper docutils container" id="id7">
 <div class="code-block-caption"><span class="caption-text">4 Solving for the UAP</span><a class="headerlink" href="#id7" title="Permalink to this code">#</a></div>
