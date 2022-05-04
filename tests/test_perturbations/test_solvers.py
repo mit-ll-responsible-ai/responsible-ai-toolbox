@@ -303,23 +303,34 @@ def test_pert_model_validation(pert_model):
     "pert_model",
     [AdditivePerturbation, partial(AdditivePerturbation), "instance"],
 )
+@pytest.mark.parametrize(
+    "optim",
+    [SGD, partial(SGD), "instance"],
+)
 @given(x=st.floats(-10.0, 10.0))
-def test_various_forms_of_pert_model(pert_model, x: float):
+def test_various_forms_of_pert_model(pert_model, optim, x: float):
     # pert_model can be Type[PertModel], Partial[PertModel], or PertModel
     if pert_model == "instance":
         pert_model = AdditivePerturbation((1,))
 
     data = torch.tensor([x])
 
+    if optim == "instance":
+        if pert_model != "instance":
+            pytest.skip("known invalid scenario")
+        kwargs = dict(optimizer=SGD(pert_model.parameters(), lr=1.0))
+
+    else:
+        kwargs = dict(optimizer=optim, lr=1.0)
+
     adv, _ = gradient_ascent(
         model=IdentityModel(),
         data=data,
         target=torch.tensor([0.0]),
-        optimizer=SGD,
         steps=1,
-        lr=1,
         criterion=lambda pred, target: (pred - target) ** 2,
         perturbation_model=pert_model,
+        **kwargs,  # type: ignore
     )
 
     assert torch.allclose(adv, 3 * data)
@@ -400,3 +411,54 @@ def test_random_restart_targeted(repeats, targeted: bool):
     else:
         assert xadv.item() == repeats
         assert loss.item() == repeats
+
+
+def test_optimizer_validation():
+    x = torch.tensor([2.0], requires_grad=True)
+
+    with pytest.raises(TypeError):
+        gradient_ascent(
+            model=lambda x: x**2,
+            data=x,
+            target=x,
+            optimizer=None,  # type: ignore
+            steps=1,
+            lr=1,
+            criterion=lambda pred, _: pred,
+            targeted=True,
+        )
+
+
+def test_optimizer_instance_with_pert_model_type_validation():
+    x = torch.tensor([2.0], requires_grad=True)
+
+    with pytest.raises(TypeError):
+        gradient_ascent(
+            model=lambda x: x**2,
+            data=x,
+            target=x,
+            optimizer=SGD([x], lr=1.0),
+            steps=1,
+            lr=1,
+            criterion=lambda pred, _: pred,
+            targeted=True,
+        )
+
+
+def test_optimizer_instance_with_kwargs():
+    x = torch.tensor([2.0], requires_grad=True)
+    pert_model = AdditivePerturbation(x)
+    optim = SGD(pert_model.parameters(), lr=1.0)
+
+    with pytest.raises(TypeError):
+        gradient_ascent(
+            model=lambda x: x**2,
+            data=x,
+            target=x,
+            perturbation_model=pert_model,
+            optimizer=optim,
+            steps=1,
+            lr=1,
+            criterion=lambda pred, _: pred,
+            targeted=True,
+        )
