@@ -21,9 +21,6 @@ ecosystem to bolster your responsible AI R&D. For instance, one can naturally le
 the rAI-toolbox together with `PyTorch Lightning <https://www.pytorchlightning.ai/>`_ to
 perform distributed adversarial training.
 
-To see the rAI-toolbox in action, please refer to the `examples/ <https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox/tree/main/examples>`_
-and `experiments/ <https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox/tree/main/experiments>`_ sections of our repository.
-
 
 Installation
 ============
@@ -69,6 +66,10 @@ our **How-Tos** and **Reference** materials can help acquaint you with the
 unique capabilities that are offered by the toolbox. Finally, **Explanations** provide 
 readers with taxonomies, design principles, recommendations, and other articles that 
 will enrich their understanding of rAI-toolbox.
+
+To see some real-world applications of the toolbox, please refer to the `examples/ <https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox/tree/main/examples>`_
+and `experiments/ <https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox/tree/main/experiments>`_ sections of our repository.
+
 
 .. toctree::
    :maxdepth: 2
