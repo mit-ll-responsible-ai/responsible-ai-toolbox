@@ -157,7 +157,7 @@ and solve for the optimal perturbation via:
    ml_model = MyNeuralNetwork(...)
 
    # model(data) -> ml_model(pert_model(data))
-   model = Sequential([pert_model, freeze(ml_model.eval())])
+   model = Sequential(pert_model, freeze(ml_model.eval()))
 
    # solve for perturbations
    standard_trainer(model, optimizer=optim, data=..., target=..., steps=..., criterion=...)
