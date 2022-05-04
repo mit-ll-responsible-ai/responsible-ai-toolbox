@@ -10,15 +10,9 @@ chronological order. All previous releases should still be available on pip.
 
 .. _v0.1.0:
 
---------------------
-0.1.0rc - 2022-XX-XX
---------------------
-
-This is a pre-release. You can install it with: 
-
-.. code:: console
-
-   $ pip install rai-toolbox[mushin] --pre
+------------------
+0.1.0 - 2022-05-04
+------------------
 
 
 This is rAI-toolbox's first stable release on PyPI! Please check out the rest of our 
