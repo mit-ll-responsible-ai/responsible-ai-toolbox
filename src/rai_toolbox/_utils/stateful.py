@@ -23,7 +23,7 @@ def freeze(
         Iterable[tr.Tensor],
         Iterable[Dict[str, Iterable[tr.Tensor]]],
     ]
-):
+) -> Callable[[], None]:
     """'Freezes' collections of tensors by setting `requires_grad=False`.
     Returns a callable that, when called, restores the state of the tensors.
 
@@ -169,10 +169,10 @@ class frozen(ContextDecorator):
         """
         self._items = items
 
-    def __enter__(self):
+    def __enter__(self) -> None:
         self._unfreeze = freeze(*self._items)
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, type, value, traceback) -> None:
         self._unfreeze()
 
 
@@ -230,12 +230,12 @@ class evaluating(ContextDecorator):
         self._states[True].update(m for m in modules if m.training)
         self._states[False].update(m for m in modules if not m.training)
 
-    def __enter__(self):
+    def __enter__(self) -> None:
         for train_status in self._states:
             for m in self._states[train_status]:
                 m.eval()
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, type, value, traceback) -> None:
         for train_status in self._states:
             for module in self._states[train_status]:
                 module.train(train_status)

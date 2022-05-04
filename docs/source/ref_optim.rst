@@ -22,7 +22,8 @@ Because these optimizers are frequently used to update perturbations of data, an
 For example, we may be solving for a single perturbation (e.g., a "universal" perturbation), or for a *batch* of perturbations. In the latter case our parameter transformations ought to broadcast over the leading batch dimension. `param_ndim` is exposed throughout our optimizer APIs to control this behavior.
 Refer to `~rai_toolbox.optim.ParamTransformingOptimizer` for more details.
 
-All of our reference documentation features detailed Examples sections; scroll to the bottom of any given reference page to see them.
+All of our reference documentation features detailed Examples sections; scroll to the bottom of any given reference page to see them. 
+For additional instructions for creating your own parameter-transforming optimizer please refer to :ref:`our How-To guide <how-to-optim>`.
 
 .. _built-in-optim:
 

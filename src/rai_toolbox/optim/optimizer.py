@@ -207,11 +207,11 @@ class ParamTransformingOptimizer(Optimizer, metaclass=ABCMeta):
             See "Notes" for more details.
 
         grad_scale : float, optional (default=1.0)
-            Multiplies each gradient in-place after the in-place transformation is
+            Multiplies each gradient in-place after the pre-step transformation is
             performed. This can be specified per param-group.
 
         grad_bias : float, optional (default=0.0)
-            Added to each gradient in-place after the in-place transformation is
+            Added to each gradient in-place after the pre-step transformation is
             performed. This can be specified per param-group.
 
         defaults : Optional[Dict[str, Any]]
