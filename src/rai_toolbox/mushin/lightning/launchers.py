@@ -99,7 +99,7 @@ if PL_VERSION >= Version(1, 6, 0):
     class HydraDDP(DDPStrategy):  # type: ignore
         """DDP Strategy that supports Hydra run and multirun jobs.
 
-        This strategy assumes a `Trainer.fit` or `Trainer.test` has been configured
+        This strategy assumes a PyTorch Lightning `Trainer.fit` or `Trainer.test` has been configured
         to execute via Hydra.  It requires that Hydra saves a `config.yaml` in the current working directory with the following keys/properties set::
 
            ├── Config
@@ -114,7 +114,7 @@ if PL_VERSION >= Version(1, 6, 0):
         Examples
         --------
 
-        First define a Hydra configuration using hydra-zen
+        First define a Hydra configuration using hydra-zen:
 
         >>> import pytorch_lightning as pl
         ... from hydra_zen import builds, make_config,
@@ -138,7 +138,7 @@ if PL_VERSION >= Version(1, 6, 0):
         ...     module=ModuleConfig
         ... )
 
-        Next define a task function to execute the Hydra job
+        Next, define a task function to execute the Hydra job:
 
         >>> from hydra_zen import instantiate
         >>> def task_function(cfg):
@@ -159,14 +159,14 @@ if PL_VERSION >= Version(1, 6, 0):
         ...     datamodule=DataModuleconfig
         ... )
 
-        Next define a task function to execute the Hydra job
+        Next define a task function to execute the Hydra job:
 
         >>> from hydra_zen import instantiate
         >>> def task_function(cfg):
         ...     obj = instantiate(cfg)
         ...     obj.trainer.fit(obj.module, datamodule=obj.datamodule)
 
-        Launch the Hydra+Lightning DDP job
+        Launch the Hydra+Lightning DDP job:
 
         >>> from hydra_zen import launch
         >>> job = launch(Config, task_function)
@@ -258,7 +258,7 @@ else:  # pragma: no cover
     class HydraDDP(DDPPlugin):
         """DDP Strategy that supports Hydra run and multirun jobs.
 
-        This strategy assumes a `Trainer.fit` or `Trainer.test` has been configured
+        This strategy assumes a PyTorch Lightning `Trainer.fit` or `Trainer.test` has been configured
         to execute via Hydra.  It requires that Hydra saves a `config.yaml` in the current working directory with the following keys/properties set::
 
            ├── Config
@@ -273,7 +273,7 @@ else:  # pragma: no cover
         Examples
         --------
 
-        First define a Hydra configuration using hydra-zen
+        First define a Hydra configuration using hydra-zen:
 
         >>> import pytorch_lightning as pl
         ... from hydra_zen import builds, make_config,
@@ -297,14 +297,14 @@ else:  # pragma: no cover
         ...     module=ModuleConfig
         ... )
 
-        Next define a task function to execute the Hydra job
+        Next define a task function to execute the Hydra job:
 
         >>> from hydra_zen import instantiate
         >>> def task_function(cfg):
         ...     obj = instantiate(cfg)
         ...     obj.trainer.fit(obj.module)
 
-        Launch the Hydra+Lightning DDP job
+        Launch the Hydra+Lightning DDP job:
 
         >>> from hydra_zen import launch
         >>> job = launch(Config, task_function)
@@ -318,14 +318,14 @@ else:  # pragma: no cover
         ...     datamodule=DataModuleconfig
         ... )
 
-        Next define a task function to execute the Hydra job
+        Next, define a task function to execute the Hydra job:
 
         >>> from hydra_zen import instantiate
         >>> def task_function(cfg):
         ...     obj = instantiate(cfg)
         ...     obj.trainer.fit(obj.module, datamodule=obj.datamodule)
 
-        Launch the Hydra+Lightning DDP job
+        Launch the Hydra+Lightning DDP job:
 
         >>> from hydra_zen import launch
         >>> job = launch(Config, task_function)

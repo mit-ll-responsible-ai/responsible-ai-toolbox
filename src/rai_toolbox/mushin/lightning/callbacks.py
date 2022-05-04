@@ -31,8 +31,12 @@ class MetricsCallback(Callback):
 
     Examples
     --------
-    >> metrics_callback = MetricsCallback()
-    >> trainer = Trainer(callbacks=[metrics_callback])
+
+    >>> from pytorch_lightning import Trainer
+    >>> from rai_toolbox.mushin import MetricsCallback
+
+    >>> metrics_callback = MetricsCallback()
+    >>> trainer = Trainer(callbacks=[metrics_callback])
     """
 
     def __init__(

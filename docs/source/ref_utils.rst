@@ -12,7 +12,7 @@ General Utilities
 PyTorch Utilities
 *****************
 
-We provide general PyTorch-centric that help to reduce boilerplate code and to ensure 
+We provide general, PyTorch-centric utilities that help to reduce boilerplate code and to ensure
 correctness when using the rAI-toolbox.
 
 .. currentmodule:: rai_toolbox
