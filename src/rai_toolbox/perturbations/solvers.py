@@ -8,6 +8,7 @@ from typing import Any, Callable, List, Optional, Tuple, Union
 import torch as tr
 from torch import Tensor
 from torch.nn import CrossEntropyLoss, Module
+from torch.optim import Optimizer as _TorchOptim
 
 from rai_toolbox import negate
 from rai_toolbox._typing import (
@@ -28,7 +29,7 @@ def gradient_ascent(
     model: Callable[[Tensor], Tensor],
     data: ArrayLike,
     target: ArrayLike,
-    optimizer: Union[OptimizerType, Partial[Optimizer]],
+    optimizer: Union[Optimizer, OptimizerType, Partial[Optimizer]],
     steps: int,
     perturbation_model: Union[
         PerturbationModel, InstantiatesTo[PerturbationModel]
@@ -71,8 +72,10 @@ def gradient_ascent(
         If `targeted==False` (default), then this is the target to perturb away from.
         If `targeted==True`, then this is the target to perturb toward.
 
-    optimizer : Type[Optimizer] | Partial[Optimizer]
-        The optimizer to use for updating the perturbation model
+    optimizer : Optimizer | Type[Optimizer] | Partial[Optimizer]
+        The optimizer to use for updating the perturbation model.
+
+        If `optimizer` is uninstantiated, it will be instantiated as `optimizer(perturbation_model.parameters(), **optim_kwargs)`
 
     steps : int
         Number of projected gradient steps.
@@ -229,7 +232,23 @@ def gradient_ascent(
 
         pmodel = perturbation_model
 
-    optim = optimizer(pmodel.parameters(), **optim_kwargs)
+    if instantiates_to(optimizer, _TorchOptim):
+        optim = optimizer(pmodel.parameters(), **optim_kwargs)
+    else:
+        if not isinstance(optimizer, _TorchOptim):
+            raise TypeError(
+                f"`optimizer` must be an instance of Optimizer or must instantiate to Optimizer; got: {optimizer}"
+            )
+        if instantiates_to(perturbation_model, PerturbationModel):
+            raise TypeError(
+                "An initialized optimizer can only be passed to the solver in combination with an intialized perturbation model."
+            )
+        if optim_kwargs:
+            raise TypeError(
+                "**optim_kwargs were specified, but the provided `optimizer` has already been instaniated"
+            )
+
+        optim = optimizer
 
     to_freeze: List[Any] = [data, target]
 
