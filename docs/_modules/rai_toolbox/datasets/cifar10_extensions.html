@@ -39,6 +39,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
+      
+      <link rel="icon" sizes="16x16" href="../../../_static/favicon-16x16.png">
+      
+    
+      
+      <link rel="icon" sizes="32x32" href="../../../_static/favicon-32x32.png">
+      
+    
+      
+      <link rel="apple-touch-icon" sizes="180x180" href="../../../_static/apple-touch-icon.png">
+      
+    
 
     <!-- Google Analytics -->
     
@@ -53,9 +65,11 @@
   <div id="navbar-start">
     
     
+
 <a class="navbar-brand" href="../../../index.html">
-<p class="title">rai-toolbox</p>
+  <img src="../../../_static/logo_no_text.png" class="logo" alt="logo">
 </a>
+
 
     
   </div>
@@ -201,6 +215,24 @@
         <span class="n">target_transform</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="nb">int</span><span class="p">],</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">download</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        root : PathLike</span>
+<span class="sd">            Root directory of dataset where</span>
+<span class="sd">            CIFAR-10.1 files exist or will be saved to if download is set to True.</span>
+
+<span class="sd">        transform :  Optional[Callable[[Image], Any]]</span>
+<span class="sd">            A function/transform that takes in a PIL image</span>
+<span class="sd">            and returns a transformed version. E.g., ``transforms.RandomCrop``</span>
+
+<span class="sd">        target_transform : Optional[Callable]</span>
+<span class="sd">            A function/transform that takes in a target</span>
+<span class="sd">            and returns a transformed version.</span>
+
+<span class="sd">        download : bool, optional (default=False)</span>
+<span class="sd">            If true, downloads the dataset from the internet and puts it in root directory.</span>
+<span class="sd">            If dataset is already downloaded, it is not downloaded again.&quot;&quot;&quot;</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">root</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">root</span><span class="p">),</span> <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">,</span> <span class="n">target_transform</span><span class="o">=</span><span class="n">target_transform</span>

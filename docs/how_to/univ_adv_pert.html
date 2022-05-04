@@ -1,0 +1,423 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<meta content="A guide for using the rAI-toolbox to solve for a universal adversarial perturbation" name="description" />
+
+    <title>Solve for a Universal Perturbation &#8212; rai-toolbox  documentation</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/tabs.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Run PyTorch Lightning DDP in Hydra" href="hydraddp.html" />
+    <link rel="prev" title="Create a Parameter-Transforming Optimizer" href="custom_optim.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+      
+      <link rel="icon" sizes="16x16" href="../_static/favicon-16x16.png">
+      
+    
+      
+      <link rel="icon" sizes="32x32" href="../_static/favicon-32x32.png">
+      
+    
+      
+      <link rel="apple-touch-icon" sizes="180x180" href="../_static/apple-touch-icon.png">
+      
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+
+<a class="navbar-brand" href="../index.html">
+  <img src="../_static/logo_no_text.png" class="logo" alt="logo">
+</a>
+
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../tutorials.html">
+  Tutorials
+ </a>
+</li>
+
+<li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="../how_tos.html">
+  How-To Guides
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../explanation.html">
+  Explanation
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../api_reference.html">
+  Reference
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../changes.html">
+  Changelog
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    <p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  How to...
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="custom_optim.html">
+   Create a Parameter-Transforming Optimizer
+  </a>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   Solve for a Universal Perturbation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="hydraddp.html">
+   Run PyTorch Lightning DDP in Hydra
+  </a>
+ </li>
+</ul>
+
+  </div>
+</nav>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+
+<nav id="bd-toc-nav">
+    
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <section id="solve-for-a-universal-perturbation">
+<span id="how-to-univ-pert"></span><h1>Solve for a Universal Perturbation<a class="headerlink" href="#solve-for-a-universal-perturbation" title="Permalink to this headline">#</a></h1>
+<p>A universal adversarial perturbation (UAP) is a <em>single</em> perturbation that can be applied to <em>uniformly to any data</em> in order to substantially reduce the quality of a machine learning model’s predicitons on that data.
+In the case of an additive perturbation (i.e., <span class="math notranslate nohighlight">\(x \rightarrow x + \delta\)</span>), the single perturbation, <span class="math notranslate nohighlight">\(\delta\)</span>, is optimized over a data distribution:</p>
+<div class="math notranslate nohighlight">
+\[\max\limits_{\delta \in \Delta} \mathbb{E}_{(x,y)\sim D} [\mathcal{L}(f_\theta(x + \delta,y)]\]</div>
+<p>The paper <a class="reference external" href="https://arxiv.org/pdf/1811.11304.pdf">Universal Adversarial Training</a> by Shafahi et al propose a simple and efficient gradient-based optimization method for solving for such a UAP.</p>
+<p>In this How-To, we demonstrate how the rAI-toolbox’s perturbation models, optimizers, and solvers naturally accomodate this approach to solving for UAPs.
+Specifically, we will</p>
+<ol class="arabic simple">
+<li><p>Create some toy-data and a trivial model.</p></li>
+<li><p>Initialize a perurbation model that is designed to apply a single perturbation across a batch of data.</p></li>
+<li><p>Configure a perturbation-optimizer to normalize the gradient of the single perturbation, and to project the updated perturbation to fall within an <span class="math notranslate nohighlight">\(\epsilon\)</span>-sized <span class="math notranslate nohighlight">\(L^2\)</span> ball.</p></li>
+<li><p>Configure our solver to aggregate the loss such that the gradient is invariante to batch-size.</p></li>
+</ol>
+<p>It should be noted that the data and model that we are using here are meaningless, and thus nor will the resulting UAP be of any particular interest; this How-To is only meant to demonstrate mechanics rather than a real-world application.</p>
+<p>Let’s assume that our model is a classifier that classifies images among ten classes.
+For our toy data, let’s create a batch of image-like tensors; we’ll create a shape-<code class="xref py py-obj docutils literal notranslate"><span class="pre">(N=9,</span> <span class="pre">C=3,</span> <span class="pre">H=4,</span> <span class="pre">W=4)</span></code> tensor, which represents a batch of nine 4x4 images with three color channels. Accordingly, we’ll also create a shape-<code class="xref py py-obj docutils literal notranslate"><span class="pre">(N=9,)</span></code> tensor of integer-values labels. Our toy model will consist a <code class="xref py py-obj docutils literal notranslate"><span class="pre">conv-relu-dense</span></code> sequence of layers.</p>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">1 Creating toy data and model</span><a class="headerlink" href="#id2" title="Permalink to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span> <span class="k">as</span> <span class="nn">tr</span>
+<span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">Conv2d</span><span class="p">,</span> <span class="n">Linear</span><span class="p">,</span> <span class="n">Sequential</span><span class="p">,</span> <span class="n">ReLU</span><span class="p">,</span> <span class="n">Flatten</span>
+
+<span class="n">tr</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="n">truth</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,))</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">Sequential</span><span class="p">(</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">Flatten</span><span class="p">(),</span> <span class="n">ReLU</span><span class="p">(),</span> <span class="n">Linear</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<p>We will use an additive perturbation, which adds as single shape-<code class="xref py py-obj docutils literal notranslate"><span class="pre">(C=3,</span> <span class="pre">H=4,</span> <span class="pre">W=4)</span></code> perturbation to the batch of data (broadcasting over the batch dimension).
+Rather than specifying the precise shape of the perturbation, we can simply indicate <code class="xref py py-obj docutils literal notranslate"><span class="pre">delta_ndim=-1</span></code> to indicate that we want to drop the batch-dimension from <code class="xref py py-obj docutils literal notranslate"><span class="pre">data</span></code></p>
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text">2 Initialize a universal perturbation model</span><a class="headerlink" href="#id3" title="Permalink to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rai_toolbox.perturbations</span> <span class="kn">import</span> <span class="n">AdditivePerturbation</span>
+
+<span class="n">pert_model</span> <span class="o">=</span> <span class="n">AdditivePerturbation</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">delta_ndim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-text">Inspecting the initialized perturbation parameter, <span class="math notranslate nohighlight">\(\delta\)</span></span><a class="headerlink" href="#id4" title="Permalink to this code">#</a></div>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pert_model</span><span class="o">.</span><span class="n">delta</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">torch.Size([3, 4, 4])</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pert_model</span><span class="o">.</span><span class="n">delta</span>
+<span class="go">Parameter containing:</span>
+<span class="go">tensor([[[0., 0., 0., 0.],</span>
+<span class="go">         [0., 0., 0., 0.],</span>
+<span class="go">         [0., 0., 0., 0.],</span>
+<span class="go">         [0., 0., 0., 0.]],</span>
+
+<span class="go">        [[0., 0., 0., 0.],</span>
+<span class="go">         [0., 0., 0., 0.],</span>
+<span class="go">         [0., 0., 0., 0.],</span>
+<span class="go">         [0., 0., 0., 0.]],</span>
+
+<span class="go">        [[0., 0., 0., 0.],</span>
+<span class="go">         [0., 0., 0., 0.],</span>
+<span class="go">         [0., 0., 0., 0.],</span>
+<span class="go">         [0., 0., 0., 0.]]], requires_grad=True)</span>
+</pre></div>
+</div>
+</div>
+<p>Now we will initialize an optimizer that will update our perturbation. <a class="reference internal" href="../generated/rai_toolbox.optim.L2ProjectedOptim.html#rai_toolbox.optim.L2ProjectedOptim" title="rai_toolbox.optim.L2ProjectedOptim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">L2ProjectedOptim</span></code></a> is designed to normalize a gradient by its <span class="math notranslate nohighlight">\(L^2\)</span> norm prior to perfoming the parameter updated (using a <code class="xref py py-obj docutils literal notranslate"><span class="pre">SGD</span></code> step by default). The updated perturbation is then projected into a <span class="math notranslate nohighlight">\(\epsilon\)</span>-sized <span class="math notranslate nohighlight">\(L^2\)</span> ball.
+We will use an <code class="xref py py-obj docutils literal notranslate"><span class="pre">SGD</span></code> step with <code class="xref py py-obj docutils literal notranslate"><span class="pre">lr=0.1</span></code> and a momentum of 0.9; we pick <span class="math notranslate nohighlight">\(\epsilon=2\)</span>. In order to ensure that these gradient and parameter-transforming operations apply appropriately to our UAP, we specify <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim=None</span></code> (see <a class="reference internal" href="../generated/rai_toolbox.optim.ParamTransformingOptimizer.html#param-ndim-add"><span class="std std-ref">these docs</span></a> for more details).</p>
+<div class="literal-block-wrapper docutils container" id="id5">
+<div class="code-block-caption"><span class="caption-text">3 Initialize the perturbation optimizer</span><a class="headerlink" href="#id5" title="Permalink to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rai_toolbox.optim</span> <span class="kn">import</span> <span class="n">L2ProjectedOptim</span>
+
+<span class="n">optim</span> <span class="o">=</span> <span class="n">L2ProjectedOptim</span><span class="p">(</span>
+    <span class="n">pert_model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span>
+    <span class="n">epsilon</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">param_ndim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">lr</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">momentum</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id6">
+<div class="code-block-caption"><span class="caption-text">Inspecting the optmizer</span><a class="headerlink" href="#id6" title="Permalink to this code">#</a></div>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">optim</span>
+<span class="go">L2ProjectedOptim [SGD](</span>
+<span class="go">Parameter Group 0</span>
+<span class="go">    dampening: 0</span>
+<span class="go">    epsilon: 2</span>
+<span class="go">    grad_bias: 0.0</span>
+<span class="go">    grad_scale: 1.0</span>
+<span class="go">    lr: 0.1</span>
+<span class="go">    maximize: False</span>
+<span class="go">    momentum: 0.9</span>
+<span class="go">    nesterov: False</span>
+<span class="go">    param_ndim: None</span>
+<span class="go">    weight_decay: 0</span>
+<span class="go">)</span>
+</pre></div>
+</div>
+</div>
+<p>Finally, we run <a class="reference internal" href="../generated/rai_toolbox.perturbations.gradient_ascent.html#rai_toolbox.perturbations.gradient_ascent" title="rai_toolbox.perturbations.gradient_ascent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gradient_ascent</span></code></a> for ten steps to solve for our UAP.
+Note that we must reduce our loss using <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.mean</span></code>, not the default <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.sum</span></code>, so that the gradient of our single perturbation is not scaled by batch-size.</p>
+<div class="literal-block-wrapper docutils container" id="id7">
+<div class="code-block-caption"><span class="caption-text">4 Solving for the UAP</span><a class="headerlink" href="#id7" title="Permalink to this code">#</a></div>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">rai_toolbox.perturbations</span> <span class="kn">import</span> <span class="n">gradient_ascent</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">xadv</span><span class="p">,</span> <span class="n">losses</span> <span class="o">=</span> <span class="n">gradient_ascent</span><span class="p">(</span>
+<span class="gp">... </span> <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+<span class="gp">... </span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+<span class="gp">... </span> <span class="n">target</span><span class="o">=</span><span class="n">truth</span><span class="p">,</span>
+<span class="gp">... </span> <span class="n">perturbation_model</span><span class="o">=</span><span class="n">pert_model</span><span class="p">,</span>
+<span class="gp">... </span> <span class="n">optimizer</span><span class="o">=</span><span class="n">optim</span><span class="p">,</span>
+<span class="gp">... </span> <span class="n">reduction_fn</span><span class="o">=</span><span class="n">tr</span><span class="o">.</span><span class="n">mean</span><span class="p">,</span>
+<span class="gp">... </span> <span class="n">steps</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pert_model</span><span class="o">.</span><span class="n">delta</span>  <span class="c1"># the UAP solution</span>
+<span class="go">Parameter containing:</span>
+<span class="go">tensor([[[-0.0670,  0.0970,  0.1258,  0.4220],</span>
+<span class="go">         [ 0.5926, -0.0525, -0.4427, -0.1195],</span>
+<span class="go">         [ 0.5156, -0.0750, -0.0547, -0.1155],</span>
+<span class="go">         [-0.0163,  0.5255,  0.1064, -0.4517]],</span>
+
+<span class="go">        [[-0.0072, -0.4236,  0.4355, -0.2047],</span>
+<span class="go">         [-0.0961,  0.4003, -0.1891, -0.1592],</span>
+<span class="go">         [-0.1453,  0.0062, -0.4630,  0.6092],</span>
+<span class="go">         [-0.1998, -0.1265,  0.4888,  0.0515]],</span>
+
+<span class="go">        [[-0.0886,  0.2541,  0.1003,  0.0585],</span>
+<span class="go">         [ 0.3680,  0.1455, -0.4263, -0.0196],</span>
+<span class="go">         [-0.1726,  0.1401, -0.5161, -0.1914],</span>
+<span class="go">         [ 0.1375,  0.3058,  0.1123,  0.0247]]], requires_grad=True)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tr</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">pert_model</span><span class="o">.</span><span class="n">delta</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="nb">ord</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>  <span class="c1"># verify that δ falls in eps-2 ball</span>
+<span class="go">tensor(2.0000, grad_fn=&lt;CopyBackwards&gt;)</span>
+</pre></div>
+</div>
+</div>
+<p>Let’s check that the loss of the clean batch of data is less than the loss of the perturbed batch</p>
+<div class="literal-block-wrapper docutils container" id="id8">
+<div class="code-block-caption"><span class="caption-text">Verifying the attack</span><a class="headerlink" href="#id8" title="Permalink to this code">#</a></div>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">torch.nn.functional</span> <span class="kn">import</span> <span class="n">cross_entropy</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cross_entropy</span><span class="p">(</span><span class="n">model</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">truth</span><span class="p">)</span>
+<span class="go">tensor(2.2578, grad_fn=&lt;NllLossBackward0&gt;)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pert_data</span> <span class="o">=</span> <span class="n">pert_model</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cross_entropy</span><span class="p">(</span><span class="n">model</span><span class="p">(</span><span class="n">pert_data</span><span class="p">),</span> <span class="n">truth</span><span class="p">)</span>
+<span class="go">tensor(2.4227, grad_fn=&lt;NllLossBackward0&gt;)</span>
+</pre></div>
+</div>
+</div>
+<p>Great! Our UAP for this toy problem reduces the average perfomance of our model on uniformally-perturbed data.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The paper <a class="reference external" href="https://arxiv.org/pdf/1811.11304.pdf">Universal Adversarial Training</a> utilizes a clamped cross-entropy loss. In the workflow presented here, one would pass a clamped version of the loss via the <code class="xref py py-obj docutils literal notranslate"><span class="pre">criterion</span></code> argument to <a class="reference internal" href="../generated/rai_toolbox.perturbations.gradient_ascent.html#rai_toolbox.perturbations.gradient_ascent" title="rai_toolbox.perturbations.gradient_ascent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gradient_ascent</span></code></a>.</p>
+</div>
+</section>
+
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="custom_optim.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">Create a Parameter-Transforming Optimizer</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="hydraddp.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Run PyTorch Lightning DDP in Hydra</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2022 Massachusetts Institute of Technology.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
+</html>

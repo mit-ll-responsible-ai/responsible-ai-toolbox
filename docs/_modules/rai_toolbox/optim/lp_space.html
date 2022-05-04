@@ -39,6 +39,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
+      
+      <link rel="icon" sizes="16x16" href="../../../_static/favicon-16x16.png">
+      
+    
+      
+      <link rel="icon" sizes="32x32" href="../../../_static/favicon-32x32.png">
+      
+    
+      
+      <link rel="apple-touch-icon" sizes="180x180" href="../../../_static/apple-touch-icon.png">
+      
+    
 
     <!-- Google Analytics -->
     
@@ -53,9 +65,11 @@
   <div id="navbar-start">
     
     
+
 <a class="navbar-brand" href="../../../index.html">
-<p class="title">rai-toolbox</p>
+  <img src="../../../_static/logo_no_text.png" class="logo" alt="logo">
 </a>
+
 
     
   </div>
@@ -244,7 +258,7 @@
 <span class="sd">            - A negative number indicates the &#39;offset&#39; from the dimensionality of the tensor (see &quot;Notes&quot; for examples).</span>
 <span class="sd">            - `None` means that the transformation will be applied directly to the tensor without any broadcasting.</span>
 
-<span class="sd">            See `ParamTransformingOptimizer` for more details and examples</span>
+<span class="sd">            See `ParamTransformingOptimizer` for more details and examples.</span>
 
 <span class="sd">        grad_scale : float, optional (default=1.0)</span>
 <span class="sd">            Multiplies each gradient in-place after the in-place transformation is</span>
@@ -308,7 +322,6 @@
 <span class="sd">    --------</span>
 <span class="sd">    L1NormedGradientOptim</span>
 <span class="sd">    L2NormedGradientOptim</span>
-<span class="sd">    ProjectionMixin</span>
 <span class="sd">    ParamTransformingOptimizer</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -342,11 +355,11 @@
 <span class="sd">            performed. This can be specified per param-group.</span>
 
 <span class="sd">        defaults : Optional[Dict[str, Any]]</span>
+<span class="sd">            Specifies default parameters for all parameter groups.</span>
 
 <span class="sd">        param_ndim : Optional[int]</span>
 <span class="sd">            Controls how `_pre_step_transform_` is broadcast onto the gradient</span>
 <span class="sd">            of a given parameter. This has no effect for `SignedGradientOptim`.</span>
-<span class="sd">            Specifies default parameters for all parameter groups.</span>
 
 <span class="sd">        **inner_opt_kwargs : Any</span>
 <span class="sd">            Named arguments used to initialize `InnerOpt`.</span>
@@ -397,7 +410,7 @@
 
 
 <div class="viewcode-block" id="L1NormedGradientOptim"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.L1NormedGradientOptim.html#rai_toolbox.optim.L1NormedGradientOptim">[docs]</a><span class="k">class</span> <span class="nc">L1NormedGradientOptim</span><span class="p">(</span><span class="n">_LpNormOptimizer</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;A gradient-tranforming  optimizer that normalizes the each gradient by</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;A gradient-tranforming optimizer that normalizes the gradient by</span>
 <span class="sd">    its :math:`L^1`-norm prior to using `InnerOp.step` to update the</span>
 <span class="sd">    corresponding parameter.</span>
 
@@ -405,7 +418,6 @@
 <span class="sd">    --------</span>
 <span class="sd">    L2NormedGradientOptim</span>
 <span class="sd">    SignedGradientOptim</span>
-<span class="sd">    ProjectionMixin</span>
 <span class="sd">    ParamTransformingOptimizer</span>
 
 <span class="sd">    Examples</span>
@@ -443,7 +455,7 @@
 
 
 <div class="viewcode-block" id="L2NormedGradientOptim"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.L2NormedGradientOptim.html#rai_toolbox.optim.L2NormedGradientOptim">[docs]</a><span class="k">class</span> <span class="nc">L2NormedGradientOptim</span><span class="p">(</span><span class="n">_LpNormOptimizer</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;A gradient-tranforming  optimizer that normalizes the each gradient by</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;A gradient-tranforming optimizer that normalizes the gradient by</span>
 <span class="sd">    its :math:`L^2`-norm prior to using `InnerOp.step` to update the</span>
 <span class="sd">    corresponding parameter.</span>
 
@@ -453,7 +465,6 @@
 <span class="sd">    --------</span>
 <span class="sd">    L1NormedGradientOptim</span>
 <span class="sd">    SignedGradientOptim</span>
-<span class="sd">    ProjectionMixin</span>
 <span class="sd">    ParamTransformingOptimizer</span>
 
 <span class="sd">    Examples</span>
@@ -495,7 +506,7 @@
 <span class="sd">    to lie within an :math:`\epsilon`-sized ball in :math:`L^2` space centered on the</span>
 <span class="sd">    origin.</span>
 
-<span class="sd">    A step with this optimizer normalizes the each gradient by its :math:`L^2`-norm</span>
+<span class="sd">    A step with this optimizer normalizes the gradient by its :math:`L^2`-norm</span>
 <span class="sd">    prior to using `InnerOp.step` to update the corresponding parameter. Each parameter</span>
 <span class="sd">    is then projected into the constraint set.</span>
 
@@ -506,7 +517,6 @@
 <span class="sd">    --------</span>
 <span class="sd">    L2NormedGradientOptim</span>
 <span class="sd">    LinfProjectedOptim</span>
-<span class="sd">    ProjectionMixin</span>
 <span class="sd">    ParamTransformingOptimizer</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -547,7 +557,7 @@
 <span class="sd">            - A negative number indicates the &#39;offset&#39; from the dimensionality of the tensor (see &quot;Notes&quot; for examples).</span>
 <span class="sd">            - `None` means that the transformation will be applied directly to the tensor without any broadcasting.</span>
 
-<span class="sd">            See `ParamTransformingOptimizer` for more details and examples</span>
+<span class="sd">            See `ParamTransformingOptimizer` for more details and examples.</span>
 
 <span class="sd">        grad_scale : float, optional (default=1.0)</span>
 <span class="sd">            Multiplies each gradient in-place after the in-place transformation is</span>
@@ -636,7 +646,6 @@
 <span class="sd">    --------</span>
 <span class="sd">    L2NormedGradientOptim</span>
 <span class="sd">    LinfProjectedOptim</span>
-<span class="sd">    ProjectionMixin</span>
 <span class="sd">    ParamTransformingOptimizer</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -740,7 +749,7 @@
 <span class="sd">    normalizes the gradient to have an :math:`L^1`-norm of `grad_scale`, prior to</span>
 <span class="sd">    updating the parameter using `InnerOpt.step`.</span>
 
-<span class="sd">    The sparsification process retains only the signs (i.e. :math:`\pm 1`) of the</span>
+<span class="sd">    The sparsification process retains only the signs (i.e., :math:`\pm 1`) of the</span>
 <span class="sd">    gradient&#39;s elements. The transformation is applied to the gradient in accordance</span>
 <span class="sd">    with `param_ndim`.</span>
 
@@ -779,7 +788,7 @@
 
 <span class="sd">        q : float</span>
 <span class="sd">            Specifies the (fractional) percentile of absolute-largest gradient elements</span>
-<span class="sd">            to retain when sparsifying the gradient. E.g `q=0.9` means that only the</span>
+<span class="sd">            to retain when sparsifying the gradient. E.g., `q=0.9` means that only the</span>
 <span class="sd">            gradient elements within the 90th-percentile will be retained.</span>
 
 <span class="sd">            Must be within `[0.0, 1.0]`. The sparsification is applied to the gradient</span>
@@ -799,7 +808,7 @@
 <span class="sd">            - A negative number indicates the &#39;offset&#39; from the dimensionality of the tensor (see &quot;Notes&quot; for examples).</span>
 <span class="sd">            - `None` means that the transformation will be applied directly to the tensor without any broadcasting.</span>
 
-<span class="sd">            See `ParamTransformingOptimizer` for more details and examples</span>
+<span class="sd">            See `ParamTransformingOptimizer` for more details and examples.</span>
 
 <span class="sd">        grad_scale : float, optional (default=1.0)</span>
 <span class="sd">            Multiplies each gradient in-place after the in-place transformation is</span>

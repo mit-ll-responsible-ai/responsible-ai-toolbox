@@ -43,6 +43,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
+      
+      <link rel="icon" sizes="16x16" href="../_static/favicon-16x16.png">
+      
+    
+      
+      <link rel="icon" sizes="32x32" href="../_static/favicon-32x32.png">
+      
+    
+      
+      <link rel="apple-touch-icon" sizes="180x180" href="../_static/apple-touch-icon.png">
+      
+    
 
     <!-- Google Analytics -->
     
@@ -57,9 +69,11 @@
   <div id="navbar-start">
     
     
+
 <a class="navbar-brand" href="../index.html">
-<p class="title">rai-toolbox</p>
+  <img src="../_static/logo_no_text.png" class="logo" alt="logo">
 </a>
+
 
     
   </div>
@@ -318,7 +332,7 @@
 <dd><p>A Frank-Wolfe <a class="reference internal" href="#rd25ad1f7d854-1" id="id1">[1]</a> optimizer that, when computing the LMO, sparsifies a
 parameter’s gradient. Each updated parameter is constrained to fall within an
 <span class="math notranslate nohighlight">\(\epsilon\)</span>-sized ball in <span class="math notranslate nohighlight">\(L^1\)</span> space, centered on the origin.</p>
-<p>The sparsification process retains only the signs (i.e. <span class="math notranslate nohighlight">\(\pm 1\)</span>) of the
+<p>The sparsification process retains only the signs (i.e., <span class="math notranslate nohighlight">\(\pm 1\)</span>) of the
 gradient’s elements. The transformation is applied to the gradient in accordance
 with <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim</span></code>.</p>
 <div class="admonition seealso">
@@ -345,7 +359,7 @@ with <code class="xref py py-obj docutils literal notranslate"><span class="pre"
 <dt><strong>params</strong><span class="classifier">Sequence[Tensor] | Iterable[Mapping[str, Any]]</span></dt><dd><p>Iterable of parameters or dicts defining parameter groups.</p>
 </dd>
 <dt><strong>q</strong><span class="classifier">float</span></dt><dd><p>Specifies the (fractional) percentile of absolute-largest gradient elements
-to retain when sparsifying the gradient. E.g <a href="#id3"><span class="problematic" id="id4">`</span></a>q=0.9`means that only the
+to retain when sparsifying the gradient. E.g., <a href="#id3"><span class="problematic" id="id4">`</span></a>q=0.9`means that only the
 gradient elements within the 90th-percentile will be retained.</p>
 <p>Must be within <code class="xref py py-obj docutils literal notranslate"><span class="pre">[0.0,</span> <span class="pre">1.0]</span></code>. The sparsification is applied to the gradient
 in accordance to <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim</span></code>.</p>
@@ -374,7 +388,7 @@ in a batch-like style. This can be specified per param-group</p>
 <li><p>A negative number indicates the ‘offset’ from the dimensionality of the tensor (see “Notes” for examples).</p></li>
 <li><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> means that the transformation will be applied directly to the tensor without any broadcasting.</p></li>
 </ul>
-<p>See <a class="reference internal" href="rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer" title="rai_toolbox.optim.ParamTransformingOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParamTransformingOptimizer</span></code></a> for more details and examples</p>
+<p>See <a class="reference internal" href="rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer" title="rai_toolbox.optim.ParamTransformingOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParamTransformingOptimizer</span></code></a> for more details and examples.</p>
 </dd>
 <dt><strong>defaults</strong><span class="classifier">Optional[Dict[str, Any]]</span></dt><dd><p>Specifies default parameters for all parameter groups.</p>
 </dd>
@@ -410,10 +424,10 @@ a gradient.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">tr</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">])</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>Performing a step with our optimizer uses the Frank Wolfe algorithm to update
+<p>Performing a step with our optimizer uses the Frank-Wolfe algorithm to update
 its parameters; the resulting parameter was updated with a LMO based on a
 sparsified, sign-only gradient. Note that the parameter falls within/on the
-L1-ball of radius <code class="xref py py-obj docutils literal notranslate"><span class="pre">1.8</span></code>.</p>
+<span class="math notranslate nohighlight">\(L^1\)</span>-ball of radius <code class="xref py py-obj docutils literal notranslate"><span class="pre">1.8</span></code>.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">optim</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">x</span>  <span class="c1"># the updated parameter; has a L1-norm of 1.8</span>
 <span class="go">tensor([ 0.0000, -0.9000, -0.9000], requires_grad=True)</span>

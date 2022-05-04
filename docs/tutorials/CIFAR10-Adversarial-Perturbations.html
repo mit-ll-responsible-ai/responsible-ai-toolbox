@@ -44,6 +44,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
+      
+      <link rel="icon" sizes="16x16" href="../_static/favicon-16x16.png">
+      
+    
+      
+      <link rel="icon" sizes="32x32" href="../_static/favicon-32x32.png">
+      
+    
+      
+      <link rel="apple-touch-icon" sizes="180x180" href="../_static/apple-touch-icon.png">
+      
+    
 
     <!-- Google Analytics -->
     
@@ -58,9 +70,11 @@
   <div id="navbar-start">
     
     
+
 <a class="navbar-brand" href="../index.html">
-<p class="title">rai-toolbox</p>
+  <img src="../_static/logo_no_text.png" class="logo" alt="logo">
 </a>
+
 
     
   </div>
@@ -516,8 +530,8 @@ div.rendered_html tbody tr:hover {
 <div class="math notranslate nohighlight">
 \[\max_{||\delta||_p&lt;\epsilon} \mathcal{L}\left(f_\theta(x+\delta), y\right)\]</div>
 <p>where <span class="math notranslate nohighlight">\(\delta\)</span> is the perturbation, <span class="math notranslate nohighlight">\(f_\theta\)</span> is a machine learning model parameterized by <span class="math notranslate nohighlight">\(\theta\)</span>, <span class="math notranslate nohighlight">\(\mathcal{L}\)</span> is the loss function (e.g., cross-entropy), <span class="math notranslate nohighlight">\(||\delta||_p\)</span> is the <span class="math notranslate nohighlight">\(L^p\)</span>-norm of the perturbation (for this example we’ll be using <span class="math notranslate nohighlight">\(p=2\)</span>), and <span class="math notranslate nohighlight">\(\epsilon\)</span> is the maximum allowable size of the perturbation.</p>
-<p>This tutorial demonstrates how to use <a class="reference external" href="https://mit-ll-responsible-ai.github.io/responsible-ai-toolbox/generated/rai_toolbox.perturbations.gradient_ascent.html#rai_toolbox.perturbations.gradient_ascent">rai_toolbox.perturbations.gradient_ascent</a> to generate <span class="math notranslate nohighlight">\(L^2\)</span>-norm-constrained adversarial perturbations using projected gradient descent (PGD) for images from the CIFAR-10 dataset, based on both a standard classification model and a robust (i.e., adversarially-trained) model. We then
-compute adversarial accuracy for a few batches of samples from the test set, and use this to generate robustness curves for increasing values of perturbation size, <span class="math notranslate nohighlight">\(\epsilon\)</span>.</p>
+<p>This tutorial demonstrates how to use <a class="reference external" href="https://mit-ll-responsible-ai.github.io/responsible-ai-toolbox/generated/rai_toolbox.perturbations.gradient_ascent.html#rai_toolbox.perturbations.gradient_ascent">rai_toolbox.perturbations.gradient_ascent</a> to generate <span class="math notranslate nohighlight">\(L^2\)</span>-norm-constrained adversarial perturbations using projected gradient descent (PGD) for images from the <a class="reference external" href="https://www.cs.toronto.edu/~kriz/cifar.html">CIFAR-10</a> dataset, based on both a standard classification model and a robust
+(i.e., adversarially-trained) model. We then compute adversarial accuracy for a few batches of samples from the test set, and use this to generate robustness curves for increasing values of perturbation size, <span class="math notranslate nohighlight">\(\epsilon\)</span>.</p>
 <section id="Getting-Started">
 <h2>Getting Started<a class="headerlink" href="#Getting-Started" title="Permalink to this headline">#</a></h2>
 <p>We will install the rAI-toolbox and then we will create a Jupyter notebook in which we will complete this tutorial.</p>
@@ -553,7 +567,7 @@ compute adversarial accuracy for a few batches of samples from the test set, and
 </section>
 <section id="Boilerplate-setup">
 <h2>Boilerplate setup<a class="headerlink" href="#Boilerplate-setup" title="Permalink to this headline">#</a></h2>
-<p>In the notebook, we will start by importing modules from the toolbox and 3rd party libraries needed for this tutorial. Then we will specify directories where data and models will be stored, determine if computations will be run on CPU or GPU (depending on resources available on your machine).</p>
+<p>In the notebook, we will start by importing modules from the toolbox and 3rd party libraries needed for this tutorial. Then we will specify directories where data and models will be stored, and determine if computations will be run on CPU or GPU (depending on the resources available on your machine).</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
@@ -635,7 +649,7 @@ cuda:0
 </section>
 <section id="Loading-the-CIFAR-10-dataset">
 <h2>Loading the CIFAR-10 dataset<a class="headerlink" href="#Loading-the-CIFAR-10-dataset" title="Permalink to this headline">#</a></h2>
-<p>CIFAR-10 is a datasets containing 32x32 RGB images; each image depicts an object or animal belonging to one of ten classes. Here we will load images from the validation set and plot a few example images from each class.</p>
+<p>CIFAR-10 is a dataset containing 32x32 RGB images; each image depicts an object or animal belonging to one of ten classes. Here we will load images from the test set and plot a few example images from each class.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
@@ -695,7 +709,7 @@ Classes: [&#39;airplane&#39;, &#39;automobile&#39;, &#39;bird&#39;, &#39;cat&#39
 </section>
 <section id="Loading-pre-trained-CIFAR-10-models">
 <h2>Loading pre-trained CIFAR-10 models<a class="headerlink" href="#Loading-pre-trained-CIFAR-10-models" title="Permalink to this headline">#</a></h2>
-<p>Now we will load two pre-trained models. First, <code class="docutils literal notranslate"><span class="pre">model_robust</span></code>, is a classification model that was trained against adversarially-generated training data. Second, <code class="docutils literal notranslate"><span class="pre">model_standard</span></code>, is a classification model that was trained against CIFAR-10 using standard (i.e., non-adversarial) data augmentation procedures. The weights for both models are derived from Madrylab’s <a class="reference external" href="https://github.com/MadryLab/robustness">robustness</a> library:</p>
+<p>Next we will load two pre-trained models. First, <code class="docutils literal notranslate"><span class="pre">model_robust</span></code>, is a classification model that was trained against adversarially-generated training data. Second, <code class="docutils literal notranslate"><span class="pre">model_standard</span></code>, is a classification model that was trained against CIFAR-10 using standard (i.e., non-adversarial) data augmentation procedures. The weights for both models are derived from Madrylab’s <a class="reference external" href="https://github.com/MadryLab/robustness">robustness</a> library:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">mitll_cifar_l2_1_0.pt</span></code>: A simplified data structure of the pre-trained model available via the <a class="reference external" href="https://github.com/MadryLab/robustness/blob/master/README.rst">README</a>. This is a ResNet-50 model trained with perturbations generated via PGD using perturbations constrained to <span class="math notranslate nohighlight">\(L^2\)</span>-ball of radius <span class="math notranslate nohighlight">\(\epsilon=1.0\)</span></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">mitll_cifar_nat.pt</span></code>: A simplified data structure of the pre-trained model available via the <a class="reference external" href="https://github.com/MadryLab/robustness/blob/master/README.rst">README</a>. This is a ResNet-50 model trained using standard training with no adversarial perturbations in the loop (i.e., <span class="math notranslate nohighlight">\(\epsilon=0\)</span>)</p></li>
@@ -742,8 +756,8 @@ Classes: [&#39;airplane&#39;, &#39;automobile&#39;, &#39;bird&#39;, &#39;cat&#39
 </section>
 <section id="Obtaining-adversarial-perturbations-for-a-batch-of-data">
 <h2>Obtaining adversarial perturbations for a batch of data<a class="headerlink" href="#Obtaining-adversarial-perturbations-for-a-batch-of-data" title="Permalink to this headline">#</a></h2>
-<p>Use the <a class="reference external" href="https://mit-ll-responsible-ai.github.io/responsible-ai-toolbox/generated/rai_toolbox.perturbations.gradient_ascent.html">gradient_ascent</a> function with the <a class="reference external" href="https://mit-ll-responsible-ai.github.io/responsible-ai-toolbox/generated/rai_toolbox.perturbations.AdditivePerturbation.html">AdditivePerturbation</a> model and <a class="reference external" href="https://mit-ll-responsible-ai.github.io/responsible-ai-toolbox/generated/rai_toolbox.optim.L2ProjectedOptim.html">L2ProjectedOptim</a> optimizer from the toolbox to
-solve for <span class="math notranslate nohighlight">\(L^2\)</span>-norm-constrained adversarial perturbations to samples from the dataset. These are perturbations that maximize – within the given constraints – the cross-entropy classification loss measured on our model’s predictions.</p>
+<p>Now we will use the <a class="reference external" href="https://mit-ll-responsible-ai.github.io/responsible-ai-toolbox/generated/rai_toolbox.perturbations.gradient_ascent.html">gradient_ascent</a> function with an <a class="reference external" href="https://mit-ll-responsible-ai.github.io/responsible-ai-toolbox/generated/rai_toolbox.perturbations.AdditivePerturbation.html">AdditivePerturbation</a> model and <a class="reference external" href="https://mit-ll-responsible-ai.github.io/responsible-ai-toolbox/generated/rai_toolbox.optim.L2ProjectedOptim.html">L2ProjectedOptim</a> optimizer from the
+toolbox to solve for <span class="math notranslate nohighlight">\(L^2\)</span>-norm-constrained adversarial perturbations to samples from the dataset. These are perturbations that maximize – within the given constraints – the cross-entropy classification loss measured on our model’s predictions.</p>
 <p><code class="docutils literal notranslate"><span class="pre">AdditivePerturbation</span></code> implements <span class="math notranslate nohighlight">\(x_{adv}=x+\delta\)</span>, where <span class="math notranslate nohighlight">\(\delta\)</span> is the sole trainable parameter of the perturbation model.</p>
 <p>We will use <code class="docutils literal notranslate"><span class="pre">functools.partial</span></code> to set default values for <code class="docutils literal notranslate"><span class="pre">gradient_ascent</span></code>, so that they can be used consistently across our two models.</p>
 <div class="nbinput nblast docutils container">
@@ -778,7 +792,7 @@ solve for <span class="math notranslate nohighlight">\(L^2\)</span>-norm-constra
 </pre></div>
 </div>
 </div>
-<p>We will first solve for a single batch of adversarial perturbations for our standard model. Given a batch of images, this will produce a corresponding batch of perturbations and we will plot each image and the corresponding perturbation that we solved for, which attempts to “fool” the standard model.</p>
+<p>We will first solve for a single batch of adversarial perturbations for our standard model. Given a batch of images, this will produce a corresponding batch of perturbed images and we will plot each image, perturbed image, and the corresponding perturbation that we solved for, which attempts to “fool” the standard model.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
@@ -808,7 +822,7 @@ solve for <span class="math notranslate nohighlight">\(L^2\)</span>-norm-constra
 </div>
 </div>
 <p>The top row is the original image with true label, the second row is the adversarially-perturbed image with the label predicted by the model, and the third row is the perturbation (multiplied by <span class="math notranslate nohighlight">\(25\)</span> so it can be viewed more easily).</p>
-<p>Now we now use the same batch to produce adversarial examples for our robust model.</p>
+<p>Now we now use the same batch of data to produce adversarial examples for our robust model.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
@@ -1121,6 +1135,7 @@ Epsilon = 2
 </div>
 </div>
 <p>While the standard model is the most accurate on unperturbed data (<span class="math notranslate nohighlight">\(\epsilon=0\)</span>), it is reduced to near-guessing performance by the smallest-magnitude adversarial perturbations. By contrast, the robust model’s performance decays much more gradually in light of perturbations of increasing strength.</p>
+<p>In the next tutorial, we will see how we can use the same <code class="docutils literal notranslate"><span class="pre">gradient_ascent</span></code> solver and <code class="docutils literal notranslate"><span class="pre">AdditivePerturbation</span></code> model with a different optimizer to execute a task from Explainable AI called concept probing.</p>
 </section>
 </section>
 

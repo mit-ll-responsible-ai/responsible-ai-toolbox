@@ -40,6 +40,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
+      
+      <link rel="icon" sizes="16x16" href="_static/favicon-16x16.png">
+      
+    
+      
+      <link rel="icon" sizes="32x32" href="_static/favicon-32x32.png">
+      
+    
+      
+      <link rel="apple-touch-icon" sizes="180x180" href="_static/apple-touch-icon.png">
+      
+    
 
     <!-- Google Analytics -->
     
@@ -54,9 +66,11 @@
   <div id="navbar-start">
     
     
+
 <a class="navbar-brand" href="#">
-<p class="title">rai-toolbox</p>
+  <img src="_static/logo_no_text.png" class="logo" alt="logo">
 </a>
+
 
     
   </div>
@@ -199,28 +213,27 @@
 </div>
 <section id="welcome-to-the-documentation-for-the-responsible-ai-toolbox">
 <h1>Welcome to the documentation for the responsible AI toolbox<a class="headerlink" href="#welcome-to-the-documentation-for-the-responsible-ai-toolbox" title="Permalink to this headline">#</a></h1>
-<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rai_toolbox</span></code> is designed to enable methods for evaluating and enhancing both the
+<p>The rAI-toolbox is designed to enable methods for evaluating and enhancing both the
 robustness and the explainability of artificial intelligence (AI) and machine
 learning (ML) models in a way that is scalable and that
 composes naturally with other popular ML frameworks.</p>
-<p>A key design principle of <code class="xref py py-obj docutils literal notranslate"><span class="pre">rai_toolbox</span></code> is that it adheres strictly to the APIs
+<p>A key design principle of the rAI-toolbox is that it adheres strictly to the APIs
 specified by the <a class="reference external" href="https://pytorch.org/">PyTorch</a> machine learning framework.
-For example, <code class="xref py py-obj docutils literal notranslate"><span class="pre">rai_toolbox</span></code> frames the process of solving for an adversarial
+For example, the rAI-toolbox frames the process of solving for an adversarial
 perturbation solely in terms of the <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.nn.Optimizer</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.nn.Module</span></code> APIs.
 This makes it trivial to leverage other libraries and frameworks from the PyTorch
 ecosystem to bolster your responsible AI R&amp;D. For instance, one can naturally leverage
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">rai_toolbox</span></code> together with <a class="reference external" href="https://www.pytorchlightning.ai/">PyTorch Lightning</a> to
+the rAI-toolbox together with <a class="reference external" href="https://www.pytorchlightning.ai/">PyTorch Lightning</a> to
 perform distributed adversarial training.</p>
-<p>To see <code class="xref py py-obj docutils literal notranslate"><span class="pre">rai_toolbox</span></code> in action, please refer to the <a class="reference external" href="https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox/tree/main/examples">examples/</a>
+<p>To see the rAI-toolbox in action, please refer to the <a class="reference external" href="https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox/tree/main/examples">examples/</a>
 and <a class="reference external" href="https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox/tree/main/experiments">experiments/</a> sections of our repository.</p>
 <section id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">#</a></h2>
-<p>hydra-zen is lightweight: its only dependencies are <code class="docutils literal notranslate"><span class="pre">hydra-core</span></code> and
-<code class="docutils literal notranslate"><span class="pre">typing-extensions</span></code>. To install it, run:</p>
+<p>To install the basic toolbox, run:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pip install rai-toolbox
 </pre></div>
 </div>
-<p>To include our “mushin” capabilities, which leverages <a class="reference external" href="https://www.pytorchlightning.ai/">pytorch lightning</a>
+<p>To include our “mushin” capabilities, which leverage <a class="reference external" href="https://www.pytorchlightning.ai/">PyTorch Lightning</a>
 and <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen">hydra-zen</a> for enhanced boilerplate-free ML, run:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pip install rai-toolbox<span class="o">[</span>mushin<span class="o">]</span>
 </pre></div>
@@ -238,13 +251,13 @@ for a list of installation dependencies.</p>
 <h2>Learning about the responsible AI toolbox<a class="headerlink" href="#learning-about-the-responsible-ai-toolbox" title="Permalink to this headline">#</a></h2>
 <p>Our docs are divided into four sections: Tutorials, How-Tos, Explanations, and
 Reference.</p>
-<p>If you want to get a bird’s-eye view of what <code class="xref py py-obj docutils literal notranslate"><span class="pre">rai_toolbox</span></code> is all about, or if you are
+<p>If you want to get a bird’s-eye view of what the rAI-toolbox is all about, or if you are
 completely new to executing adversarial or explainable AI workflows,
 check out our <strong>Tutorials</strong>. For folks who are savvy responsible AI developers,
 our <strong>How-Tos</strong> and <strong>Reference</strong> materials can help acquaint you with the
 unique capabilities that are offered by the toolbox. Finally, <strong>Explanations</strong> provide
 readers with taxonomies, design principles, recommendations, and other articles that
-will enrich their understanding of <code class="xref py py-obj docutils literal notranslate"><span class="pre">rai_toolbox</span></code>.</p>
+will enrich their understanding of rAI-toolbox.</p>
 <div class="toctree-wrapper compound">
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
@@ -255,6 +268,7 @@ will enrich their understanding of <code class="xref py py-obj docutils literal 
 </li>
 <li class="toctree-l1"><a class="reference internal" href="how_tos.html">How-To Guides</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="how_to/custom_optim.html">Create a Parameter-Transforming Optimizer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="how_to/univ_adv_pert.html">Solve for a Universal Perturbation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="how_to/hydraddp.html">Run PyTorch Lightning DDP in Hydra</a></li>
 </ul>
 </li>

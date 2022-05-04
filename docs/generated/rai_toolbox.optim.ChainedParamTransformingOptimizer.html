@@ -41,6 +41,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
+      
+      <link rel="icon" sizes="16x16" href="../_static/favicon-16x16.png">
+      
+    
+      
+      <link rel="icon" sizes="32x32" href="../_static/favicon-32x32.png">
+      
+    
+      
+      <link rel="apple-touch-icon" sizes="180x180" href="../_static/apple-touch-icon.png">
+      
+    
 
     <!-- Google Analytics -->
     
@@ -55,9 +67,11 @@
   <div id="navbar-start">
     
     
+
 <a class="navbar-brand" href="../index.html">
-<p class="title">rai-toolbox</p>
+  <img src="../_static/logo_no_text.png" class="logo" alt="logo">
 </a>
+
 
     
   </div>
@@ -314,9 +328,9 @@
 <dt class="sig sig-object py" id="rai_toolbox.optim.ChainedParamTransformingOptimizer">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rai_toolbox.optim.</span></span><span class="sig-name descname"><span class="pre">ChainedParamTransformingOptimizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*transforming_optimizers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">InnerOpt=&lt;class</span> <span class="pre">'torch.optim.sgd.SGD'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_ndim=-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grad_scale=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grad_bias=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defaults=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**inner_opt_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/optim/optimizer.html#ChainedParamTransformingOptimizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.optim.ChainedParamTransformingOptimizer" title="Permalink to this definition">#</a></dt>
 <dd><p>Chains together an arbitrary number of parameter-transforming optimizers,
-composing their pre and post-step transformation functions to modify the parameters (and their gradients) in-place. <code class="xref py py-obj docutils literal notranslate"><span class="pre">InnerOpt.step()</span></code> applies the gradient-based update
+composing their pre- and post-step transformation functions to modify the parameters (and their gradients) in-place. <code class="xref py py-obj docutils literal notranslate"><span class="pre">InnerOpt.step()</span></code> applies the gradient-based update
 to each parameter.</p>
-<p>I.e. Passing <code class="xref py py-obj docutils literal notranslate"><span class="pre">Opt1,</span> <span class="pre">Opt2,</span> <span class="pre">...,</span> <span class="pre">OptN</span></code> to <a class="reference internal" href="#rai_toolbox.optim.ChainedParamTransformingOptimizer" title="rai_toolbox.optim.ChainedParamTransformingOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ChainedParamTransformingOptimizer</span></code></a> will
+<p>I.e., passing <code class="xref py py-obj docutils literal notranslate"><span class="pre">Opt1,</span> <span class="pre">Opt2,</span> <span class="pre">...,</span> <span class="pre">OptN</span></code> to <a class="reference internal" href="#rai_toolbox.optim.ChainedParamTransformingOptimizer" title="rai_toolbox.optim.ChainedParamTransformingOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ChainedParamTransformingOptimizer</span></code></a> will
 update a parameter using: <code class="xref py py-obj docutils literal notranslate"><span class="pre">OptN.fn_(...(Opt2.fn_(Opt1.fn_(param)))</span></code>,
 where <code class="xref py py-obj docutils literal notranslate"><span class="pre">fn_</span></code> is a shorthand for <code class="xref py py-obj docutils literal notranslate"><span class="pre">_pre_step_transform_</span></code> / <code class="xref py py-obj docutils literal notranslate"><span class="pre">_post_step_transform_</span></code>.</p>
 <div class="admonition seealso">
@@ -340,7 +354,7 @@ the user-specified chained gradient-trasnformers, so that their <code class="xre
 will be composed from left to right –
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">Opt1,</span> <span class="pre">Opt2,</span> <span class="pre">...,</span> <span class="pre">OptN</span> <span class="pre">-&gt;</span> <span class="pre">fN_(...f2_(f1_(grad)))</span></code> – to modify a parameter prior to / after being updated by <code class="xref py py-obj docutils literal notranslate"><span class="pre">InnerOpt.step</span></code></p>
 </dd>
-<dt><strong>params</strong><span class="classifier">Optional[Sequence[Tensor] | Iterable[ParamGroup]]</span></dt><dd><p>iterable of parameters to optimize or dicts defining parameter groups</p>
+<dt><strong>params</strong><span class="classifier">Optional[Sequence[Tensor] | Iterable[ParamGroup]]</span></dt><dd><p>Iterable of parameters to optimize or dicts defining parameter groups</p>
 </dd>
 <dt><strong>InnerOpt</strong><span class="classifier">Type[Optimizer] | Partial[Optimizer], optional (default=`torch.nn.optim.SGD`)</span></dt><dd><p>The optimizer that updates the parameters after <code class="xref py py-obj docutils literal notranslate"><span class="pre">_pre_step_transform_</span></code> has been applied to each of them.</p>
 </dd>
@@ -353,7 +367,7 @@ in a batch-like style.</p>
 <li><p>A negative number indicates the ‘offset’ from the dimensionality of the tensor (see “Notes” for examples).</p></li>
 <li><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> means that the transformation will be applied directly to the tensor without any broadcasting.</p></li>
 </ul>
-<p>See <a class="reference internal" href="rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer" title="rai_toolbox.optim.ParamTransformingOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParamTransformingOptimizer</span></code></a> for more details.</p>
+<p>See <a class="reference internal" href="rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer" title="rai_toolbox.optim.ParamTransformingOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParamTransformingOptimizer</span></code></a> for more details and examples.</p>
 </dd>
 <dt><strong>grad_scale</strong><span class="classifier">float, optional (default=1.0)</span></dt><dd><p>Multiplies each gradient in-place after the in-place transformation is
 performed. This can be specified per param-group.</p>
@@ -368,25 +382,14 @@ performed. This can be specified per param-group.</p>
 </dl>
 </dd>
 </dl>
-<p class="rubric">Notes</p>
-<p>Additional Explanation of <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim</span></code>:</p>
-<p>If the parameter has a shape <code class="xref py py-obj docutils literal notranslate"><span class="pre">(d0,</span> <span class="pre">d1,</span> <span class="pre">d2)</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim=1</span></code> then the
-transformation will be broadcast over each shape-(d2,) sub-tensor in the
-parameter (of which there are <code class="xref py py-obj docutils literal notranslate"><span class="pre">d0</span> <span class="pre">*</span> <span class="pre">d1</span></code>).</p>
-<p>If a parameter has a shape <code class="xref py py-obj docutils literal notranslate"><span class="pre">(d0,</span> <span class="pre">d1,</span> <span class="pre">d2,</span> <span class="pre">d3)</span></code>, and if <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim=-1</span></code>,
-then the transformation will broadcast over each shape-<code class="xref py py-obj docutils literal notranslate"><span class="pre">(d1,</span> <span class="pre">d2,</span> <span class="pre">d3)</span></code>
-sub-tensor in the parameter (of which there are d0). This is equivalent
-to <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim=3</span></code>.</p>
-<p>If <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim=0</span></code> then the transformation is applied elementwise to the
-parameter by temporarily reshaping the parameter to a shape-(T, 1) tensor.</p>
 <p class="rubric">Examples</p>
 <p><strong>Basic Example</strong></p>
 <p>Let’s chain together two gradient-transforming optimizers supplied by rAI-toolbox:
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">TopQGradientOptim</span></code> and <a class="reference internal" href="rai_toolbox.optim.ClampedGradientOptimizer.html#rai_toolbox.optim.ClampedGradientOptimizer" title="rai_toolbox.optim.ClampedGradientOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ClampedGradientOptimizer</span></code></a></p>
+<a class="reference internal" href="rai_toolbox.optim.TopQGradientOptimizer.html#rai_toolbox.optim.TopQGradientOptimizer" title="rai_toolbox.optim.TopQGradientOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TopQGradientOptimizer</span></code></a> and <a class="reference internal" href="rai_toolbox.optim.ClampedGradientOptimizer.html#rai_toolbox.optim.ClampedGradientOptimizer" title="rai_toolbox.optim.ClampedGradientOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ClampedGradientOptimizer</span></code></a></p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">rai_toolbox.optim</span> <span class="kn">import</span> <span class="p">(</span>
 <span class="gp">... </span><span class="n">ChainedParamTransformingOptimizer</span><span class="p">,</span>
 <span class="gp">... </span><span class="n">ClampedGradientOptimizer</span><span class="p">,</span>
-<span class="gp">... </span><span class="n">TopQGradientOptim</span><span class="p">,</span>
+<span class="gp">... </span><span class="n">TopQGradientOptimizer</span><span class="p">,</span>
 <span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">torch</span> <span class="k">as</span> <span class="nn">tr</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
@@ -400,17 +403,17 @@ the smallest elements will be zero’d. Then the resulting gradient will be
 clamped so that its largest possible entry is <code class="xref py py-obj docutils literal notranslate"><span class="pre">2.8</span></code>. Finally, the standard <code class="xref py py-obj docutils literal notranslate"><span class="pre">SGD</span></code>
 optimizer will be used, with <code class="xref py py-obj docutils literal notranslate"><span class="pre">lr=1.0</span></code>, to update the parameter(s) using the
 transformed gradients.</p>
-<p>We specify <code class="xref py py-obj docutils literal notranslate"><span class="pre">TopQGradientOptim</span></code> and then <a class="reference internal" href="rai_toolbox.optim.ClampedGradientOptimizer.html#rai_toolbox.optim.ClampedGradientOptimizer" title="rai_toolbox.optim.ClampedGradientOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ClampedGradientOptimizer</span></code></a>; the
+<p>We specify <a class="reference internal" href="rai_toolbox.optim.TopQGradientOptimizer.html#rai_toolbox.optim.TopQGradientOptimizer" title="rai_toolbox.optim.TopQGradientOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TopQGradientOptimizer</span></code></a> and then <a class="reference internal" href="rai_toolbox.optim.ClampedGradientOptimizer.html#rai_toolbox.optim.ClampedGradientOptimizer" title="rai_toolbox.optim.ClampedGradientOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ClampedGradientOptimizer</span></code></a>; the
 transformations are applied in order from left to right. Providing per-optimizer
 defaults is achieved most naturally using <a class="reference external" href="https://docs.python.org/3/library/functools.html#functools.partial" title="(in Python v3.10)"><code class="xref py py-func docutils literal notranslate"><span class="pre">functools.partial()</span></code></a>.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">optim</span> <span class="o">=</span> <span class="n">ChainedParamTransformingOptimizer</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">partial</span><span class="p">(</span><span class="n">TopQGradientOptim</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="mf">0.33</span><span class="p">),</span>
+<span class="gp">... </span>    <span class="n">partial</span><span class="p">(</span><span class="n">TopQGradientOptimizer</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="mf">0.33</span><span class="p">),</span>
 <span class="gp">... </span>    <span class="n">partial</span><span class="p">(</span><span class="n">ClampedGradientOptimizer</span><span class="p">,</span> <span class="n">clamp_max</span><span class="o">=</span><span class="mf">2.8</span><span class="p">),</span>
 <span class="gp">... </span>    <span class="n">params</span><span class="o">=</span><span class="p">[</span><span class="n">x1</span><span class="p">],</span>
 <span class="gp">... </span>    <span class="n">lr</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">param_ndim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="c1"># we don&#39;t want any broadcasting to occur</span>
 <span class="gp">... </span><span class="p">)</span>
-<span class="go">ClampedGradientOptimizer ○ TopQGradientOptim [SGD](</span>
+<span class="go">ClampedGradientOptimizer ○ TopQGradientOptimizer [SGD](</span>
 <span class="go">Parameter Group 0</span>
 <span class="go">    clamp_max: 2.8</span>
 <span class="go">    clamp_min: None</span>

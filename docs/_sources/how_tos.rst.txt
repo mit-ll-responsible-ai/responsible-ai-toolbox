@@ -15,4 +15,5 @@ towards concrete objectives.
    :caption: How to...
 
    how_to/custom_optim
+   how_to/univ_adv_pert
    how_to/hydraddp

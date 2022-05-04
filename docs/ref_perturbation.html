@@ -39,10 +39,22 @@
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="rai_toolbox.perturbations.gradient_ascent" href="generated/rai_toolbox.perturbations.gradient_ascent.html" />
+    <link rel="next" title="rai_toolbox.perturbations.PerturbationModel" href="generated/rai_toolbox.perturbations.PerturbationModel.html" />
     <link rel="prev" title="rai_toolbox.optim.L1qFrankWolfe" href="generated/rai_toolbox.optim.L1qFrankWolfe.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
+    
+      
+      <link rel="icon" sizes="16x16" href="_static/favicon-16x16.png">
+      
+    
+      
+      <link rel="icon" sizes="32x32" href="_static/favicon-32x32.png">
+      
+    
+      
+      <link rel="apple-touch-icon" sizes="180x180" href="_static/apple-touch-icon.png">
+      
     
 
     <!-- Google Analytics -->
@@ -58,9 +70,11 @@
   <div id="navbar-start">
     
     
+
 <a class="navbar-brand" href="index.html">
-<p class="title">rai-toolbox</p>
+  <img src="_static/logo_no_text.png" class="logo" alt="logo">
 </a>
+
 
     
   </div>
@@ -161,16 +175,6 @@
   </label>
   <ul>
    <li class="toctree-l2">
-    <a class="reference internal" href="generated/rai_toolbox.perturbations.gradient_ascent.html">
-     rai_toolbox.perturbations.gradient_ascent
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="generated/rai_toolbox.perturbations.random_restart.html">
-     rai_toolbox.perturbations.random_restart
-    </a>
-   </li>
-   <li class="toctree-l2">
     <a class="reference internal" href="generated/rai_toolbox.perturbations.PerturbationModel.html">
      rai_toolbox.perturbations.PerturbationModel
     </a>
@@ -178,6 +182,16 @@
    <li class="toctree-l2">
     <a class="reference internal" href="generated/rai_toolbox.perturbations.AdditivePerturbation.html">
      rai_toolbox.perturbations.AdditivePerturbation
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/rai_toolbox.perturbations.gradient_ascent.html">
+     rai_toolbox.perturbations.gradient_ascent
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/rai_toolbox.perturbations.random_restart.html">
+     rai_toolbox.perturbations.random_restart
     </a>
    </li>
    <li class="toctree-l2">
@@ -246,13 +260,13 @@
 <nav id="bd-toc-nav">
     <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#solvers">
-   Solvers
+  <a class="reference internal nav-link" href="#models">
+   Models
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#models">
-   Models
+  <a class="reference internal nav-link" href="#solvers">
+   Solvers
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
@@ -284,27 +298,10 @@
   <section id="perturbations">
 <span id="pert-reference"></span><h1>Perturbations<a class="headerlink" href="#perturbations" title="Permalink to this headline">#</a></h1>
 <p>The rAI-toolbox provides utilities for applying perturbations to data and solving for optimal perturbations. A perturbation model is a <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.nn.Module</span></code> whose parameters are used by its forward pass to perturb a datum or a batch of data.
-E.g. <a class="reference internal" href="generated/rai_toolbox.perturbations.AdditivePerturbation.html#rai_toolbox.perturbations.AdditivePerturbation" title="rai_toolbox.perturbations.AdditivePerturbation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AdditivePerturbation</span></code></a> applies the perturbation <span class="math notranslate nohighlight">\(x \rightarrow x + \delta\)</span> via its forward pass, where <span class="math notranslate nohighlight">\(\delta\)</span> is the sole learnable parameter of this perturbation model.</p>
+E.g., <a class="reference internal" href="generated/rai_toolbox.perturbations.AdditivePerturbation.html#rai_toolbox.perturbations.AdditivePerturbation" title="rai_toolbox.perturbations.AdditivePerturbation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AdditivePerturbation</span></code></a> applies the perturbation <span class="math notranslate nohighlight">\(x \rightarrow x + \delta\)</span> via its forward pass, where <span class="math notranslate nohighlight">\(\delta\)</span> is the sole learnable parameter of this perturbation model.</p>
 <p>Thus solving for perturbations is cast as a standard PyTorch optimization problem, where <a class="reference internal" href="ref_optim.html#optim-reference"><span class="std std-ref">optimizers</span></a> are used to make gradient-based updates to the perturbations.
-In this way the rAI-toolbox enables adversarial perturbation work flows to be performed by standard training and testing frameworks (e.g. via <a class="reference external" href="https://www.pytorchlightning.ai/">PyTorch-Lightning</a>).
-We also provide some custom solvers, e.g. <a class="reference internal" href="generated/rai_toolbox.perturbations.gradient_ascent.html#rai_toolbox.perturbations.gradient_ascent" title="rai_toolbox.perturbations.gradient_ascent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gradient_ascent</span></code></a>, to facilitate this line of work.</p>
-<section id="solvers">
-<span id="pert-solvers"></span><h2>Solvers<a class="headerlink" href="#solvers" title="Permalink to this headline">#</a></h2>
-<table class="autosummary longtable table autosummary">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/rai_toolbox.perturbations.gradient_ascent.html#rai_toolbox.perturbations.gradient_ascent" title="rai_toolbox.perturbations.gradient_ascent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gradient_ascent</span></code></a>(*, model, data, target, ...)</p></td>
-<td><p>Solve for a set of perturbations for a given set of data and a model.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/rai_toolbox.perturbations.random_restart.html#rai_toolbox.perturbations.random_restart" title="rai_toolbox.perturbations.random_restart"><code class="xref py py-obj docutils literal notranslate"><span class="pre">random_restart</span></code></a>(solver, repeats)</p></td>
-<td><p>Executes a solver function multiple times saving out the best perturbations.</p></td>
-</tr>
-</tbody>
-</table>
-</section>
+In this way, the rAI-toolbox enables adversarial perturbation workflows to be performed by standard training and testing frameworks (e.g. via <a class="reference external" href="https://www.pytorchlightning.ai/">PyTorch-Lightning</a>).
+We also provide some custom solvers, e.g., <a class="reference internal" href="generated/rai_toolbox.perturbations.gradient_ascent.html#rai_toolbox.perturbations.gradient_ascent" title="rai_toolbox.perturbations.gradient_ascent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gradient_ascent</span></code></a>, to facilitate this line of work.</p>
 <section id="models">
 <span id="pert-models"></span><h2>Models<a class="headerlink" href="#models" title="Permalink to this headline">#</a></h2>
 <table class="autosummary longtable table autosummary">
@@ -322,6 +319,23 @@ We also provide some custom solvers, e.g. <a class="reference internal" href="ge
 </tbody>
 </table>
 </section>
+<section id="solvers">
+<span id="pert-solvers"></span><h2>Solvers<a class="headerlink" href="#solvers" title="Permalink to this headline">#</a></h2>
+<table class="autosummary longtable table autosummary">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/rai_toolbox.perturbations.gradient_ascent.html#rai_toolbox.perturbations.gradient_ascent" title="rai_toolbox.perturbations.gradient_ascent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gradient_ascent</span></code></a>(*, model, data, target, ...)</p></td>
+<td><p>Solve for a set of perturbations for a given set of data and a model, and then apply those perturbations to the data.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/rai_toolbox.perturbations.random_restart.html#rai_toolbox.perturbations.random_restart" title="rai_toolbox.perturbations.random_restart"><code class="xref py py-obj docutils literal notranslate"><span class="pre">random_restart</span></code></a>(solver, repeats)</p></td>
+<td><p>Executes a solver function multiple times, saving out the best perturbations.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
 <section id="initializers">
 <h2>Initializers<a class="headerlink" href="#initializers" title="Permalink to this headline">#</a></h2>
 <table class="autosummary longtable table autosummary">
@@ -331,13 +345,13 @@ We also provide some custom solvers, e.g. <a class="reference internal" href="ge
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/rai_toolbox.perturbations.uniform_like_l1_n_ball_.html#rai_toolbox.perturbations.uniform_like_l1_n_ball_" title="rai_toolbox.perturbations.uniform_like_l1_n_ball_"><code class="xref py py-obj docutils literal notranslate"><span class="pre">uniform_like_l1_n_ball_</span></code></a>(x[, epsilon, ...])</p></td>
-<td><p>Uniform sampling of a epsilon-sized n-ball for <span class="math notranslate nohighlight">\(L^1\)</span>-norm, where <code class="xref py py-obj docutils literal notranslate"><span class="pre">n</span></code> is controlled by <code class="xref py py-obj docutils literal notranslate"><span class="pre">x.shape</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim</span></code>.</p></td>
+<td><p>Uniform sampling of an <span class="math notranslate nohighlight">\(\epsilon\)</span>-sized <code class="xref py py-obj docutils literal notranslate"><span class="pre">n</span></code>-ball for <span class="math notranslate nohighlight">\(L^1\)</span>-norm, where <code class="xref py py-obj docutils literal notranslate"><span class="pre">n</span></code> is controlled by <code class="xref py py-obj docutils literal notranslate"><span class="pre">x.shape</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim</span></code>.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/rai_toolbox.perturbations.uniform_like_l2_n_ball_.html#rai_toolbox.perturbations.uniform_like_l2_n_ball_" title="rai_toolbox.perturbations.uniform_like_l2_n_ball_"><code class="xref py py-obj docutils literal notranslate"><span class="pre">uniform_like_l2_n_ball_</span></code></a>(x[, epsilon, ...])</p></td>
-<td><p>Uniform sampling within an epsilon-sized n-ball for <span class="math notranslate nohighlight">\(L^2\)</span>-norm, where <code class="xref py py-obj docutils literal notranslate"><span class="pre">n</span></code> is controlled by <code class="xref py py-obj docutils literal notranslate"><span class="pre">x.shape</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim</span></code>.</p></td>
+<td><p>Uniform sampling within an <span class="math notranslate nohighlight">\(\epsilon\)</span>-sized <code class="xref py py-obj docutils literal notranslate"><span class="pre">n</span></code>-ball for <span class="math notranslate nohighlight">\(L^2\)</span>-norm, where <code class="xref py py-obj docutils literal notranslate"><span class="pre">n</span></code> is controlled by <code class="xref py py-obj docutils literal notranslate"><span class="pre">x.shape</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim</span></code>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/rai_toolbox.perturbations.uniform_like_linf_n_ball_.html#rai_toolbox.perturbations.uniform_like_linf_n_ball_" title="rai_toolbox.perturbations.uniform_like_linf_n_ball_"><code class="xref py py-obj docutils literal notranslate"><span class="pre">uniform_like_linf_n_ball_</span></code></a>(x[, epsilon, ...])</p></td>
-<td><p>Uniform sampling within an epsilon-sized n-ball for <span class="math notranslate nohighlight">\(L^{\infty}\)</span>-norm.</p></td>
+<td><p>Uniform sampling within an <span class="math notranslate nohighlight">\(\epsilon\)</span>-sized <code class="xref py py-obj docutils literal notranslate"><span class="pre">n</span></code>-ball for <span class="math notranslate nohighlight">\(L^{\infty}\)</span>-norm.</p></td>
 </tr>
 </tbody>
 </table>
@@ -357,10 +371,10 @@ We also provide some custom solvers, e.g. <a class="reference internal" href="ge
             <p class="prev-next-title">rai_toolbox.optim.L1qFrankWolfe</p>
         </div>
     </a>
-    <a class='right-next' id="next-link" href="generated/rai_toolbox.perturbations.gradient_ascent.html" title="next page">
+    <a class='right-next' id="next-link" href="generated/rai_toolbox.perturbations.PerturbationModel.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">rai_toolbox.perturbations.gradient_ascent</p>
+        <p class="prev-next-title">rai_toolbox.perturbations.PerturbationModel</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>

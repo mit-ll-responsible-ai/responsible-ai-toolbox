@@ -43,6 +43,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
+      
+      <link rel="icon" sizes="16x16" href="../_static/favicon-16x16.png">
+      
+    
+      
+      <link rel="icon" sizes="32x32" href="../_static/favicon-32x32.png">
+      
+    
+      
+      <link rel="apple-touch-icon" sizes="180x180" href="../_static/apple-touch-icon.png">
+      
+    
 
     <!-- Google Analytics -->
     
@@ -57,9 +69,11 @@
   <div id="navbar-start">
     
     
+
 <a class="navbar-brand" href="../index.html">
-<p class="title">rai-toolbox</p>
+  <img src="../_static/logo_no_text.png" class="logo" alt="logo">
 </a>
+
 
     
   </div>
@@ -315,7 +329,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="rai_toolbox.optim.L2NormedGradientOptim">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rai_toolbox.optim.</span></span><span class="sig-name descname"><span class="pre">L2NormedGradientOptim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">InnerOpt=&lt;class</span> <span class="pre">'torch.optim.sgd.SGD'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_ndim=-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defaults=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grad_scale=1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grad_bias=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">div_by_zero_eps=1.1754943508222875e-38</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/optim/lp_space.html#L2NormedGradientOptim"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.optim.L2NormedGradientOptim" title="Permalink to this definition">#</a></dt>
-<dd><p>A gradient-tranforming  optimizer that normalizes the each gradient by
+<dd><p>A gradient-tranforming optimizer that normalizes the gradient by
 its <span class="math notranslate nohighlight">\(L^2\)</span>-norm prior to using <code class="xref py py-obj docutils literal notranslate"><span class="pre">InnerOp.step</span></code> to update the
 corresponding parameter.</p>
 <p>The transformation is applied to the gradient in accordance with <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim</span></code>.</p>
@@ -324,7 +338,6 @@ corresponding parameter.</p>
 <dl class="simple">
 <dt><a class="reference internal" href="rai_toolbox.optim.L1NormedGradientOptim.html#rai_toolbox.optim.L1NormedGradientOptim" title="rai_toolbox.optim.L1NormedGradientOptim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">L1NormedGradientOptim</span></code></a></dt><dd></dd>
 <dt><a class="reference internal" href="rai_toolbox.optim.SignedGradientOptim.html#rai_toolbox.optim.SignedGradientOptim" title="rai_toolbox.optim.SignedGradientOptim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SignedGradientOptim</span></code></a></dt><dd></dd>
-<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProjectionMixin</span></code></dt><dd></dd>
 <dt><a class="reference internal" href="rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer" title="rai_toolbox.optim.ParamTransformingOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParamTransformingOptimizer</span></code></a></dt><dd></dd>
 </dl>
 </div>
@@ -378,7 +391,7 @@ in a batch-like style. This can be specified per param-group</p>
 <li><p>A negative number indicates the ‘offset’ from the dimensionality of the tensor (see “Notes” for examples).</p></li>
 <li><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> means that the transformation will be applied directly to the tensor without any broadcasting.</p></li>
 </ul>
-<p>See <a class="reference internal" href="rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer" title="rai_toolbox.optim.ParamTransformingOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParamTransformingOptimizer</span></code></a> for more details and examples</p>
+<p>See <a class="reference internal" href="rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer" title="rai_toolbox.optim.ParamTransformingOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParamTransformingOptimizer</span></code></a> for more details and examples.</p>
 </dd>
 <dt><strong>grad_scale</strong><span class="classifier">float, optional (default=1.0)</span></dt><dd><p>Multiplies each gradient in-place after the in-place transformation is
 performed. This can be specified per param-group.</p>

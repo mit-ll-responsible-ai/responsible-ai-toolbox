@@ -34,12 +34,26 @@
     <script src="../_static/clipboard.min.js"></script>
     <script src="../_static/copybutton.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="rai_toolbox.augmentations.fourier.generate_fourier_bases" href="rai_toolbox.augmentations.fourier.generate_fourier_bases.html" />
     <link rel="prev" title="Augmentations" href="../ref_augmentations.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
+    
+      
+      <link rel="icon" sizes="16x16" href="../_static/favicon-16x16.png">
+      
+    
+      
+      <link rel="icon" sizes="32x32" href="../_static/favicon-32x32.png">
+      
+    
+      
+      <link rel="apple-touch-icon" sizes="180x180" href="../_static/apple-touch-icon.png">
+      
     
 
     <!-- Google Analytics -->
@@ -55,9 +69,11 @@
   <div id="navbar-start">
     
     
+
 <a class="navbar-brand" href="../index.html">
-<p class="title">rai-toolbox</p>
+  <img src="../_static/logo_no_text.png" class="logo" alt="logo">
 </a>
+
 
     
   </div>
@@ -260,7 +276,7 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rai_toolbox.augmentations.fourier.</span></span><span class="sig-name descname"><span class="pre">FourierBasis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">basis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">position</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sym_position</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase_shift</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/augmentations/fourier/_fourier_basis.html#FourierBasis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.augmentations.fourier.FourierBasis" title="Permalink to this definition">#</a></dt>
 <dd><p>Describes a 2D planewave generated via:</p>
 <p>A * cos(2pi * freq_vector &#64; x + phase_shift)</p>
-<p>Where <code class="xref py py-obj docutils literal notranslate"><span class="pre">A</span></code> normalizes the 2D array to have an L2-norm of 1,
+<p>Where <code class="xref py py-obj docutils literal notranslate"><span class="pre">A</span></code> normalizes the 2D array to have an <span class="math notranslate nohighlight">\(L^2\)</span>-norm of 1,
 and <code class="xref py py-obj docutils literal notranslate"><span class="pre">x</span></code> is evaluated on a grid of positions on [0, H] x [0, W].</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -268,14 +284,14 @@ and <code class="xref py py-obj docutils literal notranslate"><span class="pre">
 <dt><strong>basis: np.ndarray, shape-(H, W)</strong></dt><dd><p>The amplitudes of the 2D planewave.</p>
 </dd>
 <dt><strong>position</strong><span class="classifier">Tuple[int, int]</span></dt><dd><p>The (k-row, k-col) coordinate in shifted k-space, where
-the freq-0 component has been shifted to resides at the
+the freq-0 component has been shifted to reside at the
 center of the shape-(H, W) “k-image”.</p>
 </dd>
 <dt><strong>sym_position</strong><span class="classifier">Tuple[int, int]</span></dt><dd><p>The k-space coordinate symmetric to <code class="xref py py-obj docutils literal notranslate"><span class="pre">position</span></code>, about the
 center of the k-space image.</p>
 </dd>
 <dt><strong>phase_shift</strong><span class="classifier">float</span></dt><dd><p>The total phase-shift applied to the cosine-generated
-planewave</p>
+planewave.</p>
 </dd>
 </dl>
 </dd>

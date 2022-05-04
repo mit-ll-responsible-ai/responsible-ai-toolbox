@@ -34,12 +34,26 @@
     <script src="../_static/clipboard.min.js"></script>
     <script src="../_static/copybutton.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="rai_toolbox.augmentations.fourier.create_heatmaps" href="rai_toolbox.augmentations.fourier.create_heatmaps.html" />
     <link rel="prev" title="rai_toolbox.augmentations.fourier.FourierBasis" href="rai_toolbox.augmentations.fourier.FourierBasis.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
+    
+      
+      <link rel="icon" sizes="16x16" href="../_static/favicon-16x16.png">
+      
+    
+      
+      <link rel="icon" sizes="32x32" href="../_static/favicon-32x32.png">
+      
+    
+      
+      <link rel="apple-touch-icon" sizes="180x180" href="../_static/apple-touch-icon.png">
+      
     
 
     <!-- Google Analytics -->
@@ -55,9 +69,11 @@
   <div id="navbar-start">
     
     
+
 <a class="navbar-brand" href="../index.html">
-<p class="title">rai-toolbox</p>
+  <img src="../_static/logo_no_text.png" class="logo" alt="logo">
 </a>
+
 
     
   </div>
@@ -268,7 +284,7 @@ the grid.</p>
 <dt><strong>nrows</strong><span class="classifier">int</span></dt><dd></dd>
 <dt><strong>ncols</strong><span class="classifier">int</span></dt><dd></dd>
 <dt><strong>dtype</strong><span class="classifier">DTypeLike</span></dt><dd></dd>
-<dt><strong>factor_2pi_phase_shift</strong><span class="classifier">float (optional, default=0)</span></dt><dd><p>E.g. specifying <code class="docutils literal notranslate"><span class="pre">0.5</span></code> will induce a phase-shift of pi on all bases.</p>
+<dt><strong>factor_2pi_phase_shift</strong><span class="classifier">float (optional, default=0)</span></dt><dd><p>E.g., specifying <code class="docutils literal notranslate"><span class="pre">0.5</span></code> will induce a phase-shift of <span class="math notranslate nohighlight">\(\pi\)</span> on all bases.</p>
 </dd>
 <dt><strong>row_col_coords</strong><span class="classifier">Optional[Iterable[Tuple[int, int]]]</span></dt><dd><p>If provided, specifies the specific Fourier-bases to generate in terms of their
 Fourier-space locations. Otherwise, all non-redundant entries on the nrows x ncols
@@ -289,7 +305,7 @@ shape-(nrows, ncols) real-valued basis array itself.</p>
 <p class="rubric">Examples</p>
 <p>Here we will visualize the collection of bases in Fourier space that support the</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">ll_freq_analysis</span> <span class="kn">import</span> <span class="n">generate_fourier_bases</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">rai_toolbox.augmentations.fourier</span> <span class="kn">import</span> <span class="n">generate_fourier_bases</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">basis</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="k">for</span> <span class="n">out</span> <span class="ow">in</span> <span class="n">generate_fourier_bases</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)]</span>
 <span class="go">[array([[ 0.33,  0.12, -0.46],</span>
 <span class="go">    [ 0.12, -0.46,  0.33],</span>

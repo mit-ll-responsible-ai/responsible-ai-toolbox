@@ -44,6 +44,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
+      
+      <link rel="icon" sizes="16x16" href="../_static/favicon-16x16.png">
+      
+    
+      
+      <link rel="icon" sizes="32x32" href="../_static/favicon-32x32.png">
+      
+    
+      
+      <link rel="apple-touch-icon" sizes="180x180" href="../_static/apple-touch-icon.png">
+      
+    
 
     <!-- Google Analytics -->
     
@@ -58,9 +70,11 @@
   <div id="navbar-start">
     
     
+
 <a class="navbar-brand" href="../index.html">
-<p class="title">rai-toolbox</p>
+  <img src="../_static/logo_no_text.png" class="logo" alt="logo">
 </a>
+
 
     
   </div>
@@ -470,7 +484,7 @@ div.rendered_html tbody tr:hover {
 </div></blockquote>
 <section id="Concept-Probing">
 <h1>Concept Probing<a class="headerlink" href="#Concept-Probing" title="Permalink to this headline">#</a></h1>
-<p>This notebook demonstrates how the <a class="reference external" href="https://mit-ll-responsible-ai.github.io/responsible-ai-toolbox/generated/rai_toolbox.perturbations.gradient_ascent.html#rai_toolbox.perturbations.gradient_ascent">gradient_ascent</a> function from the previous tutorial can be repurposed with a different optimizer (<a class="reference external" href="https://mit-ll-responsible-ai.github.io/responsible-ai-toolbox/generated/rai_toolbox.optim.L1qFrankWolfe.html">L1qFrankWolfe</a>).</p>
+<p>This notebook demonstrates how the <a class="reference external" href="https://mit-ll-responsible-ai.github.io/responsible-ai-toolbox/generated/rai_toolbox.perturbations.gradient_ascent.html#rai_toolbox.perturbations.gradient_ascent">gradient_ascent</a> function from the previous tutorial can be repurposed with a different optimizer (<a class="reference external" href="https://mit-ll-responsible-ai.github.io/responsible-ai-toolbox/generated/rai_toolbox.optim.L1qFrankWolfe.html">L1qFrankWolfe</a>) to execute a task called concept probing.</p>
 <p>If you haven’t already, follow the steps at the beginning of the previous tutorial to install the rAI-toolbox and create a Jupyter notebook called <code class="docutils literal notranslate"><span class="pre">ImageNet-Concept-Probing.ipynb</span></code>. You can then follow along with this tutorial by copying, pasting, and running the code blocks below in the cells of your notebook.</p>
 <section id="Boilerplate-setup">
 <h2>Boilerplate setup<a class="headerlink" href="#Boilerplate-setup" title="Permalink to this headline">#</a></h2>
@@ -514,8 +528,11 @@ cuda:0
 </section>
 <section id="Load-pre-trained-ImageNet-models">
 <h2>Load pre-trained ImageNet models<a class="headerlink" href="#Load-pre-trained-ImageNet-models" title="Permalink to this headline">#</a></h2>
-<p>The pre-trained models used in this example are simplified data structures of the pre-trained models available via Madrylab’s robustness library <a class="reference external" href="https://github.com/MadryLab/robustness/blob/master/README.rst">README</a> for the <a class="reference external" href="https://www.image-net.org/">ImageNet</a> dataset, and include: - <code class="docutils literal notranslate"><span class="pre">mitll_imagenet_l2_3_0.pt</span></code>: ResNet-50 model trained with perturbations generated via PGD using the <span class="math notranslate nohighlight">\(L^2\)</span>-norm with <span class="math notranslate nohighlight">\(\epsilon=3.0\)</span> - <code class="docutils literal notranslate"><span class="pre">imagenet_nat.pt</span></code>: ResNet-50 model trained using standard
-training, i.e., <span class="math notranslate nohighlight">\(\epsilon=0\)</span></p>
+<p>The pre-trained models used in this example are simplified data structures of the pre-trained models available via Madrylab’s robustness library <a class="reference external" href="https://github.com/MadryLab/robustness/blob/master/README.rst">README</a> for the <a class="reference external" href="https://www.image-net.org/">ImageNet</a> dataset, and include:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">mitll_imagenet_l2_3_0.pt</span></code>: ResNet-50 model trained with perturbations generated via PGD using the <span class="math notranslate nohighlight">\(L^2\)</span>-norm with <span class="math notranslate nohighlight">\(\epsilon=3.0\)</span></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">imagenet_nat.pt</span></code>: ResNet-50 model trained using standard training, i.e., <span class="math notranslate nohighlight">\(\epsilon=0\)</span></p></li>
+</ul>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
@@ -551,7 +568,7 @@ training, i.e., <span class="math notranslate nohighlight">\(\epsilon=0\)</span>
 </section>
 <section id="Concept-probing">
 <h2>Concept probing<a class="headerlink" href="#Concept-probing" title="Permalink to this headline">#</a></h2>
-<p>We will now demonstrate how the optimizer input to <code class="docutils literal notranslate"><span class="pre">gradient_ascent</span></code> can be switched out to complete a different task, called Concept Probing. Now instead of starting with a real image from the validation set and optimizing its perturbation away from its true class as we did in the previous tutorial, in this example, we’ll be starting with a random noise image and optimizing its perturbation towards a class of interest, in an attempt to visualize what the model has learned for that class.</p>
+<p>We will now demonstrate how the optimizer input to <code class="docutils literal notranslate"><span class="pre">gradient_ascent</span></code> can be switched out to complete a different task, called Concept Probing. Now instead of starting with a real image from the test set and optimizing its perturbation away from its true class as we did in the previous tutorial, in this example, we’ll be starting with a random noise image and optimizing its perturbation towards a class of interest, in an attempt to visualize what the model has learned for that class.</p>
 <p>Following the approach proposed by the authors of <a class="reference external" href="https://diglib.eg.org/bitstream/handle/10.2312/mlvis20211072/001-005.pdf?sequence=1&amp;isAllowed=y">this paper</a>, we utilize the <span class="math notranslate nohighlight">\(L^{1-q}\)</span> Frank-Wolfe optimizer to solve for sparse perturbations that are more interpretable by humans.</p>
 <p>We will use <code class="docutils literal notranslate"><span class="pre">functools.partial</span></code> to set default values for <code class="docutils literal notranslate"><span class="pre">gradient_ascent</span></code>, so that they can be used consistently across our two models. Note that <a class="reference external" href="https://mit-ll-responsible-ai.github.io/responsible-ai-toolbox/generated/rai_toolbox.perturbations.AdditivePerturbation.html#rai_toolbox.perturbations.AdditivePerturbation">AdditivePerturbation</a> is the default <code class="docutils literal notranslate"><span class="pre">perturbation_model</span></code> for <code class="docutils literal notranslate"><span class="pre">gradient_ascent</span></code>, so we don’t need to define it explicitly.</p>
 <div class="nbinput nblast docutils container">

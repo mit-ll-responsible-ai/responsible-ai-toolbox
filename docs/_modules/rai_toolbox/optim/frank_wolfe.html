@@ -39,6 +39,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
+      
+      <link rel="icon" sizes="16x16" href="../../../_static/favicon-16x16.png">
+      
+    
+      
+      <link rel="icon" sizes="32x32" href="../../../_static/favicon-32x32.png">
+      
+    
+      
+      <link rel="apple-touch-icon" sizes="180x180" href="../../../_static/apple-touch-icon.png">
+      
+    
 
     <!-- Google Analytics -->
     
@@ -53,9 +65,11 @@
   <div id="navbar-start">
     
     
+
 <a class="navbar-brand" href="../../../index.html">
-<p class="title">rai-toolbox</p>
+  <img src="../../../_static/logo_no_text.png" class="logo" alt="logo">
 </a>
+
 
     
   </div>
@@ -290,7 +304,7 @@
 <span class="sd">    parameter&#39;s gradient. Each updated parameter is constrained to fall within an</span>
 <span class="sd">    :math:`\epsilon`-sized ball in :math:`L^1` space, centered on the origin.</span>
 
-<span class="sd">    The sparsification process retains only the signs (i.e. :math:`\pm 1`) of the</span>
+<span class="sd">    The sparsification process retains only the signs (i.e., :math:`\pm 1`) of the</span>
 <span class="sd">    gradient&#39;s elements. The transformation is applied to the gradient in accordance</span>
 <span class="sd">    with `param_ndim`.</span>
 
@@ -327,7 +341,7 @@
 
 <span class="sd">        q : float</span>
 <span class="sd">            Specifies the (fractional) percentile of absolute-largest gradient elements</span>
-<span class="sd">            to retain when sparsifying the gradient. E.g `q=0.9`means that only the</span>
+<span class="sd">            to retain when sparsifying the gradient. E.g., `q=0.9`means that only the</span>
 <span class="sd">            gradient elements within the 90th-percentile will be retained.</span>
 
 <span class="sd">            Must be within `[0.0, 1.0]`. The sparsification is applied to the gradient</span>
@@ -362,7 +376,7 @@
 <span class="sd">            - A negative number indicates the &#39;offset&#39; from the dimensionality of the tensor (see &quot;Notes&quot; for examples).</span>
 <span class="sd">            - `None` means that the transformation will be applied directly to the tensor without any broadcasting.</span>
 
-<span class="sd">            See `ParamTransformingOptimizer` for more details and examples</span>
+<span class="sd">            See `ParamTransformingOptimizer` for more details and examples.</span>
 
 <span class="sd">        defaults : Optional[Dict[str, Any]]</span>
 <span class="sd">            Specifies default parameters for all parameter groups.</span>
@@ -399,10 +413,10 @@
 
 <span class="sd">        &gt;&gt;&gt; (tr.tensor([0.0, 1.0, 2.0]) * x).sum().backward()</span>
 
-<span class="sd">        Performing a step with our optimizer uses the Frank Wolfe algorithm to update</span>
+<span class="sd">        Performing a step with our optimizer uses the Frank-Wolfe algorithm to update</span>
 <span class="sd">        its parameters; the resulting parameter was updated with a LMO based on a</span>
 <span class="sd">        sparsified, sign-only gradient. Note that the parameter falls within/on the</span>
-<span class="sd">        L1-ball of radius `1.8`.</span>
+<span class="sd">        :math:`L^1`-ball of radius `1.8`.</span>
 
 <span class="sd">        &gt;&gt;&gt; optim.step()</span>
 <span class="sd">        &gt;&gt;&gt; x  # the updated parameter; has a L1-norm of 1.8</span>
@@ -485,7 +499,7 @@
 <span class="sd">            - A negative number indicates the &#39;offset&#39; from the dimensionality of the tensor (see &quot;Notes&quot; for examples).</span>
 <span class="sd">            - `None` means that the transformation will be applied directly to the tensor without any broadcasting.</span>
 
-<span class="sd">            See `ParamTransformingOptimizer` for more details and examples</span>
+<span class="sd">            See `ParamTransformingOptimizer` for more details and examples.</span>
 
 <span class="sd">        div_by_zero_eps : float, optional (default=`torch.finfo(torch.float32).tiny`)</span>
 <span class="sd">            Prevents div-by-zero error in learning rate schedule.</span>
@@ -510,7 +524,7 @@
 
 <span class="sd">        &gt;&gt;&gt; (tr.tensor([1.0, 2.0]) * x).sum().backward()</span>
 
-<span class="sd">        Performing a step with our optimizer uses the Frank Wolfe algorithm to update</span>
+<span class="sd">        Performing a step with our optimizer uses the Frank-Wolfe algorithm to update</span>
 <span class="sd">        its parameters. Note that the updated parameter falls within/on the</span>
 <span class="sd">        :math:`L^1`-ball of radius `1.8`.</span>
 
@@ -602,7 +616,7 @@
 <span class="sd">            - A negative number indicates the &#39;offset&#39; from the dimensionality of the tensor (see &quot;Notes&quot; for examples).</span>
 <span class="sd">            - `None` means that the transformation will be applied directly to the tensor without any broadcasting.</span>
 
-<span class="sd">            See `ParamTransformingOptimizer` for more details and examples</span>
+<span class="sd">            See `ParamTransformingOptimizer` for more details and examples.</span>
 
 <span class="sd">        div_by_zero_eps : float, optional (default=`torch.finfo(torch.float32).tiny`)</span>
 <span class="sd">            Prevents div-by-zero error in learning rate schedule.</span>
@@ -627,7 +641,7 @@
 
 <span class="sd">        &gt;&gt;&gt; (tr.tensor([1.0, 2.0]) * x).sum().backward()</span>
 
-<span class="sd">        Performing a step with our optimizer uses the Frank Wolfe algorithm to update</span>
+<span class="sd">        Performing a step with our optimizer uses the Frank-Wolfe algorithm to update</span>
 <span class="sd">        its parameters. Note that the updated parameter falls within/on the</span>
 <span class="sd">        :math:`L^2`-ball of radius `1.8`.</span>
 
@@ -670,7 +684,7 @@
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    Using `LinfFrankWolfe`, we&#39;ll constrain the updated parameter to fall within a</span>
-<span class="sd">    :math:`L^infty`-ball of radius `1.8`.</span>
+<span class="sd">    :math:`L^\infty`-ball of radius `1.8`.</span>
 
 <span class="sd">    &gt;&gt;&gt; import torch as tr</span>
 <span class="sd">    &gt;&gt;&gt; from rai_toolbox.optim import LinfFrankWolfe</span>
@@ -687,7 +701,7 @@
 
 <span class="sd">    &gt;&gt;&gt; (tr.tensor([1.0, 2.0]) * x).sum().backward()</span>
 
-<span class="sd">    Performing a step with our optimizer uses the Frank Wolfe algorithm to update</span>
+<span class="sd">    Performing a step with our optimizer uses the Frank-Wolfe algorithm to update</span>
 <span class="sd">    its parameters. Note that the updated parameter falls within/on the</span>
 <span class="sd">    :math:`L^\infty`-ball of radius `1.8`.</span>
 
@@ -736,7 +750,7 @@
 <span class="sd">            - A negative number indicates the &#39;offset&#39; from the dimensionality of the tensor (see &quot;Notes&quot; for examples).</span>
 <span class="sd">            - `None` means that the transformation will be applied directly to the tensor without any broadcasting.</span>
 
-<span class="sd">            See `ParamTransformingOptimizer` for more details and examples</span>
+<span class="sd">            See `ParamTransformingOptimizer` for more details and examples.</span>
 
 <span class="sd">        div_by_zero_eps : float, optional (default=`torch.finfo(torch.float32).tiny`)</span>
 <span class="sd">            Prevents div-by-zero error in learning rate schedule.</span>

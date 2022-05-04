@@ -41,6 +41,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
+      
+      <link rel="icon" sizes="16x16" href="../_static/favicon-16x16.png">
+      
+    
+      
+      <link rel="icon" sizes="32x32" href="../_static/favicon-32x32.png">
+      
+    
+      
+      <link rel="apple-touch-icon" sizes="180x180" href="../_static/apple-touch-icon.png">
+      
+    
 
     <!-- Google Analytics -->
     
@@ -55,9 +67,11 @@
   <div id="navbar-start">
     
     
+
 <a class="navbar-brand" href="../index.html">
-<p class="title">rai-toolbox</p>
+  <img src="../_static/logo_no_text.png" class="logo" alt="logo">
 </a>
+
 
     
   </div>
@@ -266,7 +280,25 @@ designed to minimize distribution shift relative to the original dataset.”</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="rai_toolbox.datasets.CIFAR10P1.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_transform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/datasets/cifar10_extensions.html#CIFAR10P1.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.datasets.CIFAR10P1.__init__" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>root</strong><span class="classifier">PathLike</span></dt><dd><p>Root directory of dataset where
+CIFAR-10.1 files exist or will be saved to if download is set to True.</p>
+</dd>
+<dt><strong>transform</strong><span class="classifier">Optional[Callable[[Image], Any]]</span></dt><dd><p>A function/transform that takes in a PIL image
+and returns a transformed version. E.g., <code class="docutils literal notranslate"><span class="pre">transforms.RandomCrop</span></code></p>
+</dd>
+<dt><strong>target_transform</strong><span class="classifier">Optional[Callable]</span></dt><dd><p>A function/transform that takes in a target
+and returns a transformed version.</p>
+</dd>
+<dt><strong>download</strong><span class="classifier">bool, optional (default=False)</span></dt><dd><p>If true, downloads the dataset from the internet and puts it in root directory.
+If dataset is already downloaded, it is not downloaded again.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 <p class="rubric">Methods</p>
 <table class="autosummary longtable table autosummary">
@@ -276,7 +308,11 @@ designed to minimize distribution shift relative to the original dataset.”</p>
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#rai_toolbox.datasets.CIFAR10P1.__init__" title="rai_toolbox.datasets.CIFAR10P1.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(root[, transform, ...])</p></td>
-<td><p></p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+</p></td>
 </tr>
 </tbody>
 </table>

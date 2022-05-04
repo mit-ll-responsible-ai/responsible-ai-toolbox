@@ -39,6 +39,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
+      
+      <link rel="icon" sizes="16x16" href="../../../_static/favicon-16x16.png">
+      
+    
+      
+      <link rel="icon" sizes="32x32" href="../../../_static/favicon-32x32.png">
+      
+    
+      
+      <link rel="apple-touch-icon" sizes="180x180" href="../../../_static/apple-touch-icon.png">
+      
+    
 
     <!-- Google Analytics -->
     
@@ -53,9 +65,11 @@
   <div id="navbar-start">
     
     
+
 <a class="navbar-brand" href="../../../index.html">
-<p class="title">rai-toolbox</p>
+  <img src="../../../_static/logo_no_text.png" class="logo" alt="logo">
 </a>
+
 
     
   </div>
@@ -178,6 +192,28 @@
         <span class="n">loader</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">folder</span><span class="o">.</span><span class="n">default_loader</span><span class="p">,</span>
         <span class="n">is_valid_file</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        root : Union[str, Path]</span>
+<span class="sd">            Root directory of dataset where</span>
+<span class="sd">            ImageNet folders exist.</span>
+
+<span class="sd">        transform :  Optional[Callable[[Image], Any]]</span>
+<span class="sd">            A function/transform that takes in a PIL image</span>
+<span class="sd">            and returns a transformed version. E.g., ``transforms.RandomCrop``</span>
+
+<span class="sd">        target_transform : Optional[Callable]</span>
+<span class="sd">            A function/transform that takes in a target</span>
+<span class="sd">            and returns a transformed version.</span>
+
+<span class="sd">        loader : Callable[[str], Any], optional (default=`folder.default_loader`)</span>
+<span class="sd">            A function to load a sample given its path.</span>
+
+<span class="sd">        is_valid_file : Optional[Callable[[str], bool]], optional (default=None)</span>
+<span class="sd">            A function that takes path of a file</span>
+<span class="sd">            and checks if the file is a valid file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">root</span><span class="p">,</span>
             <span class="n">loader</span><span class="p">,</span>

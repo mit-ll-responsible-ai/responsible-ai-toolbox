@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-<meta content="A description of how-to run PyTorch Lightning's DDP strategy with Hydra using rai-toolbox." name="description" />
+<meta content="A description of how-to run PyTorch Lightning's DDP strategy with Hydra using rAI-toolbox." name="description" />
 
     <title>Run PyTorch Lightning DDP in Hydra &#8212; rai-toolbox  documentation</title>
     
@@ -38,9 +38,21 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Explanation" href="../explanation.html" />
-    <link rel="prev" title="Create a Parameter-Transforming Optimizer" href="custom_optim.html" />
+    <link rel="prev" title="Solve for a Universal Perturbation" href="univ_adv_pert.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
+    
+      
+      <link rel="icon" sizes="16x16" href="../_static/favicon-16x16.png">
+      
+    
+      
+      <link rel="icon" sizes="32x32" href="../_static/favicon-32x32.png">
+      
+    
+      
+      <link rel="apple-touch-icon" sizes="180x180" href="../_static/apple-touch-icon.png">
+      
     
 
     <!-- Google Analytics -->
@@ -56,9 +68,11 @@
   <div id="navbar-start">
     
     
+
 <a class="navbar-brand" href="../index.html">
-<p class="title">rai-toolbox</p>
+  <img src="../_static/logo_no_text.png" class="logo" alt="logo">
 </a>
+
 
     
   </div>
@@ -146,6 +160,11 @@
  <li class="toctree-l1">
   <a class="reference internal" href="custom_optim.html">
    Create a Parameter-Transforming Optimizer
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="univ_adv_pert.html">
+   Solve for a Universal Perturbation
   </a>
  </li>
  <li class="toctree-l1 current active">
@@ -240,9 +259,9 @@ becomes compatible with interactive environments such as Jupyter Notebooks!</p>
 often <a class="reference external" href="https://github.com/PyTorchLightning/pytorch-lightning/issues/11300">has issues</a>
 , in part because the strategy launches subprocesses where the command is derived from
 values in <a class="reference external" href="https://docs.python.org/3/library/sys.html#sys.argv" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sys.argv</span></code></a>.</p>
-<p>The rai-toolbox comes with a custom strategy, <a class="reference internal" href="../generated/rai_toolbox.mushin.HydraDDP.html#rai_toolbox.mushin.HydraDDP" title="rai_toolbox.mushin.HydraDDP"><code class="xref py py-func docutils literal notranslate"><span class="pre">HydraDDP()</span></code></a>,
+<p>The rAI-toolbox comes with a custom strategy, <a class="reference internal" href="../generated/rai_toolbox.mushin.HydraDDP.html#rai_toolbox.mushin.HydraDDP" title="rai_toolbox.mushin.HydraDDP"><code class="xref py py-func docutils literal notranslate"><span class="pre">HydraDDP()</span></code></a>,
 that addresses the challenge of running Hydra and Lightning together using DDP.</p>
-<p>In this How-To we will</p>
+<p>In this How-To we will:</p>
 <ol class="arabic simple">
 <li><p>Define the requirements for a Hydra configuration.</p></li>
 <li><p>Build a <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/">hydra-zen</a> configuration to execute a PyTorch Lightning multi-GPU training task.</p></li>
@@ -319,7 +338,7 @@ a single epoch and in “fast dev run” mode.</p>
 </pre></div>
 </div>
 </div>
-<p>Lastly, the Hydra working directory will contain these two items</p>
+<p>Lastly, the Hydra working directory will contain these two items:</p>
 <ul class="simple">
 <li><p>The Hydra directory, <code class="docutils literal notranslate"><span class="pre">.hydra</span></code>, storing the YAML configuration files</p></li>
 <li><p>The file, <code class="docutils literal notranslate"><span class="pre">zen_launch.log</span></code>, storing any logging outputs from the run</p></li>
@@ -393,11 +412,11 @@ further explanation and instruction.</p>
               
               <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-    <a class='left-prev' id="prev-link" href="custom_optim.html" title="previous page">
+    <a class='left-prev' id="prev-link" href="univ_adv_pert.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title">Create a Parameter-Transforming Optimizer</p>
+            <p class="prev-next-title">Solve for a Universal Perturbation</p>
         </div>
     </a>
     <a class='right-next' id="next-link" href="../explanation.html" title="next page">

@@ -38,10 +38,22 @@
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="rai_toolbox.perturbations.uniform_like_l1_n_ball_" href="rai_toolbox.perturbations.uniform_like_l1_n_ball_.html" />
+    <link rel="next" title="rai_toolbox.perturbations.gradient_ascent" href="rai_toolbox.perturbations.gradient_ascent.html" />
     <link rel="prev" title="rai_toolbox.perturbations.PerturbationModel" href="rai_toolbox.perturbations.PerturbationModel.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
+    
+      
+      <link rel="icon" sizes="16x16" href="../_static/favicon-16x16.png">
+      
+    
+      
+      <link rel="icon" sizes="32x32" href="../_static/favicon-32x32.png">
+      
+    
+      
+      <link rel="apple-touch-icon" sizes="180x180" href="../_static/apple-touch-icon.png">
+      
     
 
     <!-- Google Analytics -->
@@ -57,9 +69,11 @@
   <div id="navbar-start">
     
     
+
 <a class="navbar-brand" href="../index.html">
-<p class="title">rai-toolbox</p>
+  <img src="../_static/logo_no_text.png" class="logo" alt="logo">
 </a>
+
 
     
   </div>
@@ -160,16 +174,6 @@
   </label>
   <ul class="current">
    <li class="toctree-l2">
-    <a class="reference internal" href="rai_toolbox.perturbations.gradient_ascent.html">
-     rai_toolbox.perturbations.gradient_ascent
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="rai_toolbox.perturbations.random_restart.html">
-     rai_toolbox.perturbations.random_restart
-    </a>
-   </li>
-   <li class="toctree-l2">
     <a class="reference internal" href="rai_toolbox.perturbations.PerturbationModel.html">
      rai_toolbox.perturbations.PerturbationModel
     </a>
@@ -177,6 +181,16 @@
    <li class="toctree-l2 current active">
     <a class="current reference internal" href="#">
      rai_toolbox.perturbations.AdditivePerturbation
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="rai_toolbox.perturbations.gradient_ascent.html">
+     rai_toolbox.perturbations.gradient_ascent
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="rai_toolbox.perturbations.random_restart.html">
+     rai_toolbox.perturbations.random_restart
     </a>
    </li>
    <li class="toctree-l2">
@@ -277,7 +291,7 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="rai_toolbox.perturbations.AdditivePerturbation.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_or_shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_fn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_ndim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">init_fn_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/perturbations/models.html#AdditivePerturbation.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.perturbations.AdditivePerturbation.__init__" title="Permalink to this definition">#</a></dt>
-<dd><p>The init function should support data is the argument to initialize
+<dd><p>The init function should support data as the argument to initialize
 perturbations.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -296,7 +310,7 @@ final initialization of the perturbation.</p>
 </dd>
 <dt><strong>delta_ndim: Optional[int] = None</strong></dt><dd><p>If a positive number, determines the dimensionality of the perturbation.
 If a negative number, indicates the ‘offset’ from the dimensionality of
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">data_or_shape</span></code>. E.g. if <code class="xref py py-obj docutils literal notranslate"><span class="pre">data_or_shape</span></code> has a shape (N, C, H, W), and
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">data_or_shape</span></code>. E.g., if <code class="xref py py-obj docutils literal notranslate"><span class="pre">data_or_shape</span></code> has a shape (N, C, H, W), and
 if <code class="xref py py-obj docutils literal notranslate"><span class="pre">delta_ndim=-1</span></code>, then the perturbation will have shape (C, H, W),
 and will be applied in a broadcast fashion.</p>
 </dd>
@@ -307,9 +321,9 @@ and will be applied in a broadcast fashion.</p>
 </dl>
 <p class="rubric">Examples</p>
 <p><strong>Basic Additive Perturbations</strong></p>
-<p>Let’s imagine we have a batch of three shape-(2, 2) images (our toy data will
-be all ones) that we want to perturb. We’ll randomly initialize a shape-(3, 2,
-2) tensor of perturbations to apply additively to the shape-(3, 2, 2) batch.</p>
+<p>Let’s imagine we have a batch of three shape-<code class="xref py py-obj docutils literal notranslate"><span class="pre">(2,</span> <span class="pre">2)</span></code> images (our toy data will
+be all ones) that we want to perturb. We’ll randomly initialize a shape-<code class="xref py py-obj docutils literal notranslate"><span class="pre">(3,</span> <span class="pre">2,</span>
+<span class="pre">2)</span></code> tensor of perturbations to apply additively to the shape-<code class="xref py py-obj docutils literal notranslate"><span class="pre">(3,</span> <span class="pre">2,</span> <span class="pre">2)</span></code> batch.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">torch</span> <span class="k">as</span> <span class="nn">tr</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">rai_toolbox.perturbations</span> <span class="kn">import</span> <span class="n">AdditivePerturbation</span><span class="p">,</span> <span class="n">uniform_like_l1_n_ball_</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
@@ -354,21 +368,21 @@ performed, then gradients are computed for the perturbations.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">pert_data</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pert_model</span><span class="o">.</span><span class="n">delta</span><span class="o">.</span><span class="n">grad</span>
 <span class="go">tensor([[[2.1770, 2.0871],</span>
-<span class="go"> [2.7285, 2.5439]],</span>
-<span class="go">.</span>
-<span class="go">[[2.6148, 2.3653],</span>
-<span class="go"> [2.2880, 2.5247]],</span>
-<span class="go">.</span>
-<span class="go">[[2.6978, 2.1056],</span>
-<span class="go"> [2.1078, 2.3534]]])</span>
+<span class="go">        [2.7285, 2.5439]],</span>
+<span class="go">        .</span>
+<span class="go">        [[2.6148, 2.3653],</span>
+<span class="go">        [2.2880, 2.5247]],</span>
+<span class="go">        .</span>
+<span class="go">        [[2.6978, 2.1056],</span>
+<span class="go">        [2.1078, 2.3534]]])</span>
 </pre></div>
 </div>
 <p><strong>Broadcasted (“Universal”) Perturbations</strong></p>
-<p>Suppose that we want to use a single shape-(2, 2) tensor to perturb each datum
+<p>Suppose that we want to use a single shape-<code class="xref py py-obj docutils literal notranslate"><span class="pre">(2,</span> <span class="pre">2)</span></code> tensor to perturb each datum
 in a batch. We can create a perturbation model in a similar manner, but
 specifying <code class="xref py py-obj docutils literal notranslate"><span class="pre">delta_ndim=-1</span></code> indicates that our perturbation should have one
-fewer dimension than our data; whereas our batch has shape-(N, 2, 2) our
-perturbation model’s parameter will have shape-(2, 2)</p>
+fewer dimension than our data; whereas our batch has shape-<code class="xref py py-obj docutils literal notranslate"><span class="pre">(N,</span> <span class="pre">2,</span> <span class="pre">2)</span></code>, our
+perturbation model’s parameter will have shape-<code class="xref py py-obj docutils literal notranslate"><span class="pre">(2,</span> <span class="pre">2)</span></code></p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pert_model</span> <span class="o">=</span> <span class="n">AdditivePerturbation</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="n">data_or_shape</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">delta_ndim</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
@@ -386,13 +400,13 @@ the batch.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pert_data</span> <span class="o">=</span> <span class="n">pert_model</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pert_data</span>
 <span class="go">tensor([[[1.2793, 1.4783],</span>
-<span class="go"> [1.4031, 1.3316]],</span>
-<span class="go"> .</span>
-<span class="go">[[1.2793, 1.4783],</span>
-<span class="go"> [1.4031, 1.3316]],</span>
-<span class="go"> .</span>
-<span class="go">[[1.2793, 1.4783],</span>
-<span class="go"> [1.4031, 1.3316]]], grad_fn=&lt;AddBackward0&gt;)</span>
+<span class="go">        [1.4031, 1.3316]],</span>
+<span class="go">        .</span>
+<span class="go">        [[1.2793, 1.4783],</span>
+<span class="go">        [1.4031, 1.3316]],</span>
+<span class="go">        .</span>
+<span class="go">        [[1.2793, 1.4783],</span>
+<span class="go">        [1.4031, 1.3316]]], grad_fn=&lt;AddBackward0&gt;)</span>
 </pre></div>
 </div>
 <div class="admonition important">
@@ -421,7 +435,7 @@ perturbation tensor and/or its gradient, as it has no batch dimension.</p>
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#rai_toolbox.perturbations.AdditivePerturbation.__init__" title="rai_toolbox.perturbations.AdditivePerturbation.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(data_or_shape[, init_fn, device, ...])</p></td>
-<td><p>The init function should support data is the argument to initialize perturbations.</p></td>
+<td><p>The init function should support data as the argument to initialize perturbations.</p></td>
 </tr>
 </tbody>
 </table>
@@ -442,10 +456,10 @@ perturbation tensor and/or its gradient, as it has no batch dimension.</p>
             <p class="prev-next-title">rai_toolbox.perturbations.PerturbationModel</p>
         </div>
     </a>
-    <a class='right-next' id="next-link" href="rai_toolbox.perturbations.uniform_like_l1_n_ball_.html" title="next page">
+    <a class='right-next' id="next-link" href="rai_toolbox.perturbations.gradient_ascent.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">rai_toolbox.perturbations.uniform_like_l1_n_ball_</p>
+        <p class="prev-next-title">rai_toolbox.perturbations.gradient_ascent</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>

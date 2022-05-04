@@ -39,6 +39,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
+      
+      <link rel="icon" sizes="16x16" href="../../../../_static/favicon-16x16.png">
+      
+    
+      
+      <link rel="icon" sizes="32x32" href="../../../../_static/favicon-32x32.png">
+      
+    
+      
+      <link rel="apple-touch-icon" sizes="180x180" href="../../../../_static/apple-touch-icon.png">
+      
+    
 
     <!-- Google Analytics -->
     
@@ -53,9 +65,11 @@
   <div id="navbar-start">
     
     
+
 <a class="navbar-brand" href="../../../../index.html">
-<p class="title">rai-toolbox</p>
+  <img src="../../../../_static/logo_no_text.png" class="logo" alt="logo">
 </a>
+
 
     
   </div>
@@ -176,7 +190,7 @@
 
 <span class="sd">    A * cos(2pi * freq_vector @ x + phase_shift)</span>
 
-<span class="sd">    Where `A` normalizes the 2D array to have an L2-norm of 1,</span>
+<span class="sd">    Where `A` normalizes the 2D array to have an :math:`L^2`-norm of 1,</span>
 <span class="sd">    and `x` is evaluated on a grid of positions on [0, H] x [0, W].</span>
 
 <span class="sd">    Parameters</span>
@@ -186,7 +200,7 @@
 
 <span class="sd">    position : Tuple[int, int]</span>
 <span class="sd">        The (k-row, k-col) coordinate in shifted k-space, where</span>
-<span class="sd">        the freq-0 component has been shifted to resides at the</span>
+<span class="sd">        the freq-0 component has been shifted to reside at the</span>
 <span class="sd">        center of the shape-(H, W) &quot;k-image&quot;.</span>
 
 <span class="sd">    sym_position : Tuple[int, int]</span>
@@ -195,7 +209,7 @@
 
 <span class="sd">    phase_shift : float</span>
 <span class="sd">        The total phase-shift applied to the cosine-generated</span>
-<span class="sd">        planewave</span>
+<span class="sd">        planewave.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
@@ -226,7 +240,7 @@
 <span class="sd">    dtype : DTypeLike</span>
 
 <span class="sd">    factor_2pi_phase_shift : float (optional, default=0)</span>
-<span class="sd">        E.g. specifying ``0.5`` will induce a phase-shift of pi on all bases.</span>
+<span class="sd">        E.g., specifying ``0.5`` will induce a phase-shift of :math:`\pi` on all bases.</span>
 
 <span class="sd">    row_col_coords : Optional[Iterable[Tuple[int, int]]]</span>
 <span class="sd">        If provided, specifies the specific Fourier-bases to generate in terms of their</span>
@@ -248,7 +262,7 @@
 <span class="sd">    Here we will visualize the collection of bases in Fourier space that support the</span>
 
 <span class="sd">    &gt;&gt;&gt; import numpy as np</span>
-<span class="sd">    &gt;&gt;&gt; from ll_freq_analysis import generate_fourier_bases</span>
+<span class="sd">    &gt;&gt;&gt; from rai_toolbox.augmentations.fourier import generate_fourier_bases</span>
 <span class="sd">    &gt;&gt;&gt; [np.round(out.basis, 2) for out in generate_fourier_bases(3, 3)]</span>
 <span class="sd">    [array([[ 0.33,  0.12, -0.46],</span>
 <span class="sd">        [ 0.12, -0.46,  0.33],</span>

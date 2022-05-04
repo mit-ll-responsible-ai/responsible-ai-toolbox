@@ -41,6 +41,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
+      
+      <link rel="icon" sizes="16x16" href="../_static/favicon-16x16.png">
+      
+    
+      
+      <link rel="icon" sizes="32x32" href="../_static/favicon-32x32.png">
+      
+    
+      
+      <link rel="apple-touch-icon" sizes="180x180" href="../_static/apple-touch-icon.png">
+      
+    
 
     <!-- Google Analytics -->
     
@@ -55,9 +67,11 @@
   <div id="navbar-start">
     
     
+
 <a class="navbar-brand" href="../index.html">
-<p class="title">rai-toolbox</p>
+  <img src="../_static/logo_no_text.png" class="logo" alt="logo">
 </a>
+
 
     
   </div>
@@ -273,9 +287,11 @@ composed to form each augmentation chain.</p>
 <p>If a tuple of values are provided, these are used as the lower (inclusive) and
 upper (exclusive) bounds on a uniform integer-valued distribution from which the depth
 will be sampled for each augmentation chain.</p>
-<p>E.g.
-- <code class="xref py py-obj docutils literal notranslate"><span class="pre">mixture_depth=2</span></code> means that each augmentation chain will consist of two (randomly sampled) augmentations composed together.
-- <code class="xref py py-obj docutils literal notranslate"><span class="pre">aug_chain_depth=(1,</span> <span class="pre">4)</span></code> means depth of any given augmentation chain is uniformly sampled from [1, 4).</p>
+<p>E.g.,</p>
+<ul class="simple">
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">mixture_depth=2</span></code> means that each augmentation chain will consist of two (randomly sampled) augmentations composed together.</p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">aug_chain_depth=(1,</span> <span class="pre">4)</span></code> means depth of any given augmentation chain is uniformly sampled from [1, 4).</p></li>
+</ul>
 </dd>
 <dt><strong>process_fn</strong><span class="classifier">Callable[[T1], T2]</span></dt><dd><p>The preprocessing function applied to the both clean and augmixed datums before
 they are combined. The return type of <code class="xref py py-obj docutils literal notranslate"><span class="pre">process_fn</span></code> determines the return type
@@ -284,16 +300,16 @@ of <a class="reference internal" href="#rai_toolbox.augmentations.augmix.augment
 <dt><strong>augmentations</strong><span class="classifier">Sequence[Callable[[T1], T1]]</span></dt><dd><p>The collection of datum augmentations that is sampled from (with replacement) to form each augmentation
 chain.</p>
 </dd>
-<dt><strong>beta_params</strong><span class="classifier">Tuple[float, float]</span></dt><dd><p>The Beta distribution parameters to draw m, which weights that convex combination:</p>
+<dt><strong>beta_params</strong><span class="classifier">Tuple[float, float]</span></dt><dd><p>The Beta distribution parameters to draw <code class="xref py py-obj docutils literal notranslate"><span class="pre">m</span></code>, which weights that convex combination:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">m</span><span class="p">)</span> <span class="o">*</span> <span class="n">img_process_fn</span><span class="p">(</span><span class="n">datum</span><span class="p">)</span> <span class="o">+</span> <span class="n">m</span> <span class="o">*</span> <span class="n">img_process_fn</span><span class="p">(</span><span class="n">augment</span><span class="p">(</span><span class="n">datum</span><span class="p">))</span>
 </pre></div>
 </div>
 <p>If a single value is specified, it is used as both parameters for the distribution.</p>
 </dd>
-<dt><strong>dirichlet_params</strong><span class="classifier">Union[float, Sequence[float]]</span></dt><dd><p>The Dirichlet distribution parameters used to weigh the <code class="xref py py-obj docutils literal notranslate"><span class="pre">mixture_width</span></code> number of augmentation chains.
+<dt><strong>dirichlet_params</strong><span class="classifier">Union[float, Sequence[float]]</span></dt><dd><p>The Dirichlet distribution parameters used to weight the <code class="xref py py-obj docutils literal notranslate"><span class="pre">mixture_width</span></code> number of augmentation chains.
 If a sequence is provided, its length must match <code class="xref py py-obj docutils literal notranslate"><span class="pre">num_aug_chains</span></code>.</p>
 </dd>
-<dt><strong>sample_probabilities</strong><span class="classifier">Optional[Sequence[float]]</span></dt><dd><p>The probabilities associated with sampling each respective entry in <code class="xref py py-obj docutils literal notranslate"><span class="pre">augmentations</span></code>.
+<dt><strong>augmentation_choice_probs</strong><span class="classifier">Optional[Sequence[float]]</span></dt><dd><p>The probabilities associated with sampling each respective entry in <code class="xref py py-obj docutils literal notranslate"><span class="pre">augmentations</span></code>.
 If not specified, a uniform distribution over all entries of <code class="xref py py-obj docutils literal notranslate"><span class="pre">augmentation</span></code>.</p>
 </dd>
 </dl>
@@ -316,8 +332,8 @@ composed augmentations, where the composition depth is determined by <code class
 <li><p>m ~ Beta</p></li>
 <li><p>[w1, …, wN] ~ Dirichlet</p></li>
 </ul>
-<p>Random values are drawn via NumPy’s global random number generator. Thus <code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy.</span>
-<span class="pre">random.seed</span></code> must be set in order to obtain reproducible results. Note that, until
+<p>Random values are drawn via NumPy’s global random number generator. Thus <a class="reference external" href="https://numpy.org/doc/stable/reference/random/generated/numpy.random.seed.html#numpy.random.seed" title="(in NumPy v1.22)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy.random.seed</span></code></a>
+must be set in order to obtain reproducible results. Note that, until
 PyTorch 1.9.0, there was an issue with using NumPy’s global RNG in conjunction with
 DataLoaders that used multiple workers, where identical seeds were being used
 across workers and the same seed was being set at the outset of each epoch.</p>
@@ -325,10 +341,9 @@ across workers and the same seed was being set at the outset of each epoch.</p>
 <p class="rubric">References</p>
 <dl class="citation">
 <dt class="label" id="r118abdb39488-1"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
-<dd><p>Hendrycks, Dan, et al. “Augmix: A simple data processing method to improve</p>
+<dd><p>Hendrycks, Dan, et al. “Augmix: A simple data processing method to improve robustness and uncertainty.” arXiv preprint arXiv:1912.02781 (2019).</p>
 </dd>
 </dl>
-<p>robustness and uncertainty.” arXiv preprint arXiv:1912.02781 (2019).</p>
 </dd></dl>
 
 </section>

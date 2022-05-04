@@ -41,6 +41,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
+      
+      <link rel="icon" sizes="16x16" href="../_static/favicon-16x16.png">
+      
+    
+      
+      <link rel="icon" sizes="32x32" href="../_static/favicon-32x32.png">
+      
+    
+      
+      <link rel="apple-touch-icon" sizes="180x180" href="../_static/apple-touch-icon.png">
+      
+    
 
     <!-- Google Analytics -->
     
@@ -55,9 +67,11 @@
   <div id="navbar-start">
     
     
+
 <a class="navbar-brand" href="../index.html">
-<p class="title">rai-toolbox</p>
+  <img src="../_static/logo_no_text.png" class="logo" alt="logo">
 </a>
+
 
     
   </div>
@@ -253,8 +267,8 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="rai_toolbox.mushin.MultiRunMetricsWorkflow">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rai_toolbox.mushin.</span></span><span class="sig-name descname"><span class="pre">MultiRunMetricsWorkflow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eval_task_cfg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/mushin/workflows.html#MultiRunMetricsWorkflow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.mushin.MultiRunMetricsWorkflow" title="Permalink to this definition">#</a></dt>
-<dd><p>Abstract class for workflows that record metrics using Hydra multi-run</p>
-<p>This workflow creates subdirectories of by using Hydra.  These directories
+<dd><p>Abstract class for workflows that record metrics using Hydra multirun.</p>
+<p>This workflow creates subdirectories of multirun experiments using Hydra.  These directories
 contain the Hydra YAML configuration and any saved metrics file (defined by the evaulation task):</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>├── working_dir
 │    ├── &lt;experiment directory name: 0&gt;
@@ -271,8 +285,8 @@ contain the Hydra YAML configuration and any saved metrics file (defined by the 
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">metric-name</span> <span class="pre">(str)</span> <span class="pre">-&gt;</span> <span class="pre">value</span> <span class="pre">(number</span> <span class="pre">|</span> <span class="pre">Sequence[number])</span></code></p>
 <p class="rubric">Examples</p>
 <p>Let’s create a simple workflow where we perform a multirun over a parameter,
-epsilon, and evaluate a task function that computes an accuracy and loss based on
-that epsilon value and a specified scale.</p>
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">epsilon</span></code>, and evaluate a task function that computes an accuracy and loss based on
+that <code class="xref py py-obj docutils literal notranslate"><span class="pre">epsilon</span></code> value and a specified <code class="xref py py-obj docutils literal notranslate"><span class="pre">scale</span></code>.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">rai_toolbox.mushin.workflows</span> <span class="kn">import</span> <span class="n">MultiRunMetricsWorkflow</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">rai_toolbox.mushin</span> <span class="kn">import</span> <span class="n">multirun</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">torch</span> <span class="k">as</span> <span class="nn">tr</span>
@@ -286,7 +300,7 @@ that epsilon value and a specified scale.</p>
 <span class="gp">... </span>        <span class="k">return</span> <span class="n">result</span>
 </pre></div>
 </div>
-<p>We’ll run this workflow for six total configurations of three epsilon values and two scale values. This will launch a Hydra multirun job and aggregate the results.</p>
+<p>We’ll run this workflow for six total configurations of three <code class="xref py py-obj docutils literal notranslate"><span class="pre">epsilon</span></code> values and two <code class="xref py py-obj docutils literal notranslate"><span class="pre">scale</span></code> values. This will launch a Hydra multirun job and aggregate the results.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">wf</span> <span class="o">=</span> <span class="n">LocalRobustness</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">wf</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">epsilon</span><span class="o">=</span><span class="n">multirun</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">]),</span> <span class="n">scale</span><span class="o">=</span><span class="n">multirun</span><span class="p">([</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]))</span>
 <span class="go">[2022-05-02 11:57:59,219][HYDRA] Launching 6 jobs locally</span>
@@ -299,7 +313,7 @@ that epsilon value and a specified scale.</p>
 </pre></div>
 </div>
 <p>Now that this workflow has run, we can view the results as an xarray-dataset whose
-coordinates reflect the multirun parameters that were varied, and whose data-variables are our recorded metrics: “accuracy” and “loss”</p>
+coordinates reflect the multirun parameters that were varied, and whose data-variables are our recorded metrics: “accuracies” and “loss”.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">wf</span><span class="o">.</span><span class="n">to_xarray</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span>
 <span class="go">&lt;xarray.Dataset&gt;</span>
@@ -332,7 +346,7 @@ coordinates reflect the multirun parameters that were varied, and whose data-var
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>eval_task_cfg: Mapping | None (default: None)</strong></dt><dd><p>The workflow configuration object</p>
+<dt><strong>eval_task_cfg: Mapping | None (default: None)</strong></dt><dd><p>The workflow configuration object.</p>
 </dd>
 </dl>
 </dd>
@@ -372,12 +386,6 @@ pass the entire list as a single input.</p>
 </dl>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="rai_toolbox.mushin.MultiRunMetricsWorkflow.plot">
-<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rai_toolbox.mushin.MultiRunMetricsWorkflow.plot" title="Permalink to this definition">#</a></dt>
-<dd><p>Plot workflow metrics</p>
 </dd></dl>
 
 <dl class="py method">
@@ -424,7 +432,7 @@ default to all parameters saved in Hydra’s <code class="xref py py-obj docutil
 <td><p>Workflows and experiments using Hydra.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">evaluation_task</span></code>(*args, **kwargs)</p></td>
-<td><p>User defined evaluation task to run the workflow.</p></td>
+<td><p>User-defined evaluation task to run the workflow.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">jobs_post_process</span></code>()</p></td>
 <td><p>Method to extract attributes and metrics relevant to the workflow.</p></td>
@@ -432,8 +440,8 @@ default to all parameters saved in Hydra’s <code class="xref py py-obj docutil
 <tr class="row-even"><td><p><a class="reference internal" href="#rai_toolbox.mushin.MultiRunMetricsWorkflow.load_from_dir" title="rai_toolbox.mushin.MultiRunMetricsWorkflow.load_from_dir"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_from_dir</span></code></a>(working_dir[, config_dir, ...])</p></td>
 <td><p>Loading workflow job data from a given working directory.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#rai_toolbox.mushin.MultiRunMetricsWorkflow.plot" title="rai_toolbox.mushin.MultiRunMetricsWorkflow.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>(**kwargs)</p></td>
-<td><p>Plot workflow metrics</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code>(**kwargs)</p></td>
+<td><p>Plot workflow metrics.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#rai_toolbox.mushin.MultiRunMetricsWorkflow.run" title="rai_toolbox.mushin.MultiRunMetricsWorkflow.run"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run</span></code></a>(*[, working_dir, sweeper, launcher, ...])</p></td>
 <td><p>Run the experiment.</p></td>

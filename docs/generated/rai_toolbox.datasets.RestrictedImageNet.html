@@ -41,6 +41,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
+      
+      <link rel="icon" sizes="16x16" href="../_static/favicon-16x16.png">
+      
+    
+      
+      <link rel="icon" sizes="32x32" href="../_static/favicon-32x32.png">
+      
+    
+      
+      <link rel="apple-touch-icon" sizes="180x180" href="../_static/apple-touch-icon.png">
+      
+    
 
     <!-- Google Analytics -->
     
@@ -55,9 +67,11 @@
   <div id="navbar-start">
     
     
+
 <a class="navbar-brand" href="../index.html">
-<p class="title">rai-toolbox</p>
+  <img src="../_static/logo_no_text.png" class="logo" alt="logo">
 </a>
+
 
     
   </div>
@@ -285,63 +299,6 @@
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_transform=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loader=&lt;function</span> <span class="pre">default_loader&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_valid_file=None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rai_toolbox.datasets.RestrictedImageNet.__init__" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="rai_toolbox.datasets.RestrictedImageNet.find_classes">
-<span class="sig-name descname"><span class="pre">find_classes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">directory</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rai_toolbox.datasets.RestrictedImageNet.find_classes" title="Permalink to this definition">#</a></dt>
-<dd><p>Find the class folders in a dataset structured as follows:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>directory/
-├── class_x
-│   ├── xxx.ext
-│   ├── xxy.ext
-│   └── ...
-│       └── xxz.ext
-└── class_y
-    ├── 123.ext
-    ├── nsdf3.ext
-    └── ...
-    └── asd932_.ext
-</pre></div>
-</div>
-<p>This method can be overridden to only consider
-a subset of classes, or to adapt to a different dataset directory structure.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>directory(str): Root directory path, corresponding to <code class="docutils literal notranslate"><span class="pre">self.root</span></code></p>
-</dd>
-<dt>Raises:</dt><dd><p>FileNotFoundError: If <code class="docutils literal notranslate"><span class="pre">dir</span></code> has no class folders.</p>
-</dd>
-<dt>Returns:</dt><dd><p>(Tuple[List[str], Dict[str, int]]): List of all classes and dictionary mapping each class to an index.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="rai_toolbox.datasets.RestrictedImageNet.make_dataset">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">make_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">class_to_idx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extensions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_valid_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rai_toolbox.datasets.RestrictedImageNet.make_dataset" title="Permalink to this definition">#</a></dt>
-<dd><p>Generates a list of samples of a form (path_to_sample, class).</p>
-<p>This can be overridden to e.g. read files from a compressed zip file instead of from the disk.</p>
-<dl>
-<dt>Args:</dt><dd><p>directory (str): root dataset directory, corresponding to <code class="docutils literal notranslate"><span class="pre">self.root</span></code>.
-class_to_idx (Dict[str, int]): Dictionary mapping class name to class index.
-extensions (optional): A list of allowed extensions.</p>
-<blockquote>
-<div><p>Either extensions or is_valid_file should be passed. Defaults to None.</p>
-</div></blockquote>
-<dl class="simple">
-<dt>is_valid_file (optional): A function that takes path of a file</dt><dd><p>and checks if the file is a valid file
-(used to check of corrupt files) both extensions and
-is_valid_file should not be passed. Defaults to None.</p>
-</dd>
-</dl>
-</dd>
-<dt>Raises:</dt><dd><p>ValueError: In case <code class="docutils literal notranslate"><span class="pre">class_to_idx</span></code> is empty.
-ValueError: In case <code class="docutils literal notranslate"><span class="pre">extensions</span></code> and <code class="docutils literal notranslate"><span class="pre">is_valid_file</span></code> are None or both are not None.
-FileNotFoundError: In case no valid file was found for any class.</p>
-</dd>
-<dt>Returns:</dt><dd><p>List[Tuple[str, int]]: samples of a form (path_to_sample, class)</p>
-</dd>
-</dl>
-</dd></dl>
-
 <p class="rubric">Methods</p>
 <table class="autosummary longtable table autosummary">
 <colgroup>
@@ -351,12 +308,6 @@ FileNotFoundError: In case no valid file was found for any class.</p>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#rai_toolbox.datasets.RestrictedImageNet.__init__" title="rai_toolbox.datasets.RestrictedImageNet.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(root[, transform, ...])</p></td>
 <td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#rai_toolbox.datasets.RestrictedImageNet.find_classes" title="rai_toolbox.datasets.RestrictedImageNet.find_classes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">find_classes</span></code></a>(directory)</p></td>
-<td><p>Find the class folders in a dataset structured as follows.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#rai_toolbox.datasets.RestrictedImageNet.make_dataset" title="rai_toolbox.datasets.RestrictedImageNet.make_dataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_dataset</span></code></a>(directory, class_to_idx[, ...])</p></td>
-<td><p>Generates a list of samples of a form (path_to_sample, class).</p></td>
 </tr>
 </tbody>
 </table>

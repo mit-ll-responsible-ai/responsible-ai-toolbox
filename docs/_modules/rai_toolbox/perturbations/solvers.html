@@ -39,6 +39,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
+      
+      <link rel="icon" sizes="16x16" href="../../../_static/favicon-16x16.png">
+      
+    
+      
+      <link rel="icon" sizes="32x32" href="../../../_static/favicon-32x32.png">
+      
+    
+      
+      <link rel="apple-touch-icon" sizes="180x180" href="../../../_static/apple-touch-icon.png">
+      
+    
 
     <!-- Google Analytics -->
     
@@ -53,9 +65,11 @@
   <div id="navbar-start">
     
     
+
 <a class="navbar-brand" href="../../../index.html">
-<p class="title">rai-toolbox</p>
+  <img src="../../../_static/logo_no_text.png" class="logo" alt="logo">
 </a>
+
 
     
   </div>
@@ -169,6 +183,7 @@
 <span class="kn">import</span> <span class="nn">torch</span> <span class="k">as</span> <span class="nn">tr</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
 <span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">CrossEntropyLoss</span><span class="p">,</span> <span class="n">Module</span>
+<span class="kn">from</span> <span class="nn">torch.optim</span> <span class="kn">import</span> <span class="n">Optimizer</span> <span class="k">as</span> <span class="n">_TorchOptim</span>
 
 <span class="kn">from</span> <span class="nn">rai_toolbox</span> <span class="kn">import</span> <span class="n">negate</span>
 <span class="kn">from</span> <span class="nn">rai_toolbox._typing</span> <span class="kn">import</span> <span class="p">(</span>
@@ -189,7 +204,7 @@
     <span class="n">model</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Tensor</span><span class="p">],</span> <span class="n">Tensor</span><span class="p">],</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
     <span class="n">target</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
-    <span class="n">optimizer</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">OptimizerType</span><span class="p">,</span> <span class="n">Partial</span><span class="p">[</span><span class="n">Optimizer</span><span class="p">]],</span>
+    <span class="n">optimizer</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Optimizer</span><span class="p">,</span> <span class="n">OptimizerType</span><span class="p">,</span> <span class="n">Partial</span><span class="p">[</span><span class="n">Optimizer</span><span class="p">]],</span>
     <span class="n">steps</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">perturbation_model</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
         <span class="n">PerturbationModel</span><span class="p">,</span> <span class="n">InstantiatesTo</span><span class="p">[</span><span class="n">PerturbationModel</span><span class="p">]</span>
@@ -200,7 +215,8 @@
     <span class="n">reduction_fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Tensor</span><span class="p">],</span> <span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">sum</span><span class="p">,</span>
     <span class="o">**</span><span class="n">optim_kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
-    <span class="sd">&quot;&quot;&quot;Solve for a set of perturbations for a given set of data and a model.</span>
+    <span class="sd">&quot;&quot;&quot;Solve for a set of perturbations for a given set of data and a model,</span>
+<span class="sd">    and then apply those perturbations to the data.</span>
 
 <span class="sd">    This performs, for `steps` iterations, the following optimization::</span>
 
@@ -210,7 +226,7 @@
 <span class="sd">       loss = (1 if targeted else -1) * loss  # default: targeted=False</span>
 <span class="sd">       optim.step()</span>
 
-<span class="sd">    Note that, by default, this perturbs the data away from `target` (i.e. this performs</span>
+<span class="sd">    Note that, by default, this perturbs the data away from `target` (i.e., this performs</span>
 <span class="sd">    gradient *ascent*), given a standard loss function that seeks to minimize the</span>
 <span class="sd">    diffence between the model&#39;s output and the target. See `targeted` to toggle this</span>
 <span class="sd">    behavior.</span>
@@ -221,7 +237,7 @@
 <span class="sd">        Differentiable function that processes the (perturbed) data prior to computing</span>
 <span class="sd">        the loss.</span>
 
-<span class="sd">        If `model` is a `torch.nn.Module` then its weights will be frozen and it will</span>
+<span class="sd">        If `model` is a `torch.nn.Module`, then its weights will be frozen and it will</span>
 <span class="sd">        be set to eval mode during the perturbation-solve phase.</span>
 
 <span class="sd">    data : Tensor, shape-(N, ...)</span>
@@ -231,11 +247,13 @@
 <span class="sd">        If `targeted==False` (default), then this is the target to perturb away from.</span>
 <span class="sd">        If `targeted==True`, then this is the target to perturb toward.</span>
 
-<span class="sd">    optimizer : Type[Optimizer] | Partial[Optimizer]</span>
-<span class="sd">        The optimizer to use for updating the perturbation model</span>
+<span class="sd">    optimizer : Optimizer | Type[Optimizer] | Partial[Optimizer]</span>
+<span class="sd">        The optimizer to use for updating the perturbation model.</span>
+
+<span class="sd">        If `optimizer` is uninstantiated, it will be instantiated as `optimizer(perturbation_model.parameters(), **optim_kwargs)`</span>
 
 <span class="sd">    steps : int</span>
-<span class="sd">        Number of projected gradient steps</span>
+<span class="sd">        Number of projected gradient steps.</span>
 
 <span class="sd">    perturbation_model : PerturbationModel | Type[PerturbationModel], optional (default=AdditivePerturbation)</span>
 <span class="sd">        A `torch.nn.Module` whose parameters are updated by the solver. Its forward-pass applies the perturbation to the data. Default is</span>
@@ -247,20 +265,23 @@
 <span class="sd">        `perturbation_model(data)`.</span>
 
 <span class="sd">    criterion : Optional[Callable[[Tensor, Tensor], Tensor]]</span>
-<span class="sd">        The criterion to use for calculating the loss **per-datum**.  I.e. for a</span>
+<span class="sd">        The criterion to use for calculating the loss **per-datum**.  I.e., for a</span>
 <span class="sd">        shape-(N, ...) batch of data, `criterion` should return a shape-(N,) tensor of</span>
 <span class="sd">        loss values – one for each datum in the batch.</span>
 
-<span class="sd">        If `None` then `CrossEntropyLoss(reduction=None)` is used.</span>
+<span class="sd">        If `None`, then `CrossEntropyLoss(reduction=None)` is used.</span>
 
 <span class="sd">    targeted : bool (default: False)</span>
-<span class="sd">        If `True`, then perturb towards the defined `target` otherwise move away from</span>
+<span class="sd">        If `True`, then perturb towards the defined `target`, otherwise move away from</span>
 <span class="sd">        `target`.</span>
+
+<span class="sd">        Note: Default (`targeted=False`) implements gradient *ascent*.</span>
+<span class="sd">        To perform gradient *descent*, set `targeted=True`.</span>
 
 <span class="sd">    use_best : bool (default: True)</span>
 <span class="sd">        Whether to only report the best perturbation over all steps.</span>
 <span class="sd">        Note: Requires criterion to output a loss per sample, e.g., set</span>
-<span class="sd">        `reduction=&quot;none&quot;`</span>
+<span class="sd">        `reduction=&quot;none&quot;`.</span>
 
 <span class="sd">    reduction_fn : Callable[[Tensor], Tensor], optional (default=torch.sum)</span>
 <span class="sd">        Used to reduce the shape-(N,) per-datum loss to a scalar. This should be</span>
@@ -386,7 +407,23 @@
 
         <span class="n">pmodel</span> <span class="o">=</span> <span class="n">perturbation_model</span>
 
-    <span class="n">optim</span> <span class="o">=</span> <span class="n">optimizer</span><span class="p">(</span><span class="n">pmodel</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="o">**</span><span class="n">optim_kwargs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">instantiates_to</span><span class="p">(</span><span class="n">optimizer</span><span class="p">,</span> <span class="n">_TorchOptim</span><span class="p">):</span>
+        <span class="n">optim</span> <span class="o">=</span> <span class="n">optimizer</span><span class="p">(</span><span class="n">pmodel</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="o">**</span><span class="n">optim_kwargs</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">optimizer</span><span class="p">,</span> <span class="n">_TorchOptim</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;`optimizer` must be an instance of Optimizer or must instantiate to Optimizer; got: </span><span class="si">{</span><span class="n">optimizer</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">instantiates_to</span><span class="p">(</span><span class="n">perturbation_model</span><span class="p">,</span> <span class="n">PerturbationModel</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="s2">&quot;An initialized optimizer can only be passed to the solver in combination with an intialized perturbation model.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">optim_kwargs</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="s2">&quot;**optim_kwargs were specified, but the provided `optimizer` has already been instaniated&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">optim</span> <span class="o">=</span> <span class="n">optimizer</span>
 
     <span class="n">to_freeze</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">data</span><span class="p">,</span> <span class="n">target</span><span class="p">]</span>
 
@@ -450,7 +487,7 @@
     <span class="n">solver</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]],</span>
     <span class="n">repeats</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]]:</span>
-    <span class="sd">&quot;&quot;&quot;Executes a solver function multiple times saving out the best perturbations.</span>
+    <span class="sd">&quot;&quot;&quot;Executes a solver function multiple times, saving out the best perturbations.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -458,12 +495,12 @@
 <span class="sd">        The solver whose execution will be repeated.</span>
 
 <span class="sd">    repeats : int</span>
-<span class="sd">        The number of times to run perturber</span>
+<span class="sd">        The number of times to run `solver`</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    random_restart_fn : Callable[..., Tuple[Tensor, Tensor]]</span>
-<span class="sd">        Wrapped function that will execute `perturber` `repeats` times.</span>
+<span class="sd">        Wrapped function that will execute `solver` `repeats` times.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>

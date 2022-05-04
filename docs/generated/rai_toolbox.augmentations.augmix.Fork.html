@@ -41,6 +41,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
+      
+      <link rel="icon" sizes="16x16" href="../_static/favicon-16x16.png">
+      
+    
+      
+      <link rel="icon" sizes="32x32" href="../_static/favicon-32x32.png">
+      
+    
+      
+      <link rel="apple-touch-icon" sizes="180x180" href="../_static/apple-touch-icon.png">
+      
+    
 
     <!-- Google Analytics -->
     
@@ -55,9 +67,11 @@
   <div id="navbar-start">
     
     
+
 <a class="navbar-brand" href="../index.html">
-<p class="title">rai-toolbox</p>
+  <img src="../_static/logo_no_text.png" class="logo" alt="logo">
 </a>
+
 
     
   </div>
@@ -269,7 +283,7 @@ be useful for doing consistency-loss workflows.</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">rai_toolbox.augmix.transforms</span> <span class="kn">import</span> <span class="n">Fork</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">rai_toolbox.augmentations.augmix</span> <span class="kn">import</span> <span class="n">Fork</span>
 </pre></div>
 </div>
 <p>Here are some trivial examples:</p>
@@ -286,7 +300,7 @@ be useful for doing consistency-loss workflows.</p>
 <p>Here is a simplified version of the triple-processing used by the AugMix
 paper’s consistency loss. It anticipates a PIL image and produces a triplet.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">torchvision.transforms</span> <span class="kn">import</span> <span class="n">ToTensor</span><span class="p">,</span> <span class="n">RandomHorizontalFlip</span><span class="p">,</span> <span class="n">RandomVerticalFlip</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">rai_toolbox.augmix.transforms</span> <span class="kn">import</span> <span class="n">AugMix</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">rai_toolbox.augmentations.augmix</span> <span class="kn">import</span> <span class="n">AugMix</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">augmix</span> <span class="o">=</span> <span class="n">AugMix</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="n">augmentations</span><span class="o">=</span><span class="p">[</span><span class="n">RandomHorizontalFlip</span><span class="p">(),</span> <span class="n">RandomVerticalFlip</span><span class="p">()],</span>
 <span class="gp">... </span>    <span class="n">process_fn</span><span class="o">=</span><span class="n">ToTensor</span><span class="p">(),</span>

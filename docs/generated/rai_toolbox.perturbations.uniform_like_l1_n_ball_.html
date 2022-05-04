@@ -39,9 +39,21 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="rai_toolbox.perturbations.uniform_like_l2_n_ball_" href="rai_toolbox.perturbations.uniform_like_l2_n_ball_.html" />
-    <link rel="prev" title="rai_toolbox.perturbations.AdditivePerturbation" href="rai_toolbox.perturbations.AdditivePerturbation.html" />
+    <link rel="prev" title="rai_toolbox.perturbations.random_restart" href="rai_toolbox.perturbations.random_restart.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
+    
+      
+      <link rel="icon" sizes="16x16" href="../_static/favicon-16x16.png">
+      
+    
+      
+      <link rel="icon" sizes="32x32" href="../_static/favicon-32x32.png">
+      
+    
+      
+      <link rel="apple-touch-icon" sizes="180x180" href="../_static/apple-touch-icon.png">
+      
     
 
     <!-- Google Analytics -->
@@ -57,9 +69,11 @@
   <div id="navbar-start">
     
     
+
 <a class="navbar-brand" href="../index.html">
-<p class="title">rai-toolbox</p>
+  <img src="../_static/logo_no_text.png" class="logo" alt="logo">
 </a>
+
 
     
   </div>
@@ -160,16 +174,6 @@
   </label>
   <ul class="current">
    <li class="toctree-l2">
-    <a class="reference internal" href="rai_toolbox.perturbations.gradient_ascent.html">
-     rai_toolbox.perturbations.gradient_ascent
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="rai_toolbox.perturbations.random_restart.html">
-     rai_toolbox.perturbations.random_restart
-    </a>
-   </li>
-   <li class="toctree-l2">
     <a class="reference internal" href="rai_toolbox.perturbations.PerturbationModel.html">
      rai_toolbox.perturbations.PerturbationModel
     </a>
@@ -177,6 +181,16 @@
    <li class="toctree-l2">
     <a class="reference internal" href="rai_toolbox.perturbations.AdditivePerturbation.html">
      rai_toolbox.perturbations.AdditivePerturbation
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="rai_toolbox.perturbations.gradient_ascent.html">
+     rai_toolbox.perturbations.gradient_ascent
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="rai_toolbox.perturbations.random_restart.html">
+     rai_toolbox.perturbations.random_restart
     </a>
    </li>
    <li class="toctree-l2 current active">
@@ -265,13 +279,13 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="rai_toolbox.perturbations.uniform_like_l1_n_ball_">
 <span class="sig-prename descclassname"><span class="pre">rai_toolbox.perturbations.</span></span><span class="sig-name descname"><span class="pre">uniform_like_l1_n_ball_</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_ndim=-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generator=&lt;torch._C.Generator</span> <span class="pre">object&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/perturbations/init.html#uniform_like_l1_n_ball_"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.perturbations.uniform_like_l1_n_ball_" title="Permalink to this definition">#</a></dt>
-<dd><p>Uniform sampling of a epsilon-sized n-ball for <span class="math notranslate nohighlight">\(L^1\)</span>-norm, where <code class="xref py py-obj docutils literal notranslate"><span class="pre">n</span></code> is controlled by <code class="xref py py-obj docutils literal notranslate"><span class="pre">x.shape</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim</span></code>. The result overwrites <code class="xref py py-obj docutils literal notranslate"><span class="pre">x</span></code> in-place.</p>
+<dd><p>Uniform sampling of an <span class="math notranslate nohighlight">\(\epsilon\)</span>-sized <code class="xref py py-obj docutils literal notranslate"><span class="pre">n</span></code>-ball for <span class="math notranslate nohighlight">\(L^1\)</span>-norm, where <code class="xref py py-obj docutils literal notranslate"><span class="pre">n</span></code> is controlled by <code class="xref py py-obj docutils literal notranslate"><span class="pre">x.shape</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim</span></code>. The result overwrites <code class="xref py py-obj docutils literal notranslate"><span class="pre">x</span></code> in-place.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
-<dt><strong>x: Tensor, shape-(N, D, …)</strong></dt><dd><p>The tensor to generate a new random tensor from, i.e., returns a tensor of
+<dt><strong>x: Tensor, shape-(N, D, …)</strong></dt><dd><p>The tensor from which to generate a new random tensor, i.e., returns a tensor of
 similar shape and on the same device.</p>
-<p>By default, each of the N shape-(D, …) subtensors are initialized
+<p>By default, each of the <code class="xref py py-obj docutils literal notranslate"><span class="pre">N</span></code> shape-<code class="xref py py-obj docutils literal notranslate"><span class="pre">(D,</span> <span class="pre">...)</span></code> subtensors are initialized
 independently. See <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim</span></code> to contol this behavior.</p>
 </dd>
 <dt><strong>epsilon</strong><span class="classifier">float, optional (default=1)</span></dt><dd><p>Determines the radius of the ball.</p>
@@ -279,9 +293,9 @@ independently. See <code class="xref py py-obj docutils literal notranslate"><sp
 <dt><strong>param_ndim</strong><span class="classifier">int | None, optional (default=-1)</span></dt><dd><p>Determines the dimenionality of the subtensors that are sampled by this
 function.</p>
 <ul class="simple">
-<li><p>A positive number determines the dimensionality of each subtensor to be drawn and packed into the shape-(N, D, …) resulting tensor.</p></li>
-<li><p>A negative number determines from the dimensionality of the subtensor in terms of the offset of <code class="xref py py-obj docutils literal notranslate"><span class="pre">x.ndim</span></code>. E.g. -1 indicates that <code class="xref py py-obj docutils literal notranslate"><span class="pre">x</span></code> is arranged in a batch-style, and that N independent shape-(D, …) tensors will be sampled.</p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> means that a single tensor of shape-(N, D, …) is sampled.</p></li>
+<li><p>A positive number determines the dimensionality of each subtensor to be drawn and packed into the shape-<code class="xref py py-obj docutils literal notranslate"><span class="pre">(N,</span> <span class="pre">D,</span> <span class="pre">...)</span></code> resulting tensor.</p></li>
+<li><p>A negative number determines from the dimensionality of the subtensor in terms of the offset of <code class="xref py py-obj docutils literal notranslate"><span class="pre">x.ndim</span></code>. E.g. -1 indicates that <code class="xref py py-obj docutils literal notranslate"><span class="pre">x</span></code> is arranged in a batch-style, and that <code class="xref py py-obj docutils literal notranslate"><span class="pre">N</span></code> independent shape-<code class="xref py py-obj docutils literal notranslate"><span class="pre">(D,</span> <span class="pre">...)</span></code> tensors will be sampled.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> means that a single tensor of shape-<code class="xref py py-obj docutils literal notranslate"><span class="pre">(N,</span> <span class="pre">D,</span> <span class="pre">...)</span></code> is sampled.</p></li>
 </ul>
 </dd>
 </dl>
@@ -307,7 +321,7 @@ function.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">rai_toolbox.perturbations.init</span> <span class="kn">import</span> <span class="n">uniform_like_l1_n_ball_</span>
 </pre></div>
 </div>
-<p>Drawing two shape(3,) tensors from an <span class="math notranslate nohighlight">\(\epsilon=2\)</span> sized L1 ball.</p>
+<p>Drawing two shape-<code class="xref py py-obj docutils literal notranslate"><span class="pre">(3,)</span></code> tensors from an <span class="math notranslate nohighlight">\(\epsilon=2\)</span> sized <span class="math notranslate nohighlight">\(L^1\)</span> 3D-ball.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">uniform_like_l1_n_ball_</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span> <span class="c1"># default: param_ndim=-1</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">x</span>
@@ -317,8 +331,8 @@ function.</p>
 <span class="go">tensor([True, True])</span>
 </pre></div>
 </div>
-<p>Drawing one tensor shape-(6,) tensor from a <span class="math notranslate nohighlight">\(\epsilon=2\)</span> sized 6D ball, and
-storing it in <code class="xref py py-obj docutils literal notranslate"><span class="pre">x`as</span> <span class="pre">a</span> <span class="pre">shape-(2,</span> <span class="pre">3)</span> <span class="pre">tensor.</span> <span class="pre">We</span> <span class="pre">specify</span> <span class="pre">`param_ndim=2</span></code> (or
+<p>Drawing one tensor shape-<code class="xref py py-obj docutils literal notranslate"><span class="pre">(6,)</span></code> tensor from a <span class="math notranslate nohighlight">\(\epsilon=2\)</span> sized <span class="math notranslate nohighlight">\(L^1\)</span> 6D-ball, and
+storing it in <code class="xref py py-obj docutils literal notranslate"><span class="pre">x</span></code> as a shape-<code class="xref py py-obj docutils literal notranslate"><span class="pre">(2,</span> <span class="pre">3)</span></code> tensor. We specify <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim=2</span></code> (or
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim=None</span></code>) to achieve this.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">uniform_like_l1_n_ball_</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">param_ndim</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
@@ -339,11 +353,11 @@ storing it in <code class="xref py py-obj docutils literal notranslate"><span cl
               
               <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-    <a class='left-prev' id="prev-link" href="rai_toolbox.perturbations.AdditivePerturbation.html" title="previous page">
+    <a class='left-prev' id="prev-link" href="rai_toolbox.perturbations.random_restart.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title">rai_toolbox.perturbations.AdditivePerturbation</p>
+            <p class="prev-next-title">rai_toolbox.perturbations.random_restart</p>
         </div>
     </a>
     <a class='right-next' id="next-link" href="rai_toolbox.perturbations.uniform_like_l2_n_ball_.html" title="next page">

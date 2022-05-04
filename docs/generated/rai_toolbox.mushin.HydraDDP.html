@@ -41,6 +41,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
+      
+      <link rel="icon" sizes="16x16" href="../_static/favicon-16x16.png">
+      
+    
+      
+      <link rel="icon" sizes="32x32" href="../_static/favicon-32x32.png">
+      
+    
+      
+      <link rel="apple-touch-icon" sizes="180x180" href="../_static/apple-touch-icon.png">
+      
+    
 
     <!-- Google Analytics -->
     
@@ -55,9 +67,11 @@
   <div id="navbar-start">
     
     
+
 <a class="navbar-brand" href="../index.html">
-<p class="title">rai-toolbox</p>
+  <img src="../_static/logo_no_text.png" class="logo" alt="logo">
 </a>
+
 
     
   </div>
@@ -254,7 +268,7 @@
 <dt class="sig sig-object py" id="rai_toolbox.mushin.HydraDDP">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rai_toolbox.mushin.</span></span><span class="sig-name descname"><span class="pre">HydraDDP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">accelerator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parallel_devices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cluster_environment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">checkpoint_io</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precision_plugin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ddp_comm_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ddp_comm_hook</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ddp_comm_wrapper</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_averaging_period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">process_group_backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/mushin/lightning/launchers.html#HydraDDP"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.mushin.HydraDDP" title="Permalink to this definition">#</a></dt>
 <dd><p>DDP Strategy that supports Hydra run and multirun jobs.</p>
-<p>This strategy assumes a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Trainer.fit</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">Trainer.test</span></code> has been configured
+<p>This strategy assumes a PyTorch Lightning <code class="xref py py-obj docutils literal notranslate"><span class="pre">Trainer.fit</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">Trainer.test</span></code> has been configured
 to execute via Hydra.  It requires that Hydra saves a <code class="xref py py-obj docutils literal notranslate"><span class="pre">config.yaml</span></code> in the current working directory with the following keys/properties set:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>├── Config
 │    ├── trainer: A `pytorch_lightning.Trainer` configuration
@@ -267,7 +281,7 @@ to execute via Hydra.  It requires that Hydra saves a <code class="xref py py-ob
 </pre></div>
 </div>
 <p class="rubric">Examples</p>
-<p>First define a Hydra configuration using hydra-zen</p>
+<p>First define a Hydra configuration using hydra-zen:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pytorch_lightning</span> <span class="k">as</span> <span class="nn">pl</span>
 <span class="gp">... </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">builds</span><span class="p">,</span> <span class="n">make_config</span><span class="p">,</span>
 <span class="gp">... </span><span class="kn">from</span> <span class="nn">rai_toolbox.mushin</span> <span class="kn">import</span> <span class="n">HydraDDP</span>
@@ -291,7 +305,7 @@ to execute via Hydra.  It requires that Hydra saves a <code class="xref py py-ob
 <span class="gp">... </span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Next define a task function to execute the Hydra job</p>
+<p>Next, define a task function to execute the Hydra job:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">instantiate</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">task_function</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="n">obj</span> <span class="o">=</span> <span class="n">instantiate</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
@@ -312,14 +326,14 @@ to execute via Hydra.  It requires that Hydra saves a <code class="xref py py-ob
 <span class="gp">... </span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Next define a task function to execute the Hydra job</p>
+<p>Next define a task function to execute the Hydra job:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">instantiate</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">task_function</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="n">obj</span> <span class="o">=</span> <span class="n">instantiate</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
 <span class="gp">... </span>    <span class="n">obj</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">module</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">=</span><span class="n">obj</span><span class="o">.</span><span class="n">datamodule</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Launch the Hydra+Lightning DDP job</p>
+<p>Launch the Hydra+Lightning DDP job:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">launch</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">job</span> <span class="o">=</span> <span class="n">launch</span><span class="p">(</span><span class="n">Config</span><span class="p">,</span> <span class="n">task_function</span><span class="p">)</span>
 </pre></div>

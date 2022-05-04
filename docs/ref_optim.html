@@ -44,6 +44,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
+      
+      <link rel="icon" sizes="16x16" href="_static/favicon-16x16.png">
+      
+    
+      
+      <link rel="icon" sizes="32x32" href="_static/favicon-32x32.png">
+      
+    
+      
+      <link rel="apple-touch-icon" sizes="180x180" href="_static/apple-touch-icon.png">
+      
+    
 
     <!-- Google Analytics -->
     
@@ -58,9 +70,11 @@
   <div id="navbar-start">
     
     
+
 <a class="navbar-brand" href="index.html">
-<p class="title">rai-toolbox</p>
+  <img src="_static/logo_no_text.png" class="logo" alt="logo">
 </a>
+
 
     
   </div>
@@ -317,7 +331,7 @@
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#frank-wolfe-optimizers">
-   Frank Wolfe Optimizers
+   Frank-Wolfe Optimizers
   </a>
  </li>
 </ul>
@@ -347,11 +361,13 @@
 This is facilitated by <a class="reference internal" href="generated/rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer" title="rai_toolbox.optim.ParamTransformingOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParamTransformingOptimizer</span></code></a>, which is able to encapsulate any optimizer (referred to as <code class="xref py py-obj docutils literal notranslate"><span class="pre">InnerOpt</span></code> throughout the reference docs) and add parameter/gradient-transforming capabilities to it.</p>
 <p>The capabilities and implementations provided here are particularly useful for <a class="reference internal" href="ref_perturbation.html#pert-reference"><span class="std std-ref">solving for data perturbations</span></a>.
 Popular adversarial training and evaluation methods often involve normalizing parameter gradients prior to applying updates, as well as constraining (or projecting) the updated parameters.
-Thus our optimizers are particularly well-suited for such applications.
-E.g. <a class="reference internal" href="generated/rai_toolbox.optim.SignedGradientOptim.html#rai_toolbox.optim.SignedGradientOptim" title="rai_toolbox.optim.SignedGradientOptim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SignedGradientOptim</span></code></a> implements the fast gradient sign method, and can encapsulate any other optimizer (e.g., <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.optim.Adam</span></code>) which performs the actual gradient-based step.</p>
-<p id="param-ndim">Because these optimizers are frequently used to update perturbations of data, and not model weights, it is often necessary to control how the parameter-transformations performed  by <a class="reference internal" href="generated/rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer" title="rai_toolbox.optim.ParamTransformingOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParamTransformingOptimizer</span></code></a> are broadcast over each tensor; e.g. we may be solving for a single perturbation (e.g, a “universal” perturbation), or for a <em>batch</em> of perturbations. In the latter case our parameter transformations ought to broadcast over the leading batch dimension. <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim</span></code> is exposed throughout our optimizer APIs to control this behavior.
+Thus, our optimizers are particularly well-suited for such applications.
+E.g., <a class="reference internal" href="generated/rai_toolbox.optim.SignedGradientOptim.html#rai_toolbox.optim.SignedGradientOptim" title="rai_toolbox.optim.SignedGradientOptim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SignedGradientOptim</span></code></a> implements the fast gradient sign method, and can encapsulate any other optimizer (e.g., <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.optim.Adam</span></code>) which performs the actual gradient-based step.</p>
+<p id="param-ndim">Because these optimizers are frequently used to update perturbations of data, and not model weights, it is often necessary to control how the parameter-transformations performed by <a class="reference internal" href="generated/rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer" title="rai_toolbox.optim.ParamTransformingOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParamTransformingOptimizer</span></code></a> are broadcast over each tensor.
+For example, we may be solving for a single perturbation (e.g., a “universal” perturbation), or for a <em>batch</em> of perturbations. In the latter case our parameter transformations ought to broadcast over the leading batch dimension. <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim</span></code> is exposed throughout our optimizer APIs to control this behavior.
 Refer to <a class="reference internal" href="generated/rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer" title="rai_toolbox.optim.ParamTransformingOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParamTransformingOptimizer</span></code></a> for more details.</p>
-<p>All of our reference documentation features detailed Examples sections; scroll to the bottom of any given reference page to see them.</p>
+<p>All of our reference documentation features detailed Examples sections; scroll to the bottom of any given reference page to see them.
+For additional instructions for creating your own parameter-transforming optimizer please refer to <a class="reference internal" href="how_to/custom_optim.html#how-to-optim"><span class="std std-ref">our How-To guide</span></a>.</p>
 <section id="base-parameter-transforming-optimizers">
 <span id="built-in-optim"></span><h2>Base Parameter-Transforming Optimizers<a class="headerlink" href="#base-parameter-transforming-optimizers" title="Permalink to this headline">#</a></h2>
 <table class="autosummary longtable table autosummary">
@@ -361,10 +377,10 @@ Refer to <a class="reference internal" href="generated/rai_toolbox.optim.ParamTr
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer" title="rai_toolbox.optim.ParamTransformingOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParamTransformingOptimizer</span></code></a>([params, ...])</p></td>
-<td><p>An optimizer that performs an in-place transformation to the each parameter, both before and after performing the gradient-based update on each parameter via <code class="xref py py-obj docutils literal notranslate"><span class="pre">InnerOptim.step</span></code>.</p></td>
+<td><p>An optimizer that performs an in-place transformation to each parameter, both before and after performing the gradient-based update on each parameter via <code class="xref py py-obj docutils literal notranslate"><span class="pre">InnerOptim.step</span></code>.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/rai_toolbox.optim.ChainedParamTransformingOptimizer.html#rai_toolbox.optim.ChainedParamTransformingOptimizer" title="rai_toolbox.optim.ChainedParamTransformingOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ChainedParamTransformingOptimizer</span></code></a>(...[, ...])</p></td>
-<td><p>Chains together an arbitrary number of parameter-transforming optimizers, composing their pre and post-step transformation functions to modify the parameters (and their gradients) in-place.</p></td>
+<td><p>Chains together an arbitrary number of parameter-transforming optimizers, composing their pre- and post-step transformation functions to modify the parameters (and their gradients) in-place.</p></td>
 </tr>
 </tbody>
 </table>
@@ -378,10 +394,10 @@ Refer to <a class="reference internal" href="generated/rai_toolbox.optim.ParamTr
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/rai_toolbox.optim.L1NormedGradientOptim.html#rai_toolbox.optim.L1NormedGradientOptim" title="rai_toolbox.optim.L1NormedGradientOptim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">L1NormedGradientOptim</span></code></a>(params[, InnerOpt, ...])</p></td>
-<td><p>A gradient-tranforming  optimizer that normalizes the each gradient by its <span class="math notranslate nohighlight">\(L^1\)</span>-norm prior to using <code class="xref py py-obj docutils literal notranslate"><span class="pre">InnerOp.step</span></code> to update the corresponding parameter.</p></td>
+<td><p>A gradient-tranforming optimizer that normalizes the gradient by its <span class="math notranslate nohighlight">\(L^1\)</span>-norm prior to using <code class="xref py py-obj docutils literal notranslate"><span class="pre">InnerOp.step</span></code> to update the corresponding parameter.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/rai_toolbox.optim.L2NormedGradientOptim.html#rai_toolbox.optim.L2NormedGradientOptim" title="rai_toolbox.optim.L2NormedGradientOptim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">L2NormedGradientOptim</span></code></a>(params[, InnerOpt, ...])</p></td>
-<td><p>A gradient-tranforming  optimizer that normalizes the each gradient by its <span class="math notranslate nohighlight">\(L^2\)</span>-norm prior to using <code class="xref py py-obj docutils literal notranslate"><span class="pre">InnerOp.step</span></code> to update the corresponding parameter.</p></td>
+<td><p>A gradient-tranforming optimizer that normalizes the gradient by its <span class="math notranslate nohighlight">\(L^2\)</span>-norm prior to using <code class="xref py py-obj docutils literal notranslate"><span class="pre">InnerOp.step</span></code> to update the corresponding parameter.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/rai_toolbox.optim.SignedGradientOptim.html#rai_toolbox.optim.SignedGradientOptim" title="rai_toolbox.optim.SignedGradientOptim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SignedGradientOptim</span></code></a>(params[, InnerOpt, ...])</p></td>
 <td><p>A gradient-tranforming optimizer that takes the elementwise sign of a parameter's gradient prior to using <code class="xref py py-obj docutils literal notranslate"><span class="pre">InnerOp.step</span></code> to update the corresponding parameter.</p></td>
@@ -430,7 +446,7 @@ Refer to <a class="reference internal" href="generated/rai_toolbox.optim.ParamTr
 </table>
 </section>
 <section id="frank-wolfe-optimizers">
-<h2>Frank Wolfe Optimizers<a class="headerlink" href="#frank-wolfe-optimizers" title="Permalink to this headline">#</a></h2>
+<h2>Frank-Wolfe Optimizers<a class="headerlink" href="#frank-wolfe-optimizers" title="Permalink to this headline">#</a></h2>
 <table class="autosummary longtable table autosummary">
 <colgroup>
 <col style="width: 10%" />

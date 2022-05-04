@@ -39,6 +39,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
+      
+      <link rel="icon" sizes="16x16" href="../../../_static/favicon-16x16.png">
+      
+    
+      
+      <link rel="icon" sizes="32x32" href="../../../_static/favicon-32x32.png">
+      
+    
+      
+      <link rel="apple-touch-icon" sizes="180x180" href="../../../_static/apple-touch-icon.png">
+      
+    
 
     <!-- Google Analytics -->
     
@@ -53,9 +65,11 @@
   <div id="navbar-start">
     
     
+
 <a class="navbar-brand" href="../../../index.html">
-<p class="title">rai-toolbox</p>
+  <img src="../../../_static/logo_no_text.png" class="logo" alt="logo">
 </a>
+
 
     
   </div>
@@ -174,10 +188,12 @@
 <div class="viewcode-block" id="jensen_shannon_divergence"><a class="viewcode-back" href="../../../generated/rai_toolbox.losses.jensen_shannon_divergence.html#rai_toolbox.losses.jensen_shannon_divergence">[docs]</a><span class="k">def</span> <span class="nf">jensen_shannon_divergence</span><span class="p">(</span>
     <span class="o">*</span><span class="n">probs</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span> <span class="n">weight</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">tr</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Computes the Jensen-Shannon divergence [1]_ between n distributions:</span>
-<span class="sd">                      JSD(P1, P2, ..., Pn)</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes the Jensen-Shannon divergence [1]_ between n distributions:</span>
 
-<span class="sd">    This loss is symmetric and is bounded by 0 &lt;= JSD(P1, P2, ..., Pn) &lt;= ln(n)</span>
+<span class="sd">    :math:`JSD(P_1, P_2, ..., P_n)`</span>
+
+<span class="sd">    This loss is symmetric and is bounded by :math:`0 &lt;= JSD(P_1, P_2, ..., P_n) &lt;= \ln(n)`</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>

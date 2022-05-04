@@ -39,6 +39,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
+      
+      <link rel="icon" sizes="16x16" href="../../../../_static/favicon-16x16.png">
+      
+    
+      
+      <link rel="icon" sizes="32x32" href="../../../../_static/favicon-32x32.png">
+      
+    
+      
+      <link rel="apple-touch-icon" sizes="180x180" href="../../../../_static/apple-touch-icon.png">
+      
+    
 
     <!-- Google Analytics -->
     
@@ -53,9 +65,11 @@
   <div id="navbar-start">
     
     
+
 <a class="navbar-brand" href="../../../../index.html">
-<p class="title">rai-toolbox</p>
+  <img src="../../../../_static/logo_no_text.png" class="logo" alt="logo">
 </a>
+
 
     
   </div>
@@ -217,7 +231,8 @@
 <span class="sd">        upper (exclusive) bounds on a uniform integer-valued distribution from which the depth</span>
 <span class="sd">        will be sampled for each augmentation chain.</span>
 
-<span class="sd">        E.g.</span>
+<span class="sd">        E.g.,</span>
+
 <span class="sd">        - `mixture_depth=2` means that each augmentation chain will consist of two (randomly sampled) augmentations composed together.</span>
 <span class="sd">        - `aug_chain_depth=(1, 4)` means depth of any given augmentation chain is uniformly sampled from [1, 4).</span>
 
@@ -231,17 +246,17 @@
 <span class="sd">        chain.</span>
 
 <span class="sd">    beta_params : Tuple[float, float]</span>
-<span class="sd">        The Beta distribution parameters to draw m, which weights that convex combination::</span>
+<span class="sd">        The Beta distribution parameters to draw `m`, which weights that convex combination::</span>
 
 <span class="sd">                (1 - m) * img_process_fn(datum) + m * img_process_fn(augment(datum))</span>
 
 <span class="sd">        If a single value is specified, it is used as both parameters for the distribution.</span>
 
 <span class="sd">    dirichlet_params : Union[float, Sequence[float]]</span>
-<span class="sd">        The Dirichlet distribution parameters used to weigh the `mixture_width` number of augmentation chains.</span>
+<span class="sd">        The Dirichlet distribution parameters used to weight the `mixture_width` number of augmentation chains.</span>
 <span class="sd">        If a sequence is provided, its length must match `num_aug_chains`.</span>
 
-<span class="sd">    sample_probabilities : Optional[Sequence[float]]</span>
+<span class="sd">    augmentation_choice_probs : Optional[Sequence[float]]</span>
 <span class="sd">        The probabilities associated with sampling each respective entry in `augmentations`.</span>
 <span class="sd">        If not specified, a uniform distribution over all entries of `augmentation`.</span>
 
@@ -262,8 +277,8 @@
 <span class="sd">    - m ~ Beta</span>
 <span class="sd">    - [w1, ..., wN] ~ Dirichlet</span>
 
-<span class="sd">    Random values are drawn via NumPy&#39;s global random number generator. Thus `numpy.</span>
-<span class="sd">    random.seed` must be set in order to obtain reproducible results. Note that, until</span>
+<span class="sd">    Random values are drawn via NumPy&#39;s global random number generator. Thus `numpy.random.seed`</span>
+<span class="sd">    must be set in order to obtain reproducible results. Note that, until</span>
 <span class="sd">    PyTorch 1.9.0, there was an issue with using NumPy&#39;s global RNG in conjunction with</span>
 <span class="sd">    DataLoaders that used multiple workers, where identical seeds were being used</span>
 <span class="sd">    across workers and the same seed was being set at the outset of each epoch.</span>
@@ -272,8 +287,7 @@
 
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
-<span class="sd">    .. [1] Hendrycks, Dan, et al. &quot;Augmix: A simple data processing method to improve</span>
-<span class="sd">    robustness and uncertainty.&quot; arXiv preprint arXiv:1912.02781 (2019).</span>
+<span class="sd">    .. [1] Hendrycks, Dan, et al. &quot;Augmix: A simple data processing method to improve robustness and uncertainty.&quot; arXiv preprint arXiv:1912.02781 (2019).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># See: https://numpy.org/doc/stable/reference/random/index.html?#module-numpy.random</span>
     <span class="c1"># for details about new rng methods in numpy</span>

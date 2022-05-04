@@ -7,8 +7,6 @@ rai\_toolbox.datasets.ImageNetM10
 
    
    .. automethod:: __init__
-   .. automethod:: find_classes
-   .. automethod:: make_dataset
 
    
    .. rubric:: Methods
@@ -16,8 +14,6 @@ rai\_toolbox.datasets.ImageNetM10
    .. autosummary::
    
       ~ImageNetM10.__init__
-      ~ImageNetM10.find_classes
-      ~ImageNetM10.make_dataset
    
    
 

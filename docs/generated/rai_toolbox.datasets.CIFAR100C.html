@@ -41,6 +41,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
+      
+      <link rel="icon" sizes="16x16" href="../_static/favicon-16x16.png">
+      
+    
+      
+      <link rel="icon" sizes="32x32" href="../_static/favicon-32x32.png">
+      
+    
+      
+      <link rel="apple-touch-icon" sizes="180x180" href="../_static/apple-touch-icon.png">
+      
+    
 
     <!-- Google Analytics -->
     
@@ -55,9 +67,11 @@
   <div id="navbar-start">
     
     
+
 <a class="navbar-brand" href="../index.html">
-<p class="title">rai-toolbox</p>
+  <img src="../_static/logo_no_text.png" class="logo" alt="logo">
 </a>
+
 
     
   </div>
@@ -257,28 +271,28 @@
 <h1>rai_toolbox.datasets.CIFAR100C<a class="headerlink" href="#rai-toolbox-datasets-cifar100c" title="Permalink to this headline">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="rai_toolbox.datasets.CIFAR100C">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rai_toolbox.datasets.</span></span><span class="sig-name descname"><span class="pre">CIFAR100C</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PathLike</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corruption</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">severity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">2</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">4</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">5</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">Image.Image</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_transform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/datasets/cifar_corruptions.html#CIFAR100C"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.datasets.CIFAR100C" title="Permalink to this definition">#</a></dt>
-<dd><p>A CIFAR100-test-based dataset for benchmarking neural network robustness to common
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rai_toolbox.datasets.</span></span><span class="sig-name descname"><span class="pre">CIFAR100C</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corruption</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">severity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_transform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/datasets/cifar_corruptions.html#CIFAR100C"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.datasets.CIFAR100C" title="Permalink to this definition">#</a></dt>
+<dd><p>A CIFAR-100-based test dataset for benchmarking neural network robustness to common
 corruptions <a class="reference internal" href="#rb8cb5b192edb-1" id="id1">[1]</a>. For each corruption and for each severity (<code class="xref py py-obj docutils literal notranslate"><span class="pre">1-5</span></code>), the
-dataset consists of the 10,000 test images from CIFAR100 with that corruption
+dataset consists of the 10,000 test images from CIFAR-100 with that corruption
 applied to those images.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>root</strong><span class="classifier">PathLike</span></dt><dd><dl class="simple">
-<dt>Root directory of dataset where directory</dt><dd><p><code class="docutils literal notranslate"><span class="pre">CIFAR-100-C</span></code> exists or will be saved to if download is set to True.</p>
+<dt><strong>root</strong><span class="classifier">PathLike</span></dt><dd><p>Root directory of dataset where directory
+<code class="docutils literal notranslate"><span class="pre">CIFAR-100-C</span></code> exists or will be saved to if download is set to True.</p>
 </dd>
-</dl>
-</dd>
-<dt><strong>corruption</strong><span class="classifier">str</span></dt><dd><p>The type of corruption, e.g. “fog”. See <code class="xref py py-obj docutils literal notranslate"><span class="pre">CIFAR100C.all_corruptions()</span></code> for a full
+<dt><strong>corruption</strong><span class="classifier">str</span></dt><dd><p>The type of corruption, e.g., “fog”. See <code class="xref py py-obj docutils literal notranslate"><span class="pre">CIFAR100C.all_corruptions()</span></code> for a full
 list of corruptions.</p>
 </dd>
 <dt><strong>severity</strong><span class="classifier">Literal[1, 2, 3, 4, 5]</span></dt><dd><p>The severity-level of the corruption, ranging from 1 to 5.</p>
 </dd>
 <dt><strong>transform</strong><span class="classifier">Optional[Callable[[Image], Any]]</span></dt><dd><p>A function/transform that takes in an PIL image
-and returns a transformed version. E.g, <code class="docutils literal notranslate"><span class="pre">transforms.RandomCrop</span></code></p>
+and returns a transformed version. E.g., <code class="docutils literal notranslate"><span class="pre">transforms.RandomCrop</span></code></p>
 </dd>
-<dt><strong>target_transform</strong><span class="classifier">Optional[Callable]</span></dt><dd></dd>
+<dt><strong>target_transform</strong><span class="classifier">Optional[Callable]</span></dt><dd><p>A function/transform that takes in a target
+and returns a transformed version.</p>
+</dd>
 <dt><strong>download: bool, optional (default=False)</strong></dt><dd><p>If true, downloads the dataset from the internet and puts it in root directory.
 If dataset is already downloaded, it is not downloaded again.</p>
 </dd>
@@ -293,24 +307,23 @@ If dataset is already downloaded, it is not downloaded again.</p>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="rai_toolbox.datasets.CIFAR100C.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PathLike</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corruption</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">severity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">2</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">4</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">5</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">Image.Image</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_transform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rai_toolbox.datasets.CIFAR100C.__init__" title="Permalink to this definition">#</a></dt>
-<dd><p>CIFAR10C(root: PathLike, corruption: str, severity: Literal[1, 2, 3, 4, 5], transform: Optional[Callable[[Image.Image], Any]] = None, target_transform: Optional[Callable] = None, download: bool = False)</p>
-<dl class="field-list simple">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corruption</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">severity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_transform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rai_toolbox.datasets.CIFAR100C.__init__" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>root</strong><span class="classifier">PathLike</span></dt><dd><dl class="simple">
-<dt>Root directory of dataset where directory</dt><dd><p><code class="docutils literal notranslate"><span class="pre">CIFAR-10-C</span></code> exists or will be saved to if download is set to True.</p>
+<dt><strong>root</strong><span class="classifier">PathLike</span></dt><dd><p>Root directory of dataset where directory
+<code class="docutils literal notranslate"><span class="pre">CIFAR-10-C</span></code> exists or will be saved to if download is set to True.</p>
 </dd>
-</dl>
-</dd>
-<dt><strong>corruption</strong><span class="classifier">str</span></dt><dd><p>The type of corruption, e.g. “fog”. See <code class="xref py py-obj docutils literal notranslate"><span class="pre">CIFAR10C.all_corruptions()</span></code> for a full list of corruptions.</p>
+<dt><strong>corruption</strong><span class="classifier">str</span></dt><dd><p>The type of corruption, e.g., “fog”. See <code class="xref py py-obj docutils literal notranslate"><span class="pre">CIFAR10C.all_corruptions()</span></code> for a full list of corruptions.</p>
 </dd>
 <dt><strong>severity</strong><span class="classifier">Literal[1, 2, 3, 4, 5]</span></dt><dd><p>The severity-level of the corruption, ranging from 1 to 5.</p>
 </dd>
-<dt><strong>transform</strong><span class="classifier">Optional[Callable[[Image], Any]]</span></dt><dd><p>A function/transform that takes in an PIL image
-and returns a transformed version. E.g, <code class="docutils literal notranslate"><span class="pre">transforms.RandomCrop</span></code></p>
+<dt><strong>transform</strong><span class="classifier">Optional[Callable[[Image], Any]]</span></dt><dd><p>A function/transform that takes in a PIL image
+and returns a transformed version. E.g., <code class="docutils literal notranslate"><span class="pre">transforms.RandomCrop</span></code></p>
 </dd>
-<dt><strong>target_transform</strong><span class="classifier">Optional[Callable]</span></dt><dd></dd>
+<dt><strong>target_transform</strong><span class="classifier">Optional[Callable]</span></dt><dd><p>A function/transform that takes in a target
+and returns a transformed version.</p>
+</dd>
 <dt><strong>download</strong><span class="classifier">bool, optional (default=False)</span></dt><dd><p>If true, downloads the dataset from the internet and puts it in root directory.
 If dataset is already downloaded, it is not downloaded again.</p>
 </dd>
@@ -327,7 +340,11 @@ If dataset is already downloaded, it is not downloaded again.</p>
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#rai_toolbox.datasets.CIFAR100C.__init__" title="rai_toolbox.datasets.CIFAR100C.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(root, corruption, severity[, ...])</p></td>
-<td><p>CIFAR10C(root: PathLike, corruption: str, severity: Literal[1, 2, 3, 4, 5], transform: Optional[Callable[[Image.Image], Any]] = None, target_transform: Optional[Callable] = None, download: bool = False)</p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+</p></td>
 </tr>
 </tbody>
 </table>

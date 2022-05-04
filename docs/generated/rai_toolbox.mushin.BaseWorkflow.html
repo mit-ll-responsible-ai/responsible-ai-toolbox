@@ -41,6 +41,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
+      
+      <link rel="icon" sizes="16x16" href="../_static/favicon-16x16.png">
+      
+    
+      
+      <link rel="icon" sizes="32x32" href="../_static/favicon-32x32.png">
+      
+    
+      
+      <link rel="apple-touch-icon" sizes="180x180" href="../_static/apple-touch-icon.png">
+      
+    
 
     <!-- Google Analytics -->
     
@@ -55,9 +67,11 @@
   <div id="navbar-start">
     
     
+
 <a class="navbar-brand" href="../index.html">
-<p class="title">rai-toolbox</p>
+  <img src="../_static/logo_no_text.png" class="logo" alt="logo">
 </a>
+
 
     
   </div>
@@ -262,7 +276,7 @@
 </dd>
 <dt><strong>metrics</strong><span class="classifier">Dict[str, List[Any]]</span></dt><dd><p>Dictionary of metrics for across all jobs.</p>
 </dd>
-<dt><strong>workflow_overrides</strong><span class="classifier">Dict[str, Any]</span></dt><dd><p>Workflow parameters defined additional arguments to <code class="xref py py-obj docutils literal notranslate"><span class="pre">run</span></code>.</p>
+<dt><strong>workflow_overrides</strong><span class="classifier">Dict[str, Any]</span></dt><dd><p>Workflow parameters defined as additional arguments to <a class="reference internal" href="#rai_toolbox.mushin.BaseWorkflow.run" title="rai_toolbox.mushin.BaseWorkflow.run"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run</span></code></a>.</p>
 </dd>
 <dt><strong>jobs</strong><span class="classifier">List[Any]</span></dt><dd><p>List of jobs returned for each experiment within the workflow.</p>
 </dd>
@@ -279,7 +293,7 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>eval_task_cfg: Mapping | None (default: None)</strong></dt><dd><p>The workflow configuration object</p>
+<dt><strong>eval_task_cfg: Mapping | None (default: None)</strong></dt><dd><p>The workflow configuration object.</p>
 </dd>
 </dl>
 </dd>
@@ -289,8 +303,8 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="rai_toolbox.mushin.BaseWorkflow.evaluation_task">
 <em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">evaluation_task</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/mushin/workflows.html#BaseWorkflow.evaluation_task"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.mushin.BaseWorkflow.evaluation_task" title="Permalink to this definition">#</a></dt>
-<dd><p>User defined evaluation task to run the workflow.</p>
-<p>Arguments should be instantiated configuration variables.  For example
+<dd><p>User-defined evaluation task to run the workflow.</p>
+<p>Arguments should be instantiated configuration variables.  For example,
 if the the workflow configuration is structured as:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>├── eval_task_cfg
 │    ├── trainer
@@ -312,6 +326,41 @@ if the the workflow configuration is structured as:</p>
 <dd><p>Method to extract attributes and metrics relevant to the workflow.</p>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="rai_toolbox.mushin.BaseWorkflow.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">working_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sweeper</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">launcher</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overrides</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">workflow_overrides</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/mushin/workflows.html#BaseWorkflow.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.mushin.BaseWorkflow.run" title="Permalink to this definition">#</a></dt>
+<dd><p>Run the experiment.</p>
+<p>Individual workflows can expclitly define <code class="xref py py-obj docutils literal notranslate"><span class="pre">workflow_overrides</span></code> to improve
+readability and undstanding of what parameters are expected for a particular
+workflow.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>working_dir: str (default: None, the Hydra default will be used)</strong></dt><dd><p>The directory to run the experiment in.  This value is used for
+setting <code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra.sweep.dir</span></code>.</p>
+</dd>
+<dt><strong>sweeper: str | None (default: None)</strong></dt><dd><p>The configuration name of the Hydra Sweeper to use (i.e., the override for
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra/sweeper=sweeper</span></code>)</p>
+</dd>
+<dt><strong>launcher: str | None (default: None)</strong></dt><dd><p>The configuration name of the Hydra Launcher to use (i.e., the override for
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra/launcher=launcher</span></code>)</p>
+</dd>
+<dt><strong>overrides: List[str] | None (default: None)</strong></dt><dd><p>Parameter overrides not considered part of the workflow parameter set.
+This is helpful for filtering out parameters stored in
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">self.workflow_overrides</span></code>.</p>
+</dd>
+<dt><strong>**workflow_overrides: str | int | float | bool | multirun | hydra_list | dict</strong></dt><dd><p>These parameters represent the values for configurations to use for the
+experiment.</p>
+<p>Passing <code class="xref py py-obj docutils literal notranslate"><span class="pre">param=multirun([1,</span> <span class="pre">2,</span> <span class="pre">3])</span></code> will perform a multirun over those
+three param values, whereas passing <code class="xref py py-obj docutils literal notranslate"><span class="pre">param=hydra_list([1,</span> <span class="pre">2,</span> <span class="pre">3])</span></code> will
+pass the entire list as a single input.</p>
+<p>These values will be appended to the <code class="xref py py-obj docutils literal notranslate"><span class="pre">overrides</span></code> for the Hydra job.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
 <p class="rubric">Methods</p>
 <table class="autosummary longtable table autosummary">
 <colgroup>
@@ -323,22 +372,22 @@ if the the workflow configuration is structured as:</p>
 <td><p>Workflows and experiments using Hydra.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#rai_toolbox.mushin.BaseWorkflow.evaluation_task" title="rai_toolbox.mushin.BaseWorkflow.evaluation_task"><code class="xref py py-obj docutils literal notranslate"><span class="pre">evaluation_task</span></code></a>(*args, **kwargs)</p></td>
-<td><p>User defined evaluation task to run the workflow.</p></td>
+<td><p>User-defined evaluation task to run the workflow.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#rai_toolbox.mushin.BaseWorkflow.jobs_post_process" title="rai_toolbox.mushin.BaseWorkflow.jobs_post_process"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jobs_post_process</span></code></a>()</p></td>
 <td><p>Method to extract attributes and metrics relevant to the workflow.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code>(**kwargs)</p></td>
-<td><p>Plot workflow metrics</p></td>
+<td><p>Plot workflow metrics.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">run</span></code>(*[, working_dir, sweeper, launcher, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#rai_toolbox.mushin.BaseWorkflow.run" title="rai_toolbox.mushin.BaseWorkflow.run"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run</span></code></a>(*[, working_dir, sweeper, launcher, ...])</p></td>
 <td><p>Run the experiment.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_dataframe</span></code>()</p></td>
 <td><p>Convert workflow data to Pandas DataFrame.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_xarray</span></code>()</p></td>
-<td><p>Convert workflow data to xArray Dataset or DataArray</p></td>
+<td><p>Convert workflow data to xArray Dataset or DataArray.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate</span></code>()</p></td>
 <td><p>Valide the configuration will execute with the user defined evaluation task</p></td>

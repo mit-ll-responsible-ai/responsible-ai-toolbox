@@ -42,6 +42,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
+      
+      <link rel="icon" sizes="16x16" href="_static/favicon-16x16.png">
+      
+    
+      
+      <link rel="icon" sizes="32x32" href="_static/favicon-32x32.png">
+      
+    
+      
+      <link rel="apple-touch-icon" sizes="180x180" href="_static/apple-touch-icon.png">
+      
+    
 
     <!-- Google Analytics -->
     
@@ -56,9 +68,11 @@
   <div id="navbar-start">
     
     
+
 <a class="navbar-brand" href="index.html">
-<p class="title">rai-toolbox</p>
+  <img src="_static/logo_no_text.png" class="logo" alt="logo">
 </a>
+
 
     
   </div>
@@ -281,12 +295,13 @@
 <p><a class="reference external" href="https://en.wikipedia.org/wiki/Mushin_(mental_state)">Mushin</a> means, roughly,
 <em>“no-mind”</em>;
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">rai_toolbox.mushin</span></code> provides utilities that greatly reduce the “boilerplate” code and overall complexity of conducting machine learning experiments, tests, and analyses.
-Unlike the rest of the toolbox, which is adheres solely to essential PyTorch APIs, <code class="xref py py-obj docutils literal notranslate"><span class="pre">mushin</span></code> is intentionally opinionated and specialized in its design;
-it reflects our (the toolbox dev team’s) shared work flows, best practices, and favorite tools for doing research and development.</p>
-<p>As such, <code class="xref py py-obj docutils literal notranslate"><span class="pre">mushin</span></code> is designed around <a class="reference external" href="https://www.pytorchlightning.ai/">PyTorch-Lightning</a>, which facilitates boilerplate-free and performant machine learning work, and around <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen">hydra-zen</a>, which makes it easy to design configurable and reproducible work flows that leverage <a class="reference external" href="https://github.com/facebookresearch/hydra">the Hydra framework</a>.</p>
+Unlike the rest of the toolbox, which adheres solely to essential PyTorch APIs, <code class="xref py py-obj docutils literal notranslate"><span class="pre">mushin</span></code> is intentionally opinionated and specialized in its design;
+it reflects our (the toolbox dev team’s) shared workflows, best practices, and favorite tools for doing research and development.</p>
+<p>As such, <code class="xref py py-obj docutils literal notranslate"><span class="pre">mushin</span></code> is designed around <a class="reference external" href="https://www.pytorchlightning.ai/">PyTorch-Lightning</a>, which facilitates boilerplate-free and performant machine learning work,
+and around <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen">hydra-zen</a>, which makes it easy to design configurable and reproducible workflows that leverage <a class="reference external" href="https://github.com/facebookresearch/hydra">the Hydra framework</a>.</p>
 <section id="workflows">
 <h2>Workflows<a class="headerlink" href="#workflows" title="Permalink to this headline">#</a></h2>
-<p>Workflows are designed to simplify and automate the process of configuring, running, and reproducing various data science and machine learning work flows.
+<p>Workflows are designed to simplify and automate the process of configuring, running, and reproducing various data science and machine learning workflows.
 In part, these serve to greatly simplify the process of organizing and running jobs using the Hydra framework, and aggregating the results of those jobs for analysis.</p>
 <table class="autosummary longtable table autosummary">
 <colgroup>
@@ -298,10 +313,10 @@ In part, these serve to greatly simplify the process of organizing and running j
 <td><p>Provides an interface for creating a reusable workflow: encapsulated &quot;boilerplate&quot; for running, aggregating, and analyzing one or more Hydra jobs.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/rai_toolbox.mushin.MultiRunMetricsWorkflow.html#rai_toolbox.mushin.MultiRunMetricsWorkflow" title="rai_toolbox.mushin.MultiRunMetricsWorkflow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MultiRunMetricsWorkflow</span></code></a>([eval_task_cfg])</p></td>
-<td><p>Abstract class for workflows that record metrics using Hydra multi-run</p></td>
+<td><p>Abstract class for workflows that record metrics using Hydra multirun.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/rai_toolbox.mushin.RobustnessCurve.html#rai_toolbox.mushin.RobustnessCurve" title="rai_toolbox.mushin.RobustnessCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RobustnessCurve</span></code></a>([eval_task_cfg])</p></td>
-<td><p>Abstract class for workflows that measure performance for different perturbation.</p></td>
+<td><p>Abstract class for workflows that measure performance for different perturbation values.</p></td>
 </tr>
 </tbody>
 </table>

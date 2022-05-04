@@ -41,6 +41,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
+      
+      <link rel="icon" sizes="16x16" href="../_static/favicon-16x16.png">
+      
+    
+      
+      <link rel="icon" sizes="32x32" href="../_static/favicon-32x32.png">
+      
+    
+      
+      <link rel="apple-touch-icon" sizes="180x180" href="../_static/apple-touch-icon.png">
+      
+    
 
     <!-- Google Analytics -->
     
@@ -55,9 +67,11 @@
   <div id="navbar-start">
     
     
+
 <a class="navbar-brand" href="../index.html">
-<p class="title">rai-toolbox</p>
+  <img src="../_static/logo_no_text.png" class="logo" alt="logo">
 </a>
+
 
     
   </div>
@@ -321,7 +335,6 @@ corresponding parameter.</p>
 <dl class="simple">
 <dt><a class="reference internal" href="rai_toolbox.optim.L1NormedGradientOptim.html#rai_toolbox.optim.L1NormedGradientOptim" title="rai_toolbox.optim.L1NormedGradientOptim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">L1NormedGradientOptim</span></code></a></dt><dd></dd>
 <dt><a class="reference internal" href="rai_toolbox.optim.L2NormedGradientOptim.html#rai_toolbox.optim.L2NormedGradientOptim" title="rai_toolbox.optim.L2NormedGradientOptim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">L2NormedGradientOptim</span></code></a></dt><dd></dd>
-<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProjectionMixin</span></code></dt><dd></dd>
 <dt><a class="reference internal" href="rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer" title="rai_toolbox.optim.ParamTransformingOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParamTransformingOptimizer</span></code></a></dt><dd></dd>
 </dl>
 </div>
@@ -342,10 +355,10 @@ performed. This can be specified per param-group.</p>
 <dt><strong>grad_bias</strong><span class="classifier">float, optional (default=0.0)</span></dt><dd><p>Added to each gradient in-place after the in-place transformation is
 performed. This can be specified per param-group.</p>
 </dd>
-<dt><strong>defaults</strong><span class="classifier">Optional[Dict[str, Any]]</span></dt><dd></dd>
+<dt><strong>defaults</strong><span class="classifier">Optional[Dict[str, Any]]</span></dt><dd><p>Specifies default parameters for all parameter groups.</p>
+</dd>
 <dt><strong>param_ndim</strong><span class="classifier">Optional[int]</span></dt><dd><p>Controls how <code class="xref py py-obj docutils literal notranslate"><span class="pre">_pre_step_transform_</span></code> is broadcast onto the gradient
-of a given parameter. This has no effect for <a class="reference internal" href="#rai_toolbox.optim.SignedGradientOptim" title="rai_toolbox.optim.SignedGradientOptim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SignedGradientOptim</span></code></a>.
-Specifies default parameters for all parameter groups.</p>
+of a given parameter. This has no effect for <a class="reference internal" href="#rai_toolbox.optim.SignedGradientOptim" title="rai_toolbox.optim.SignedGradientOptim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SignedGradientOptim</span></code></a>.</p>
 </dd>
 <dt><strong>**inner_opt_kwargs</strong><span class="classifier">Any</span></dt><dd><p>Named arguments used to initialize <code class="xref py py-obj docutils literal notranslate"><span class="pre">InnerOpt</span></code>.</p>
 </dd>

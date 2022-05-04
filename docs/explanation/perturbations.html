@@ -44,6 +44,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
+      
+      <link rel="icon" sizes="16x16" href="../_static/favicon-16x16.png">
+      
+    
+      
+      <link rel="icon" sizes="32x32" href="../_static/favicon-32x32.png">
+      
+    
+      
+      <link rel="apple-touch-icon" sizes="180x180" href="../_static/apple-touch-icon.png">
+      
+    
 
     <!-- Google Analytics -->
     
@@ -58,9 +70,11 @@
   <div id="navbar-start">
     
     
+
 <a class="navbar-brand" href="../index.html">
-<p class="title">rai-toolbox</p>
+  <img src="../_static/logo_no_text.png" class="logo" alt="logo">
 </a>
+
 
     
   </div>
@@ -185,12 +199,7 @@
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#common-data-related-workflows-supported-by-rai-toolbox">
-   Common data-related workflows supported by
-   <code class="xref py py-obj docutils literal notranslate">
-    <span class="pre">
-     rai-toolbox
-    </span>
-   </code>
+   Common data-related workflows supported by rAI-toolbox
   </a>
  </li>
 </ul>
@@ -218,7 +227,7 @@
 <h1>On Data Perturbations<a class="headerlink" href="#on-data-perturbations" title="Permalink to this headline">#</a></h1>
 <p>This article provides an overview of common data optimization problems, using model-dependent criteria, that are relevant for assessing and enhancing robustness in machine learning models.
 We present a broad picture of how we have designed the rAI-toolbox to solve these problems, and provide pseudo-code that illustrates how <a class="reference internal" href="../ref_optim.html#optim-reference"><span class="std std-ref">optimizations</span></a> over <a class="reference internal" href="../ref_perturbation.html#pert-reference"><span class="std std-ref">data perturbations</span></a> adhere strictly
-adhering core <a class="reference external" href="https://pytorch.org/">PyTorch</a> APIs; i.e,
+to core <a class="reference external" href="https://pytorch.org/">PyTorch</a> APIs; i.e.,
 a perturbation model is defined as a <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.nn.Module</span></code>, and its optimizer as <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.optim.Optimizer</span></code>.</p>
 <section id="model-optimization-vs-data-optimization">
 <h2>Model optimization vs. data optimization<a class="headerlink" href="#model-optimization-vs-data-optimization" title="Permalink to this headline">#</a></h2>
@@ -308,9 +317,9 @@ need to write an entirely new solver.</p>
 
 <span class="c1"># Implements PyTorch Optimizer API</span>
 <span class="k">class</span> <span class="nc">PerturbationOptimizer</span><span class="p">(</span><span class="n">Optimizer</span><span class="p">):</span>
-   <span class="k">def</span> <span class="nf">_pre_step_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">):</span> <span class="c1"># e.g. perform gradient-normalization</span>
+   <span class="k">def</span> <span class="nf">_pre_step_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">):</span> <span class="c1"># e.g., perform gradient-normalization</span>
    <span class="k">def</span> <span class="nf">_step_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">):</span> <span class="c1"># perform gradient-based update on parameter</span>
-   <span class="k">def</span> <span class="nf">_post_step_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">grad</span><span class="p">):</span> <span class="c1"># e.g. project updated parameter into constraint set</span>
+   <span class="k">def</span> <span class="nf">_post_step_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">grad</span><span class="p">):</span> <span class="c1"># e.g., project updated parameter into constraint set</span>
 
    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
       <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_params</span><span class="p">:</span>
@@ -320,7 +329,7 @@ need to write an entirely new solver.</p>
 </pre></div>
 </div>
 </div>
-<p>Having framed the perturbation process as a <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.nn.Module</span></code>, whose parameters (e.g. the perturbation itself) are optimized and constrained via the <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.optim.Optimizer</span></code> API, we can take any standard trainer, e.g.</p>
+<p>Having framed the perturbation process as a <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.nn.Module</span></code>, whose parameters (e.g., the perturbation itself) are optimized and constrained via the <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.optim.Optimizer</span></code> API, we can take any standard trainer, e.g.:</p>
 <div class="literal-block-wrapper docutils container" id="id3">
 <div class="code-block-caption"><span class="caption-text">A standard PyTorch trainer</span><a class="headerlink" href="#id3" title="Permalink to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">standard_trainer</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">steps</span><span class="p">,</span> <span class="n">criterion</span><span class="p">):</span>
@@ -335,7 +344,7 @@ need to write an entirely new solver.</p>
 </pre></div>
 </div>
 </div>
-<p>and solve for perturbation via:</p>
+<p>and solve for the optimal perturbation via:</p>
 <div class="literal-block-wrapper docutils container" id="id4">
 <div class="code-block-caption"><span class="caption-text">Solving for perturbations using a standard PyTorch trainer</span><a class="headerlink" href="#id4" title="Permalink to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">Sequential</span>
@@ -347,7 +356,7 @@ need to write an entirely new solver.</p>
 <span class="n">ml_model</span> <span class="o">=</span> <span class="n">MyNeuralNetwork</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
 
 <span class="c1"># model(data) -&gt; ml_model(pert_model(data))</span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">Sequential</span><span class="p">([</span><span class="n">pert_model</span><span class="p">,</span> <span class="n">freeze</span><span class="p">(</span><span class="n">ml_model</span><span class="o">.</span><span class="n">eval</span><span class="p">())])</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">Sequential</span><span class="p">(</span><span class="n">pert_model</span><span class="p">,</span> <span class="n">freeze</span><span class="p">(</span><span class="n">ml_model</span><span class="o">.</span><span class="n">eval</span><span class="p">()))</span>
 
 <span class="c1"># solve for perturbations</span>
 <span class="n">standard_trainer</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">optimizer</span><span class="o">=</span><span class="n">optim</span><span class="p">,</span> <span class="n">data</span><span class="o">=...</span><span class="p">,</span> <span class="n">target</span><span class="o">=...</span><span class="p">,</span> <span class="n">steps</span><span class="o">=...</span><span class="p">,</span> <span class="n">criterion</span><span class="o">=...</span><span class="p">)</span>
@@ -356,13 +365,21 @@ need to write an entirely new solver.</p>
 </pre></div>
 </div>
 </div>
-<p>The abstractions provided by a perturbation model and a perturbation optimizer yields a natural delegation of functionality, which makes it easy for us to modify the critical implementation details of this problem. E.g., One can modify the optimizer to adjust how the perturbation is constrained, or how its gradient is normalized; the perturbation model controls the random initialization of the perturbation and how the perturbation broadcasts over a batch of data. None of these adjustments require any modification to the process by which we actually solve for the perturbations; i.e., we can continue to use <code class="xref py py-obj docutils literal notranslate"><span class="pre">standard_trainer</span></code> or any gradient-based solver.
-<a class="reference internal" href="../generated/rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer" title="rai_toolbox.optim.ParamTransformingOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParamTransformingOptimizer</span></code></a> and <a class="reference internal" href="../generated/rai_toolbox.perturbations.AdditivePerturbation.html#rai_toolbox.perturbations.AdditivePerturbation" title="rai_toolbox.perturbations.AdditivePerturbation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AdditivePerturbation</span></code></a> represent concrete implementations of this design; the reader is advised to consult their reference documentation for further insights into the rAI-toolbox’s approach to solving for data perturbations.</p>
+<p>We can then use <code class="xref py py-obj docutils literal notranslate"><span class="pre">pert_model</span></code> to apply these optimized perturbations to new data</p>
+<div class="literal-block-wrapper docutils container" id="id5">
+<div class="code-block-caption"><span class="caption-text">Peturbing data</span><a class="headerlink" href="#id5" title="Permalink to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="c1"># some tensor of data</span>
+<span class="n">pert_data</span> <span class="o">=</span> <span class="n">pert_model</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>  <span class="c1"># applies optimized peturbation to `data`</span>
+</pre></div>
+</div>
+</div>
+<p>The abstractions provided by a perturbation model and a perturbation optimizer yields a natural delegation of functionality, which makes it easy for us to modify the critical implementation details of this problem. E.g., One can modify the optimizer to adjust how the perturbation is constrained, or how its gradient is normalized; the perturbation model controls the random initialization of the perturbation and how the perturbation broadcasts over a batch of data. None of these adjustments require any modification to the process by which we actually solve for the perturbations; i.e., we can continue to use <code class="xref py py-obj docutils literal notranslate"><span class="pre">standard_trainer</span></code> or any gradient-based solver.</p>
+<p><a class="reference internal" href="../generated/rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer" title="rai_toolbox.optim.ParamTransformingOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParamTransformingOptimizer</span></code></a>, <a class="reference internal" href="../generated/rai_toolbox.perturbations.AdditivePerturbation.html#rai_toolbox.perturbations.AdditivePerturbation" title="rai_toolbox.perturbations.AdditivePerturbation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AdditivePerturbation</span></code></a>, and <a class="reference internal" href="../generated/rai_toolbox.perturbations.gradient_ascent.html#rai_toolbox.perturbations.gradient_ascent" title="rai_toolbox.perturbations.gradient_ascent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gradient_ascent</span></code></a> represent concrete implementations of this design; the reader is advised to consult their reference documentation for further insights into the rAI-toolbox’s approach to solving for data perturbations.</p>
 </section>
 <section id="common-data-related-workflows-supported-by-rai-toolbox">
-<h2>Common data-related workflows supported by <code class="xref py py-obj docutils literal notranslate"><span class="pre">rai-toolbox</span></code><a class="headerlink" href="#common-data-related-workflows-supported-by-rai-toolbox" title="Permalink to this headline">#</a></h2>
+<h2>Common data-related workflows supported by rAI-toolbox<a class="headerlink" href="#common-data-related-workflows-supported-by-rai-toolbox" title="Permalink to this headline">#</a></h2>
 <p>A wide range of responsible AI techniques involve optimizing parameters of data
-transformations, often in addition to optimizations over model parameters:</p>
+perturbations (or more generally, <em>transforations</em>), often in addition to optimizations over model parameters:</p>
 <ul class="simple">
 <li><dl class="simple">
 <dt>Data augmentations / corruptions: <span class="math notranslate nohighlight">\(g_\delta(x)\)</span></dt><dd><ul>
@@ -402,7 +419,7 @@ transformations, often in addition to optimizations over model parameters:</p>
 </ul>
 <p>where <span class="math notranslate nohighlight">\(g_\delta\)</span> represents a model for transforming data, parameterized by
 <span class="math notranslate nohighlight">\(\delta\)</span>.</p>
-<p>The rai-toolbox is designed to support all of the flavors of analysis represented by
+<p>The rAI-toolbox is designed to support all of the flavors of analysis represented by
 the above workflows. Users can immediately leverage the toolbox’s perturbation
 <a class="reference internal" href="../ref_perturbation.html#pert-models"><span class="std std-ref">models</span></a>, <a class="reference internal" href="../ref_optim.html#optim-reference"><span class="std std-ref">optimizers</span></a>,
 and <a class="reference internal" href="../ref_perturbation.html#pert-solvers"><span class="std std-ref">solvers</span></a>, or build their own in a manner that can be easily composed with other existing tools from the PyTorch ecosystem for creating distributed and scalable Responsible AI workflows.</p>

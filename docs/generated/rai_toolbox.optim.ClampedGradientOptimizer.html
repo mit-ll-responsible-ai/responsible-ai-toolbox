@@ -41,6 +41,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
+      
+      <link rel="icon" sizes="16x16" href="../_static/favicon-16x16.png">
+      
+    
+      
+      <link rel="icon" sizes="32x32" href="../_static/favicon-32x32.png">
+      
+    
+      
+      <link rel="apple-touch-icon" sizes="180x180" href="../_static/apple-touch-icon.png">
+      
+    
 
     <!-- Google Analytics -->
     
@@ -55,9 +67,11 @@
   <div id="navbar-start">
     
     
+
 <a class="navbar-brand" href="../index.html">
-<p class="title">rai-toolbox</p>
+  <img src="../_static/logo_no_text.png" class="logo" alt="logo">
 </a>
+
 
     
   </div>
@@ -342,9 +356,9 @@ performing a step with <code class="xref py py-obj docutils literal notranslate"
 <dl class="py method">
 <dt class="sig sig-object py" id="rai_toolbox.optim.ClampedGradientOptimizer.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">InnerOpt=&lt;class</span> <span class="pre">'torch.optim.sgd.SGD'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clamp_min=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clamp_max=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defaults=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_ndim=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**inner_opt_kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rai_toolbox.optim.ClampedGradientOptimizer.__init__" title="Permalink to this definition">#</a></dt>
-<dd><dl class="field-list">
+<dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl>
+<dd class="field-odd"><dl class="simple">
 <dt><strong>params</strong><span class="classifier">Sequence[Tensor] | Iterable[Mapping[str, Any]]</span></dt><dd><p>Iterable of parameters or dicts defining parameter groups.</p>
 </dd>
 <dt><strong>InnerOpt</strong><span class="classifier">Type[Optimizer] | Partial[Optimizer], optional (default=`torch.nn.optim.SGD`)</span></dt><dd><p>The optimizer that updates the parameters after their gradients have
@@ -368,8 +382,7 @@ performed. This can be specified per param-group.</p>
 </dd>
 <dt><strong>param_ndim</strong><span class="classifier">Optional[int]</span></dt><dd><p>Controles how <code class="xref py py-obj docutils literal notranslate"><span class="pre">_pre_step_transform_</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">_post_step_transform_</span></code>  are
 broadcast onto a given parameter. This has no effect for
-<a class="reference internal" href="#rai_toolbox.optim.ClampedGradientOptimizer" title="rai_toolbox.optim.ClampedGradientOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ClampedGradientOptimizer</span></code></a>.</p>
-<p>Specifies default parameters for all parameter groups.</p>
+<a class="reference internal" href="#rai_toolbox.optim.ClampedGradientOptimizer" title="rai_toolbox.optim.ClampedGradientOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ClampedGradientOptimizer</span></code></a> and <a class="reference internal" href="rai_toolbox.optim.ClampedParameterOptimizer.html#rai_toolbox.optim.ClampedParameterOptimizer" title="rai_toolbox.optim.ClampedParameterOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ClampedParameterOptimizer</span></code></a>.</p>
 </dd>
 <dt><strong>**inner_opt_kwargs</strong><span class="classifier">Any</span></dt><dd><p>Named arguments used to initialize <code class="xref py py-obj docutils literal notranslate"><span class="pre">InnerOpt</span></code>.</p>
 </dd>

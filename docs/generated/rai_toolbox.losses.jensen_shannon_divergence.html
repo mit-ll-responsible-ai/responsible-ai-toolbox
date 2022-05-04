@@ -34,12 +34,26 @@
     <script src="../_static/clipboard.min.js"></script>
     <script src="../_static/copybutton.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Mushin" href="../ref_mushin.html" />
     <link rel="prev" title="Losses" href="../ref_losses.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
+    
+      
+      <link rel="icon" sizes="16x16" href="../_static/favicon-16x16.png">
+      
+    
+      
+      <link rel="icon" sizes="32x32" href="../_static/favicon-32x32.png">
+      
+    
+      
+      <link rel="apple-touch-icon" sizes="180x180" href="../_static/apple-touch-icon.png">
+      
     
 
     <!-- Google Analytics -->
@@ -55,9 +69,11 @@
   <div id="navbar-start">
     
     
+
 <a class="navbar-brand" href="../index.html">
-<p class="title">rai-toolbox</p>
+  <img src="../_static/logo_no_text.png" class="logo" alt="logo">
 </a>
+
 
     
   </div>
@@ -233,11 +249,9 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="rai_toolbox.losses.jensen_shannon_divergence">
 <span class="sig-prename descclassname"><span class="pre">rai_toolbox.losses.</span></span><span class="sig-name descname"><span class="pre">jensen_shannon_divergence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">probs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/losses/_jensen_shannon_divergence.html#jensen_shannon_divergence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.losses.jensen_shannon_divergence" title="Permalink to this definition">#</a></dt>
-<dd><dl class="simple">
-<dt>Computes the Jensen-Shannon divergence <a class="reference internal" href="#re09190a32207-1" id="id1">[1]</a> between n distributions:</dt><dd><p>JSD(P1, P2, …, Pn)</p>
-</dd>
-</dl>
-<p>This loss is symmetric and is bounded by 0 &lt;= JSD(P1, P2, …, Pn) &lt;= ln(n)</p>
+<dd><p>Computes the Jensen-Shannon divergence <a class="reference internal" href="#re09190a32207-1" id="id1">[1]</a> between n distributions:</p>
+<p><span class="math notranslate nohighlight">\(JSD(P_1, P_2, ..., P_n)\)</span></p>
+<p>This loss is symmetric and is bounded by <span class="math notranslate nohighlight">\(0 &lt;= JSD(P_1, P_2, ..., P_n) &lt;= \ln(n)\)</span></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">

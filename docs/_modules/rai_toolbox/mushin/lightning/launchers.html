@@ -39,6 +39,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
+      
+      <link rel="icon" sizes="16x16" href="../../../../_static/favicon-16x16.png">
+      
+    
+      
+      <link rel="icon" sizes="32x32" href="../../../../_static/favicon-32x32.png">
+      
+    
+      
+      <link rel="apple-touch-icon" sizes="180x180" href="../../../../_static/apple-touch-icon.png">
+      
+    
 
     <!-- Google Analytics -->
     
@@ -53,9 +65,11 @@
   <div id="navbar-start">
     
     
+
 <a class="navbar-brand" href="../../../../index.html">
-<p class="title">rai-toolbox</p>
+  <img src="../../../../_static/logo_no_text.png" class="logo" alt="logo">
 </a>
+
 
     
   </div>
@@ -260,7 +274,7 @@
     <span class="k">class</span> <span class="nc">HydraDDP</span><span class="p">(</span><span class="n">DDPStrategy</span><span class="p">):</span>  <span class="c1"># type: ignore</span>
         <span class="sd">&quot;&quot;&quot;DDP Strategy that supports Hydra run and multirun jobs.</span>
 
-<span class="sd">        This strategy assumes a `Trainer.fit` or `Trainer.test` has been configured</span>
+<span class="sd">        This strategy assumes a PyTorch Lightning `Trainer.fit` or `Trainer.test` has been configured</span>
 <span class="sd">        to execute via Hydra.  It requires that Hydra saves a `config.yaml` in the current working directory with the following keys/properties set::</span>
 
 <span class="sd">           ├── Config</span>
@@ -275,7 +289,7 @@
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 
-<span class="sd">        First define a Hydra configuration using hydra-zen</span>
+<span class="sd">        First define a Hydra configuration using hydra-zen:</span>
 
 <span class="sd">        &gt;&gt;&gt; import pytorch_lightning as pl</span>
 <span class="sd">        ... from hydra_zen import builds, make_config,</span>
@@ -299,7 +313,7 @@
 <span class="sd">        ...     module=ModuleConfig</span>
 <span class="sd">        ... )</span>
 
-<span class="sd">        Next define a task function to execute the Hydra job</span>
+<span class="sd">        Next, define a task function to execute the Hydra job:</span>
 
 <span class="sd">        &gt;&gt;&gt; from hydra_zen import instantiate</span>
 <span class="sd">        &gt;&gt;&gt; def task_function(cfg):</span>
@@ -320,14 +334,14 @@
 <span class="sd">        ...     datamodule=DataModuleconfig</span>
 <span class="sd">        ... )</span>
 
-<span class="sd">        Next define a task function to execute the Hydra job</span>
+<span class="sd">        Next define a task function to execute the Hydra job:</span>
 
 <span class="sd">        &gt;&gt;&gt; from hydra_zen import instantiate</span>
 <span class="sd">        &gt;&gt;&gt; def task_function(cfg):</span>
 <span class="sd">        ...     obj = instantiate(cfg)</span>
 <span class="sd">        ...     obj.trainer.fit(obj.module, datamodule=obj.datamodule)</span>
 
-<span class="sd">        Launch the Hydra+Lightning DDP job</span>
+<span class="sd">        Launch the Hydra+Lightning DDP job:</span>
 
 <span class="sd">        &gt;&gt;&gt; from hydra_zen import launch</span>
 <span class="sd">        &gt;&gt;&gt; job = launch(Config, task_function)</span>
@@ -419,7 +433,7 @@
 <div class="viewcode-block" id="HydraDDP"><a class="viewcode-back" href="../../../../generated/rai_toolbox.mushin.HydraDDP.html#rai_toolbox.mushin.HydraDDP">[docs]</a>    <span class="k">class</span> <span class="nc">HydraDDP</span><span class="p">(</span><span class="n">DDPPlugin</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;DDP Strategy that supports Hydra run and multirun jobs.</span>
 
-<span class="sd">        This strategy assumes a `Trainer.fit` or `Trainer.test` has been configured</span>
+<span class="sd">        This strategy assumes a PyTorch Lightning `Trainer.fit` or `Trainer.test` has been configured</span>
 <span class="sd">        to execute via Hydra.  It requires that Hydra saves a `config.yaml` in the current working directory with the following keys/properties set::</span>
 
 <span class="sd">           ├── Config</span>
@@ -434,7 +448,7 @@
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 
-<span class="sd">        First define a Hydra configuration using hydra-zen</span>
+<span class="sd">        First define a Hydra configuration using hydra-zen:</span>
 
 <span class="sd">        &gt;&gt;&gt; import pytorch_lightning as pl</span>
 <span class="sd">        ... from hydra_zen import builds, make_config,</span>
@@ -458,14 +472,14 @@
 <span class="sd">        ...     module=ModuleConfig</span>
 <span class="sd">        ... )</span>
 
-<span class="sd">        Next define a task function to execute the Hydra job</span>
+<span class="sd">        Next define a task function to execute the Hydra job:</span>
 
 <span class="sd">        &gt;&gt;&gt; from hydra_zen import instantiate</span>
 <span class="sd">        &gt;&gt;&gt; def task_function(cfg):</span>
 <span class="sd">        ...     obj = instantiate(cfg)</span>
 <span class="sd">        ...     obj.trainer.fit(obj.module)</span>
 
-<span class="sd">        Launch the Hydra+Lightning DDP job</span>
+<span class="sd">        Launch the Hydra+Lightning DDP job:</span>
 
 <span class="sd">        &gt;&gt;&gt; from hydra_zen import launch</span>
 <span class="sd">        &gt;&gt;&gt; job = launch(Config, task_function)</span>
@@ -479,14 +493,14 @@
 <span class="sd">        ...     datamodule=DataModuleconfig</span>
 <span class="sd">        ... )</span>
 
-<span class="sd">        Next define a task function to execute the Hydra job</span>
+<span class="sd">        Next, define a task function to execute the Hydra job:</span>
 
 <span class="sd">        &gt;&gt;&gt; from hydra_zen import instantiate</span>
 <span class="sd">        &gt;&gt;&gt; def task_function(cfg):</span>
 <span class="sd">        ...     obj = instantiate(cfg)</span>
 <span class="sd">        ...     obj.trainer.fit(obj.module, datamodule=obj.datamodule)</span>
 
-<span class="sd">        Launch the Hydra+Lightning DDP job</span>
+<span class="sd">        Launch the Hydra+Lightning DDP job:</span>
 
 <span class="sd">        &gt;&gt;&gt; from hydra_zen import launch</span>
 <span class="sd">        &gt;&gt;&gt; job = launch(Config, task_function)</span>
