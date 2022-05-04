@@ -10,8 +10,6 @@ rai\_toolbox.mushin.BaseWorkflow
    .. automethod:: evaluation_task
    .. automethod:: jobs_post_process
    .. automethod:: run
-   .. automethod:: plot
-
    
    .. rubric:: Methods
 

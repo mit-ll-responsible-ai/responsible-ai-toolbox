@@ -7,17 +7,13 @@ rai\_toolbox.datasets.RestrictedImageNet
 
    
    .. automethod:: __init__
-   .. automethod:: find_classes
-   .. automethod:: make_dataset
-   
+
    .. rubric:: Methods
 
    .. autosummary::
    
       ~RestrictedImageNet.__init__
-      ~RestrictedImageNet.find_classes
-      ~RestrictedImageNet.make_dataset
-   
+
    
 
    

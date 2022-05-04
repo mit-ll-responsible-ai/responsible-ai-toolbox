@@ -234,19 +234,19 @@ class ParamTransformingOptimizer(Optimizer, metaclass=ABCMeta):
 
         If `param_ndim=1` (or `param_ndim=-3`), then the parameter and its gradient
         will be temporarily reshaped to a shape-`(d0 * d1 * d2, d3)` so that the
-        transformation will be broadcast over each shape-(d3,) sub-tensor.
+        transformation will be broadcast over each shape-`(d3,)` sub-tensor.
 
         If `param_ndim=2` (or `param_ndim=-2`), then the parameter and its gradient
         will be temporarily reshaped to a shape-`(d0 * d1, d2, d3)` so that the
-        transformation will be broadcast over each shape-(d2, d3) sub-tensor.
+        transformation will be broadcast over each shape-`(d2, d3)` sub-tensor.
 
         If `param_ndim=3` (or `param_ndim=-1`), then the parameter and its gradient
         will be temporarily reshaped to a shape-`(d0, d1, d2, d3)` so that the
-        transformation will be broadcast over each shape-(d1, d2, d3) sub-tensor.
+        transformation will be broadcast over each shape-`(d1, d2, d3)` sub-tensor.
 
         If `param_ndim=4` (or `param_ndim=None`), then the parameter and its gradient
         will be temporarily reshaped to a shape-`(1, d0, d1, d2, d3)` so that the
-        transformation will be applied to the shape-(d0, d1, d2, d3) tensor without
+        transformation will be applied to the shape-`(d0, d1, d2, d3)` tensor without
         broadcasting.
 
         Examples

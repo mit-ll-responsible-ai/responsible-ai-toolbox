@@ -15,6 +15,7 @@ def jensen_shannon_divergence(
 ) -> tr.Tensor:
     """
     Computes the Jensen-Shannon divergence [1]_ between n distributions:
+
     :math:`JSD(P_1, P_2, ..., P_n)`
 
     This loss is symmetric and is bounded by :math:`0 <= JSD(P_1, P_2, ..., P_n) <= \ln(n)`
