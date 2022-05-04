@@ -8,7 +8,6 @@ rai\_toolbox.mushin.MultiRunMetricsWorkflow
    
    .. automethod:: __init__
    .. automethod:: run
-   .. automethod:: plot
    .. automethod:: load_from_dir
 
    

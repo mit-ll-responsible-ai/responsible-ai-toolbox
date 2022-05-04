@@ -110,7 +110,7 @@ class Fork(tr.nn.Module):
 
     Examples
     --------
-    >>> from rai_toolbox.augmix.transforms import Fork
+    >>> from rai_toolbox.augmentations.augmix import Fork
 
     Here are some trivial examples:
 
@@ -126,7 +126,7 @@ class Fork(tr.nn.Module):
     paper's consistency loss. It anticipates a PIL image and produces a triplet.
 
     >>> from torchvision.transforms import ToTensor, RandomHorizontalFlip, RandomVerticalFlip
-    >>> from rai_toolbox.augmix.transforms import AugMix
+    >>> from rai_toolbox.augmentations.augmix import AugMix
     >>> augmix = AugMix(
     ...     augmentations=[RandomHorizontalFlip(), RandomVerticalFlip()],
     ...     process_fn=ToTensor(),

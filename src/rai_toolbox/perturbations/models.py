@@ -61,7 +61,7 @@ class AdditivePerturbation(nn.Module, PerturbationModel):
         delta_ndim: Optional[int] = None,
         **init_fn_kwargs: Any,
     ) -> None:
-        """The init function should support data is the argument to initialize
+        """The init function should support data as the argument to initialize
         perturbations.
 
         Parameters
@@ -86,7 +86,7 @@ class AdditivePerturbation(nn.Module, PerturbationModel):
         delta_ndim: Optional[int] = None
             If a positive number, determines the dimensionality of the perturbation.
             If a negative number, indicates the 'offset' from the dimensionality of
-            `data_or_shape`. E.g. if `data_or_shape` has a shape (N, C, H, W), and
+            `data_or_shape`. E.g., if `data_or_shape` has a shape (N, C, H, W), and
             if `delta_ndim=-1`, then the perturbation will have shape (C, H, W),
             and will be applied in a broadcast fashion.
 
@@ -97,9 +97,9 @@ class AdditivePerturbation(nn.Module, PerturbationModel):
         --------
         **Basic Additive Perturbations**
 
-        Let's imagine we have a batch of three shape-(2, 2) images (our toy data will
-        be all ones) that we want to perturb. We'll randomly initialize a shape-(3, 2,
-        2) tensor of perturbations to apply additively to the shape-(3, 2, 2) batch.
+        Let's imagine we have a batch of three shape-`(2, 2)` images (our toy data will
+        be all ones) that we want to perturb. We'll randomly initialize a shape-`(3, 2,
+        2)` tensor of perturbations to apply additively to the shape-`(3, 2, 2)` batch.
 
         >>> import torch as tr
         >>> from rai_toolbox.perturbations import AdditivePerturbation, uniform_like_l1_n_ball_
@@ -146,21 +146,21 @@ class AdditivePerturbation(nn.Module, PerturbationModel):
         >>> (pert_data ** 2).sum().backward()
         >>> pert_model.delta.grad
         tensor([[[2.1770, 2.0871],
-         [2.7285, 2.5439]],
-        .
-        [[2.6148, 2.3653],
-         [2.2880, 2.5247]],
-        .
-        [[2.6978, 2.1056],
-         [2.1078, 2.3534]]])
+                [2.7285, 2.5439]],
+                .
+                [[2.6148, 2.3653],
+                [2.2880, 2.5247]],
+                .
+                [[2.6978, 2.1056],
+                [2.1078, 2.3534]]])
 
         **Broadcasted ("Universal") Perturbations**
 
-        Suppose that we want to use a single shape-(2, 2) tensor to perturb each datum
+        Suppose that we want to use a single shape-`(2, 2)` tensor to perturb each datum
         in a batch. We can create a perturbation model in a similar manner, but
         specifying `delta_ndim=-1` indicates that our perturbation should have one
-        fewer dimension than our data; whereas our batch has shape-(N, 2, 2) our
-        perturbation model's parameter will have shape-(2, 2)
+        fewer dimension than our data; whereas our batch has shape-`(N, 2, 2)`, our
+        perturbation model's parameter will have shape-`(2, 2)`
 
         >>> pert_model = AdditivePerturbation(
         ...     data_or_shape=data,
@@ -179,13 +179,13 @@ class AdditivePerturbation(nn.Module, PerturbationModel):
         >>> pert_data = pert_model(data)
         >>> pert_data
         tensor([[[1.2793, 1.4783],
-         [1.4031, 1.3316]],
-         .
-        [[1.2793, 1.4783],
-         [1.4031, 1.3316]],
-         .
-        [[1.2793, 1.4783],
-         [1.4031, 1.3316]]], grad_fn=<AddBackward0>)
+                [1.4031, 1.3316]],
+                .
+                [[1.2793, 1.4783],
+                [1.4031, 1.3316]],
+                .
+                [[1.2793, 1.4783],
+                [1.4031, 1.3316]]], grad_fn=<AddBackward0>)
 
         .. important::
 

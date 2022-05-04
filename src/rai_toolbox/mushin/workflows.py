@@ -54,7 +54,7 @@ class BaseWorkflow(ABC):
         Dictionary of metrics for across all jobs.
 
     workflow_overrides : Dict[str, Any]
-        Workflow parameters defined additional arguments to `run`.
+        Workflow parameters defined as additional arguments to `run`.
 
     jobs : List[Any]
         List of jobs returned for each experiment within the workflow.
@@ -76,7 +76,7 @@ class BaseWorkflow(ABC):
         Parameters
         ----------
         eval_task_cfg: Mapping | None (default: None)
-            The workflow configuration object
+            The workflow configuration object.
 
         """
         # we can do validation checks here
@@ -114,9 +114,9 @@ class BaseWorkflow(ABC):
 
     @abstractstaticmethod
     def evaluation_task(*args: Any, **kwargs: Any) -> Any:
-        """User defined evaluation task to run the workflow.
+        """User-defined evaluation task to run the workflow.
 
-        Arguments should be instantiated configuration variables.  For example
+        Arguments should be instantiated configuration variables.  For example,
         if the the workflow configuration is structured as::
 
             ├── eval_task_cfg
@@ -224,7 +224,7 @@ class BaseWorkflow(ABC):
         """Method to extract attributes and metrics relevant to the workflow."""
 
     def plot(self, **kwargs) -> None:
-        """Plot workflow metrics"""
+        """Plot workflow metrics."""
         raise NotImplementedError()
 
     def to_dataframe(self):
@@ -232,7 +232,7 @@ class BaseWorkflow(ABC):
         raise NotImplementedError()
 
     def to_xarray(self):
-        """Convert workflow data to xArray Dataset or DataArray"""
+        """Convert workflow data to xArray Dataset or DataArray."""
         raise NotImplementedError()
 
 
@@ -252,9 +252,9 @@ def _non_str_sequence(x: Any) -> TypeGuard[Sequence[Any]]:
 
 
 class MultiRunMetricsWorkflow(BaseWorkflow):
-    """Abstract class for workflows that record metrics using Hydra multi-run
+    """Abstract class for workflows that record metrics using Hydra multirun.
 
-    This workflow creates subdirectories of by using Hydra.  These directories
+    This workflow creates subdirectories of multirun experiments using Hydra.  These directories
     contain the Hydra YAML configuration and any saved metrics file (defined by the evaulation task)::
 
         ├── working_dir
@@ -273,8 +273,8 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
     Examples
     --------
     Let's create a simple workflow where we perform a multirun over a parameter,
-    epsilon, and evaluate a task function that computes an accuracy and loss based on
-    that epsilon value and a specified scale.
+    `epsilon`, and evaluate a task function that computes an accuracy and loss based on
+    that `epsilon` value and a specified `scale`.
 
     >>> from rai_toolbox.mushin.workflows import MultiRunMetricsWorkflow
     >>> from rai_toolbox.mushin import multirun
@@ -288,7 +288,7 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
     ...         tr.save(result, "test_metrics.pt")
     ...         return result
 
-    We'll run this workflow for six total configurations of three epsilon values and two scale values. This will launch a Hydra multirun job and aggregate the results.
+    We'll run this workflow for six total configurations of three `epsilon` values and two `scale` values. This will launch a Hydra multirun job and aggregate the results.
 
     >>> wf = LocalRobustness()
     >>> wf.run(epsilon=multirun([1.0, 2.0, 3.0]), scale=multirun([0.1, 1.0]))
@@ -301,7 +301,7 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
     [2022-05-02 11:57:59,683][HYDRA] 	#5 : +epsilon=3.0 +scale=1.0
 
     Now that this workflow has run, we can view the results as an xarray-dataset whose
-    coordinates reflect the multirun parameters that were varied, and whose data-variables are our recorded metrics: "accuracy" and "loss"
+    coordinates reflect the multirun parameters that were varied, and whose data-variables are our recorded metrics: "accuracies" and "loss".
 
     >>> ds = wf.to_xarray()
     >>> ds
@@ -478,9 +478,9 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
 
 
 class RobustnessCurve(MultiRunMetricsWorkflow):
-    """Abstract class for workflows that measure performance for different perturbation.
+    """Abstract class for workflows that measure performance for different perturbation values.
 
-    This workflow requires and uses parameter `epsilon` as the configuration option for varying the a perturbation.
+    This workflow requires and uses parameter `epsilon` as the configuration option for varying the perturbation.
 
     See Also
     --------
@@ -497,12 +497,12 @@ class RobustnessCurve(MultiRunMetricsWorkflow):
         overrides: Optional[List[str]] = None,
         **workflow_overrides: Union[str, int, float, bool, multirun, hydra_list],
     ):
-        """Run the experiment for varying the perturbation value `epsilon`.
+        """Run the experiment for varying value `epsilon`.
 
         Parameters
         ----------
         epsilon: str | Sequence[float]
-            The configuration parameter for the perturbation.  Unlike Hydra overrides
+            The configuration parameter for the perturbation.  Unlike Hydra overrides,
             this parameter can be a list of floats that will be converted into a
             multirun sequence override for Hydra.
 

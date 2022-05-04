@@ -8,7 +8,7 @@ On Data Perturbations
 
 This article provides an overview of common data optimization problems, using model-dependent criteria, that are relevant for assessing and enhancing robustness in machine learning models.
 We present a broad picture of how we have designed the rAI-toolbox to solve these problems, and provide pseudo-code that illustrates how :ref:`optimizations <optim-reference>` over :ref:`data perturbations <pert-reference>` adhere strictly
-adhering core `PyTorch <https://pytorch.org/>`_ APIs; i.e, 
+to core `PyTorch <https://pytorch.org/>`_ APIs; i.e.,
 a perturbation model is defined as a `torch.nn.Module`, and its optimizer as `torch.optim.Optimizer`. 
 
 
@@ -116,9 +116,9 @@ By adhering to PyTorch APIs, the rAI-toolbox frames the process of solving for a
 
    # Implements PyTorch Optimizer API
    class PerturbationOptimizer(Optimizer):
-      def _pre_step_(self, param, **kwds): # e.g. perform gradient-normalization
+      def _pre_step_(self, param, **kwds): # e.g., perform gradient-normalization
       def _step_(self, param, **kwds): # perform gradient-based update on parameter
-      def _post_step_(self, param, grad): # e.g. project updated parameter into constraint set
+      def _post_step_(self, param, grad): # e.g., project updated parameter into constraint set
 
       def step(self):
          for param in self.all_params:
@@ -127,7 +127,7 @@ By adhering to PyTorch APIs, the rAI-toolbox frames the process of solving for a
             self._post_step_(param)
 
 
-Having framed the perturbation process as a `torch.nn.Module`, whose parameters (e.g. the perturbation itself) are optimized and constrained via the `torch.optim.Optimizer` API, we can take any standard trainer, e.g.
+Having framed the perturbation process as a `torch.nn.Module`, whose parameters (e.g., the perturbation itself) are optimized and constrained via the `torch.optim.Optimizer` API, we can take any standard trainer, e.g.:
 
 .. code-block:: python
    :caption: A standard PyTorch trainer 
@@ -143,7 +143,7 @@ Having framed the perturbation process as a `torch.nn.Module`, whose parameters 
          optimizer.step()
 
 
-and solve for perturbation via:
+and solve for the optimal perturbation via:
 
 .. code-block:: python
    :caption: Solving for perturbations using a standard PyTorch trainer
@@ -173,14 +173,15 @@ We can then use `pert_model` to apply these optimized perturbations to new data
    pert_data = pert_model(data)  # applies optimized peturbation to `data`
 
 The abstractions provided by a perturbation model and a perturbation optimizer yields a natural delegation of functionality, which makes it easy for us to modify the critical implementation details of this problem. E.g., One can modify the optimizer to adjust how the perturbation is constrained, or how its gradient is normalized; the perturbation model controls the random initialization of the perturbation and how the perturbation broadcasts over a batch of data. None of these adjustments require any modification to the process by which we actually solve for the perturbations; i.e., we can continue to use `standard_trainer` or any gradient-based solver.
-`~rai_toolbox.optim.ParamTransformingOptimizer` and `~rai_toolbox.perturbations.AdditivePerturbation` represent concrete implementations of this design; the reader is advised to consult their reference documentation for further insights into the rAI-toolbox's approach to solving for data perturbations.
+
+`~rai_toolbox.optim.ParamTransformingOptimizer`, `~rai_toolbox.perturbations.AdditivePerturbation`, and `~rai_toolbox.perturbations.gradient_ascent` represent concrete implementations of this design; the reader is advised to consult their reference documentation for further insights into the rAI-toolbox's approach to solving for data perturbations.
 
 
-Common data-related workflows supported by `rai-toolbox`
-========================================================
+Common data-related workflows supported by rAI-toolbox
+======================================================
 
 A wide range of responsible AI techniques involve optimizing parameters of data
-transformations, often in addition to optimizations over model parameters:
+perturbations (or more generally, *transforations*), often in addition to optimizations over model parameters:
 
 - Data augmentations / corruptions: :math:`g_\delta(x)`
     - Model-independent
@@ -196,7 +197,7 @@ transformations, often in addition to optimizations over model parameters:
 where :math:`g_\delta` represents a model for transforming data, parameterized by
 :math:`\delta`.
 
-The rai-toolbox is designed to support all of the flavors of analysis represented by
+The rAI-toolbox is designed to support all of the flavors of analysis represented by
 the above workflows. Users can immediately leverage the toolbox's perturbation
 :ref:`models <pert-models>`, :ref:`optimizers <optim-reference>`,
 and :ref:`solvers <pert-solvers>`, or build their own in a manner that can be easily composed with other existing tools from the PyTorch ecosystem for creating distributed and scalable Responsible AI workflows.

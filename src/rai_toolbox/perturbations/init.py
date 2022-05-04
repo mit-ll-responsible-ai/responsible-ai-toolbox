@@ -19,15 +19,15 @@ def uniform_like_l1_n_ball_(
     param_ndim: Union[int, None] = -1,
     generator: Generator = default_generator,
 ) -> None:
-    r"""Uniform sampling of a epsilon-sized n-ball for :math:`L^1`-norm, where `n` is controlled by `x.shape` and `param_ndim`. The result overwrites `x` in-place.
+    r"""Uniform sampling of an :math:`\epsilon`-sized `n`-ball for :math:`L^1`-norm, where `n` is controlled by `x.shape` and `param_ndim`. The result overwrites `x` in-place.
 
     Parameters
     ----------
     x: Tensor, shape-(N, D, ...)
-        The tensor to generate a new random tensor from, i.e., returns a tensor of
+        The tensor from which to generate a new random tensor, i.e., returns a tensor of
         similar shape and on the same device.
 
-        By default, each of the N shape-(D, ...) subtensors are initialized
+        By default, each of the `N` shape-`(D, ...)` subtensors are initialized
         independently. See `param_ndim` to contol this behavior.
 
     epsilon : float, optional (default=1)
@@ -37,9 +37,9 @@ def uniform_like_l1_n_ball_(
         Determines the dimenionality of the subtensors that are sampled by this
         function.
 
-        - A positive number determines the dimensionality of each subtensor to be drawn and packed into the shape-(N, D, ...) resulting tensor.
-        - A negative number determines from the dimensionality of the subtensor in terms of the offset of `x.ndim`. E.g. -1 indicates that `x` is arranged in a batch-style, and that N independent shape-(D, ...) tensors will be sampled.
-        - `None` means that a single tensor of shape-(N, D, ...) is sampled.
+        - A positive number determines the dimensionality of each subtensor to be drawn and packed into the shape-`(N, D, ...)` resulting tensor.
+        - A negative number determines from the dimensionality of the subtensor in terms of the offset of `x.ndim`. E.g. -1 indicates that `x` is arranged in a batch-style, and that `N` independent shape-`(D, ...)` tensors will be sampled.
+        - `None` means that a single tensor of shape-`(N, D, ...)` is sampled.
 
     Returns
     -------
@@ -57,7 +57,7 @@ def uniform_like_l1_n_ball_(
     >>> import torch as tr
     >>> from rai_toolbox.perturbations.init import uniform_like_l1_n_ball_
 
-    Drawing two shape(3,) tensors from an :math:`\epsilon=2` sized L1 ball.
+    Drawing two shape-`(3,)` tensors from an :math:`\epsilon=2` sized :math:`L^1` 3D-ball.
 
     >>> x = tr.zeros(2, 3)
     >>> uniform_like_l1_n_ball_(x, epsilon=2.0) # default: param_ndim=-1
@@ -67,8 +67,8 @@ def uniform_like_l1_n_ball_(
     >>> tr.linalg.norm(x, dim=1, ord=1) < 2.0
     tensor([True, True])
 
-    Drawing one tensor shape-(6,) tensor from a :math:`\epsilon=2` sized 6D ball, and
-    storing it in `x`as a shape-(2, 3) tensor. We specify `param_ndim=2` (or
+    Drawing one tensor shape-`(6,)` tensor from a :math:`\epsilon=2` sized :math:`L^1` 6D-ball, and
+    storing it in `x` as a shape-`(2, 3)` tensor. We specify `param_ndim=2` (or
     `param_ndim=None`) to achieve this.
 
     >>> x = tr.zeros(2, 3)
@@ -100,7 +100,7 @@ def uniform_like_l2_n_ball_(
     param_ndim: Union[int, None] = -1,
     generator: Generator = default_generator,
 ) -> None:
-    r"""Uniform sampling within an epsilon-sized n-ball for :math:`L^2`-norm, where `n`
+    r"""Uniform sampling within an :math:`\epsilon`-sized `n`-ball for :math:`L^2`-norm, where `n`
     is controlled by `x.shape` and `param_ndim`. The result overwrites `x` in-place.
 
     Parameters
@@ -109,7 +109,7 @@ def uniform_like_l2_n_ball_(
         The tensor to generate a new random tensor from, i.e., returns a tensor of
         similar shape and on the same device.
 
-        By default, each of the N shape-(D, ...) subtensors are initialized
+        By default, each of the `N` shape-`(D, ...)` subtensors are initialized
         independently. See `param_ndim` to contol this behavior.
 
     epsilon : float, optional (default=1)
@@ -119,16 +119,16 @@ def uniform_like_l2_n_ball_(
         Determines the dimenionality of the subtensors that are sampled by this
         function.
 
-        - A positive number determines the dimensionality of each subtensor to be drawn and packed into the shape-(N, D, ...) resulting tensor.
-        - A negative number determines from the dimensionality of the subtensor in terms of the offset of `x.ndim`. E.g. -1 indicates that `x` is arranged in a batch-style, and that N independent shape-(D, ...) tensors will be sampled.
-        - `None` means that a single tensor of shape-(N, D, ...) is sampled.
+        - A positive number determines the dimensionality of each subtensor to be drawn and packed into the shape-`(N, D, ...)` resulting tensor.
+        - A negative number determines from the dimensionality of the subtensor in terms of the offset of `x.ndim`. E.g. -1 indicates that `x` is arranged in a batch-style, and that `N` independent shape-`(D, ...)` tensors will be sampled.
+        - `None` means that a single tensor of shape-`(N, D, ...)` is sampled.
 
     generator : torch.Generator, optional (default=`torch.default_generator`)
         Controls the RNG source.
 
     Returns
     -------
-    out: Tensor, shape-(N, ...)
+    out: Tensor, shape-`(N, ...)`
         A new random tensor of the same shape and on the same device as the input.
 
     References
@@ -144,7 +144,7 @@ def uniform_like_l2_n_ball_(
     >>> import torch as tr
     >>> from rai_toolbox.perturbations.init import uniform_like_l2_n_ball_
 
-    Drawing two shape-(3,) tensors from an :math:`\epsilon=2`-sized L2 3D-ball.
+    Drawing two shape-`(3,)` tensors from an :math:`\epsilon=2`-sized :math:`L^2` 3D-ball.
 
     >>> x = tr.zeros(2, 3)
     >>> uniform_like_l2_n_ball_(x, epsilon=2.0, param_ndim=1)
@@ -154,8 +154,8 @@ def uniform_like_l2_n_ball_(
     >>> tr.linalg.norm(x, dim=1, ord=2) < 2.0
     tensor([True, True])
 
-    Drawing one shape-(6, ) tensor from a :math:`\epsilon=2`-sized L2 6D ball, and
-    storing it in `x`  as a shape-(2, 3) tensor. We specify `param_ndim=2` (or
+    Drawing one shape-`(6, )` tensor from a :math:`\epsilon=2`-sized :math:`L^2` 6D-ball, and
+    storing it in `x` as a shape-`(2, 3)` tensor. We specify `param_ndim=2` (or
     `param_ndim=None`) to achieve this.
 
     >>> x = tr.zeros(2, 3)
@@ -183,7 +183,7 @@ def uniform_like_linf_n_ball_(
     param_ndim: Optional[int] = None,
     generator: Generator = default_generator,
 ) -> None:
-    r"""Uniform sampling within an epsilon-sized n-ball for :math:`L^{\infty}`-norm.
+    r"""Uniform sampling within an :math:`\epsilon`-sized `n`-ball for :math:`L^{\infty}`-norm.
     The result overwrites `x` in-place.
 
     Parameters
