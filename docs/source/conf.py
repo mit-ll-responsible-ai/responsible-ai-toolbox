@@ -91,7 +91,7 @@ extlinks = {
 # a list of builtin themes.
 #
 html_theme = "pydata_sphinx_theme"
-# html_logo = "../../brand/Hydra-Zen_logo_full_filled_bkgrnd_smaller.png"
+html_logo = "../../brand/logo_no_text.png"
 
 html_theme_options = {
     "collapse_navigation": True,
@@ -103,18 +103,23 @@ html_theme_options = {
             "icon": "fab fa-github-square",
         },
     ],
-    # "favicons": [
-    #     {
-    #         "rel": "icon",
-    #         "sizes": "32x32",
-    #         "href": "hydra_zen_favicon_32x32.png",
-    #     },
-    #     {
-    #         "rel": "icon",
-    #         "sizes": "64x64",
-    #         "href": "hydra_zen_favicon_64x64.png",
-    #     },
-    # ],
+    "favicons": [
+        {
+            "rel": "icon",
+            "sizes": "16x16",
+            "href": "favicon-16x16.png",
+        },
+        {
+            "rel": "icon",
+            "sizes": "32x32",
+            "href": "favicon-32x32.png",
+        },
+        {
+            "rel": "apple-touch-icon",
+            "sizes": "180x180",
+            "href": "apple-touch-icon.png",
+        },
+    ],
 }
 
 
