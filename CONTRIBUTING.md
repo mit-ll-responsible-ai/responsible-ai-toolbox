@@ -15,6 +15,8 @@ code base.
   - [Type-Hints](#type-hints)
   - [Documentation Strings](#documentation-strings)
   - [Using Descriptive Data Structures](#using-descriptive-data-structures)
+- [Validating Type Correctness](#validating-type-correctness)
+- [Publishing a new version to PyPI](#publishing-a-new-version-to-pypi)
   
 
 ## Installing rAI toolkit for development
@@ -255,3 +257,20 @@ Coordinates:
   * sensor_type   (sensor_type) <U2 'EO' 'IR'
   ```
 Using explicit data structures when processing data is critical to ensuring that an algorithm can have a long shelf-life and will be useful to people other than the algorithm's author(s).
+
+
+## Validating Type Correctness
+
+Our CI runs the `pyright` type-checker in basic mode against hydra-zen's entire code base and against specific test files; this ensures that our type-annotations are complete and accurate.
+
+If you use VSCode with Pylance, then make sure that `Type Checking Mode` is set to `basic` for your hydra-zen workspace. Your IDE will then mark any problematic code.Other IDEs can leverage the pyright language server to a similar effect. 
+
+While this is helpful for getting immediate feedback about your code, it is no substitute for running `pyright` from the commandline. To do so, [install pyright](https://github.com/microsoft/pyright#command-line) and, from the top-level of this repo, run:
+
+```console
+pyright --lib tests/annotations/ src/
+```
+
+## Publishing a new version to PyPI
+
+We use GitHub Actions to automate the process of publishing to the Python Package Index. To publish a new release, simply create a new tag to reflect the new version `v<major>.<minor>.<patch>[rc<iter>]` (e.g. `v1.0.2` or `v1.0.2rc3` -- for the 3rd release candidate of `v1.0.2`). Then, in the repo, create a new release using that tag. This will trigger the action for publishing to PyPI; within minutes users will be able to install the latest version using pip!
