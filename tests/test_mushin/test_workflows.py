@@ -122,8 +122,13 @@ def test_robustnesscurve_hydra(sweeper, launcher):
 def test_robustnesscurve_override():
     LocalRobustness = create_workflow()
     task = LocalRobustness(make_config(epsilon=0))
-    task.run(epsilon=[0, 1, 2, 3], overrides=["hydra.sweep.dir=test_sweep_dir"])
+
+    overrides = ["hydra.sweep.dir=test_sweep_dir"]
+    task.run(epsilon=[0, 1, 2, 3], overrides=overrides)
     assert Path("test_sweep_dir").exists()
+
+    # make sure overrides is not modified
+    assert len(overrides) == 1
 
 
 @pytest.mark.usefixtures("cleandir")
