@@ -1,35 +1,34 @@
 # Responsible AI Toolbox
 
-The rAI-toolbox is designed to enable methods for evaluating and enhancing both the 
-robustness and the explainability of AI models in a way that is scalable and that 
-composes naturally with other popular ML frameworks.
+<p align="center">
+  <img width="200" height="200" src="brand/logo_no_text_small.png">
+</p>
 
-A key design principle of the rAI-toolbox is that it adheres strictly to the APIs 
-specified by the [PyTorch](https://pytorch.org/) machine learning framework.
-For example, the rAI-toolbox frames the process of solving for an adversarial
-perturbation solely in terms of the `torch.nn.Optimizer` and 
-`torch.nn.Module` APIs. This makes it trivial to leverage other libraries and 
-frameworks from the PyTorch ecosystem to bolster your responsible AI R&D. For 
-instance, one can naturally leverage the rAI-toolbox together with
-[PyTorch Lightning](https://www.pytorchlightning.ai/) to perform distributed 
-adversarial training.
+<p align="center">
+  <a href="https://pypi.org/project/rai-toolbox/">
+    <img src="https://img.shields.io/pypi/v/rai-toolbox.svg" alt="PyPI" />
+  </a>
+  <a>
+    <img src="https://img.shields.io/badge/python-3.7%20&#8208;%203.9-blue.svg" alt="Python version support" />
+  </a>
+  <a href="https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox/actions?query=workflow%3ATests+branch%3Amain">
+    <img src="https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox/workflows/Tests/badge.svg" alt="GitHub Actions" />
+  <a href="https://hypothesis.readthedocs.io/">
+    <img src="https://img.shields.io/badge/hypothesis-tested-brightgreen.svg" alt="Tested with Hypothesis" />
+  </a>
 
-To see the rAI-toolbox in action, please refer to [`examples/`](https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox/tree/main/examples) and [`experiments/`](https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox/tree/main/experiments).
+  <p align="center">
+    A library that provides high-quality, PyTorch-centric tools for evaluating and enhancing both the robustness and the explainability of AI models.
+  </p>
+  <p align="center">
+    Check out our <a href="https://mit-ll-responsible-ai.github.io/responsible-ai-toolbox/">documentation</a> for more information.
+  </p>
+  <p align="center">
+    The rAI-toolbox works great with <a href="https://www.pytorchlightning.ai/">PyTorch Lightning</a> ⚡ and <a href="https://hydra.cc/">Hydra</a> 🐉. Check out <a href="https://mit-ll-responsible-ai.github.io/responsible-ai-toolbox/ref_mushin.html">rai_toolbox.mushin</a> to see how we use these frameworks to create efficient, configurable, and reproducible ML workflows with minimal boilerplate code.
+  </p>
+</p>
 
 
-## Installation
-
-To install the basic toolbox, run:
-
-```console
-pip install rai-toolbox
-```
-
-To include our "mushin" capabilities, which leverage [PyTorch Lightning](https://www.pytorchlightning.ai/) and [hydra-zen](https://github.com/mit-ll-responsible-ai/hydra-zen) for enhanced boilerplate-free ML, run:
-
-```console
-pip install rai-toolbox[mushin]
-```
 
 ## Citation
 
