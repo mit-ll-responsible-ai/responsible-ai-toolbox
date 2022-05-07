@@ -43,8 +43,8 @@ def uniform_like_l1_n_ball_(
 
     Returns
     -------
-    out: Tensor, shape-(N, D, ...)
-        A new random tensor of the same shape and on the same device as the input.
+    x : Tensor, shape-(N, D, ...)
+        The input tensor, which has been modified in-place.
 
     References
     ----------
@@ -128,8 +128,8 @@ def uniform_like_l2_n_ball_(
 
     Returns
     -------
-    out: Tensor, shape-`(N, ...)`
-        A new random tensor of the same shape and on the same device as the input.
+    x : Tensor, shape-(N, D, ...)
+        The input tensor, which has been modified in-place.
 
     References
     ----------
@@ -203,8 +203,8 @@ def uniform_like_linf_n_ball_(
 
     Returns
     -------
-    out: Tensor, shape-(N, ...)
-        A new random tensor of the same shape and on the same device as the input.
+    x : Tensor, shape-(N, D, ...)
+        The input tensor, which has been modified in-place.
 
     Examples
     --------
