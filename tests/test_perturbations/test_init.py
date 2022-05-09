@@ -51,13 +51,14 @@ def test_uniform_like_l2_n_ball(dshape, param_ndim):
 
 @pytest.mark.parametrize("dshape", [(1,), (2,), (5,), (2, 3), (5, 2, 3)])
 def test_uniform_like_l1_n_ball(dshape):
-    samples = tr.zeros(500, *dshape)
+    samples = tr.zeros(5000, *dshape)
     uniform_like_l1_n_ball_(samples)
 
     samples = samples.flatten(1)
     d = samples.shape[1]
-    # TODO: The mean appears to decay as 1 / (1 + d)
-    assert tr.allclose(samples.mean(dim=0), tr.tensor(1.0 / (1 + d)), atol=0.1)
+    assert samples.mean() < 0.03  # the mean should be zero
+    # TODO: The abs-mean appears to decay as 1 / (1 + d)
+    assert tr.allclose(samples.abs().mean(dim=0), tr.tensor(1.0 / (1 + d)), atol=0.1)
 
     # From: https://mathoverflow.net/questions/9185/how-to-generate-random-points-in-ell-p-balls
     # This ensures that all points fall within the simplex

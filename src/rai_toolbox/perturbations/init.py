@@ -89,7 +89,7 @@ def uniform_like_l1_n_ball_(
     vp = torch.cat((xflat.new_zeros(nbatch, 1), v[:, : ndim - 1]), dim=1)
     assert v.shape == vp.shape
     z = v - vp
-    sign = xflat.new(nbatch, ndim).uniform_().sign()
+    sign = xflat.new(nbatch, ndim).uniform_(-1, 1, generator=generator).sign()
     x.copy_(epsilon * (sign * z).reshape(x.shape))
 
 
