@@ -55,10 +55,7 @@ def test_uniform_like_l1_n_ball(dshape):
     uniform_like_l1_n_ball_(samples)
 
     samples = samples.flatten(1)
-    d = samples.shape[1]
     assert samples.mean() < 0.03  # the mean should be zero
-    # TODO: The abs-mean appears to decay as 1 / (1 + d)
-    assert tr.allclose(samples.abs().mean(dim=0), tr.tensor(1.0 / (1 + d)), atol=0.1)
 
     # From: https://mathoverflow.net/questions/9185/how-to-generate-random-points-in-ell-p-balls
     # This ensures that all points fall within the simplex
@@ -101,10 +98,11 @@ if tr.cuda.is_available():
 @given(
     seed=st.none() | st.integers(10_000, 20_000),
     x_device=st.sampled_from(avail_devices),
+    x_dtype=st.sampled_from([tr.float16, tr.float32, tr.float64]),
     generator_device=st.sampled_from(avail_devices),
 )
 def test_init_draws_from_user_provided_rng(
-    init_, seed: int, x_device: str, generator_device: str
+    init_, seed: int, x_device: str, x_dtype, generator_device: str
 ):
     # Providing a seeded generator should always produce the same results
     saved = []
@@ -116,9 +114,12 @@ def test_init_draws_from_user_provided_rng(
             if seed
             else base_gen
         )
-        x = tr.zeros((100,), device=x_device)
+        x = tr.zeros((100,), device=x_device, dtype=x_dtype)
         init_(x, generator=gen)
         saved.append(x)
+
+        assert x.device == tr.device(x_device)
+        assert x.dtype == x_dtype
 
     first = saved[0]
 
