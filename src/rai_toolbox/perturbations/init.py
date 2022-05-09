@@ -101,7 +101,8 @@ def uniform_like_l1_n_ball_(
     assert v.shape == vp.shape
     z = v - vp
     sign = torch.empty((nbatch, ndim), **tensor_kwargs)
-    sign.uniform_(-1, 1, generator=generator).sign()
+    sign.uniform_(-1, 1, generator=generator)
+    sign = sign.sign()
     x.copy_(epsilon * (sign * z).reshape(x.shape))
 
 
