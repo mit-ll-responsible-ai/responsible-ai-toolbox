@@ -87,20 +87,36 @@ def test_uniform_like_linf_n_ball(x: tr.Tensor, epsilon: float):
     assert tr.all(x.abs() < epsilon)
 
 
+avail_devices = ["cpu"]
+
+if tr.cuda.is_available():
+    avail_devices.append("cuda:0")
+
+
 @pytest.mark.parametrize(
     "init_",
     [uniform_like_l1_n_ball_, uniform_like_l2_n_ball_, uniform_like_linf_n_ball_],
 )
-@settings(max_examples=10)
-@given(st.none() | st.integers(10_000, 20_000))
-def test_init_draws_from_user_provided_rng(init_, seed: int):
+@settings(max_examples=20, deadline=None)
+@given(
+    seed=st.none() | st.integers(10_000, 20_000),
+    x_device=st.sampled_from(avail_devices),
+    generator_device=st.sampled_from(avail_devices),
+)
+def test_init_draws_from_user_provided_rng(
+    init_, seed: int, x_device: str, generator_device: str
+):
     # Providing a seeded generator should always produce the same results
     saved = []
-    base_gen = tr.Generator().manual_seed(0)
+    base_gen = tr.Generator(device=generator_device).manual_seed(0)
 
     for _ in range(10):
-        gen = tr.Generator().manual_seed(seed) if seed else base_gen
-        x = tr.zeros((100,))
+        gen = (
+            tr.Generator(device=generator_device).manual_seed(seed)
+            if seed
+            else base_gen
+        )
+        x = tr.zeros((100,), device=x_device)
         init_(x, generator=gen)
         saved.append(x)
 
