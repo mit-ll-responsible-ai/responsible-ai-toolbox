@@ -2,6 +2,8 @@
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 
+import math
+
 import hypothesis.extra.numpy as hnp
 import hypothesis.strategies as st
 import pytest
@@ -128,3 +130,26 @@ def test_init_draws_from_user_provided_rng(
             assert not tr.all(first == other)
         else:
             assert tr.all(first == other)
+
+
+@pytest.mark.parametrize(
+    "init_, ord",
+    [
+        (uniform_like_l1_n_ball_, 1),
+        (uniform_like_l2_n_ball_, 2),
+        (uniform_like_linf_n_ball_, float("inf")),
+    ],
+)
+@settings(max_examples=20, deadline=None)
+@given(epsilon=st.floats(1e-1, 1e6))
+def test_epsilon(init_, ord, epsilon: float):
+    tr.Generator().manual_seed(0)
+
+    x = tr.empty(1000, 3)
+    init_(x, epsilon=epsilon)
+    assert math.isclose(
+        tr.linalg.norm(x, ord=ord, dim=1).max(),
+        epsilon,
+        rel_tol=1e-1,
+        abs_tol=1e-1,
+    )

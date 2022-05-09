@@ -15,7 +15,7 @@ from rai_toolbox._utils import value_check
 @torch.no_grad()
 def uniform_like_l1_n_ball_(
     x: Tensor,
-    epsilon: float = 1,
+    epsilon: float = 1.0,
     param_ndim: Union[int, None] = -1,
     generator: Generator = default_generator,
 ) -> None:
@@ -109,7 +109,7 @@ def uniform_like_l1_n_ball_(
 @torch.no_grad()
 def uniform_like_l2_n_ball_(
     x: Tensor,
-    epsilon: float = 1,
+    epsilon: float = 1.0,
     param_ndim: Union[int, None] = -1,
     generator: Generator = default_generator,
 ) -> None:
@@ -194,7 +194,7 @@ def uniform_like_l2_n_ball_(
 @torch.no_grad()
 def uniform_like_linf_n_ball_(
     x: Tensor,
-    epsilon: float = 1,
+    epsilon: float = 1.0,
     param_ndim: Optional[int] = None,
     generator: Generator = default_generator,
 ) -> None:
