@@ -278,7 +278,7 @@
 <h1>rai_toolbox.perturbations.uniform_like_l2_n_ball_<a class="headerlink" href="#rai-toolbox-perturbations-uniform-like-l2-n-ball" title="Permalink to this headline">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="rai_toolbox.perturbations.uniform_like_l2_n_ball_">
-<span class="sig-prename descclassname"><span class="pre">rai_toolbox.perturbations.</span></span><span class="sig-name descname"><span class="pre">uniform_like_l2_n_ball_</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_ndim=-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generator=&lt;torch._C.Generator</span> <span class="pre">object&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/perturbations/init.html#uniform_like_l2_n_ball_"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.perturbations.uniform_like_l2_n_ball_" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">rai_toolbox.perturbations.</span></span><span class="sig-name descname"><span class="pre">uniform_like_l2_n_ball_</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon=1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_ndim=-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generator=&lt;torch._C.Generator</span> <span class="pre">object&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/perturbations/init.html#uniform_like_l2_n_ball_"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.perturbations.uniform_like_l2_n_ball_" title="Permalink to this definition">#</a></dt>
 <dd><p>Uniform sampling within an <span class="math notranslate nohighlight">\(\epsilon\)</span>-sized <code class="xref py py-obj docutils literal notranslate"><span class="pre">n</span></code>-ball for <span class="math notranslate nohighlight">\(L^2\)</span>-norm, where <code class="xref py py-obj docutils literal notranslate"><span class="pre">n</span></code>
 is controlled by <code class="xref py py-obj docutils literal notranslate"><span class="pre">x.shape</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim</span></code>. The result overwrites <code class="xref py py-obj docutils literal notranslate"><span class="pre">x</span></code> in-place.</p>
 <dl class="field-list">
@@ -305,7 +305,7 @@ function.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt>out: Tensor, shape-<code class="xref py py-obj docutils literal notranslate"><span class="pre">(N,</span> <span class="pre">...)</span></code></dt><dd><p>A new random tensor of the same shape and on the same device as the input.</p>
+<dt><strong>x</strong><span class="classifier">Tensor, shape-(N, D, …)</span></dt><dd><p>The input tensor, which has been modified in-place.</p>
 </dd>
 </dl>
 </dd>

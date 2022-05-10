@@ -35,6 +35,8 @@
     <script src="_static/clipboard.min.js"></script>
     <script src="_static/copybutton.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="prev" title="rai_toolbox.negate" href="generated/rai_toolbox.negate.html" />
@@ -173,6 +175,11 @@
 <nav id="bd-toc-nav">
     <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#v0-1-1">
+   0.1.1 - 2022-05-10
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#v0-1-0">
    0.1.0 - 2022-05-04
   </a>
@@ -202,8 +209,16 @@
 <h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">#</a></h1>
 <p>This is a record of all past rAI-toolbox releases and what went into them, in reverse
 chronological order. All previous releases should still be available on pip.</p>
+<section id="v0-1-1">
+<span id="id1"></span><h2>0.1.1 - 2022-05-10<a class="headerlink" href="#v0-1-1" title="Permalink to this headline">#</a></h2>
+<p>This patch fixes two bugs in <code class="docutils literal notranslate"><span class="pre">rai_toolbox.perturbations.init</span></code>:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="generated/rai_toolbox.perturbations.uniform_like_l1_n_ball_.html#rai_toolbox.perturbations.uniform_like_l1_n_ball_" title="rai_toolbox.perturbations.uniform_like_l1_n_ball_"><code class="xref py py-obj docutils literal notranslate"><span class="pre">uniform_like_l1_n_ball_</span></code></a> was not correctly symmeterized; the drawn values only had components in the direction of the positive hemisphere of the <span class="math notranslate nohighlight">\(L^1\)</span> ball.</p></li>
+<li><p>Passing an on-gpu tensor to the in-place init functions would cause a device mis-match error with the default random number generator, which is on CPU.</p></li>
+</ul>
+</section>
 <section id="v0-1-0">
-<span id="id1"></span><h2>0.1.0 - 2022-05-04<a class="headerlink" href="#v0-1-0" title="Permalink to this headline">#</a></h2>
+<span id="id2"></span><h2>0.1.0 - 2022-05-04<a class="headerlink" href="#v0-1-0" title="Permalink to this headline">#</a></h2>
 <p>This is rAI-toolbox’s first stable release on PyPI! Please check out the rest of our
 docs to see what the toolbox has to offer.</p>
 <p>We plan to have an aggressive release schedule for compatibility-preserving patches of

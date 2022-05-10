@@ -190,7 +190,7 @@
 <div class="viewcode-block" id="uniform_like_l1_n_ball_"><a class="viewcode-back" href="../../../generated/rai_toolbox.perturbations.uniform_like_l1_n_ball_.html#rai_toolbox.perturbations.uniform_like_l1_n_ball_">[docs]</a><span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">uniform_like_l1_n_ball_</span><span class="p">(</span>
     <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-    <span class="n">epsilon</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">epsilon</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
     <span class="n">param_ndim</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
     <span class="n">generator</span><span class="p">:</span> <span class="n">Generator</span> <span class="o">=</span> <span class="n">default_generator</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -218,8 +218,8 @@
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    out: Tensor, shape-(N, D, ...)</span>
-<span class="sd">        A new random tensor of the same shape and on the same device as the input.</span>
+<span class="sd">    x : Tensor, shape-(N, D, ...)</span>
+<span class="sd">        The input tensor, which has been modified in-place.</span>
 
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
@@ -257,21 +257,34 @@
     <span class="n">_validate_param_ndim</span><span class="p">(</span><span class="n">param_ndim</span><span class="o">=</span><span class="n">param_ndim</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">x</span><span class="p">)</span>
     <span class="n">value_check</span><span class="p">(</span><span class="s2">&quot;epsilon&quot;</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">,</span> <span class="n">min_</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">incl_min</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
+    <span class="n">tensor_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">generator</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+
     <span class="n">xflat</span> <span class="o">=</span> <span class="n">_to_batch</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">param_ndim</span><span class="o">=</span><span class="n">param_ndim</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">nbatch</span><span class="p">,</span> <span class="n">ndim</span> <span class="o">=</span> <span class="n">xflat</span><span class="o">.</span><span class="n">shape</span>
-    <span class="n">u</span> <span class="o">=</span> <span class="n">xflat</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">nbatch</span><span class="p">,</span> <span class="n">ndim</span><span class="p">)</span><span class="o">.</span><span class="n">uniform_</span><span class="p">(</span><span class="n">generator</span><span class="o">=</span><span class="n">generator</span><span class="p">)</span>
+
+    <span class="n">u</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">nbatch</span><span class="p">,</span> <span class="n">ndim</span><span class="p">),</span> <span class="o">**</span><span class="n">tensor_kwargs</span><span class="p">)</span>
+    <span class="n">u</span><span class="o">.</span><span class="n">uniform_</span><span class="p">(</span><span class="n">generator</span><span class="o">=</span><span class="n">generator</span><span class="p">)</span>
+
     <span class="n">v</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
-    <span class="n">vp</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">xflat</span><span class="o">.</span><span class="n">new_zeros</span><span class="p">(</span><span class="n">nbatch</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">v</span><span class="p">[:,</span> <span class="p">:</span> <span class="n">ndim</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">vp</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span>
+        <span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nbatch</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="o">**</span><span class="n">tensor_kwargs</span><span class="p">),</span>
+            <span class="n">v</span><span class="p">[:,</span> <span class="p">:</span> <span class="n">ndim</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span>
+        <span class="p">),</span>
+        <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="p">)</span>
     <span class="k">assert</span> <span class="n">v</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">vp</span><span class="o">.</span><span class="n">shape</span>
     <span class="n">z</span> <span class="o">=</span> <span class="n">v</span> <span class="o">-</span> <span class="n">vp</span>
-    <span class="n">sign</span> <span class="o">=</span> <span class="n">xflat</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">nbatch</span><span class="p">,</span> <span class="n">ndim</span><span class="p">)</span><span class="o">.</span><span class="n">uniform_</span><span class="p">()</span><span class="o">.</span><span class="n">sign</span><span class="p">()</span>
+    <span class="n">sign</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">nbatch</span><span class="p">,</span> <span class="n">ndim</span><span class="p">),</span> <span class="o">**</span><span class="n">tensor_kwargs</span><span class="p">)</span>
+    <span class="n">sign</span><span class="o">.</span><span class="n">uniform_</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">generator</span><span class="o">=</span><span class="n">generator</span><span class="p">)</span>
+    <span class="n">sign</span> <span class="o">=</span> <span class="n">sign</span><span class="o">.</span><span class="n">sign</span><span class="p">()</span>
     <span class="n">x</span><span class="o">.</span><span class="n">copy_</span><span class="p">(</span><span class="n">epsilon</span> <span class="o">*</span> <span class="p">(</span><span class="n">sign</span> <span class="o">*</span> <span class="n">z</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span></div>
 
 
 <div class="viewcode-block" id="uniform_like_l2_n_ball_"><a class="viewcode-back" href="../../../generated/rai_toolbox.perturbations.uniform_like_l2_n_ball_.html#rai_toolbox.perturbations.uniform_like_l2_n_ball_">[docs]</a><span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">uniform_like_l2_n_ball_</span><span class="p">(</span>
     <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-    <span class="n">epsilon</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">epsilon</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
     <span class="n">param_ndim</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
     <span class="n">generator</span><span class="p">:</span> <span class="n">Generator</span> <span class="o">=</span> <span class="n">default_generator</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -303,8 +316,8 @@
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    out: Tensor, shape-`(N, ...)`</span>
-<span class="sd">        A new random tensor of the same shape and on the same device as the input.</span>
+<span class="sd">    x : Tensor, shape-(N, D, ...)</span>
+<span class="sd">        The input tensor, which has been modified in-place.</span>
 
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
@@ -346,7 +359,9 @@
 
     <span class="n">xflat</span> <span class="o">=</span> <span class="n">_to_batch</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">param_ndim</span><span class="o">=</span><span class="n">param_ndim</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">nbatch</span><span class="p">,</span> <span class="n">ndim</span> <span class="o">=</span> <span class="n">xflat</span><span class="o">.</span><span class="n">shape</span>
-    <span class="n">z</span> <span class="o">=</span> <span class="n">xflat</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">nbatch</span><span class="p">,</span> <span class="n">ndim</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">normal_</span><span class="p">(</span><span class="n">generator</span><span class="o">=</span><span class="n">generator</span><span class="p">)</span>
+
+    <span class="n">z</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">nbatch</span><span class="p">,</span> <span class="n">ndim</span> <span class="o">+</span> <span class="mi">2</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">xflat</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">generator</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">z</span><span class="o">.</span><span class="n">normal_</span><span class="p">(</span><span class="n">generator</span><span class="o">=</span><span class="n">generator</span><span class="p">)</span>
     <span class="n">r</span> <span class="o">=</span> <span class="n">z</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
     <span class="n">x</span><span class="o">.</span><span class="n">copy_</span><span class="p">(</span><span class="n">epsilon</span> <span class="o">*</span> <span class="p">(</span><span class="n">z</span> <span class="o">/</span> <span class="n">r</span><span class="p">)[:,</span> <span class="p">:</span><span class="n">ndim</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span></div>
 
@@ -354,7 +369,7 @@
 <div class="viewcode-block" id="uniform_like_linf_n_ball_"><a class="viewcode-back" href="../../../generated/rai_toolbox.perturbations.uniform_like_linf_n_ball_.html#rai_toolbox.perturbations.uniform_like_linf_n_ball_">[docs]</a><span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">uniform_like_linf_n_ball_</span><span class="p">(</span>
     <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-    <span class="n">epsilon</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">epsilon</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
     <span class="n">param_ndim</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">generator</span><span class="p">:</span> <span class="n">Generator</span> <span class="o">=</span> <span class="n">default_generator</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -378,8 +393,8 @@
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    out: Tensor, shape-(N, ...)</span>
-<span class="sd">        A new random tensor of the same shape and on the same device as the input.</span>
+<span class="sd">    x : Tensor, shape-(N, D, ...)</span>
+<span class="sd">        The input tensor, which has been modified in-place.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
@@ -397,7 +412,9 @@
     <span class="k">del</span> <span class="n">param_ndim</span>
     <span class="n">value_check</span><span class="p">(</span><span class="s2">&quot;epsilon&quot;</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">,</span> <span class="n">min_</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">incl_min</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
-    <span class="n">x</span><span class="o">.</span><span class="n">uniform_</span><span class="p">(</span><span class="o">-</span><span class="n">epsilon</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">,</span> <span class="n">generator</span><span class="o">=</span><span class="n">generator</span><span class="p">)</span></div>
+    <span class="n">new</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">generator</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">new</span><span class="o">.</span><span class="n">uniform_</span><span class="p">(</span><span class="o">-</span><span class="n">epsilon</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">,</span> <span class="n">generator</span><span class="o">=</span><span class="n">generator</span><span class="p">)</span>
+    <span class="n">x</span><span class="o">.</span><span class="n">copy_</span><span class="p">(</span><span class="n">new</span><span class="p">)</span></div>
 </pre></div>
 
               </div>

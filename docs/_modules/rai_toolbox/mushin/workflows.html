@@ -357,17 +357,19 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_workflow_overrides</span> <span class="o">=</span> <span class="n">workflow_overrides</span>
 
-        <span class="k">if</span> <span class="n">overrides</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">overrides</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">launch_overrides</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="n">overrides</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">launch_overrides</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">overrides</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">working_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">overrides</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;hydra.sweep.dir=</span><span class="si">{</span><span class="n">working_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">launch_overrides</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;hydra.sweep.dir=</span><span class="si">{</span><span class="n">working_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">sweeper</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">overrides</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;hydra/sweeper=</span><span class="si">{</span><span class="n">sweeper</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">launch_overrides</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;hydra/sweeper=</span><span class="si">{</span><span class="n">sweeper</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">launcher</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">overrides</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;hydra/launcher=</span><span class="si">{</span><span class="n">launcher</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">launch_overrides</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;hydra/launcher=</span><span class="si">{</span><span class="n">launcher</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">workflow_overrides</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">value_check</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">type_</span><span class="o">=</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">multirun</span><span class="p">,</span> <span class="n">hydra_list</span><span class="p">))</span>
@@ -381,13 +383,13 @@
             <span class="p">):</span>
                 <span class="n">prefix</span> <span class="o">=</span> <span class="s2">&quot;+&quot;</span>
 
-            <span class="n">overrides</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}{</span><span class="n">k</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">launch_overrides</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}{</span><span class="n">k</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="c1"># Run a Multirun over epsilons</span>
         <span class="p">(</span><span class="n">jobs</span><span class="p">,)</span> <span class="o">=</span> <span class="n">launch</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">eval_task_cfg</span><span class="p">,</span>
             <span class="n">zen</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evaluation_task</span><span class="p">),</span>
-            <span class="n">overrides</span><span class="o">=</span><span class="n">overrides</span><span class="p">,</span>
+            <span class="n">overrides</span><span class="o">=</span><span class="n">launch_overrides</span><span class="p">,</span>
             <span class="n">multirun</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="p">)</span>
 
@@ -453,8 +455,8 @@
 
 <span class="sd">    &gt;&gt;&gt; from rai_toolbox.mushin.workflows import MultiRunMetricsWorkflow</span>
 <span class="sd">    &gt;&gt;&gt; from rai_toolbox.mushin import multirun</span>
-<span class="sd">    &gt;&gt;&gt; import torch as tr</span>
-<span class="sd">    ... class LocalRobustness(MultiRunMetricsWorkflow):</span>
+
+<span class="sd">    &gt;&gt;&gt; class LocalRobustness(MultiRunMetricsWorkflow):</span>
 <span class="sd">    ...     @staticmethod</span>
 <span class="sd">    ...     def evaluation_task(epsilon: float, scale: float) -&gt; dict:</span>
 <span class="sd">    ...         epsilon *= scale</span>
