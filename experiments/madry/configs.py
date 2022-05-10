@@ -133,6 +133,7 @@ L2PGD = pbuilds(
 ############
 Trainer = builds(
     pl.Trainer,
+    max_epochs=1,
     num_nodes=1,
     accelerator="gpu",
     devices="${gpus}",
