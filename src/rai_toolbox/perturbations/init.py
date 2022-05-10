@@ -15,7 +15,7 @@ from rai_toolbox._utils import value_check
 @torch.no_grad()
 def uniform_like_l1_n_ball_(
     x: Tensor,
-    epsilon: float = 1,
+    epsilon: float = 1.0,
     param_ndim: Union[int, None] = -1,
     generator: Generator = default_generator,
 ) -> None:
@@ -82,21 +82,34 @@ def uniform_like_l1_n_ball_(
     _validate_param_ndim(param_ndim=param_ndim, p=x)
     value_check("epsilon", epsilon, min_=0.0, incl_min=False)
 
+    tensor_kwargs = dict(dtype=x.dtype, device=generator.device)
+
     xflat = _to_batch(x, param_ndim=param_ndim).flatten(1)
     nbatch, ndim = xflat.shape
-    u = xflat.new(nbatch, ndim).uniform_(generator=generator)
+
+    u = torch.empty((nbatch, ndim), **tensor_kwargs)
+    u.uniform_(generator=generator)
+
     v = u.sort(dim=1).values
-    vp = torch.cat((xflat.new_zeros(nbatch, 1), v[:, : ndim - 1]), dim=1)
+    vp = torch.cat(
+        (
+            torch.zeros((nbatch, 1), **tensor_kwargs),
+            v[:, : ndim - 1],
+        ),
+        dim=1,
+    )
     assert v.shape == vp.shape
     z = v - vp
-    sign = xflat.new(nbatch, ndim).uniform_().sign()
+    sign = torch.empty((nbatch, ndim), **tensor_kwargs)
+    sign.uniform_(-1, 1, generator=generator)
+    sign = sign.sign()
     x.copy_(epsilon * (sign * z).reshape(x.shape))
 
 
 @torch.no_grad()
 def uniform_like_l2_n_ball_(
     x: Tensor,
-    epsilon: float = 1,
+    epsilon: float = 1.0,
     param_ndim: Union[int, None] = -1,
     generator: Generator = default_generator,
 ) -> None:
@@ -171,7 +184,9 @@ def uniform_like_l2_n_ball_(
 
     xflat = _to_batch(x, param_ndim=param_ndim).flatten(1)
     nbatch, ndim = xflat.shape
-    z = xflat.new(nbatch, ndim + 2).normal_(generator=generator)
+
+    z = torch.empty((nbatch, ndim + 2), dtype=xflat.dtype, device=generator.device)
+    z.normal_(generator=generator)
     r = z.norm(p=2, dim=1, keepdim=True)  # type: ignore
     x.copy_(epsilon * (z / r)[:, :ndim].reshape(x.shape))
 
@@ -179,7 +194,7 @@ def uniform_like_l2_n_ball_(
 @torch.no_grad()
 def uniform_like_linf_n_ball_(
     x: Tensor,
-    epsilon: float = 1,
+    epsilon: float = 1.0,
     param_ndim: Optional[int] = None,
     generator: Generator = default_generator,
 ) -> None:
@@ -222,4 +237,6 @@ def uniform_like_linf_n_ball_(
     del param_ndim
     value_check("epsilon", epsilon, min_=0.0, incl_min=False)
 
-    x.uniform_(-epsilon, epsilon, generator=generator)
+    new = torch.empty_like(x, dtype=x.dtype, device=generator.device)
+    new.uniform_(-epsilon, epsilon, generator=generator)
+    x.copy_(new)
