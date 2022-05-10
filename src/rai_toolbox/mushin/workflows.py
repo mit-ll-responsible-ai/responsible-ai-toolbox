@@ -5,17 +5,19 @@
 from abc import ABC, abstractmethod, abstractstaticmethod
 from collections import UserList, defaultdict
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
+from typing import Any, Dict, List, Optional, Sequence, Type, Union
 
 import numpy as np
 import torch as tr
+from hydra.core.override_parser.overrides_parser import OverridesParser
 from hydra.core.utils import JobReturn
-from hydra_zen import load_from_yaml, make_config
+from hydra_zen import launch, load_from_yaml, make_config
+from hydra_zen._launch import _NotSet
 from typing_extensions import Self, TypeAlias, TypeGuard
 
 from rai_toolbox._utils import value_check
 
-from .hydra import launch, zen
+from .hydra import zen
 
 LoadedValue: TypeAlias = Union[str, int, float]
 
@@ -92,24 +94,40 @@ class BaseWorkflow(ABC):
         self.jobs = []
         self.working_dir = Path.cwd()  # TODO: I don't think we should assume this
 
+    def _pase_overrides(self, overrides: List[str]):
+        parser = OverridesParser.create()
+        parsed_overrides = parser.parse_overrides(overrides=overrides)
+
+        output = {}
+        for override in parsed_overrides:
+            if override.is_sweep_override():
+                param_name = override.get_key_element()
+                val = [
+                    _num_from_string(val) for val in override.sweep_string_iterator()
+                ]
+            else:
+                param_name = override.get_key_element()
+                val = override.get_value_element_as_str()
+                val = _num_from_string(val)
+
+            param_name = param_name.split("+")[-1]
+            output[param_name] = val
+
+        return output
+
     @property
     def multirun_task_overrides(
         self,
     ) -> Dict[str, Union[LoadedValue, Sequence[LoadedValue]]]:
         # e.g. {'epsilon': [1.0, 2.0, 3.0], "foo": "apple"}
         if not self._multirun_task_overrides:
-            for entry in load_from_yaml(
+            overrides = load_from_yaml(
                 self.working_dir / "multirun.yaml"
-            ).hydra.overrides.task:
-                entry: str  # e.g. +epsilon=1.0,3.0,2.0
-                param_name, val = entry.split("=", 1)
-                if "," in val:
-                    val = [_num_from_string(v) for v in val.split(",")]
-                else:
-                    val = _num_from_string(val)
+            ).hydra.overrides.task
 
-                param_name = param_name.split("+")[-1]
-                self._multirun_task_overrides[param_name] = val
+            output = self._pase_overrides(overrides)
+            self._multirun_task_overrides.update(output)
+
         return self._multirun_task_overrides
 
     @abstractstaticmethod
@@ -130,7 +148,6 @@ class BaseWorkflow(ABC):
             def evaluation_task(trainer: Trainer, module: LightningModule) -> None:
                 trainer.fit(module)
         """
-        raise NotImplementedError()
 
     def validate(self):
         """Valide the configuration will execute with the user defined evaluation task"""
@@ -143,6 +160,11 @@ class BaseWorkflow(ABC):
         sweeper: Optional[str] = None,
         launcher: Optional[str] = None,
         overrides: Optional[List[str]] = None,
+        version_base: Optional[Union[str, Type[_NotSet]]] = _NotSet,
+        to_dictconfig: bool = False,
+        config_name: str = "zen_launch",
+        job_name: str = "zen_launch",
+        with_log_configuration: bool = True,
         **workflow_overrides: Union[str, int, float, bool, dict, multirun, hydra_list],
     ):
         """Run the experiment.
@@ -170,6 +192,25 @@ class BaseWorkflow(ABC):
             This is helpful for filtering out parameters stored in
             `self.workflow_overrides`.
 
+        version_base : Optional[str], optional (default=_NotSet)
+            Available starting with Hydra 1.2.0.
+            - If the `version_base parameter` is not specified, Hydra 1.x will use defaults compatible with version 1.1. Also in this case, a warning is issued to indicate an explicit version_base is preferred.
+            - If the `version_base parameter` is `None`, then the defaults are chosen for the current minor Hydra version. For example for Hydra 1.2, then would imply `config_path=None` and `hydra.job.chdir=False`.
+            - If the `version_base` parameter is an explicit version string like "1.1", then the defaults appropriate to that version are used.
+
+        to_dictconfig: bool (default: False)
+            If ``True``, convert a ``dataclasses.dataclass`` to a ``omegaconf.DictConfig``. Note, this
+            will remove Hydra's cabability for validation with structured configurations.
+
+        config_name : str (default: "zen_launch")
+            Name of the stored configuration in Hydra's ConfigStore API.
+
+        job_name : str (default: "zen_launch")
+            Name of job for logging.
+
+        with_log_configuration : bool (default: True)
+            If ``True``, enables the configuration of the logging subsystem from the loaded config.
+
         **workflow_overrides: str | int | float | bool | multirun | hydra_list | dict
             These parameters represent the values for configurations to use for the
             experiment.
@@ -180,8 +221,6 @@ class BaseWorkflow(ABC):
 
             These values will be appended to the `overrides` for the Hydra job.
         """
-        self._workflow_overrides = workflow_overrides
-
         launch_overrides = []
 
         if overrides is not None:
@@ -216,6 +255,11 @@ class BaseWorkflow(ABC):
             zen(self.evaluation_task),
             overrides=launch_overrides,
             multirun=True,
+            version_base=version_base,
+            to_dictconfig=to_dictconfig,
+            config_name=config_name,
+            job_name=job_name,
+            with_log_configuration=with_log_configuration,
         )
 
         self.jobs = jobs
@@ -227,10 +271,6 @@ class BaseWorkflow(ABC):
 
     def plot(self, **kwargs) -> None:
         """Plot workflow metrics."""
-        raise NotImplementedError()
-
-    def to_dataframe(self):
-        """Convert workflow data to Pandas DataFrame."""
         raise NotImplementedError()
 
     def to_xarray(self):
@@ -332,12 +372,24 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
 
     @abstractstaticmethod
     def evaluation_task(*args: Any, **kwargs: Any) -> Dict[str, Any]:
-        raise NotImplementedError()
+        """Abstract `staticmethod` for users to define the evalultion task"""
+
+    def _process_metrics(self, job_metrics) -> Dict[str, List[Any]]:
+        metrics = defaultdict(list)
+        for task_metrics in job_metrics:
+            for k, v in task_metrics.items():
+                # get item if it's a single element array
+                if isinstance(v, list) and len(v) == 1:
+                    v = v[0]
+
+                metrics[k].append(v)
+        return metrics
 
     def jobs_post_process(self):
         assert len(self.jobs) > 0
         # TODO: Make protocol type for JobReturn
         assert isinstance(self.jobs[0], JobReturn)
+        self.jobs: List[JobReturn]
 
         # set working directory of this workflow
         first_job_working_dir = self.jobs[0].working_dir
@@ -346,20 +398,14 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
 
         # extract configs, overrides, and metrics
         self.cfgs = [j.cfg for j in self.jobs]
-        job_overrides = [j.hydra_cfg.hydra.overrides.task for j in self.jobs]
         job_metrics = [j.return_value for j in self.jobs]
-        workflow_params = list(self._workflow_overrides.keys())
-
-        self.metrics, self.workflow_overrides = _load_metrics(
-            job_overrides, job_metrics, workflow_params
-        )
+        self.metrics = self._process_metrics(job_metrics)
 
     def load_from_dir(
         self: Self,
         working_dir: Union[Path, str],
         config_dir: str = ".hydra",
         metrics_filename: str = "test_metrics.pt",
-        workflow_params: Optional[Sequence[str]] = None,
     ) -> Self:
         """Loading workflow job data from a given working directory. The workflow
         is loaded in-place and "self" is returned by this method.
@@ -380,10 +426,6 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
 
                 `Path(working_dir).glob("**/*/<metrics_filename")`
 
-        workflow_params: Sequence[str] | None (default: None)
-            A string of parameters to use for `workflow_params`.  If `None` it will
-            default to all parameters saved in Hydra's `overrides.yaml` file.
-
         Returns
         -------
         loaded_workflow : Self
@@ -401,12 +443,6 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
             for f in sorted(self.working_dir.glob(f"**/*/{config_dir}/config.yaml"))
         ]
 
-        # Load saved YAML overrides for each job (in hydra.job.output_subdir)
-        job_overrides = [
-            list(load_from_yaml(f))
-            for f in sorted(self.working_dir.glob(f"**/*/{config_dir}/overrides.yaml"))
-        ]
-
         # Load metrics for each job
         job_metrics = [
             tr.load(f)
@@ -414,21 +450,14 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
         ]
 
         self.cfgs = job_cfgs
-        self.metrics, self.workflow_overrides = _load_metrics(
-            job_overrides, job_metrics, workflow_params
-        )
+        self.metrics = self._process_metrics(job_metrics)
         return self
 
-    def to_dataframe(self):
-        """Convert workflow data to Pandas DataFrame."""
-        import pandas as pd
-
-        d = {}
-        d.update(self.metrics)
-        d.update(self.workflow_overrides)
-        return pd.DataFrame(d)
-
-    def to_xarray(self, non_multirun_params_as_singleton_dims: bool = False):
+    def to_xarray(
+        self,
+        coord_from_metrics: Optional[str] = None,
+        non_multirun_params_as_singleton_dims: bool = False,
+    ):
         """Convert workflow data to xarray Dataset.
 
         Parameters
@@ -451,6 +480,19 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
             if non_multirun_params_as_singleton_dims or _non_str_sequence(v)
         }
 
+        metric_coords = {}
+        if coord_from_metrics:
+            if coord_from_metrics not in self.metrics:
+                raise ValueError(
+                    f"key `{coord_from_metrics}` not in metrics (available: {list(self.metrics.keys())})"
+                )
+
+            v = self.metrics[coord_from_metrics]
+            if np.asarray(v).ndim > 1:
+                # assume this coord was repeated across experiments, e.g., "epochs"
+                v = v[0]
+            metric_coords[coord_from_metrics] = v
+
         # non-multirun overrides
         attrs = {
             k: v
@@ -460,22 +502,32 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
 
         # we will add additional coordinates as-needed for multi-dim metrics
         coords: Dict[str, Any] = orig_coords.copy()
-        shape = tuple(len(v) for v in coords.values())
+        shape = tuple(len(v) for k, v in coords.items())
 
         data = {}
         for k, v in self.metrics.items():
-            datum = np.asarray(v).reshape(shape + np.asarray(v[0]).shape)
-            n = 0
-            for n in range(datum.ndim - len(coords)):
-                # Create additional arbitrary coordinates as-needed for non-scalar
-                # metrics
-                coords[f"{k}_dim{n}"] = np.arange(datum.shape[len(orig_coords) + n])
+            if coord_from_metrics and k == coord_from_metrics:
+                continue
 
-            data[k] = (
-                list(orig_coords)
-                + [f"{k}_dim{i}" for i in range(datum.ndim - len(shape))],
-                datum,
-            )
+            datum = np.asarray(v).reshape(shape + np.asarray(v[0]).shape)
+
+            k_coords = list(orig_coords)
+            for n in range(datum.ndim - len(orig_coords)):
+
+                if coord_from_metrics and n < len(metric_coords):
+                    # Assume the first coordinate of the metric is the iteration dimension
+                    k_coords += list(metric_coords.keys())
+                    for mk, mv in metric_coords.items():
+                        coords[mk] = mv
+                else:
+                    # Create additional arbitrary coordinates as-needed for non-scalar
+                    # metrics
+                    k_coords += [f"{k}_dim{n}"]
+                    coords[f"{k}_dim{n}"] = np.arange(datum.shape[len(orig_coords) + n])
+
+            data[k] = (k_coords, datum)
+
+        coords.update(metric_coords)
         return xr.Dataset(coords=coords, data_vars=data, attrs=attrs)
 
 
@@ -546,11 +598,11 @@ class RobustnessCurve(MultiRunMetricsWorkflow):
             epsilon=epsilon,
         )
 
-    def to_dataframe(self):
-        """Convert workflow data to Pandas DataFrame."""
-        return super().to_dataframe().sort_values("epsilon")
-
-    def to_xarray(self, non_multirun_params_as_singleton_dims: bool = False):
+    def to_xarray(
+        self,
+        coord_from_metrics: Optional[str] = None,
+        non_multirun_params_as_singleton_dims: bool = False,
+    ):
         """Convert workflow data to xarray Dataset.
 
         Parameters
@@ -568,7 +620,8 @@ class RobustnessCurve(MultiRunMetricsWorkflow):
         return (
             super()
             .to_xarray(
-                non_multirun_params_as_singleton_dims=non_multirun_params_as_singleton_dims
+                coord_from_metrics=coord_from_metrics,
+                non_multirun_params_as_singleton_dims=non_multirun_params_as_singleton_dims,
             )
             .sortby("epsilon")
         )
@@ -632,29 +685,3 @@ class RobustnessCurve(MultiRunMetricsWorkflow):
             plt.savefig(save_filename)
 
         return plots
-
-
-def _load_metrics(
-    job_overrides: List[List[str]],
-    job_metrics: List[Dict[str, Any]],
-    workflow_params: Optional[Sequence[str]] = None,
-) -> Tuple[Dict[str, List[Any]], Dict[str, List[Any]]]:
-    workflow_overrides = defaultdict(list)
-    metrics = defaultdict(list)
-    for task_overrides, task_metrics in zip(job_overrides, job_metrics):
-        for override in task_overrides:
-            k, v = override.split("=")
-            # remove any hydra override prefix
-            param = k.split("+")[-1]
-            if workflow_params is None or param in workflow_params:
-                v = _num_from_string(v)
-                workflow_overrides[param].append(v)
-
-        for k, v in task_metrics.items():
-            # get item if it's a single element array
-            if isinstance(v, list) and len(v) == 1:
-                v = v[0]
-
-            metrics[k].append(v)
-
-    return metrics, workflow_overrides

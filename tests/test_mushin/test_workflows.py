@@ -7,7 +7,6 @@ from pathlib import Path
 import hypothesis.strategies as st
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
 import pytest
 import torch as tr
 import xarray as xr
@@ -17,7 +16,12 @@ from hypothesis.extra.numpy import array_shapes, arrays
 from xarray.testing import assert_identical
 
 from rai_toolbox.mushin import multirun
-from rai_toolbox.mushin.workflows import BaseWorkflow, RobustnessCurve, _load_metrics
+from rai_toolbox.mushin.workflows import (
+    BaseWorkflow,
+    MultiRunMetricsWorkflow,
+    RobustnessCurve,
+    hydra_list,
+)
 
 common_shape = array_shapes(min_dims=2, max_dims=2)
 
@@ -33,7 +37,7 @@ class MyWorkflow(BaseWorkflow):
     def evaluation_task():
         return dict(result=1)
 
-    def jobs_post_process(self, workflow_params):
+    def jobs_post_process(self):
         return
 
 
@@ -58,9 +62,6 @@ def test_robustnesscurve_raises_notimplemented():
 
     with pytest.raises(NotImplementedError):
         task.plot()
-
-    with pytest.raises(NotImplementedError):
-        task.to_dataframe()
 
     with pytest.raises(NotImplementedError):
         task.to_xarray()
@@ -91,8 +92,8 @@ def test_robustnesscurve_run(config, as_array):
 
     assert "result" in task.metrics
     assert len(task.metrics["result"]) == len(epsilon)
-    assert "epsilon" in task.workflow_overrides
-    assert len(task.workflow_overrides["epsilon"]) == len(epsilon)
+    assert "epsilon" in task.multirun_task_overrides
+    assert len(task.multirun_task_overrides["epsilon"]) == len(epsilon)
 
     # will raise if not set correctly
     task.plot("result")
@@ -139,11 +140,6 @@ def test_robustnesscurve_to_data(epsilon):
     task = LocalRobustness(make_config(epsilon=0))
     task.run(epsilon=epsilon)
 
-    df = task.to_dataframe()
-
-    assert isinstance(df, pd.DataFrame)
-    assert len(df["epsilon"]) == len(epsilon)
-
     xd = task.to_xarray(non_multirun_params_as_singleton_dims=True)
 
     assert isinstance(xd, xr.Dataset)
@@ -159,11 +155,11 @@ def test_robustnesscurve_load_from_dir():
     working_dir = "test_dir"
     LocalRobustness = create_workflow()
     load_task = LocalRobustness()
-    load_task.load_from_dir(working_dir, workflow_params=["epsilon"])
+    load_task.load_from_dir(working_dir)
 
-    for k, v in task.workflow_overrides.items():
-        assert k in load_task.workflow_overrides
-        assert v == load_task.workflow_overrides[k]
+    for k, v in task.multirun_task_overrides.items():
+        assert k in load_task.multirun_task_overrides
+        assert v == load_task.multirun_task_overrides[k]
 
     for k, v in task.metrics.items():
         assert k in load_task.metrics
@@ -186,8 +182,8 @@ def test_robustnesscurve_extra_param(fake_param_string):
             task.run(epsilon=[0, 1, 2, 3], fake_param=BadVal)  # type: ignore
         return
 
-    assert "fake_param" in task.workflow_overrides
-    assert task.workflow_overrides["fake_param"] == ["some_value"] * 4
+    assert "fake_param" in task.multirun_task_overrides
+    assert task.multirun_task_overrides["fake_param"] == "some_value"
     task.plot("result", group="fake_param", non_multirun_params_as_singleton_dims=True)
 
 
@@ -205,10 +201,8 @@ def test_robustnesscurve_extra_param_multirun(fake_param_string):
             task.run(epsilon=[0, 1, 2, 3], fake_param=[1, 2])  # type: ignore
         return
 
-    assert "fake_param" in task.workflow_overrides
-
-    num_jobs = 4 * 2 if fake_param_string else 4
-    assert len(task.workflow_overrides["fake_param"]) == num_jobs
+    assert "fake_param" in task.multirun_task_overrides
+    assert len(task.multirun_task_overrides["fake_param"]) == 2
 
 
 @pytest.mark.usefixtures("cleandir")
@@ -219,22 +213,6 @@ def test_robustnesscurve_plot_save(ax):
     task.run(epsilon=[0, 1, 2, 3])
     task.plot("result", save_filename="test_save.png", ax=ax)
     assert Path("test_save.png").exists()
-
-
-@pytest.mark.parametrize("workflow_params", [None, "param_2"])
-def test_load_metrics(workflow_params):
-    job_overrides = [["param_1=1"], ["param_2=2"]]
-    job_metrics = [dict(val=1), dict(val=2)]
-    mets, overs = _load_metrics(job_overrides, job_metrics, workflow_params)
-
-    assert "val" in mets
-    assert len(mets["val"]) == 2
-    assert "param_2" in overs
-
-    if workflow_params is None:
-        assert "param_1" in overs
-    else:
-        assert "param_1" not in overs
 
 
 class MultiDimMetrics(RobustnessCurve):
@@ -249,9 +227,13 @@ class MultiDimMetrics(RobustnessCurve):
 
 
 @pytest.mark.usefixtures("cleandir")
-def test_robustness_with_multidim_metrics():
+@pytest.mark.parametrize(
+    "foo, foo_expected", [("val", "val"), (hydra_list(["val"]), "['val']")]
+)
+@pytest.mark.parametrize("bar", [multirun(["a", "b"]), multirun(["[a,b]", "[c,d]"])])
+def test_robustness_with_multidim_metrics(foo, foo_expected, bar):
     wf = MultiDimMetrics()
-    wf.run(epsilon=[1.0, 3.0, 2.0], foo="val", bar=multirun(["a", "b"]))
+    wf.run(epsilon=[1.0, 3.0, 2.0], foo=foo, bar=bar)
     xarray = wf.to_xarray()
     assert list(xarray.data_vars.keys()) == ["images", "accuracies"]
     assert list(xarray.coords.keys()) == [
@@ -262,6 +244,43 @@ def test_robustness_with_multidim_metrics():
     ]
     assert xarray.accuracies.shape == (2, 3)
     assert xarray.images.shape == (2, 3, 4, 1)
+    assert xarray.attrs == {"foo": foo_expected}
+
+    for eps, expected in zip([1.0, 2.0, 3.0], [99.0, 96.0, 91.0]):
+        # test that results were organized as-expected
+        sub_xray = xarray.sel(epsilon=eps)
+        assert np.all(sub_xray.accuracies == expected + 2).item()
+        assert np.all(sub_xray.images == expected).item()
+
+
+class MultiDimIterationMetrics(MultiRunMetricsWorkflow):
+    # returns "images" -> shape-(N, 4, 4)
+    #         "accuracies" -> N
+    @staticmethod
+    def evaluation_task(epsilon):
+        val = 100 * np.ones(10) - epsilon**2
+        epochs = np.arange(10)
+        images = 100 * np.ones((10, 4, 4)) - epsilon**2
+        result = dict(images=images, accuracies=val + 2, epochs=epochs)
+        tr.save(result, "test_metrics.pt")
+        return result
+
+
+@pytest.mark.usefixtures("cleandir")
+def test_robustness_with_multidim_metrics_with_iteration():
+    wf = MultiDimIterationMetrics()
+    wf.run(epsilon=multirun([1.0, 3.0, 2.0]), foo="val", bar=multirun(["a", "b"]))
+    xarray = wf.to_xarray(coord_from_metrics="epochs")
+    assert list(xarray.data_vars.keys()) == ["images", "accuracies"]
+    assert list(xarray.coords.keys()) == [
+        "epsilon",
+        "bar",
+        "epochs",
+        "images_dim1",
+        "images_dim2",
+    ]
+    assert xarray.accuracies.shape == (3, 2, 10)
+    assert xarray.images.shape == (3, 2, 10, 4, 4)
     assert xarray.attrs == {"foo": "val"}
 
     for eps, expected in zip([1.0, 2.0, 3.0], [99.0, 96.0, 91.0]):
@@ -269,6 +288,9 @@ def test_robustness_with_multidim_metrics():
         sub_xray = xarray.sel(epsilon=eps)
         assert np.all(sub_xray.accuracies == expected + 2).item()
         assert np.all(sub_xray.images == expected).item()
+
+    with pytest.raises(ValueError):
+        wf.to_xarray(coord_from_metrics="key_not_in_metrics")
 
 
 @pytest.mark.usefixtures("cleandir")
