@@ -280,8 +280,8 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
 
     >>> from rai_toolbox.mushin.workflows import MultiRunMetricsWorkflow
     >>> from rai_toolbox.mushin import multirun
-    >>> import torch as tr
-    ... class LocalRobustness(MultiRunMetricsWorkflow):
+
+    >>> class LocalRobustness(MultiRunMetricsWorkflow):
     ...     @staticmethod
     ...     def evaluation_task(epsilon: float, scale: float) -> dict:
     ...         epsilon *= scale
