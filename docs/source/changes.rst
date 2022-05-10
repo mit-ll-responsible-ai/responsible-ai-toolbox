@@ -8,6 +8,19 @@ Changelog
 This is a record of all past rAI-toolbox releases and what went into them, in reverse 
 chronological order. All previous releases should still be available on pip.
 
+.. _v0.1.1:
+
+------------------
+0.1.1 - 2022-05-10
+------------------
+
+
+This patch fixes two bugs in ``rai_toolbox.perturbations.init``:
+
+- `~rai_toolbox.perturbations.uniform_like_l1_n_ball_` was not correctly symmeterized; the drawn values only had components lying on the positive hemisphere of the :math:`L^1` ball.
+- Passing an on-gpu tensor to the in-place init functions would cause a device mis-match error with the default random number generator, which is on CPU.
+
+
 .. _v0.1.0:
 
 ------------------
