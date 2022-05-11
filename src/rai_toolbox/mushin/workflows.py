@@ -69,7 +69,7 @@ class BaseWorkflow(ABC):
     cfgs: List[Any]
     metrics: Dict[str, List[Any]]
     workflow_overrides: Dict[str, Any]
-    jobs: List[Any]
+    jobs: Union[List[JobReturn], List[Any], JobReturn]
     working_dir: Path
 
     def __init__(self, eval_task_cfg=None) -> None:
@@ -250,7 +250,7 @@ class BaseWorkflow(ABC):
             launch_overrides.append(f"{prefix}{k}={v}")
 
         # Run a Multirun over epsilons
-        (jobs,) = launch(
+        jobs = launch(
             self.eval_task_cfg,
             zen(self.evaluation_task),
             overrides=launch_overrides,
@@ -261,6 +261,10 @@ class BaseWorkflow(ABC):
             job_name=job_name,
             with_log_configuration=with_log_configuration,
         )
+
+        if isinstance(jobs, List) and len(jobs) == 1:
+            # hydra returns [jobs]
+            jobs = jobs[0]
 
         self.jobs = jobs
         self.jobs_post_process()
@@ -371,7 +375,7 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
     """
 
     @abstractstaticmethod
-    def evaluation_task(*args: Any, **kwargs: Any) -> Dict[str, Any]:
+    def evaluation_task(*args: Any, **kwargs: Any) -> Dict[str, Any]:  # type: ignore
         """Abstract `staticmethod` for users to define the evalultion task"""
 
     def jobs_post_process(self):

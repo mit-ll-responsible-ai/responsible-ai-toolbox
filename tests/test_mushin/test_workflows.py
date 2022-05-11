@@ -92,8 +92,10 @@ def test_robustnesscurve_run(config, as_array):
 
     assert "result" in task.metrics
     assert len(task.metrics["result"]) == len(epsilon)
-    assert "epsilon" in task.multirun_task_overrides
-    assert len(task.multirun_task_overrides["epsilon"]) == len(epsilon)
+
+    multirun_task_overrides = task.multirun_task_overrides
+    assert "epsilon" in multirun_task_overrides
+    assert len(multirun_task_overrides["epsilon"]) == len(epsilon)
 
     # will raise if not set correctly
     task.plot("result")
@@ -201,8 +203,9 @@ def test_robustnesscurve_extra_param_multirun(fake_param_string):
             task.run(epsilon=[0, 1, 2, 3], fake_param=[1, 2])  # type: ignore
         return
 
-    assert "fake_param" in task.multirun_task_overrides
-    assert len(task.multirun_task_overrides["fake_param"]) == 2
+    multirun_task_overrides = task.multirun_task_overrides
+    assert "fake_param" in multirun_task_overrides
+    assert len(multirun_task_overrides["fake_param"]) == 2
 
 
 @pytest.mark.usefixtures("cleandir")
