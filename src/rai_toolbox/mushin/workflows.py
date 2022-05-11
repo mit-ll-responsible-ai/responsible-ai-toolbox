@@ -374,17 +374,6 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
     def evaluation_task(*args: Any, **kwargs: Any) -> Dict[str, Any]:
         """Abstract `staticmethod` for users to define the evalultion task"""
 
-    def _process_metrics(self, job_metrics) -> Dict[str, List[Any]]:
-        metrics = defaultdict(list)
-        for task_metrics in job_metrics:
-            for k, v in task_metrics.items():
-                # get item if it's a single element array
-                if isinstance(v, list) and len(v) == 1:
-                    v = v[0]
-
-                metrics[k].append(v)
-        return metrics
-
     def jobs_post_process(self):
         assert len(self.jobs) > 0
         # TODO: Make protocol type for JobReturn
@@ -437,20 +426,29 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
             multirun_cfg.exists()
         ), "Working directory does not contain `multirun.yaml` file.  Be sure to use the value of the Hydra sweep directory for the workflow"
 
-        # Load saved YAML configurations for each job (in hydra.job.output_subdir)
-        job_cfgs = [
-            load_from_yaml(f)
-            for f in sorted(self.working_dir.glob(f"**/*/{config_dir}/config.yaml"))
-        ]
+        # Find metric file for each job
+        metric_files: List[Path] = sorted(
+            self.working_dir.glob(f"**/*/{metrics_filename}"),
+            key=lambda x: int(x.parent.parts[-1]),
+        )
 
-        # Load metrics for each job
-        job_metrics = [
-            tr.load(f)
-            for f in sorted(self.working_dir.glob(f"**/*/{metrics_filename}"))
-        ]
+        self.cfgs = []
+        self.metrics = defaultdict(list)
+        for metric_file in metric_files:
+            # Load saved YAML configurations for each job (in hydra.job.output_subdir)
+            hydra_cfg_file = Path(metric_file.parent / f"{config_dir}/hydra.yaml")
+            assert hydra_cfg_file.exists()
+            self.cfgs.append(load_from_yaml(hydra_cfg_file))
 
-        self.cfgs = job_cfgs
-        self.metrics = self._process_metrics(job_metrics)
+            # Load metrics for each job
+            task_metrics = tr.load(metric_file)
+            for k, v in task_metrics.items():
+                # get item if it's a single element array
+                if isinstance(v, list) and len(v) == 1:
+                    v = v[0]
+
+                self.metrics[k].append(v)
+
         return self
 
     def to_xarray(
