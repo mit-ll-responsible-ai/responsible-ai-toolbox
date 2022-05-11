@@ -134,7 +134,7 @@ class BaseWorkflow(ABC):
     def evaluation_task(*args: Any, **kwargs: Any) -> Any:
         """User-defined evaluation task to run the workflow.
 
-        Arguments should be instantiated configuration variables.  For example,
+        Arguments will be instantiated configuration variables.  For example,
         if the the workflow configuration is structured as::
 
             ├── eval_task_cfg
@@ -162,8 +162,8 @@ class BaseWorkflow(ABC):
         overrides: Optional[List[str]] = None,
         version_base: Optional[Union[str, Type[_NotSet]]] = _NotSet,
         to_dictconfig: bool = False,
-        config_name: str = "zen_launch",
-        job_name: str = "zen_launch",
+        config_name: str = "rai_workflow",
+        job_name: str = "rai_workflow",
         with_log_configuration: bool = True,
         **workflow_overrides: Union[str, int, float, bool, dict, multirun, hydra_list],
     ):
@@ -202,10 +202,10 @@ class BaseWorkflow(ABC):
             If ``True``, convert a ``dataclasses.dataclass`` to a ``omegaconf.DictConfig``. Note, this
             will remove Hydra's cabability for validation with structured configurations.
 
-        config_name : str (default: "zen_launch")
+        config_name : str (default: "rai_workflow")
             Name of the stored configuration in Hydra's ConfigStore API.
 
-        job_name : str (default: "zen_launch")
+        job_name : str (default: "rai_workflow")
             Name of job for logging.
 
         with_log_configuration : bool (default: True)
@@ -390,6 +390,17 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
         job_metrics = [j.return_value for j in self.jobs]
         self.metrics = self._process_metrics(job_metrics)
 
+    def _process_metrics(self, job_metrics) -> Dict[str, Any]:
+        metrics = defaultdict(list)
+        for task_metrics in job_metrics:
+            for k, v in task_metrics.items():
+                # get item if it's a single element array
+                if isinstance(v, list) and len(v) == 1:
+                    v = v[0]
+
+                metrics[k].append(v)
+        return metrics
+
     def load_from_dir(
         self: Self,
         working_dir: Union[Path, str],
@@ -433,21 +444,15 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
         )
 
         self.cfgs = []
-        self.metrics = defaultdict(list)
+        job_metrics = []
         for metric_file in metric_files:
-            # Load saved YAML configurations for each job (in hydra.job.output_subdir)
+            # Ensure we load saved YAML configurations for each job (in hydra.job.output_subdir)
             hydra_cfg_file = Path(metric_file.parent / f"{config_dir}/hydra.yaml")
             assert hydra_cfg_file.exists()
             self.cfgs.append(load_from_yaml(hydra_cfg_file))
+            self.job_metrics.append(tr.load(metric_file))
 
-            # Load metrics for each job
-            task_metrics = tr.load(metric_file)
-            for k, v in task_metrics.items():
-                # get item if it's a single element array
-                if isinstance(v, list) and len(v) == 1:
-                    v = v[0]
-
-                self.metrics[k].append(v)
+        self.metrics = self._process_metrics(job_metrics)
 
         return self
 
@@ -460,6 +465,11 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
 
         Parameters
         ----------
+        coord_from_metrics: str | None (default: None)
+            If not `None` defines the metric key value to use as a coordinate
+            in the `Dataset`.  This functions assumes this coordinate
+            represents the first dimension of other metrics (e.g., `epochs`).
+
         non_multirun_params_as_singleton_dims : bool, optional (default=False)
             If `True` then non-multirun entries from `workflow_overrides` will be
             included as length-1 dimensions in the xarray. Useful for merging/
@@ -513,7 +523,7 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
             for n in range(datum.ndim - len(orig_coords)):
 
                 if coord_from_metrics and n < len(metric_coords):
-                    # Assume the first coordinate of the metric is the iteration dimension
+                    # Assume the first coordinate of the metric is the metric coordinate dimension
                     k_coords += list(metric_coords.keys())
                     for mk, mv in metric_coords.items():
                         coords[mk] = mv
