@@ -500,7 +500,7 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
                 )
 
             v = self.metrics[coord_from_metrics]
-            if np.asarray(v).ndim > 1:
+            if np.asarray(v).ndim > 1:  # pragma: no cover
                 # assume this coord was repeated across experiments, e.g., "epochs"
                 v = v[0]
             metric_coords[coord_from_metrics] = v

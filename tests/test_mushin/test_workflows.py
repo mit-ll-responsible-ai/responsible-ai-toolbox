@@ -11,7 +11,9 @@ import numpy as np
 import pytest
 import torch as tr
 import xarray as xr
-from hydra_zen import make_config
+from hydra.core.config_store import ConfigStore
+from hydra.plugins.sweeper import Sweeper
+from hydra_zen import builds, make_config
 from hypothesis import given, settings
 from hypothesis.extra.numpy import array_shapes, arrays
 from xarray.testing import assert_identical
@@ -312,3 +314,22 @@ def test_xarray_from_loaded_workflow():
     wf2 = MultiDimMetrics().load_from_dir(wf.working_dir)
     xarray2 = wf2.to_xarray()
     assert_identical(xarray1, xarray2)
+
+
+class LocalBasicSweeper(Sweeper):
+    def setup(self, *, hydra_context, task_function, config):
+        pass
+
+    def sweep(self, arguments):
+        return dict(hi=1)
+
+
+cs = ConfigStore.instance()
+cs.store(group="hydra/sweeper", name="local_test", node=builds(LocalBasicSweeper))
+
+
+@pytest.mark.usefixtures("cleandir")
+def test_return_not_list_jobreturn():
+    wf = MyWorkflow()
+    wf.run(epsilon=multirun([1.0, 3.0, 2.0]), overrides=["hydra/sweeper=local_test"])
+    assert wf.jobs == dict(hi=1)
