@@ -27,6 +27,7 @@ from hydra.core.utils import JobReturn
 from hydra.plugins.sweeper import Sweeper
 from hydra.types import HydraContext, RunMode
 from hydra_zen import instantiate
+from hydra_zen.errors import HydraZenValidationError
 from hydra_zen.typing._implementations import DataClass_
 from omegaconf import OmegaConf
 from typing_extensions import Literal
@@ -124,6 +125,11 @@ def launch(
     return job
 
 
+SKIPPED_PARAM_KINDS = frozenset(
+    (Parameter.POSITIONAL_ONLY, Parameter.VAR_KEYWORD, Parameter.VAR_POSITIONAL)
+)
+
+
 T1 = TypeVar("T1")
 
 
@@ -154,13 +160,13 @@ class zen(Generic[T1]):
             if name in excluded_params:
                 continue
 
-            if param.kind is Parameter.POSITIONAL_ONLY:
+            if param.kind in SKIPPED_PARAM_KINDS:
                 continue
             if not hasattr(cfg, name) and param.default is param.empty:
                 missing_params.append(name)
 
         if missing_params:
-            raise TypeError(
+            raise HydraZenValidationError(
                 f"`cfg` is missing the following fields: {', '.join(missing_params)}"
             )
 
@@ -184,7 +190,7 @@ class zen(Generic[T1]):
                 else getattr(cfg, name)
             )
             for name, param in self.parameters.items()
-            if param.kind is not param.POSITIONAL_ONLY and name not in kwargs
+            if param.kind not in SKIPPED_PARAM_KINDS and name not in kwargs
         }
 
         # instantiate any configs
