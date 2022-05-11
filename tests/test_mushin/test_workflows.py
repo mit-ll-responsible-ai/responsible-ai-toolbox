@@ -97,7 +97,7 @@ def test_robustnesscurve_run(config, as_array):
     multirun_task_overrides = task.multirun_task_overrides
     assert "epsilon" in multirun_task_overrides
 
-    extracted_epsilon: List[float] = getattr(multirun_task_overrides, "epsilon")
+    extracted_epsilon = multirun_task_overrides["epsilon"]
     assert len(extracted_epsilon) == len(epsilon)
 
     # will raise if not set correctly
@@ -209,7 +209,7 @@ def test_robustnesscurve_extra_param_multirun(fake_param_string):
     multirun_task_overrides = task.multirun_task_overrides
     assert "fake_param" in multirun_task_overrides
 
-    extracted_fake_param: List[int] = getattr(multirun_task_overrides, "fake_param")
+    extracted_fake_param: List[int] = multirun_task_overrides["fake_param"]
     assert len(extracted_fake_param) == 2
 
 
