@@ -20,7 +20,6 @@ rai\_toolbox.mushin.BaseWorkflow
       ~BaseWorkflow.jobs_post_process
       ~BaseWorkflow.plot
       ~BaseWorkflow.run
-      ~BaseWorkflow.to_dataframe
       ~BaseWorkflow.to_xarray
       ~BaseWorkflow.validate
    
