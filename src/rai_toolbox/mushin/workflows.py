@@ -450,7 +450,7 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
             hydra_cfg_file = Path(metric_file.parent / f"{config_dir}/hydra.yaml")
             assert hydra_cfg_file.exists()
             self.cfgs.append(load_from_yaml(hydra_cfg_file))
-            self.job_metrics.append(tr.load(metric_file))
+            job_metrics.append(tr.load(metric_file))
 
         self.metrics = self._process_metrics(job_metrics)
 
