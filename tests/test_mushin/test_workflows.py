@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 from pathlib import Path
+from typing import List
 
 import hypothesis.strategies as st
 import matplotlib.pyplot as plt
@@ -95,7 +96,9 @@ def test_robustnesscurve_run(config, as_array):
 
     multirun_task_overrides = task.multirun_task_overrides
     assert "epsilon" in multirun_task_overrides
-    assert len(multirun_task_overrides["epsilon"]) == len(epsilon)
+
+    extracted_epsilon: List[float] = getattr(multirun_task_overrides, "epsilon")
+    assert len(extracted_epsilon) == len(epsilon)
 
     # will raise if not set correctly
     task.plot("result")
@@ -205,7 +208,9 @@ def test_robustnesscurve_extra_param_multirun(fake_param_string):
 
     multirun_task_overrides = task.multirun_task_overrides
     assert "fake_param" in multirun_task_overrides
-    assert len(multirun_task_overrides["fake_param"]) == 2
+
+    extracted_fake_param: List[int] = getattr(multirun_task_overrides, "fake_param")
+    assert len(extracted_fake_param) == 2
 
 
 @pytest.mark.usefixtures("cleandir")

@@ -13,6 +13,7 @@ from hydra.core.override_parser.overrides_parser import OverridesParser
 from hydra.core.utils import JobReturn
 from hydra_zen import launch, load_from_yaml, make_config
 from hydra_zen._launch import _NotSet
+from omegaconf import ListConfig
 from typing_extensions import Self, TypeAlias, TypeGuard
 
 from rai_toolbox._utils import value_check
@@ -94,7 +95,9 @@ class BaseWorkflow(ABC):
         self.jobs = []
         self.working_dir = Path.cwd()  # TODO: I don't think we should assume this
 
-    def _pase_overrides(self, overrides: List[str]):
+    def _parse_overrides(
+        self, overrides: Union[ListConfig, List[str]]
+    ) -> Dict[str, Any]:
         parser = OverridesParser.create()
         parsed_overrides = parser.parse_overrides(overrides=overrides)
 
@@ -125,7 +128,7 @@ class BaseWorkflow(ABC):
                 self.working_dir / "multirun.yaml"
             ).hydra.overrides.task
 
-            output = self._pase_overrides(overrides)
+            output = self._parse_overrides(overrides)
             self._multirun_task_overrides.update(output)
 
         return self._multirun_task_overrides
