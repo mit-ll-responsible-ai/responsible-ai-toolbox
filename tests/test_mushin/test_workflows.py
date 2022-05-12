@@ -173,6 +173,9 @@ def test_robustnesscurve_load_from_dir():
         assert k in load_task.metrics
         assert v == load_task.metrics[k]
 
+    for cfg in task.cfgs:
+        assert "epsilon" in cfg
+
 
 @pytest.mark.usefixtures("cleandir")
 @pytest.mark.parametrize("fake_param_string", [True, False])

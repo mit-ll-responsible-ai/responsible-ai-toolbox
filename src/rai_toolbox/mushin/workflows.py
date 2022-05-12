@@ -451,9 +451,9 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
         job_metrics = []
         for metric_file in metric_files:
             # Ensure we load saved YAML configurations for each job (in hydra.job.output_subdir)
-            hydra_cfg_file = Path(metric_file.parent / f"{config_dir}/hydra.yaml")
-            assert hydra_cfg_file.exists()
-            self.cfgs.append(load_from_yaml(hydra_cfg_file))
+            cfg_file = Path(metric_file.parent / f"{config_dir}/config.yaml")
+            assert cfg_file.exists()
+            self.cfgs.append(load_from_yaml(cfg_file))
             job_metrics.append(tr.load(metric_file))
 
         self.metrics = self._process_metrics(job_metrics)
