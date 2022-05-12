@@ -30,7 +30,10 @@ from hydra_zen import instantiate
 from hydra_zen.errors import HydraZenValidationError
 from hydra_zen.typing._implementations import DataClass_
 from omegaconf import OmegaConf
-from typing_extensions import Literal
+from typing_extensions import Literal, ParamSpec
+
+T1 = TypeVar("T1")
+P = ParamSpec("P")
 
 
 def is_config(cfg: Any) -> bool:
@@ -130,17 +133,37 @@ SKIPPED_PARAM_KINDS = frozenset(
 )
 
 
-T1 = TypeVar("T1")
+PreCall = Optional[Union[Callable[[Any], Any], Iterable[Callable[[Any], Any]]]]
+PostCall = Optional[Union[Callable[[Any, T1], Any], Iterable[Callable[[Any, T1], Any]]]]
+
+
+def _flat_call(x: Iterable[Callable[P, Any]]):
+    def f(*args: P.args, **kwargs: P.kwargs) -> None:
+        for fn in x:
+            fn(*args, **kwargs)
+
+    return f
 
 
 # TODO: - zen's instantiation should be memoized so that subsequent access
 #         to an attribute returns the same instance
 #       - zen should interface with a singelton that "recognizes"
 #         the configs that it interacts with
-class zen(Generic[T1]):
-    def __init__(self, func: Callable[..., T1]) -> None:
-        self.func = func
+class Zen(Generic[P, T1]):
+    def __init__(
+        self,
+        func: Callable[P, T1],
+        pre_call: PreCall = None,
+        post_call: PostCall[T1] = None,
+    ) -> None:
+        self.func: Callable[P, T1] = func
         self.parameters = signature(self.func).parameters
+        self.pre_call = (
+            pre_call if not isinstance(pre_call, Iterable) else _flat_call(pre_call)
+        )
+        self.post_call = (
+            post_call if not isinstance(post_call, Iterable) else _flat_call(post_call)
+        )
 
     def validate(self, cfg: Any, excluded_params: Iterable[str] = ()):
         excluded_params = set(excluded_params)
@@ -174,6 +197,9 @@ class zen(Generic[T1]):
         if callable(cfg):
             cfg = cfg()  # instantiate dataclass to resolve default-factory
 
+        if self.pre_call is not None:
+            self.pre_call(cfg)
+
         if not args:
             args_ = getattr(cfg, "_args_", [])
             assert isinstance(args_, Sequence)
@@ -203,4 +229,55 @@ class zen(Generic[T1]):
             name: instantiate(val) if is_config(val) else val
             for name, val in kwargs.items()
         }
-        return self.func(*args_, **cfg_kwargs, **kwargs)
+        out = self.func(*args_, **cfg_kwargs, **kwargs)  # type: ignore
+
+        if self.post_call is not None:
+            self.post_call(cfg, out)
+
+        return out
+
+
+@overload
+def zen(
+    __func: Callable[P, T1],
+    *,
+    pre_call: PreCall = ...,
+    post_call: PostCall = ...,
+) -> Zen[P, T1]:  # pragma: no cover
+    ...
+
+
+@overload
+def zen(
+    __func: Literal[None] = None,
+    *,
+    pre_call: PreCall = ...,
+    post_call: PostCall[T1] = ...,
+) -> Callable[[Callable[P, T1]], Zen[P, T1]]:  # pragma: no cover
+    ...
+
+
+@overload
+def zen(
+    __func: Optional[Callable[P, T1]] = None,
+    *,
+    pre_call: PreCall = None,
+    post_call: PostCall[T1] = None,
+) -> Union[Zen[P, T1], Callable[[Callable[P, T1]], Zen[P, T1]]]:  # pragma: no cover
+    ...
+
+
+def zen(
+    __func: Optional[Callable[P, T1]] = None,
+    *,
+    pre_call: PreCall = None,
+    post_call: PostCall[T1] = None,
+) -> Union[Zen[P, T1], Callable[[Callable[P, T1]], Zen[P, T1]]]:
+
+    if __func is None:
+
+        def wrap(f: Callable[P, T1]) -> Zen[P, T1]:
+            return Zen(func=f, pre_call=pre_call, post_call=post_call)
+
+        return wrap
+    return Zen(__func, pre_call=pre_call, post_call=post_call)
