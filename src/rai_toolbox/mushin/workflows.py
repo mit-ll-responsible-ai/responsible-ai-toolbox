@@ -437,9 +437,11 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
         self.working_dir = Path(working_dir).resolve()
 
         multirun_cfg = self.working_dir / "multirun.yaml"
-        assert (
-            multirun_cfg.exists()
-        ), "Working directory does not contain `multirun.yaml` file.  Be sure to use the value of the Hydra sweep directory for the workflow"
+        if not multirun_cfg.exists():
+            raise FileNotFoundError(
+                "Working directory does not contain `multirun.yaml` file. "
+                "Be sure to use the value of the Hydra sweep directory for the workflow"
+            )
 
         # Find metric file for each job
         metric_files: List[Path] = sorted(
