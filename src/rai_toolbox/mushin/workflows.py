@@ -5,7 +5,7 @@
 from abc import ABC, abstractmethod, abstractstaticmethod
 from collections import UserList, defaultdict
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Sequence, Type, Union
+from typing import Any, DefaultDict, Dict, List, Optional, Sequence, Type, Union
 
 import numpy as np
 import torch as tr
@@ -228,6 +228,7 @@ class BaseWorkflow(ABC):
 
         if working_dir is not None:
             launch_overrides.append(f"hydra.sweep.dir={working_dir}")
+            self.working_dir = Path(working_dir).resolve()
 
         if sweeper is not None:
             launch_overrides.append(f"hydra/sweeper={sweeper}")
@@ -374,9 +375,99 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
         loss        (epsilon, scale) float64 0.01 1.0 0.04 4.0 0.09 9.0
     """
 
+    # TODO: add target_job_dirs example
+    #      Document .swap_dims({"job_dir": <...>}) and .set_index(job_dir=[...]).unstack("job_dir")
+    #      for re-indexing based on overrides values
+
+    _JOBDIR_NAME: str = "job_dir"
+    _exp_multirun_task_overrides: Optional[DefaultDict[str, List[Any]]] = None
+    output_subdir: Optional[str] = None
+
     @abstractstaticmethod
     def evaluation_task(*args: Any, **kwargs: Any) -> Dict[str, Any]:  # type: ignore
         """Abstract `staticmethod` for users to define the evalultion task"""
+
+    def run(
+        self,
+        *,
+        working_dir: Optional[str] = None,
+        sweeper: Optional[str] = None,
+        launcher: Optional[str] = None,
+        overrides: Optional[List[str]] = None,
+        version_base: Optional[Union[str, Type[_NotSet]]] = _NotSet,
+        target_job_dirs: Optional[Sequence[Union[str, Path]]] = None,
+        to_dictconfig: bool = False,
+        config_name: str = "rai_workflow",
+        job_name: str = "rai_workflow",
+        with_log_configuration: bool = True,
+        **workflow_overrides: Union[str, int, float, bool, dict, multirun, hydra_list],
+    ):
+        # TODO: add docs
+
+        if target_job_dirs is not None:
+            if isinstance(target_job_dirs, str):
+                raise TypeError(
+                    f"`target_job_dirs` must be a sequence of pathlike objects, got: {target_job_dirs}"
+                )
+            value_check("target_job_dirs", target_job_dirs, type_=Sequence)
+
+            target_job_dirs = [Path(s).resolve() for s in target_job_dirs]
+            for d in target_job_dirs:
+                if not d.is_dir() or not d.exists():
+                    # TODO: check not only that dir exists but that it contains
+                    #       correct config file (e.g. .hydra)
+                    raise FileNotFoundError()
+            target_job_dirs = multirun([str(s) for s in target_job_dirs])
+            workflow_overrides[self._JOBDIR_NAME] = target_job_dirs
+
+        return super().run(
+            working_dir=working_dir,
+            sweeper=sweeper,
+            launcher=launcher,
+            overrides=overrides,
+            version_base=version_base,
+            to_dictconfig=to_dictconfig,
+            config_name=config_name,
+            job_name=job_name,
+            with_log_configuration=with_log_configuration,
+            **workflow_overrides,
+        )
+
+    @property
+    def exp_multirun_task_overrides(self) -> DefaultDict[str, List[Any]]:
+        if self._exp_multirun_task_overrides is not None:
+            return self._exp_multirun_task_overrides
+
+        assert self.output_subdir is not None
+
+        # TODO:
+        multirun_cfg = self.working_dir / "multirun.yaml"
+        self._exp_multirun_task_overrides = defaultdict(list)
+
+        overrides = load_from_yaml(multirun_cfg).hydra.overrides.task
+        self.overrides = overrides
+
+        dirs = None
+
+        for o in overrides:
+            k, v = o.split("=")
+            k = k.replace("+", "")
+            if k == self._JOBDIR_NAME:
+                dirs = v.split(",")
+                break
+
+        assert dirs is not None  # already checked in .run
+
+        for d in dirs:
+            overrides: List[str] = list(
+                load_from_yaml(Path(d) / f"{self.output_subdir}/overrides.yaml")
+            )
+            output = self._parse_overrides(overrides)
+
+            for ko, vo in output.items():
+                self._exp_multirun_task_overrides[ko].append(vo)
+
+        return self._exp_multirun_task_overrides
 
     def jobs_post_process(self):
         assert len(self.jobs) > 0
@@ -388,6 +479,10 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
         first_job_working_dir = self.jobs[0].working_dir
         assert first_job_working_dir is not None
         self.working_dir = Path(first_job_working_dir).parent
+
+        hydra_cfg = self.jobs[0].hydra_cfg
+        assert hydra_cfg is not None
+        self.output_subdir = hydra_cfg.hydra.output_subdir
 
         # extract configs, overrides, and metrics
         self.cfgs = [j.cfg for j in self.jobs]
@@ -435,6 +530,7 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
         loaded_workflow : Self
         """
         self.working_dir = Path(working_dir).resolve()
+        self.output_subdir = config_dir
 
         multirun_cfg = self.working_dir / "multirun.yaml"
         if not multirun_cfg.exists():
@@ -472,9 +568,9 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
         Parameters
         ----------
         coord_from_metrics: str | None (default: None)
-            If not `None` defines the metric key value to use as a coordinate
-            in the `Dataset`.  This functions assumes this coordinate
-            represents the first dimension of other metrics (e.g., `epochs`).
+            If not `None` defines the metric key to use as a coordinate
+            in the `Dataset`.  This function assumes that this coordinate
+            represents the leading dimension for all data-variables.
 
         non_multirun_params_as_singleton_dims : bool, optional (default=False)
             If `True` then non-multirun entries from `workflow_overrides` will be
@@ -542,7 +638,18 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
             data[k] = (k_coords, datum)
 
         coords.update(metric_coords)
-        return xr.Dataset(coords=coords, data_vars=data, attrs=attrs)
+        out = xr.Dataset(coords=coords, data_vars=data, attrs=attrs)
+
+        if self._JOBDIR_NAME in set(out.coords):
+            exp_dir = out.coords[self._JOBDIR_NAME]
+            coords = {}
+            for k, v in self.exp_multirun_task_overrides.items():
+                if len(v) == len(exp_dir):
+                    uv = list(set(np.unique(v)))
+                    if len(uv) > 1 or non_multirun_params_as_singleton_dims:
+                        coords[k] = ([self._JOBDIR_NAME], v)
+            out = out.assign_coords(coords)
+        return out
 
 
 class RobustnessCurve(MultiRunMetricsWorkflow):
