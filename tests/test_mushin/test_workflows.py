@@ -370,13 +370,14 @@ def test_multirun_over_jobdir(load_from_working_dir):
     # their metrics and re-returning them
     wf = FirstMultiRun()
     wf.run(epsilon=multirun([1.0, 2.0, 3.0]), acc=multirun([1, 2]), working_dir="first")
-    exp_dir = sorted(
-        m.parent for m in wf.working_dir.absolute().glob("**/test_metrics.pt")
-    )
-    snd_wf = ScndMultiRun()
 
+    snd_wf = ScndMultiRun()
     # runs over a total of epsilon-3 x acc-2 -> 6 job-dirs and 2 val
-    snd_wf.run(target_job_dirs=exp_dir, val=multirun([1, 2]), working_dir="second")
+    snd_wf.run(
+        target_job_dirs=wf.multirun_working_dirs,
+        val=multirun([1, 2]),
+        working_dir="second",
+    )
 
     if load_from_working_dir:
         snd_wf = ScndMultiRun().load_from_dir(snd_wf.working_dir, "test_metrics.pt")
