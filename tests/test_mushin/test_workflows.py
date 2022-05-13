@@ -164,7 +164,7 @@ def test_robustnesscurve_load_from_dir():
     working_dir = "test_dir"
     LocalRobustness = create_workflow()
     load_task = LocalRobustness()
-    load_task.load_from_dir(working_dir)
+    load_task.load_from_dir(working_dir, "test_metrics.pt")
 
     for k, v in task.multirun_task_overrides.items():
         assert k in load_task.multirun_task_overrides
@@ -316,7 +316,7 @@ def test_xarray_from_loaded_workflow():
     wf.run(epsilon=[1.0, 3.0, 2.0], foo="val", bar=multirun(["a", "b"]))
     xarray1 = wf.to_xarray()
 
-    wf2 = MultiDimMetrics().load_from_dir(wf.working_dir)
+    wf2 = MultiDimMetrics().load_from_dir(wf.working_dir, "test_metrics.pt")
     xarray2 = wf2.to_xarray()
     assert_identical(xarray1, xarray2)
 
@@ -379,7 +379,7 @@ def test_multirun_over_jobdir(load_from_working_dir):
     snd_wf.run(target_job_dirs=exp_dir, val=multirun([1, 2]), working_dir="second")
 
     if load_from_working_dir:
-        snd_wf = ScndMultiRun().load_from_dir(snd_wf.working_dir)
+        snd_wf = ScndMultiRun().load_from_dir(snd_wf.working_dir, "test_metrics.pt")
 
     assert wf.target_dir_multirun_overrides == {}
     assert snd_wf.target_dir_multirun_overrides == {

@@ -581,7 +581,7 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
     def load_from_dir(
         self: Self,
         working_dir: Union[Path, str],
-        metrics_filename: Union[str, None] = "test_metrics.pt",
+        metrics_filename: Union[str, None],
     ) -> Self:
         """Loading workflow job data from a given working directory. The workflow
         is loaded in-place and "self" is returned by this method.
@@ -593,7 +593,7 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
             that subdirectories within this working directory will contain
             individual Hydra jobs data (yaml configurations) and saved metrics files.
 
-        metrics_filename: Union[str, None] (default: "test_metrics.pt")
+        metrics_filename: Union[str, None]
             The filename used to save metrics for each individual Hydra job. This can
             be a search pattern as well since this is appended to
 
