@@ -511,7 +511,6 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
             return dict(self._target_dir_multirun_overrides)
         assert self.output_subdir is not None
 
-        # TODO:
         multirun_cfg = self.working_dir / "multirun.yaml"
         self._target_dir_multirun_overrides = defaultdict(list)
 
@@ -746,7 +745,7 @@ class RobustnessCurve(MultiRunMetricsWorkflow):
         self,
         *,
         epsilon: Union[str, Sequence[float]],
-        target_job_dirs: Optional[Sequence[Union[str, Path]]] = None,
+        target_job_dirs: Optional[Sequence[Union[str, Path]]] = None,  # TODO: add docs
         working_dir: Optional[str] = None,
         sweeper: Optional[str] = None,
         launcher: Optional[str] = None,
