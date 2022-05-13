@@ -746,6 +746,7 @@ class RobustnessCurve(MultiRunMetricsWorkflow):
         self,
         *,
         epsilon: Union[str, Sequence[float]],
+        target_job_dirs: Optional[Sequence[Union[str, Path]]] = None,
         working_dir: Optional[str] = None,
         sweeper: Optional[str] = None,
         launcher: Optional[str] = None,
@@ -796,6 +797,7 @@ class RobustnessCurve(MultiRunMetricsWorkflow):
             **workflow_overrides,
             # for multiple multi-run params, epsilon should fastest-varying param;
             # i.e. epsilon should be the trailing dim in the multi-dim array of results
+            target_job_dirs=target_job_dirs,
             epsilon=epsilon,
         )
 
