@@ -16,7 +16,7 @@ from hydra.plugins.sweeper import Sweeper
 from hydra_zen import builds, make_config
 from hypothesis import given, settings
 from hypothesis.extra.numpy import array_shapes, arrays
-from xarray.testing import assert_identical
+from xarray.testing import assert_duckarray_equal, assert_identical
 
 from rai_toolbox.mushin import multirun
 from rai_toolbox.mushin.workflows import (
@@ -271,6 +271,7 @@ def test_robustness_with_multidim_metrics(foo, foo_expected, bar):
 class MultiDimIterationMetrics(MultiRunMetricsWorkflow):
     # returns "images" -> shape-(N, 4, 4)
     #         "accuracies" -> N
+    #         "epochs" -> (N, 10)
     @staticmethod
     def evaluation_task(epsilon):
         val = 100 * np.ones(10) - epsilon**2
@@ -327,12 +328,71 @@ class LocalBasicSweeper(Sweeper):
         return dict(hi=1)
 
 
-cs = ConfigStore.instance()
-cs.store(group="hydra/sweeper", name="local_test", node=builds(LocalBasicSweeper))
-
-
 @pytest.mark.usefixtures("cleandir")
 def test_return_not_list_jobreturn():
+    cs = ConfigStore.instance()
+    cs.store(group="hydra/sweeper", name="local_test", node=builds(LocalBasicSweeper))
+
     wf = MyWorkflow()
     wf.run(epsilon=multirun([1.0, 3.0, 2.0]), overrides=["hydra/sweeper=local_test"])
     assert wf.jobs == dict(hi=1)
+
+
+class FirstMultiRun(RobustnessCurve):
+    # returns     "images" -> shape-(4, 1)
+    #         "accuracies" -> scalar
+    @staticmethod
+    def evaluation_task(epsilon, acc):
+        val = 100 - epsilon**2
+        result = dict(images=np.array([[val] * 1] * 4), accuracies=acc)
+        tr.save(result, "test_metrics.pt")
+        return result
+
+
+class ScndMultiRun(MultiRunMetricsWorkflow):
+    # loads test metrics, multiplies each by `val` and saves
+    @staticmethod
+    def evaluation_task(job_dir, val):
+        result = tr.load(f"{job_dir}/test_metrics.pt")
+
+        # val multiplies each metric
+        result = {k: v * val for k, v in result.items()}
+        tr.save(result, "test_metrics.pt")
+        return result
+
+
+@pytest.mark.usefixtures("cleandir")
+@pytest.mark.parametrize("load_from_working_dir", [False, True])
+def test_multirun_over_jobdir(load_from_working_dir):
+    # Runs a standard multirun workflow and then runs
+    # a multirun over the resulting folders, loading in
+    # their metrics and re-returning them
+    wf = FirstMultiRun()
+    wf.run(epsilon=multirun([1.0, 2.0, 3.0]), acc=multirun([1, 2]))
+    exp_dir = sorted(
+        m.parent for m in wf.working_dir.absolute().glob("**/test_metrics.pt")
+    )
+    snd_wf = ScndMultiRun()
+
+    # runs over a total of epsilon-3 x acc-2 -> 6 job-dirs and 2 val
+    snd_wf.run(target_job_dirs=exp_dir, val=multirun([1, 2]))
+
+    if load_from_working_dir:
+        snd_wf = ScndMultiRun().load_from_dir(snd_wf.working_dir)
+
+    xr1 = wf.to_xarray()
+    xr2 = snd_wf.to_xarray()
+
+    assert xr1.dims == {"acc": 2, "epsilon": 3, "images_dim0": 4, "images_dim1": 1}
+    assert xr2.dims == {"val": 2, "job_dir": 6, "images_dim0": 4, "images_dim1": 1}
+
+    xr2 = xr2.set_index(job_dir=["epsilon", "acc"]).unstack("job_dir")
+    xr2 = xr2.transpose("val", "acc", "epsilon", "images_dim0", "images_dim1")
+
+    assert_identical(xr1.epsilon, xr2.epsilon)
+    assert_identical(xr1.acc, xr2.acc)
+
+    assert_duckarray_equal(xr1.images, xr2.images.sel(val=1))
+    assert_duckarray_equal(2 * xr1.images, xr2.images.sel(val=2))
+    assert_duckarray_equal(xr1.accuracies, xr2.accuracies.sel(val=1))
+    assert_duckarray_equal(2 * xr1.accuracies, xr2.accuracies.sel(val=2))
