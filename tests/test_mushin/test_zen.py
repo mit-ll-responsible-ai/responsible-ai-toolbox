@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MIT
 import pytest
 from hydra_zen import builds, make_config
+from hydra_zen.errors import HydraZenValidationError
 from hypothesis import given
 from hypothesis import strategies as st
 
@@ -10,6 +11,18 @@ from rai_toolbox.mushin.hydra import zen
 
 
 def function(x: int, y: int, z: int = 2):
+    return x * y * z
+
+
+def function_with_args(x: int, y: int, z: int = 2, *args):
+    return x * y * z
+
+
+def function_with_kwargs(x: int, y: int, z: int = 2, **kwargs):
+    return x * y * z
+
+
+def function_with_args_kwargs(x: int, y: int, z: int = 2, *args, **kwargs):
     return x * y * z
 
 
@@ -21,7 +34,16 @@ class A:
 method = A().f
 
 
-@pytest.mark.parametrize("func", [function, method])
+@pytest.mark.parametrize(
+    "func",
+    [
+        function,
+        function_with_args,
+        function_with_kwargs,
+        function_with_args_kwargs,
+        method,
+    ],
+)
 @pytest.mark.parametrize(
     "cfg",
     [
@@ -32,11 +54,20 @@ method = A().f
     ],
 )
 def test_zen_validation(cfg, func):
-    with pytest.raises(TypeError):
+    with pytest.raises(HydraZenValidationError):
         zen(func).validate(cfg)
 
 
-@pytest.mark.parametrize("func", [function, method])
+@pytest.mark.parametrize(
+    "func",
+    [
+        function,
+        function_with_args,
+        function_with_kwargs,
+        function_with_args_kwargs,
+        method,
+    ],
+)
 @given(
     x=st.integers(-10, 10),
     y=st.integers(-10, 10),

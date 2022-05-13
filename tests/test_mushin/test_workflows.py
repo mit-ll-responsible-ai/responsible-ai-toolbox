@@ -12,6 +12,7 @@ import pytest
 import torch as tr
 import xarray as xr
 from hydra_zen import make_config
+from hydra_zen.errors import HydraZenValidationError
 from hypothesis import given, settings
 from hypothesis.extra.numpy import array_shapes, arrays
 from xarray.testing import assert_identical
@@ -74,7 +75,7 @@ def test_robustnesscurve_validate():
     task.validate()
 
     task = LocalRobustness()
-    with pytest.raises(TypeError):
+    with pytest.raises(HydraZenValidationError):
         task.validate()
 
 
