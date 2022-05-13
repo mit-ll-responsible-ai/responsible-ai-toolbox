@@ -361,7 +361,8 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
     ...         tr.save(result, "test_metrics.pt")
     ...         return result
 
-    We'll run this workflow for six total configurations of three `epsilon` values and two `scale` values. This will launch a Hydra multirun job and aggregate the results.
+    We'll run this workflow for six total configurations of three `epsilon` values and
+    two `scale` values. This will launch a Hydra multirun job and aggregate the results.
 
     >>> wf = LocalRobustness()
     >>> wf.run(epsilon=multirun([1.0, 2.0, 3.0]), scale=multirun([0.1, 1.0]))
@@ -374,7 +375,8 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
     [2022-05-02 11:57:59,683][HYDRA] 	#5 : +epsilon=3.0 +scale=1.0
 
     Now that this workflow has run, we can view the results as an xarray-dataset whose
-    coordinates reflect the multirun parameters that were varied, and whose data-variables are our recorded metrics: "accuracies" and "loss".
+    coordinates reflect the multirun parameters that were varied, and whose
+    data-variables are our recorded metrics: "accuracies" and "loss".
 
     >>> ds = wf.to_xarray()
     >>> ds
