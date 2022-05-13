@@ -5,7 +5,19 @@
 from abc import ABC, abstractmethod, abstractstaticmethod
 from collections import UserList, defaultdict
 from pathlib import Path
-from typing import Any, DefaultDict, Dict, List, Optional, Sequence, Type, Union
+from typing import (
+    Any,
+    DefaultDict,
+    Dict,
+    Iterable,
+    List,
+    Optional,
+    Sequence,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
+)
 
 import numpy as np
 import torch as tr
@@ -30,6 +42,9 @@ __all__ = [
 ]
 
 
+T = TypeVar("T", List[Any], Tuple[Any])
+
+
 class multirun(UserList):
     """Signals that a sequence is to be iterated over in a multirun"""
 
@@ -41,6 +56,13 @@ class hydra_list(UserList):
     to be iterated over during a multirun)"""
 
     pass
+
+
+def _sort_x_by_k(x: T, k: Iterable[Any]) -> T:
+    k = tuple(k)
+    assert len(x) == len(k)
+    sorted_, _ = zip(*sorted(zip(x, k), key=lambda x: x[1]))
+    return type(x)(sorted_)
 
 
 class BaseWorkflow(ABC):
@@ -266,6 +288,10 @@ class BaseWorkflow(ABC):
         if isinstance(jobs, List) and len(jobs) == 1:
             # hydra returns [jobs]
             jobs = jobs[0]
+            _job_nums = [j.hydra_cfg.hydra.job.num for j in jobs]
+            jobs = _sort_x_by_k(
+                jobs, _job_nums
+            )  # ensure jobs are always sorted by job-num
 
         self.jobs = jobs
         self.jobs_post_process()
@@ -380,8 +406,11 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
     #      for re-indexing based on overrides values
 
     _JOBDIR_NAME: str = "job_dir"
-    _exp_multirun_task_overrides: Optional[DefaultDict[str, List[Any]]] = None
+    _target_dir_multirun_overrides: Optional[DefaultDict[str, List[Any]]] = None
     output_subdir: Optional[str] = None
+
+    # List of all the dirs that the multirun writes to; sorted by job-num
+    multirun_working_dirs: Optional[List[Path]] = None
 
     @abstractstaticmethod
     def evaluation_task(*args: Any, **kwargs: Any) -> Dict[str, Any]:  # type: ignore
@@ -434,20 +463,60 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
         )
 
     @property
-    def exp_multirun_task_overrides(self) -> DefaultDict[str, List[Any]]:
-        if self._exp_multirun_task_overrides is not None:
-            return self._exp_multirun_task_overrides
+    def target_dir_multirun_overrides(self) -> Dict[str, List[Any]]:
+        """
+        For a multirun that sweeps over the target directories of a
+        previous multirun, `target_dir_multirun_overrides` provides
+        the flattened overrides for that previous run.
 
+        Examples
+        --------
+        >>> class A(MultiRunMetricsWorkflow):
+        ...     @staticmethod
+        ...     def evaluation_task(value: float, scale: float):
+        ...         pass
+        ...
+
+        >>> class B(MultiRunMetricsWorkflow):
+        ...     @staticmethod
+        ...     def evaluation_task():
+        ...         pass
+
+        >>> a = A()
+        >>> a.run(value=multirun([-1.0, 0.0, 1.0]), scale=multirun([11.0, 9.0]))
+        [2022-05-13 17:19:51,497][HYDRA] Launching 6 jobs locally
+        [2022-05-13 17:19:51,497][HYDRA] 	#0 : +value=-1.0 +scale=11.0
+        [2022-05-13 17:19:51,555][HYDRA] 	#1 : +value=-1.0 +scale=9.0
+        [2022-05-13 17:19:51,613][HYDRA] 	#2 : +value=0.0 +scale=11.0
+        [2022-05-13 17:19:51,671][HYDRA] 	#3 : +value=0.0 +scale=9.0
+        [2022-05-13 17:19:51,729][HYDRA] 	#4 : +value=1.0 +scale=11.0
+        [2022-05-13 17:19:51,787][HYDRA] 	#5 : +value=1.0 +scale=9.0
+
+        >>> b = B()
+        >>> b.run(target_job_dirs=a.multirun_working_dirs)
+        [2022-05-13 17:19:59,900][HYDRA] Launching 6 jobs locally
+        [2022-05-13 17:19:59,900][HYDRA] 	#0 : +job_dir=/home/scratch/multirun/0
+        [2022-05-13 17:19:59,958][HYDRA] 	#1 : +job_dir=/home/scratch/multirun/1
+        [2022-05-13 17:20:00,015][HYDRA] 	#2 : +job_dir=/home/scratch/multirun/2
+        [2022-05-13 17:20:00,073][HYDRA] 	#3 : +job_dir=/home/scratch/multirun/3
+        [2022-05-13 17:20:00,130][HYDRA] 	#4 : +job_dir=/home/scratch/multirun/4
+        [2022-05-13 17:20:00,188][HYDRA] 	#5 : +job_dir=/home/scratch/multirun/5
+
+        >>> b.target_dir_multirun_overrides
+        {'value': [-1.0, -1.0, 0.0, 0.0, 1.0, 1.0],
+         'scale': [11.0, 9.0, 11.0, 9.0, 11.0, 9.0]}"""
+        if self._target_dir_multirun_overrides is not None:
+            return dict(self._target_dir_multirun_overrides)
         assert self.output_subdir is not None
 
         # TODO:
         multirun_cfg = self.working_dir / "multirun.yaml"
-        self._exp_multirun_task_overrides = defaultdict(list)
+        self._target_dir_multirun_overrides = defaultdict(list)
 
         overrides = load_from_yaml(multirun_cfg).hydra.overrides.task
         self.overrides = overrides
 
-        dirs = None
+        dirs = []
 
         for o in overrides:
             k, v = o.split("=")
@@ -456,8 +525,6 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
                 dirs = v.split(",")
                 break
 
-        assert dirs is not None  # already checked in .run
-
         for d in dirs:
             overrides: List[str] = list(
                 load_from_yaml(Path(d) / f"{self.output_subdir}/overrides.yaml")
@@ -465,9 +532,8 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
             output = self._parse_overrides(overrides)
 
             for ko, vo in output.items():
-                self._exp_multirun_task_overrides[ko].append(vo)
-
-        return self._exp_multirun_task_overrides
+                self._target_dir_multirun_overrides[ko].append(vo)
+        return dict(self._target_dir_multirun_overrides)
 
     def jobs_post_process(self):
         assert len(self.jobs) > 0
@@ -475,10 +541,18 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
         assert isinstance(self.jobs[0], JobReturn)
         self.jobs: List[JobReturn]
 
+        self.multirun_working_dirs = []
+
+        for job in self.jobs:
+            _hydra_cfg = job.hydra_cfg
+            assert _hydra_cfg is not None
+            assert job.working_dir is not None
+            _cwd = _hydra_cfg.hydra.runtime.cwd
+            working_dir = Path(_cwd) / job.working_dir
+            self.multirun_working_dirs.append(working_dir)
+
         # set working directory of this workflow
-        first_job_working_dir = self.jobs[0].working_dir
-        assert first_job_working_dir is not None
-        self.working_dir = Path(first_job_working_dir).parent
+        self.working_dir = self.multirun_working_dirs[0].parent
 
         hydra_cfg = self.jobs[0].hydra_cfg
         assert hydra_cfg is not None
@@ -492,6 +566,8 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
     def _process_metrics(self, job_metrics) -> Dict[str, Any]:
         metrics = defaultdict(list)
         for task_metrics in job_metrics:
+            if task_metrics is None:
+                continue
             for k, v in task_metrics.items():
                 # get item if it's a single element array
                 if isinstance(v, list) and len(v) == 1:
@@ -503,8 +579,7 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
     def load_from_dir(
         self: Self,
         working_dir: Union[Path, str],
-        config_dir: str = ".hydra",
-        metrics_filename: str = "test_metrics.pt",
+        metrics_filename: Union[str, None] = "test_metrics.pt",
     ) -> Self:
         """Loading workflow job data from a given working directory. The workflow
         is loaded in-place and "self" is returned by this method.
@@ -516,43 +591,45 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
             that subdirectories within this working directory will contain
             individual Hydra jobs data (yaml configurations) and saved metrics files.
 
-        config_dir: str (default: ".hydra")
-            The directory in an experiment that stores Hydra configurations (`hydra.output_subdir`)
-
-        metrics_filename: str (default: "test_metrics.pt")
+        metrics_filename: Union[str, None] (default: "test_metrics.pt")
             The filename used to save metrics for each individual Hydra job. This can
             be a search pattern as well since this is appended to
 
                 `Path(working_dir).glob("**/*/<metrics_filename")`
+
+            If `None`, no metrics are loaded.
 
         Returns
         -------
         loaded_workflow : Self
         """
         self.working_dir = Path(working_dir).resolve()
-        self.output_subdir = config_dir
+        self.output_subdir = load_from_yaml(
+            self.working_dir / "multirun.yaml"
+        ).hydra.output_subdir
 
-        multirun_cfg = self.working_dir / "multirun.yaml"
-        if not multirun_cfg.exists():
-            raise FileNotFoundError(
-                "Working directory does not contain `multirun.yaml` file. "
-                "Be sure to use the value of the Hydra sweep directory for the workflow"
-            )
-
-        # Find metric file for each job
-        metric_files: List[Path] = sorted(
-            self.working_dir.glob(f"**/*/{metrics_filename}"),
-            key=lambda x: int(x.parent.parts[-1]),
+        self.multirun_working_dirs = list(
+            (x.parent for x in self.working_dir.glob(f"**/*/{self.output_subdir}"))
         )
+
+        # ensure working dirs are sorted by job num
+        _job_nums = (
+            load_from_yaml(dir_ / f"{self.output_subdir}/hydra.yaml").hydra.job.num
+            for dir_ in self.multirun_working_dirs
+        )
+
+        self.multirun_working_dirs = _sort_x_by_k(self.multirun_working_dirs, _job_nums)
 
         self.cfgs = []
         job_metrics = []
-        for metric_file in metric_files:
+        for dir_ in self.multirun_working_dirs:
+            if metrics_filename is None:
+                break
             # Ensure we load saved YAML configurations for each job (in hydra.job.output_subdir)
-            cfg_file = Path(metric_file.parent / f"{config_dir}/config.yaml")
-            assert cfg_file.exists()
+            cfg_file = dir_ / f"{self.output_subdir}/config.yaml"
+            assert cfg_file.exists(), cfg_file
             self.cfgs.append(load_from_yaml(cfg_file))
-            job_metrics.append(tr.load(metric_file))
+            job_metrics.append(tr.load(dir_ / metrics_filename))
 
         self.metrics = self._process_metrics(job_metrics)
 
@@ -581,7 +658,8 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
         -------
         results : xarray.Dataset
             A dataset whose dimensions and coordinate-values are determined by the
-            quantities over which the multi-run was performed. The data variables correspond to the named results returned by the jobs."""
+            quantities over which the multi-run was performed. The data variables
+            correspond to the named results returned by the jobs."""
         import xarray as xr
 
         orig_coords = {
@@ -643,7 +721,7 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
         if self._JOBDIR_NAME in set(out.coords):
             exp_dir = out.coords[self._JOBDIR_NAME]
             coords = {}
-            for k, v in self.exp_multirun_task_overrides.items():
+            for k, v in self.target_dir_multirun_overrides.items():
                 if len(v) == len(exp_dir):
                     uv = list(set(np.unique(v)))
                     if len(uv) > 1 or non_multirun_params_as_singleton_dims:

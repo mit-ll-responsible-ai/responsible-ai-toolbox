@@ -16,6 +16,7 @@ from hydra.plugins.sweeper import Sweeper
 from hydra_zen import builds, make_config
 from hypothesis import given, settings
 from hypothesis.extra.numpy import array_shapes, arrays
+from numpy.testing import assert_allclose
 from xarray.testing import assert_duckarray_equal, assert_identical
 
 from rai_toolbox.mushin import multirun
@@ -113,7 +114,7 @@ def test_robustnesscurve_working_dir():
     task = LocalRobustness(make_config(epsilon=0))
     task.run(epsilon="0,1,2,3", working_dir="test_dir")
 
-    assert str(task.working_dir) == "test_dir"
+    assert str(task.working_dir).endswith("test_dir")
     assert Path("test_dir").exists()
 
 
@@ -361,25 +362,30 @@ class ScndMultiRun(MultiRunMetricsWorkflow):
         return result
 
 
-@pytest.mark.usefixtures("cleandir")
 @pytest.mark.parametrize("load_from_working_dir", [False, True])
+@pytest.mark.usefixtures("cleandir")
 def test_multirun_over_jobdir(load_from_working_dir):
     # Runs a standard multirun workflow and then runs
     # a multirun over the resulting folders, loading in
     # their metrics and re-returning them
     wf = FirstMultiRun()
-    wf.run(epsilon=multirun([1.0, 2.0, 3.0]), acc=multirun([1, 2]))
+    wf.run(epsilon=multirun([1.0, 2.0, 3.0]), acc=multirun([1, 2]), working_dir="first")
     exp_dir = sorted(
         m.parent for m in wf.working_dir.absolute().glob("**/test_metrics.pt")
     )
     snd_wf = ScndMultiRun()
 
     # runs over a total of epsilon-3 x acc-2 -> 6 job-dirs and 2 val
-    snd_wf.run(target_job_dirs=exp_dir, val=multirun([1, 2]))
+    snd_wf.run(target_job_dirs=exp_dir, val=multirun([1, 2]), working_dir="second")
 
     if load_from_working_dir:
         snd_wf = ScndMultiRun().load_from_dir(snd_wf.working_dir)
 
+    assert wf.target_dir_multirun_overrides == {}
+    assert snd_wf.target_dir_multirun_overrides == {
+        "acc": [1, 1, 1, 2, 2, 2],
+        "epsilon": [1.0, 2.0, 3.0, 1.0, 2.0, 3.0],
+    }
     xr1 = wf.to_xarray()
     xr2 = snd_wf.to_xarray()
 
@@ -396,3 +402,26 @@ def test_multirun_over_jobdir(load_from_working_dir):
     assert_duckarray_equal(2 * xr1.images, xr2.images.sel(val=2))
     assert_duckarray_equal(xr1.accuracies, xr2.accuracies.sel(val=1))
     assert_duckarray_equal(2 * xr1.accuracies, xr2.accuracies.sel(val=2))
+
+
+class NoMetrics(MultiRunMetricsWorkflow):
+    @staticmethod
+    def evaluation_task(x: int, y: int):
+        pass
+
+
+@pytest.mark.parametrize("load_from_working_dir", [False, True])
+@pytest.mark.usefixtures("cleandir")
+def test_multirun_metrics_workflow_no_metrics(load_from_working_dir):
+    wf = NoMetrics()
+    wf.run(x=multirun([-1, 0, 1]), y=multirun([-10, 10]))
+    assert wf.multirun_task_overrides == {"x": [-1, 0, 1], "y": [-10, 10]}
+
+    if load_from_working_dir:
+        wf = NoMetrics().load_from_dir(wf.working_dir, metrics_filename=None)
+
+    xdata = wf.to_xarray()
+    assert xdata.dims == {"x": 3, "y": 2}
+    assert_allclose(xdata.coords["x"].data, [-1, 0, 1])
+    assert_allclose(xdata.coords["y"].data, [-10, 10])
+    assert len(xdata.data_vars) == 0
