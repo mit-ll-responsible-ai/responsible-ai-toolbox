@@ -14,6 +14,8 @@ import xarray as xr
 from hydra.core.config_store import ConfigStore
 from hydra.plugins.sweeper import Sweeper
 from hydra_zen import builds, make_config
+from hydra_zen import make_config
+from hydra_zen.errors import HydraZenValidationError
 from hypothesis import given, settings
 from hypothesis.extra.numpy import array_shapes, arrays
 from numpy.testing import assert_allclose
@@ -79,7 +81,7 @@ def test_robustnesscurve_validate():
     task.validate()
 
     task = LocalRobustness()
-    with pytest.raises(TypeError):
+    with pytest.raises(HydraZenValidationError):
         task.validate()
 
 
