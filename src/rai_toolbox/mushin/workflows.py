@@ -92,7 +92,6 @@ class BaseWorkflow(ABC):
     metrics: Dict[str, List[Any]]
     workflow_overrides: Dict[str, Any]
     jobs: Union[List[JobReturn], List[Any], JobReturn]
-    working_dir: Optional[Path]
 
     def __init__(self, eval_task_cfg=None) -> None:
         """Workflows and experiments using Hydra.
@@ -114,14 +113,28 @@ class BaseWorkflow(ABC):
         self.workflow_overrides = {}
         self._multirun_task_overrides = {}
         self.jobs = []
-        self.working_dir = None
+        self._working_dir = None
 
-    @staticmethod
-    def _check_working_dir_set(working_dir: Optional[Path]) -> Path:
-        if working_dir is None:
+    @property
+    def working_dir(self) -> Path:
+        if self._working_dir is None:
             raise ValueError("`self.working_dir` must be set.")
 
-        return working_dir
+        return self._working_dir
+
+    @working_dir.setter
+    def working_dir(self, path: Union[str, Path]):
+        if isinstance(path, str):
+            path = Path(path)
+        value_check("path", path, type_=Path)
+        path = path.resolve()
+
+        if not path.is_dir():
+            raise FileNotFoundError(
+                f"`path` point to an existing directory, got {path}"
+            )
+
+        self._working_dir = path
 
     def _parse_overrides(self, overrides: List[str]) -> Dict[str, Any]:
         parser = OverridesParser.create()
@@ -150,10 +163,9 @@ class BaseWorkflow(ABC):
     ) -> Dict[str, Union[LoadedValue, Sequence[LoadedValue]]]:
         # e.g. {'epsilon': [1.0, 2.0, 3.0], "foo": "apple"}
         if not self._multirun_task_overrides:
-            working_dir = self._check_working_dir_set(self.working_dir)
 
             overrides = load_from_yaml(
-                working_dir / "multirun.yaml"
+                self.working_dir / "multirun.yaml"
             ).hydra.overrides.task
 
             output = self._parse_overrides(overrides)
@@ -259,7 +271,6 @@ class BaseWorkflow(ABC):
 
         if working_dir is not None:
             launch_overrides.append(f"hydra.sweep.dir={working_dir}")
-            self.working_dir = Path(working_dir).resolve()
 
         if sweeper is not None:
             launch_overrides.append(f"hydra/sweeper={sweeper}")
@@ -520,9 +531,7 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
             return dict(self._target_dir_multirun_overrides)
         assert self.output_subdir is not None
 
-        working_dir = self._check_working_dir_set(self.working_dir)
-
-        multirun_cfg = working_dir / "multirun.yaml"
+        multirun_cfg = self.working_dir / "multirun.yaml"
         self._target_dir_multirun_overrides = defaultdict(list)
 
         overrides = load_from_yaml(multirun_cfg).hydra.overrides.task
@@ -615,7 +624,7 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
         -------
         loaded_workflow : Self
         """
-        self.working_dir = Path(working_dir).resolve()
+        self.working_dir = Path(working_dir)
         self.output_subdir = load_from_yaml(
             self.working_dir / "multirun.yaml"
         ).hydra.output_subdir
