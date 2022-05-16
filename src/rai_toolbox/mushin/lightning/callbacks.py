@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Union
 
 import torch
-from pytorch_lightning import Callback
+from pytorch_lightning import Callback, LightningModule, Trainer
 
 from rai_toolbox._utils import value_check
 
@@ -63,7 +63,7 @@ class MetricsCallback(Callback):
                     v = v.cpu().numpy()
             stored_metrics[k].append(v)
 
-    def on_validation_end(self, trainer, pl_module):
+    def on_validation_end(self, trainer: Trainer, pl_module: LightningModule):
         # Make sure PL is not doing it's sanity check run
         if trainer.sanity_checking:
             return self.val_metrics
@@ -74,7 +74,7 @@ class MetricsCallback(Callback):
         torch.save(self.val_metrics, self._get_filename("fit"))
         return self.val_metrics
 
-    def on_test_end(self, trainer, pl_module):
+    def on_test_end(self, trainer: Trainer, pl_module: LightningModule):
         metrics = trainer.callback_metrics
         self._process_metrics(self.test_metrics, metrics)
         torch.save(self.test_metrics, self._get_filename("test"))

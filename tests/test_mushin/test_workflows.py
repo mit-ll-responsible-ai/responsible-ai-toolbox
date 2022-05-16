@@ -3,22 +3,31 @@
 # SPDX-License-Identifier: MIT
 
 from pathlib import Path
+from typing import Sequence
 
 import hypothesis.strategies as st
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
 import pytest
 import torch as tr
 import xarray as xr
+from hydra.core.config_store import ConfigStore
+from hydra.plugins.sweeper import Sweeper
+from hydra_zen import builds, make_config
 from hydra_zen import make_config
 from hydra_zen.errors import HydraZenValidationError
 from hypothesis import given, settings
 from hypothesis.extra.numpy import array_shapes, arrays
-from xarray.testing import assert_identical
+from numpy.testing import assert_allclose
+from xarray.testing import assert_duckarray_equal, assert_identical
 
 from rai_toolbox.mushin import multirun
-from rai_toolbox.mushin.workflows import BaseWorkflow, RobustnessCurve, _load_metrics
+from rai_toolbox.mushin.workflows import (
+    BaseWorkflow,
+    MultiRunMetricsWorkflow,
+    RobustnessCurve,
+    hydra_list,
+)
 
 common_shape = array_shapes(min_dims=2, max_dims=2)
 
@@ -34,7 +43,7 @@ class MyWorkflow(BaseWorkflow):
     def evaluation_task():
         return dict(result=1)
 
-    def jobs_post_process(self, workflow_params):
+    def jobs_post_process(self):
         return
 
 
@@ -59,9 +68,6 @@ def test_robustnesscurve_raises_notimplemented():
 
     with pytest.raises(NotImplementedError):
         task.plot()
-
-    with pytest.raises(NotImplementedError):
-        task.to_dataframe()
 
     with pytest.raises(NotImplementedError):
         task.to_xarray()
@@ -92,8 +98,13 @@ def test_robustnesscurve_run(config, as_array):
 
     assert "result" in task.metrics
     assert len(task.metrics["result"]) == len(epsilon)
-    assert "epsilon" in task.workflow_overrides
-    assert len(task.workflow_overrides["epsilon"]) == len(epsilon)
+
+    multirun_task_overrides = task.multirun_task_overrides
+    assert "epsilon" in multirun_task_overrides
+
+    extracted_epsilon = multirun_task_overrides["epsilon"]
+    assert isinstance(extracted_epsilon, Sequence)
+    assert len(extracted_epsilon) == len(epsilon)
 
     # will raise if not set correctly
     task.plot("result")
@@ -105,7 +116,7 @@ def test_robustnesscurve_working_dir():
     task = LocalRobustness(make_config(epsilon=0))
     task.run(epsilon="0,1,2,3", working_dir="test_dir")
 
-    assert str(task.working_dir) == "test_dir"
+    assert str(task.working_dir).endswith("test_dir")
     assert Path("test_dir").exists()
 
 
@@ -140,11 +151,6 @@ def test_robustnesscurve_to_data(epsilon):
     task = LocalRobustness(make_config(epsilon=0))
     task.run(epsilon=epsilon)
 
-    df = task.to_dataframe()
-
-    assert isinstance(df, pd.DataFrame)
-    assert len(df["epsilon"]) == len(epsilon)
-
     xd = task.to_xarray(non_multirun_params_as_singleton_dims=True)
 
     assert isinstance(xd, xr.Dataset)
@@ -160,15 +166,18 @@ def test_robustnesscurve_load_from_dir():
     working_dir = "test_dir"
     LocalRobustness = create_workflow()
     load_task = LocalRobustness()
-    load_task.load_from_dir(working_dir, workflow_params=["epsilon"])
+    load_task.load_from_dir(working_dir, "test_metrics.pt")
 
-    for k, v in task.workflow_overrides.items():
-        assert k in load_task.workflow_overrides
-        assert v == load_task.workflow_overrides[k]
+    for k, v in task.multirun_task_overrides.items():
+        assert k in load_task.multirun_task_overrides
+        assert v == load_task.multirun_task_overrides[k]
 
     for k, v in task.metrics.items():
         assert k in load_task.metrics
         assert v == load_task.metrics[k]
+
+    for cfg in task.cfgs:
+        assert "epsilon" in cfg
 
 
 @pytest.mark.usefixtures("cleandir")
@@ -187,8 +196,8 @@ def test_robustnesscurve_extra_param(fake_param_string):
             task.run(epsilon=[0, 1, 2, 3], fake_param=BadVal)  # type: ignore
         return
 
-    assert "fake_param" in task.workflow_overrides
-    assert task.workflow_overrides["fake_param"] == ["some_value"] * 4
+    assert "fake_param" in task.multirun_task_overrides
+    assert task.multirun_task_overrides["fake_param"] == "some_value"
     task.plot("result", group="fake_param", non_multirun_params_as_singleton_dims=True)
 
 
@@ -206,10 +215,12 @@ def test_robustnesscurve_extra_param_multirun(fake_param_string):
             task.run(epsilon=[0, 1, 2, 3], fake_param=[1, 2])  # type: ignore
         return
 
-    assert "fake_param" in task.workflow_overrides
+    multirun_task_overrides = task.multirun_task_overrides
+    assert "fake_param" in multirun_task_overrides
 
-    num_jobs = 4 * 2 if fake_param_string else 4
-    assert len(task.workflow_overrides["fake_param"]) == num_jobs
+    extracted_fake_param = multirun_task_overrides["fake_param"]
+    assert isinstance(extracted_fake_param, Sequence)
+    assert len(extracted_fake_param) == 2
 
 
 @pytest.mark.usefixtures("cleandir")
@@ -220,22 +231,6 @@ def test_robustnesscurve_plot_save(ax):
     task.run(epsilon=[0, 1, 2, 3])
     task.plot("result", save_filename="test_save.png", ax=ax)
     assert Path("test_save.png").exists()
-
-
-@pytest.mark.parametrize("workflow_params", [None, "param_2"])
-def test_load_metrics(workflow_params):
-    job_overrides = [["param_1=1"], ["param_2=2"]]
-    job_metrics = [dict(val=1), dict(val=2)]
-    mets, overs = _load_metrics(job_overrides, job_metrics, workflow_params)
-
-    assert "val" in mets
-    assert len(mets["val"]) == 2
-    assert "param_2" in overs
-
-    if workflow_params is None:
-        assert "param_1" in overs
-    else:
-        assert "param_1" not in overs
 
 
 class MultiDimMetrics(RobustnessCurve):
@@ -250,9 +245,13 @@ class MultiDimMetrics(RobustnessCurve):
 
 
 @pytest.mark.usefixtures("cleandir")
-def test_robustness_with_multidim_metrics():
+@pytest.mark.parametrize(
+    "foo, foo_expected", [("val", "val"), (hydra_list(["val"]), "['val']")]
+)
+@pytest.mark.parametrize("bar", [multirun(["a", "b"]), multirun(["[a,b]", "[c,d]"])])
+def test_robustness_with_multidim_metrics(foo, foo_expected, bar):
     wf = MultiDimMetrics()
-    wf.run(epsilon=[1.0, 3.0, 2.0], foo="val", bar=multirun(["a", "b"]))
+    wf.run(epsilon=[1.0, 3.0, 2.0], foo=foo, bar=bar)
     xarray = wf.to_xarray()
     assert list(xarray.data_vars.keys()) == ["images", "accuracies"]
     assert list(xarray.coords.keys()) == [
@@ -263,7 +262,7 @@ def test_robustness_with_multidim_metrics():
     ]
     assert xarray.accuracies.shape == (2, 3)
     assert xarray.images.shape == (2, 3, 4, 1)
-    assert xarray.attrs == {"foo": "val"}
+    assert xarray.attrs == {"foo": foo_expected}
 
     for eps, expected in zip([1.0, 2.0, 3.0], [99.0, 96.0, 91.0]):
         # test that results were organized as-expected
@@ -272,12 +271,160 @@ def test_robustness_with_multidim_metrics():
         assert np.all(sub_xray.images == expected).item()
 
 
+class MultiDimIterationMetrics(MultiRunMetricsWorkflow):
+    # returns "images" -> shape-(N, 4, 4)
+    #         "accuracies" -> N
+    #         "epochs" -> (N, 10)
+    @staticmethod
+    def evaluation_task(epsilon):
+        val = 100 * np.ones(10) - epsilon**2
+        epochs = np.arange(10)
+        images = 100 * np.ones((10, 4, 4)) - epsilon**2
+        result = dict(images=images, accuracies=val + 2, epochs=epochs)
+        tr.save(result, "test_metrics.pt")
+        return result
+
+
+@pytest.mark.usefixtures("cleandir")
+def test_robustness_with_multidim_metrics_with_iteration():
+    wf = MultiDimIterationMetrics()
+    wf.run(epsilon=multirun([1.0, 3.0, 2.0]), foo="val", bar=multirun(["a", "b"]))
+    xarray = wf.to_xarray(coord_from_metrics="epochs")
+    assert list(xarray.data_vars.keys()) == ["images", "accuracies"]
+    assert list(xarray.coords.keys()) == [
+        "epsilon",
+        "bar",
+        "epochs",
+        "images_dim1",
+        "images_dim2",
+    ]
+    assert xarray.accuracies.shape == (3, 2, 10)
+    assert xarray.images.shape == (3, 2, 10, 4, 4)
+    assert xarray.attrs == {"foo": "val"}
+
+    for eps, expected in zip([1.0, 2.0, 3.0], [99.0, 96.0, 91.0]):
+        # test that results were organized as-expected
+        sub_xray = xarray.sel(epsilon=eps)
+        assert np.all(sub_xray.accuracies == expected + 2).item()
+        assert np.all(sub_xray.images == expected).item()
+
+    with pytest.raises(ValueError):
+        wf.to_xarray(coord_from_metrics="key_not_in_metrics")
+
+
 @pytest.mark.usefixtures("cleandir")
 def test_xarray_from_loaded_workflow():
     wf = MultiDimMetrics()
     wf.run(epsilon=[1.0, 3.0, 2.0], foo="val", bar=multirun(["a", "b"]))
     xarray1 = wf.to_xarray()
 
-    wf2 = MultiDimMetrics().load_from_dir(wf.working_dir)
+    wf2 = MultiDimMetrics().load_from_dir(wf.working_dir, "test_metrics.pt")
     xarray2 = wf2.to_xarray()
     assert_identical(xarray1, xarray2)
+
+
+class LocalBasicSweeper(Sweeper):
+    def setup(self, *, hydra_context, task_function, config):
+        pass
+
+    def sweep(self, arguments):
+        return dict(hi=1)
+
+
+@pytest.mark.usefixtures("cleandir")
+def test_return_not_list_jobreturn():
+    cs = ConfigStore.instance()
+    cs.store(group="hydra/sweeper", name="local_test", node=builds(LocalBasicSweeper))
+
+    wf = MyWorkflow()
+    wf.run(epsilon=multirun([1.0, 3.0, 2.0]), overrides=["hydra/sweeper=local_test"])
+    assert wf.jobs == dict(hi=1)
+
+
+class FirstMultiRun(RobustnessCurve):
+    # returns     "images" -> shape-(4, 1)
+    #         "accuracies" -> scalar
+    @staticmethod
+    def evaluation_task(epsilon, acc):
+        val = 100 - epsilon**2
+        result = dict(images=np.array([[val] * 1] * 4), accuracies=acc)
+        tr.save(result, "test_metrics.pt")
+        return result
+
+
+class ScndMultiRun(MultiRunMetricsWorkflow):
+    # loads test metrics, multiplies each by `val` and saves
+    @staticmethod
+    def evaluation_task(job_dir, val):
+        result = tr.load(f"{job_dir}/test_metrics.pt")
+
+        # val multiplies each metric
+        result = {k: v * val for k, v in result.items()}
+        tr.save(result, "test_metrics.pt")
+        return result
+
+
+@pytest.mark.parametrize("load_from_working_dir", [False, True])
+@pytest.mark.usefixtures("cleandir")
+def test_multirun_over_jobdir(load_from_working_dir):
+    # Runs a standard multirun workflow and then runs
+    # a multirun over the resulting folders, loading in
+    # their metrics and re-returning them
+    wf = FirstMultiRun()
+    wf.run(epsilon=multirun([1.0, 2.0, 3.0]), acc=multirun([1, 2]), working_dir="first")
+
+    snd_wf = ScndMultiRun()
+    # runs over a total of epsilon-3 x acc-2 -> 6 job-dirs and 2 val
+    snd_wf.run(
+        target_job_dirs=wf.multirun_working_dirs,
+        val=multirun([1, 2]),
+        working_dir="second",
+    )
+
+    if load_from_working_dir:
+        snd_wf = ScndMultiRun().load_from_dir(snd_wf.working_dir, "test_metrics.pt")
+
+    assert wf.target_dir_multirun_overrides == {}
+    assert snd_wf.target_dir_multirun_overrides == {
+        "acc": [1, 1, 1, 2, 2, 2],
+        "epsilon": [1.0, 2.0, 3.0, 1.0, 2.0, 3.0],
+    }
+    xr1 = wf.to_xarray()
+    xr2 = snd_wf.to_xarray()
+
+    assert xr1.dims == {"acc": 2, "epsilon": 3, "images_dim0": 4, "images_dim1": 1}
+    assert xr2.dims == {"val": 2, "job_dir": 6, "images_dim0": 4, "images_dim1": 1}
+
+    xr2 = xr2.set_index(job_dir=["epsilon", "acc"]).unstack("job_dir")
+    xr2 = xr2.transpose("val", "acc", "epsilon", "images_dim0", "images_dim1")
+
+    assert_identical(xr1.epsilon, xr2.epsilon)
+    assert_identical(xr1.acc, xr2.acc)
+
+    assert_duckarray_equal(xr1.images, xr2.images.sel(val=1))
+    assert_duckarray_equal(2 * xr1.images, xr2.images.sel(val=2))
+    assert_duckarray_equal(xr1.accuracies, xr2.accuracies.sel(val=1))
+    assert_duckarray_equal(2 * xr1.accuracies, xr2.accuracies.sel(val=2))
+
+
+class NoMetrics(MultiRunMetricsWorkflow):
+    @staticmethod
+    def evaluation_task(x: int, y: int):
+        pass
+
+
+@pytest.mark.parametrize("load_from_working_dir", [False, True])
+@pytest.mark.usefixtures("cleandir")
+def test_multirun_metrics_workflow_no_metrics(load_from_working_dir):
+    wf = NoMetrics()
+    wf.run(x=multirun([-1, 0, 1]), y=multirun([-10, 10]))
+    assert wf.multirun_task_overrides == {"x": [-1, 0, 1], "y": [-10, 10]}
+
+    if load_from_working_dir:
+        wf = NoMetrics().load_from_dir(wf.working_dir, metrics_filename=None)
+
+    xdata = wf.to_xarray()
+    assert xdata.dims == {"x": 3, "y": 2}
+    assert_allclose(xdata.coords["x"].data, [-1, 0, 1])
+    assert_allclose(xdata.coords["y"].data, [-10, 10])
+    assert len(xdata.data_vars) == 0
