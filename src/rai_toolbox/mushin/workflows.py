@@ -454,9 +454,9 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
             target_job_dirs = [Path(s).resolve() for s in target_job_dirs]
             for d in target_job_dirs:
                 if not d.is_dir() or not d.exists():
-                    # TODO: check not only that dir exists but that it contains
-                    #       correct config file (e.g. .hydra)
-                    raise FileNotFoundError()
+                    raise FileNotFoundError(
+                        f"The specified target directory – {d} – does not exist."
+                    )
             target_job_dirs = multirun([str(s) for s in target_job_dirs])
             workflow_overrides[self._JOBDIR_NAME] = target_job_dirs
 
