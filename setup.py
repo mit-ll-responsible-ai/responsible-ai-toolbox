@@ -23,7 +23,6 @@ CLASSIFIERS = [
 ]
 KEYWORDS = "machine learning robustness pytorch responsible AI"
 INSTALL_REQUIRES = [
-    "numpy > 1.17.2, != 1.19.3",
     "torchvision >= 0.10.0",
     "torch >= 1.9.0",
     "torchmetrics >= 0.6.0",
