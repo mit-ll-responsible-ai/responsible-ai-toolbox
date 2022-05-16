@@ -83,7 +83,7 @@ class BaseWorkflow(ABC):
     jobs : List[Any]
         List of jobs returned for each experiment within the workflow.
 
-    working_dir: pathlib.Path
+    working_dir: Optional[pathlib.Path]
         The working directory of the experiment defined by Hydra's sweep directory
         (`hydra.sweep.dir`).
     """
@@ -92,7 +92,7 @@ class BaseWorkflow(ABC):
     metrics: Dict[str, List[Any]]
     workflow_overrides: Dict[str, Any]
     jobs: Union[List[JobReturn], List[Any], JobReturn]
-    working_dir: Path
+    working_dir: Optional[Path]
 
     def __init__(self, eval_task_cfg=None) -> None:
         """Workflows and experiments using Hydra.
@@ -114,7 +114,14 @@ class BaseWorkflow(ABC):
         self.workflow_overrides = {}
         self._multirun_task_overrides = {}
         self.jobs = []
-        self.working_dir = Path.cwd()  # TODO: I don't think we should assume this
+        self.working_dir = None
+
+    @staticmethod
+    def _check_working_dir_set(working_dir: Optional[Path]) -> Path:
+        if working_dir is None:
+            raise ValueError("`self.working_dir` must be set.")
+
+        return working_dir
 
     def _parse_overrides(self, overrides: List[str]) -> Dict[str, Any]:
         parser = OverridesParser.create()
@@ -143,8 +150,10 @@ class BaseWorkflow(ABC):
     ) -> Dict[str, Union[LoadedValue, Sequence[LoadedValue]]]:
         # e.g. {'epsilon': [1.0, 2.0, 3.0], "foo": "apple"}
         if not self._multirun_task_overrides:
+            working_dir = self._check_working_dir_set(self.working_dir)
+
             overrides = load_from_yaml(
-                self.working_dir / "multirun.yaml"
+                working_dir / "multirun.yaml"
             ).hydra.overrides.task
 
             output = self._parse_overrides(overrides)
@@ -511,7 +520,9 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
             return dict(self._target_dir_multirun_overrides)
         assert self.output_subdir is not None
 
-        multirun_cfg = self.working_dir / "multirun.yaml"
+        working_dir = self._check_working_dir_set(self.working_dir)
+
+        multirun_cfg = working_dir / "multirun.yaml"
         self._target_dir_multirun_overrides = defaultdict(list)
 
         overrides = load_from_yaml(multirun_cfg).hydra.overrides.task
@@ -818,7 +829,8 @@ class RobustnessCurve(MultiRunMetricsWorkflow):
         -------
         results : xarray.Dataset
             A dataset whose dimensions and coordinate-values are determined by the
-            quantities over which the multi-run was performed. The data variables correspond to the named results returned by the jobs."""
+            quantities over which the multi-run was performed. The data variables
+            correspond to the named results returned by the jobs."""
         return (
             super()
             .to_xarray(
