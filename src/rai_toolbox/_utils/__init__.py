@@ -79,7 +79,8 @@ def value_check(
 
     if not isinstance(value, type_):
         raise TypeError(
-            f"`{name}` must be {'None or' if optional else ''}of type(s) `{_safe_name(type_)}`, got {value} (type: {_safe_name(type(value))})"
+            f"`{name}` must be {'None or' if optional else ''}of type(s) "
+            f"`{_safe_name(type_)}`, got {value} (type: {_safe_name(type(value))})"
         )
 
     if min_ is not None and max_ is not None:

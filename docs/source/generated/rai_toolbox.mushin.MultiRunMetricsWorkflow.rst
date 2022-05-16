@@ -21,6 +21,5 @@ rai\_toolbox.mushin.MultiRunMetricsWorkflow
       ~MultiRunMetricsWorkflow.load_from_dir
       ~MultiRunMetricsWorkflow.plot
       ~MultiRunMetricsWorkflow.run
-      ~MultiRunMetricsWorkflow.to_dataframe
       ~MultiRunMetricsWorkflow.to_xarray
       ~MultiRunMetricsWorkflow.validate
