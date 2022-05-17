@@ -142,7 +142,8 @@ class BaseWorkflow(ABC):
 
         self._working_dir = path
 
-    def _parse_overrides(self, overrides: List[str]) -> Dict[str, Any]:
+    @staticmethod
+    def _parse_overrides(overrides: List[str]) -> Dict[str, Any]:
         parser = OverridesParser.create()
         parsed_overrides = parser.parse_overrides(overrides=overrides)
 
@@ -326,9 +327,8 @@ class BaseWorkflow(ABC):
             # hydra returns [jobs]
             jobs = jobs[0]
             _job_nums = [j.hydra_cfg.hydra.job.num for j in jobs]
-            jobs = _sort_x_by_k(
-                jobs, _job_nums
-            )  # ensure jobs are always sorted by job-num
+            # ensure jobs are always sorted by job-num
+            jobs = _sort_x_by_k(jobs, _job_nums)
 
         self.jobs = jobs
         self.jobs_post_process()
@@ -530,10 +530,8 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
         [2022-05-13 17:19:51,497][HYDRA] Launching 6 jobs locally
         [2022-05-13 17:19:51,497][HYDRA] 	#0 : +value=-1.0 +scale=11.0
         [2022-05-13 17:19:51,555][HYDRA] 	#1 : +value=-1.0 +scale=9.0
-        [2022-05-13 17:19:51,613][HYDRA] 	#2 : +value=0.0 +scale=11.0
-        [2022-05-13 17:19:51,671][HYDRA] 	#3 : +value=0.0 +scale=9.0
-        [2022-05-13 17:19:51,729][HYDRA] 	#4 : +value=1.0 +scale=11.0
-        [2022-05-13 17:19:51,787][HYDRA] 	#5 : +value=1.0 +scale=9.0
+        [2022-05-13 17:19:51,729][HYDRA] 	#2 : +value=1.0 +scale=11.0
+        [2022-05-13 17:19:51,787][HYDRA] 	#3 : +value=1.0 +scale=9.0
 
         >>> b = B()
         >>> b.run(target_job_dirs=a.multirun_working_dirs)
@@ -542,12 +540,10 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
         [2022-05-13 17:19:59,958][HYDRA] 	#1 : +job_dir=/home/scratch/multirun/1
         [2022-05-13 17:20:00,015][HYDRA] 	#2 : +job_dir=/home/scratch/multirun/2
         [2022-05-13 17:20:00,073][HYDRA] 	#3 : +job_dir=/home/scratch/multirun/3
-        [2022-05-13 17:20:00,130][HYDRA] 	#4 : +job_dir=/home/scratch/multirun/4
-        [2022-05-13 17:20:00,188][HYDRA] 	#5 : +job_dir=/home/scratch/multirun/5
 
         >>> b.target_dir_multirun_overrides
-        {'value': [-1.0, -1.0, 0.0, 0.0, 1.0, 1.0],
-         'scale': [11.0, 9.0, 11.0, 9.0, 11.0, 9.0]}"""
+        {'value': [-1.0, -1.0, 1.0, 1.0],
+         'scale': [11.0, 9.0, 11.0, 9.0]}"""
         if self._target_dir_multirun_overrides is not None:
             return dict(self._target_dir_multirun_overrides)
         assert self.output_subdir is not None
@@ -605,7 +601,8 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
         job_metrics = [j.return_value for j in self.jobs]
         self.metrics = self._process_metrics(job_metrics)
 
-    def _process_metrics(self, job_metrics) -> Dict[str, Any]:
+    @staticmethod
+    def _process_metrics(job_metrics) -> Dict[str, Any]:
         metrics = defaultdict(list)
         for task_metrics in job_metrics:
             if task_metrics is None:
@@ -732,7 +729,7 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
 
         # we will add additional coordinates as-needed for multi-dim metrics
         coords: Dict[str, Any] = orig_coords.copy()
-        shape = tuple(len(v) for k, v in coords.items())
+        shape = tuple(len(v) for v in coords.values())
 
         data = {}
         for k, v in self.metrics.items():
