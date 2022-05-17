@@ -33,6 +33,7 @@ TESTS_REQUIRE = [
     "hypothesis >= 6.41.0",
     "mygrad >= 2.0.0",
     "omegaconf >= 2.1.1",
+    "netCDF4 >= 1.5.8",
 ]
 
 DESCRIPTION = "PyTorch-centric library for evaluating and enhancing the robustness of AI technologies"
