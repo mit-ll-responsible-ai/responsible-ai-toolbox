@@ -872,6 +872,16 @@ class RobustnessCurve(MultiRunMetricsWorkflow):
 
         Parameters
         ----------
+        include_working_subdirs_as_data_var : bool, optional (default=False)
+            If `True` then the data-variable "working_subdir" will be included in the
+            xarray. This data variable is used to lookup the working sub-dir path
+            (a string) by multirun coordinate.
+
+        coord_from_metrics : str | None (default: None)
+            If not `None` defines the metric key to use as a coordinate
+            in the `Dataset`.  This function assumes that this coordinate
+            represents the leading dimension for all data-variables.
+
         non_multirun_params_as_singleton_dims : bool, optional (default=False)
             If `True` then non-multirun entries from `workflow_overrides` will be
             included as length-1 dimensions in the xarray. Useful for merging/
