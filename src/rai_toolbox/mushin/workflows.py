@@ -7,6 +7,7 @@ from collections import UserList, defaultdict
 from pathlib import Path
 from typing import (
     Any,
+    Callable,
     DefaultDict,
     Dict,
     Iterable,
@@ -43,6 +44,7 @@ __all__ = [
 
 
 T = TypeVar("T", List[Any], Tuple[Any])
+T1 = TypeVar("T1")
 
 
 class multirun(UserList):
@@ -63,6 +65,10 @@ def _sort_x_by_k(x: T, k: Iterable[Any]) -> T:
     assert len(x) == len(k)
     sorted_, _ = zip(*sorted(zip(x, k), key=lambda x: x[1]))
     return type(x)(sorted_)
+
+
+def _identity(x: T1) -> T1:
+    return x
 
 
 class BaseWorkflow(ABC):
@@ -199,6 +205,9 @@ class BaseWorkflow(ABC):
     def run(
         self,
         *,
+        task_fn_wrapper: Union[
+            Callable[[Callable[..., T1]], Callable[[Any], T1]], None
+        ] = zen,
         working_dir: Optional[str] = None,
         sweeper: Optional[str] = None,
         launcher: Optional[str] = None,
@@ -218,6 +227,11 @@ class BaseWorkflow(ABC):
 
         Parameters
         ----------
+        task_fn_wrapper: Callable[[Callable[..., T1]], Callable[[Any], T1]] | None, optional (default=rai_toolbox.mushin.zen)
+            A wrapper applied to `self.evaluation_task` prior to launching the task.
+            The default wrapper is `rai_toolbox.mushin.zen`. Specify `None` for no
+            wrapper to be applied.
+
         working_dir: str (default: None, the Hydra default will be used)
             The directory to run the experiment in.  This value is used for
             setting `hydra.sweep.dir`.
@@ -292,10 +306,13 @@ class BaseWorkflow(ABC):
 
             launch_overrides.append(f"{prefix}{k}={v}")
 
+        if task_fn_wrapper is None:
+            task_fn_wrapper = _identity
+
         # Run a Multirun over epsilons
         jobs = launch(
             self.eval_task_cfg,
-            zen(self.evaluation_task),
+            task_fn_wrapper(self.evaluation_task),
             overrides=launch_overrides,
             multirun=True,
             version_base=version_base,
@@ -441,6 +458,9 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
     def run(
         self,
         *,
+        task_fn_wrapper: Union[
+            Callable[[Callable[..., T1]], Callable[[Any], T1]], None
+        ] = zen,
         working_dir: Optional[str] = None,
         sweeper: Optional[str] = None,
         launcher: Optional[str] = None,
@@ -472,6 +492,7 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
             workflow_overrides[self._JOBDIR_NAME] = target_job_dirs
 
         return super().run(
+            task_fn_wrapper=task_fn_wrapper,
             working_dir=working_dir,
             sweeper=sweeper,
             launcher=launcher,
@@ -765,6 +786,9 @@ class RobustnessCurve(MultiRunMetricsWorkflow):
         self,
         *,
         epsilon: Union[str, Sequence[float]],
+        task_fn_wrapper: Union[
+            Callable[[Callable[..., T1]], Callable[[Any], T1]], None
+        ] = zen,
         target_job_dirs: Optional[Sequence[Union[str, Path]]] = None,  # TODO: add docs
         working_dir: Optional[str] = None,
         sweeper: Optional[str] = None,
@@ -780,6 +804,11 @@ class RobustnessCurve(MultiRunMetricsWorkflow):
             The configuration parameter for the perturbation.  Unlike Hydra overrides,
             this parameter can be a list of floats that will be converted into a
             multirun sequence override for Hydra.
+
+        task_fn_wrapper: Callable[[Callable[..., T1]], Callable[[Any], T1]] | None, optional (default=rai_toolbox.mushin.zen)
+            A wrapper applied to `self.evaluation_task` prior to launching the task.
+            The default wrapper is `rai_toolbox.mushin.zen`. Specify `None` for no
+            wrapper to be applied.
 
         working_dir: str (default: None, the Hydra default will be used)
             The directory to run the experiment in.  This value is used for
@@ -809,6 +838,7 @@ class RobustnessCurve(MultiRunMetricsWorkflow):
             epsilon = multirun(epsilon)
 
         return super().run(
+            task_fn_wrapper=task_fn_wrapper,
             working_dir=working_dir,
             sweeper=sweeper,
             launcher=launcher,

@@ -116,3 +116,30 @@ def test_zen_works_with_non_builds():
     bigger_cfg = make_config(super_conf=make_config(a=builds(int)))
     out = zen(lambda super_conf: super_conf)(bigger_cfg)
     assert out.a == 0
+
+
+class Pre:
+    record = []
+
+
+class Post:
+    record = []
+
+
+pre_call_strat = st.just(lambda cfg: Pre.record.append(cfg.x))
+post_call_strat = st.just(lambda cfg, result: Post.record.append((cfg.y, result)))
+
+
+@given(
+    pre_call=(pre_call_strat | st.lists(pre_call_strat)),
+    post_call=(post_call_strat | st.lists(post_call_strat)),
+)
+def test_pre_and_post_call(pre_call, post_call):
+    Pre.record.clear()
+    Post.record.clear()
+    cfg = make_config(x=1, y="a")
+    assert zen(pre_call=pre_call, post_call=post_call)(g)(cfg=cfg) == 1
+    assert Pre.record == [1] * (len(pre_call) if isinstance(pre_call, list) else 1)
+    assert Post.record == [("a", 1)] * (
+        len(post_call) if isinstance(post_call, list) else 1
+    )
