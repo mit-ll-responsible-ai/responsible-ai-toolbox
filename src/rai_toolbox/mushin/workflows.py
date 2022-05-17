@@ -676,6 +676,7 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
 
     def to_xarray(
         self,
+        include_working_subdirs_as_data_var: bool = False,
         coord_from_metrics: Optional[str] = None,
         non_multirun_params_as_singleton_dims: bool = False,
     ):
@@ -683,7 +684,12 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
 
         Parameters
         ----------
-        coord_from_metrics: str | None (default: None)
+        include_working_subdirs_as_data_var : bool, optional (default=False)
+            If `True` then the data-variable "working_subdir" will be included in the
+            xarray. This data variable is used to lookup the working sub-dir path
+            (a string) by multirun coordinate.
+
+        coord_from_metrics : str | None (default: None)
             If not `None` defines the metric key to use as a coordinate
             in the `Dataset`.  This function assumes that this coordinate
             represents the leading dimension for all data-variables.
@@ -731,8 +737,17 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
         coords: Dict[str, Any] = orig_coords.copy()
         shape = tuple(len(v) for v in coords.values())
 
+        metrics_to_add = self.metrics.copy()
+        if (
+            include_working_subdirs_as_data_var
+            and self.multirun_working_dirs is not None
+        ):
+            metrics_to_add["working_subdir"] = [
+                str(p) for p in self.multirun_working_dirs
+            ]
+
         data = {}
-        for k, v in self.metrics.items():
+        for k, v in metrics_to_add.items():
             if coord_from_metrics and k == coord_from_metrics:
                 continue
 
@@ -849,6 +864,7 @@ class RobustnessCurve(MultiRunMetricsWorkflow):
 
     def to_xarray(
         self,
+        include_working_subdirs_as_data_var: bool = False,
         coord_from_metrics: Optional[str] = None,
         non_multirun_params_as_singleton_dims: bool = False,
     ):
@@ -856,6 +872,16 @@ class RobustnessCurve(MultiRunMetricsWorkflow):
 
         Parameters
         ----------
+        include_working_subdirs_as_data_var : bool, optional (default=False)
+            If `True` then the data-variable "working_subdir" will be included in the
+            xarray. This data variable is used to lookup the working sub-dir path
+            (a string) by multirun coordinate.
+
+        coord_from_metrics : str | None (default: None)
+            If not `None` defines the metric key to use as a coordinate
+            in the `Dataset`.  This function assumes that this coordinate
+            represents the leading dimension for all data-variables.
+
         non_multirun_params_as_singleton_dims : bool, optional (default=False)
             If `True` then non-multirun entries from `workflow_overrides` will be
             included as length-1 dimensions in the xarray. Useful for merging/
@@ -870,6 +896,7 @@ class RobustnessCurve(MultiRunMetricsWorkflow):
         return (
             super()
             .to_xarray(
+                include_working_subdirs_as_data_var=include_working_subdirs_as_data_var,
                 coord_from_metrics=coord_from_metrics,
                 non_multirun_params_as_singleton_dims=non_multirun_params_as_singleton_dims,
             )
