@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 from pathlib import Path
-from typing import Sequence
+from typing import Optional, Sequence
 
 import hypothesis.strategies as st
 import matplotlib.pyplot as plt
@@ -13,8 +13,7 @@ import torch as tr
 import xarray as xr
 from hydra.core.config_store import ConfigStore
 from hydra.plugins.sweeper import Sweeper
-from hydra_zen import builds, make_config
-from hydra_zen import make_config
+from hydra_zen import builds, load_from_yaml, make_config
 from hydra_zen.errors import HydraZenValidationError
 from hypothesis import given, settings
 from hypothesis.extra.numpy import array_shapes, arrays
@@ -428,3 +427,52 @@ def test_multirun_metrics_workflow_no_metrics(load_from_working_dir):
     assert_allclose(xdata.coords["x"].data, [-1, 0, 1])
     assert_allclose(xdata.coords["y"].data, [-10, 10])
     assert len(xdata.data_vars) == 0
+
+
+class GridMetrics(MultiRunMetricsWorkflow):
+    @staticmethod
+    def evaluation_task(x: int, y: int):
+        results = dict(xx=x, yy=y)
+        tr.save(results, "test_metrics.pt")
+        return results
+
+
+@pytest.mark.parametrize("hydra_sweep_dir", [None, "cross_validation/", "."])
+@pytest.mark.parametrize("hydra_sweep_subdir", [None, "x_${x}_y_${y}"])
+@pytest.mark.parametrize("load_from_working_dir", [False, True])
+@pytest.mark.usefixtures("cleandir")
+def test_working_subdirs(
+    hydra_sweep_dir: Optional[str],
+    hydra_sweep_subdir: Optional[str],
+    load_from_working_dir: bool,
+):
+    overrides = [
+        f"{k.replace('_', '.')}={v}"
+        for k, v in locals().items()
+        if k.startswith("hydra") and v is not None
+    ]
+
+    wf = GridMetrics()
+    wf.run(x=multirun([-1, 0, 1]), y=multirun([-10, 10]), overrides=overrides)
+
+    if load_from_working_dir:
+        wf = GridMetrics().load_from_dir(
+            wf.working_dir, metrics_filename="test_metrics.pt"
+        )
+
+    xdata = wf.to_xarray(include_working_subdirs_as_data_var=True)
+
+    # ensure data variables are set appropriately
+    yy, xx = np.meshgrid([-10, 10], [-1, 0, 1])
+    assert_allclose(actual=xdata.xx.data, desired=xx)
+    assert_allclose(actual=xdata.yy.data, desired=yy)
+
+    # ensure working_subdir points to correct dir
+    for x_coord in xdata.x:
+        for y_coord in xdata.y:
+            dd = Path(xdata.working_subdir.sel(x=x_coord, y=y_coord).item())
+            cfg = load_from_yaml(dd / ".hydra" / "config.yaml")
+            assert cfg == dict(x=x_coord.item(), y=y_coord.item())
+
+    # ensure working_subdir is serializable
+    xdata.to_netcdf("tmp.nc")
