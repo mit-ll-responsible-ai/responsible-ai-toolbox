@@ -288,7 +288,8 @@ class ParamTransformingOptimizer(Optimizer, metaclass=ABCMeta):
         **Controlling the gradient transformation with param_ndim**
 
         To understand the role of `param_ndim` let's design an optimizer that
-        normalizes a parameter's gradient by its max value – along some user-specified dimension – prior to performing the gradient-based update to its parameter.
+        normalizes a parameter's gradient by its max value – along some user-specified
+        dimension – prior to performing the gradient-based update to its parameter.
 
         >>> class MaxNormedGradientOptim(ParamTransformingOptimizer):
         ...
@@ -434,7 +435,8 @@ class ParamTransformingOptimizer(Optimizer, metaclass=ABCMeta):
     def _pre_step_transform_(
         self, param: Tensor, optim_group: DatumParamGroup
     ) -> None:  # pragma: no cover
-        """Applies an in-place transform on each parameter in the given param group **before** that parameter has been updated via `InnerOpt.step`.
+        """Applies an in-place transform on each parameter in the given param group
+        **before** that parameter has been updated via `InnerOpt.step`.
 
         This defaults to a no-op.
 
@@ -452,7 +454,8 @@ class ParamTransformingOptimizer(Optimizer, metaclass=ABCMeta):
         Notes
         -----
         This transform should *always* be designed to broadcast over the leading
-        dimension of the tensor being modified. That is, each parameter/gradient should be assumed to have the shape-`(N, d0, ...)` and the transformation should be
+        dimension of the tensor being modified. That is, each parameter/gradient should
+        be assumed to have the shape-`(N, d0, ...)` and the transformation should be
         applied - in-place - to each shape-`(d0, ...)` sub-tensor.
 
         Prior to calling `_pre_step_transform_`, `ParamTransformingOptimizer`
@@ -470,7 +473,8 @@ class ParamTransformingOptimizer(Optimizer, metaclass=ABCMeta):
     def _post_step_transform_(
         self, param: Tensor, optim_group: DatumParamGroup
     ) -> None:  # pragma: no cover
-        """Applies an in-place transform on each parameter in the given param group **after** that parameter has been updated via `InnerOpt.step`.
+        """Applies an in-place transform on each parameter in the given param group
+        **after** that parameter has been updated via `InnerOpt.step`.
 
         This defaults to a no-op.
 
@@ -488,7 +492,8 @@ class ParamTransformingOptimizer(Optimizer, metaclass=ABCMeta):
         Notes
         -----
         This transform should *always* be designed to broadcast over the leading
-        dimension of the tensor being modified. That is, each parameter/gradient should be assumed to have the shape-(N, d0, ...) and the transformation should be
+        dimension of the tensor being modified. That is, each parameter/gradient should
+         be assumed to have the shape-(N, d0, ...) and the transformation should be
         applied - in-place - to each shape-`(d0, ...)` sub-tensor.
 
         Prior to calling `_post_step_transform_`, `ParamTransformingOptimizer`
@@ -586,7 +591,8 @@ class ParamTransformingOptimizer(Optimizer, metaclass=ABCMeta):
 
 class ChainedParamTransformingOptimizer(ParamTransformingOptimizer):
     """Chains together an arbitrary number of parameter-transforming optimizers,
-    composing their pre- and post-step transformation functions to modify the parameters (and their gradients) in-place. `InnerOpt.step()` applies the gradient-based update
+    composing their pre- and post-step transformation functions to modify the parameters
+    (and their gradients) in-place. `InnerOpt.step()` applies the gradient-based update
     to each parameter.
 
     I.e., passing `Opt1, Opt2, ..., OptN` to `ChainedParamTransformingOptimizer` will
@@ -622,13 +628,15 @@ class ChainedParamTransformingOptimizer(ParamTransformingOptimizer):
             An arbitrary number of parameter-transforming optimizers, whose
             `_pre_step_transform_` and `_post_step_transform_` methods, respectively,
             will be composed from left to right –
-            `Opt1, Opt2, ..., OptN -> fN_(...f2_(f1_(grad)))` – to modify a parameter prior to / after being updated by `InnerOpt.step`
+            `Opt1, Opt2, ..., OptN -> fN_(...f2_(f1_(grad)))` – to modify a parameter
+            prior to / after being updated by `InnerOpt.step`
 
         params : Optional[Sequence[Tensor] | Iterable[ParamGroup]]
             Iterable of parameters to optimize or dicts defining parameter groups
 
         InnerOpt : Type[Optimizer] | Partial[Optimizer], optional (default=`torch.nn.optim.SGD`)
-            The optimizer that updates the parameters after `_pre_step_transform_` has been applied to each of them.
+            The optimizer that updates the parameters after `_pre_step_transform_` has
+            been applied to each of them.
 
         param_ndim : int | None, optional (default=-1)
             Determines how a parameter and its gradient is temporarily reshaped prior
@@ -714,7 +722,8 @@ class ChainedParamTransformingOptimizer(ParamTransformingOptimizer):
         >>> x1.grad  # element-0 should be zero'd by top-q; element-2 should be clamped to 2.8
         tensor([0.0000, 2.0000, 2.8000])
 
-        See that `SGD([x1], lr=1.0).step()` is used to update our parameters; this can be controlled via the `InnerOpt` argument.
+        See that `SGD([x1], lr=1.0).step()` is used to update our parameters; this can
+        be controlled via the `InnerOpt` argument.
 
         >>> x1
         tensor([ 1.0000, -1.0000, -1.8000], requires_grad=True)
@@ -784,7 +793,8 @@ class ChainedParamTransformingOptimizer(ParamTransformingOptimizer):
         for _opt in transforming_optimizers:
             if not instantiates_to(_opt, ParamTransformingOptimizer):
                 raise TypeError(
-                    f"*transforming_optimizers must contain `Type[ParamTransformingOptimizer]`, got: {transforming_optimizers}"
+                    f"*transforming_optimizers must contain "
+                    f"`Type[ParamTransformingOptimizer]`, got: {transforming_optimizers}"
                 )
         self._chain = tuple(
             opt(params, InnerOpt=self.inner_opt, defaults=self.defaults)

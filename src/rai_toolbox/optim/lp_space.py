@@ -209,7 +209,8 @@ class SignedGradientOptim(ParamTransformingOptimizer):
         >>> x.grad # the original gradient
         tensor([-2., 20.])
 
-        Performing a step with our optimizer transforms the gradient in-place, and then updates the parameter using `SGD([x], lr=1.0).step()`.
+        Performing a step with our optimizer transforms the gradient in-place, and
+        then updates the parameter using `SGD([x], lr=1.0).step()`.
 
         >>> optim.step()
         >>> x.grad # the normalized gradient
@@ -268,7 +269,8 @@ class L1NormedGradientOptim(_LpNormOptimizer):
     >>> x.grad # the un-normed gradient
     tensor([2., 2.])
 
-    Performing a step with our optimizer transforms the gradient in-place, and then updates the parameter using `SGD([x], lr=1.0).step()`.
+    Performing a step with our optimizer transforms the gradient in-place, and then
+    updates the parameter using `SGD([x], lr=1.0).step()`.
 
     >>> optim.step()
     >>> x.grad # the normalized gradient
@@ -315,7 +317,8 @@ class L2NormedGradientOptim(_LpNormOptimizer):
     >>> x.grad # the un-normed gradient
     tensor([2., 2.])
 
-    Performing a step with our optimizer transforms the gradient in-place, and then updates the parameter using `SGD([x], lr=1.0).step()`.
+    Performing a step with our optimizer transforms the gradient in-place, and then
+    updates the parameter using `SGD([x], lr=1.0).step()`.
 
     >>> optim.step()
     >>> x.grad # the normalized gradient
@@ -461,7 +464,8 @@ class L2ProjectedOptim(L2NormedGradientOptim):
 
 
 class LinfProjectedOptim(SignedGradientOptim):
-    r"""A gradient-tranforming optimizer that constrains the updated parameter values to fall within :math:`[-\epsilon, \epsilon]`.
+    r"""A gradient-tranforming optimizer that constrains the updated parameter values to
+    fall within :math:`[-\epsilon, \epsilon]`.
 
     A step with this optimizer takes the elementwise sign of a parameter's gradient
     prior to using `InnerOp.step` to update the corresponding parameter. The updated
@@ -685,7 +689,8 @@ class L1qNormedGradientOptim(ChainedParamTransformingOptimizer):
         >>> x.grad # the original gradient
         tensor([0., 1., 2.])
 
-        Performing a step with our optimizer sparsifies and normalizes the gradient in-place, and then updates the parameter using `SGD([x], lr=1.0).step()`.
+        Performing a step with our optimizer sparsifies and normalizes the gradient
+        in-place, and then updates the parameter using `SGD([x], lr=1.0).step()`.
 
         >>> optim.step()
         >>> x.grad # the signed, sparsified, and normalized gradient
