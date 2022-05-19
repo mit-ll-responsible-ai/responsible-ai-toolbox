@@ -22,10 +22,14 @@ def task(
     module: LightningModule,
     datamodule: Optional[LightningDataModule] = None,
     pl_testing: bool = False,
+    pl_predicting: bool = False,
     pl_local_rank: int = 0,
 ) -> None:
     if pl_testing:
         log.info(f"Rank {pl_local_rank}: Launched subprocess using Training.test")
+        trainer.test(module, datamodule=datamodule)
+    elif pl_predicting:
+        log.info(f"Rank {pl_local_rank}: Launched subprocess using Training.predict")
         trainer.test(module, datamodule=datamodule)
     else:
         log.info(f"Rank {pl_local_rank}: Launched subprocess using Training.fit")

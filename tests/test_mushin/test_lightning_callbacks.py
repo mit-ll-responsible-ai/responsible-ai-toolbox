@@ -12,6 +12,9 @@ from rai_toolbox.mushin.lightning import MetricsCallback
 from rai_toolbox.mushin.testing.lightning import SimpleLightningModule
 
 
+@pytest.mark.filterwarnings(
+    "ignore::pytorch_lightning.utilities.warnings.PossibleUserWarning"
+)
 @pytest.mark.usefixtures("cleandir")
 @pytest.mark.parametrize("testing", [True, False])
 def test_metrics_callback(testing):
@@ -29,9 +32,11 @@ def test_metrics_callback(testing):
     metrics = torch.load(metric_files[0])
     assert isinstance(metrics, dict)
 
-    assert "Tensor Metric" in metrics
-    if not testing:
-        assert "Val Tensor Metric" in metrics
+    if testing:
+        assert "test_tensor_metric" in metrics
+    else:
+        assert "fit_tensor_metric" in metrics
+        assert "val_tensor_metric" in metrics
 
     for k, v in metrics.items():
         assert not isinstance(v, torch.Tensor)
