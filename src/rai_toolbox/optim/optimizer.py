@@ -510,11 +510,11 @@ class ParamTransformingOptimizer(Optimizer, metaclass=ABCMeta):
         return None
 
     @torch.no_grad()
-    def project(self) -> None:
+    def _apply_post_step_transform_(self) -> None:
         """Update each parameter in-place by calling `_post_step_transform_` on the
         parameter.
 
-        `.project` is called automatically by `.step`."""
+        This is called automatically by `.step`."""
         for group in self.param_groups:
             param_ndim = group["param_ndim"]
 
@@ -522,7 +522,14 @@ class ParamTransformingOptimizer(Optimizer, metaclass=ABCMeta):
                 p = _to_batch(p, param_ndim)
                 self._post_step_transform_(param=p, optim_group=group)
 
+    project = _apply_post_step_transform_  # TODO: deprecate this
+
+    @torch.no_grad()
     def _apply_pre_step_transform_(self):
+        """Update each parameter in-place by calling `_pre_step_transform_` on the
+        parameter.
+
+        This is called automatically by `.step`."""
         for group in self.param_groups:
             for p in group["params"]:
                 p: Tensor
@@ -584,7 +591,7 @@ class ParamTransformingOptimizer(Optimizer, metaclass=ABCMeta):
             self._apply_pre_step_transform_()
             self.inner_opt.step()
             loss = None
-        self.project()
+        self._apply_post_step_transform_()
         loss = cast(Optional[Union[float, Tensor]], loss)
         return loss
 
