@@ -8,6 +8,18 @@ Changelog
 This is a record of all past rAI-toolbox releases and what went into them, in reverse 
 chronological order. All previous releases should still be available on pip.
 
+.. _v0.2.0:
+
+------------------
+0.2.0 - 2022-XX-XX
+------------------
+
+.. note:: This is documentation for an unreleased version of the toolbox
+
+
+- Added the method `ParamTransformingOptimizer._post_step_transform_` to fulfill the role of `ParamTransformingOptimizer.project`, for the sake of having parity among the names of the pre-step and post-step methods. See :pull:`54` for details.
+
+
 .. _v0.1.1:
 
 ------------------

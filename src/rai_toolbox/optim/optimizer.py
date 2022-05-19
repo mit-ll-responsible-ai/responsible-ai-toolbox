@@ -514,7 +514,7 @@ class ParamTransformingOptimizer(Optimizer, metaclass=ABCMeta):
         """Update each parameter in-place by calling `_post_step_transform_` on the
         parameter.
 
-        This is called automatically by `.step`."""
+        This is called automatically by `.step` after `InnerOpt.step()` has been called."""
         for group in self.param_groups:
             param_ndim = group["param_ndim"]
 
@@ -529,7 +529,8 @@ class ParamTransformingOptimizer(Optimizer, metaclass=ABCMeta):
         """Update each parameter in-place by calling `_pre_step_transform_` on the
         parameter.
 
-        This is called automatically by `.step`."""
+        This is called automatically by `.step` before `InnerOpt.step()` has been
+        called."""
         for group in self.param_groups:
             for p in group["params"]:
                 p: Tensor
