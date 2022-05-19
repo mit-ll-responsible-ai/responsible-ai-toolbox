@@ -74,9 +74,6 @@ def test_ddp_with_hydra_raises_misconfiguration():
 @pytest.mark.skipif(
     torch.cuda.device_count() < 2, reason="Need at least 2 GPUs to test"
 )
-@pytest.mark.filterwarnings(
-    "ignore::pytorch_lightning.utilities.warnings.PossibleUserWarning"
-)
 @pytest.mark.usefixtures("cleandir")
 @pytest.mark.parametrize("subdir", [None, ".hydra", "dksa"])
 def test_ddp_with_hydra_output_subdir(subdir):
@@ -99,9 +96,6 @@ def test_ddp_with_hydra_output_subdir(subdir):
 @pytest.mark.skipif(
     torch.cuda.device_count() < 2, reason="Need at least 2 GPUs to test"
 )
-@pytest.mark.filterwarnings(
-    "ignore::pytorch_lightning.utilities.warnings.PossibleUserWarning"
-)
 @pytest.mark.usefixtures("cleandir")
 @pytest.mark.parametrize(
     "testing, predicting", [(True, False), (False, True), (False, False)]
@@ -118,9 +112,6 @@ def test_ddp_with_hydra_with_datamodule(testing, predicting):
 
 @pytest.mark.skipif(
     torch.cuda.device_count() < 2, reason="Need at least 2 GPUs to test"
-)
-@pytest.mark.filterwarnings(
-    "ignore::pytorch_lightning.utilities.warnings.PossibleUserWarning"
 )
 @pytest.mark.usefixtures("cleandir")
 @pytest.mark.parametrize("num_jobs", [1, 2])
