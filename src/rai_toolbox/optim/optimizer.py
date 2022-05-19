@@ -649,7 +649,7 @@ class ChainedParamTransformingOptimizer(ParamTransformingOptimizer):
         param_ndim : int | None, optional (default=-1)
             Determines how a parameter and its gradient is temporarily reshaped prior
             to being passed to both `_pre_step_transform_` and `_post_step_transform_`.
-            By default,the transformation broadcasts over the tensor's first dimension
+            By default, the transformation broadcasts over the tensor's first dimension
             in a batch-like style.
 
             - A positive number determines the dimensionality of the tensor that the transformation will act on.
