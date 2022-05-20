@@ -29,8 +29,8 @@ def task(
         log.info(f"Rank {pl_local_rank}: Launched subprocess using Training.test")
         trainer.test(module, datamodule=datamodule)
     elif pl_predicting:
-        log.info(f"Rank {pl_local_rank}: Launched subprocess using Training.predict")
-        trainer.test(module, datamodule=datamodule)
+        log.info(f"Rank {pl_local_rank}: Launched subprocess using Trainer.predict")
+        trainer.predict(module, datamodule=datamodule)
     else:
         log.info(f"Rank {pl_local_rank}: Launched subprocess using Training.fit")
         trainer.fit(module, datamodule=datamodule)
