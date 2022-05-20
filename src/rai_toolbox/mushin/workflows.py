@@ -723,7 +723,8 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
         if coord_from_metrics:
             if coord_from_metrics not in self.metrics:
                 raise ValueError(
-                    f"key `{coord_from_metrics}` not in metrics (available: {list(self.metrics.keys())})"
+                    f"key `{coord_from_metrics}` not in metrics (available: "
+                    f"{list(self.metrics.keys())})"
                 )
 
             v = _coerce_list_of_arraylikes(self.metrics[coord_from_metrics])
