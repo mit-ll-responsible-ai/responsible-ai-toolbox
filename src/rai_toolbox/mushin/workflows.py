@@ -183,8 +183,10 @@ class BaseWorkflow:
 
         return self._multirun_task_overrides
 
+    @staticmethod
     def evaluation_task(*args: Any, **kwargs: Any) -> Any:
-        """User-defined evaluation task to run the workflow.
+        """User-defined evaluation task to run the workflow. This should be
+        a static method.
 
         Arguments will be instantiated configuration variables.  For example,
         if the the workflow configuration is structured as::
@@ -197,6 +199,7 @@ class BaseWorkflow:
         The inputs to `evaluation_task` can be any of the three configurations:
         `trainer`, `module`, or `another_config` such as::
 
+            @staticmethod
             def evaluation_task(trainer: Trainer, module: LightningModule) -> None:
                 trainer.fit(module)
         """
