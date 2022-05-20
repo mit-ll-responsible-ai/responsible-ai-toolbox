@@ -506,13 +506,16 @@ class MultiSaveFile(MultiRunMetricsWorkflow):
 
 
 @pytest.mark.usefixtures("cleandir")
-def test_globbed_xarray():
+@pytest.mark.parametrize(
+    "file_pattern", ["*.pt", ("*.pt",), ("images.pt", "acc.pt"), ("images.*", "acc.*")]
+)
+def test_globbed_xarray(file_pattern):
     # saves multiple metrics files that we load/merge via glob pattern
     wf = MultiSaveFile()
     wf.run(epsilon=multirun([1, 2, 3]), acc=multirun([0.9, 0.95, 0.99]))
     xdata1 = wf.to_xarray()
 
     wf2 = MultiSaveFile(working_dir=wf.working_dir)
-    xdata2 = wf2.to_xarray(metrics_filename="*.pt")
+    xdata2 = wf2.to_xarray(metrics_filename=file_pattern)
 
     assert_identical(xdata1, xdata2)

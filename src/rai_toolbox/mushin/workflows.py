@@ -620,7 +620,7 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
         self.metrics = self._process_metrics(job_metrics)
 
     @staticmethod
-    def _process_metrics(job_metrics) -> Dict[str, Any]:
+    def _process_metrics(job_metrics: List[Dict[str, Any]]) -> Dict[str, Any]:
         metrics = defaultdict(list)
         for task_metrics in job_metrics:
             if task_metrics is None:
@@ -636,7 +636,7 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
     def load_from_dir(
         self: Self,
         working_dir: Union[Path, str],
-        metrics_filename: Union[str, None],
+        metrics_filename: Union[str, Sequence[str], None],
     ) -> Self:
         """Loading workflow job data from a given working directory. The workflow
         is loaded in-place and "self" is returned by this method.
@@ -648,13 +648,9 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
             that subdirectories within this working directory will contain
             individual Hydra jobs data (yaml configurations) and saved metrics files.
 
-        metrics_filename: Union[str, None]
-            The filename used to save metrics for each individual Hydra job. This can
-            be a search pattern as well since this is appended to
-
-                `Path(working_dir).glob("**/*/<metrics_filename")`
-
-            If `None`, no metrics are loaded.
+        metrics_filename: str | Sequence[str] | None
+            The filename(s) or glob-pattern(s) uses to load the metrics.
+            If `None`, the metrics stored in `self.metrics` is used.
 
         Returns
         -------
@@ -689,30 +685,37 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
 
         return self
 
-    def load_metrics(self, metrics_filename: str) -> Dict[str, List[Any]]:
+    def load_metrics(
+        self, metrics_filename: Union[str, Sequence[str]]
+    ) -> Dict[str, List[Any]]:
         """Loads and aggregates across all multirun working dirs, and stores
         the metrics in `self.metrics`
 
         Parameters
         ----------
-        metrics_filename: Optional[str]
-            The filename or glob-pattern uses to load the metrics.
+        metrics_filename: str | Sequence[str]
+            The filename(s) or glob-pattern(s) uses to load the metrics.
             If `None`, the metrics stored in `self.metrics` is used.
         """
         if self.multirun_working_dirs is None:
             self.load_from_dir(self.working_dir, metrics_filename=None)
             assert self.multirun_working_dirs is not None
 
+        if isinstance(metrics_filename, str):
+            metrics_filename = [metrics_filename]
+
         job_metrics = []
         for dir_ in self.multirun_working_dirs:
-            files = sorted(dir_.glob(metrics_filename))
-            if not files:
-                raise FileNotFoundError(
-                    f"No files with the path/pattern {dir_/metrics_filename} were found"
-                )
             _metrics = {}
-            for f_ in files:
-                _metrics.update(tr.load(f_))
+            for name in metrics_filename:
+                files = sorted(dir_.glob(name))
+                if not files:
+                    raise FileNotFoundError(
+                        f"No files with the path/pattern {dir_/name} were found"
+                    )
+
+                for f_ in files:
+                    _metrics.update(tr.load(f_))
             job_metrics.append(_metrics)
 
         self.metrics = self._process_metrics(job_metrics)
@@ -724,7 +727,7 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
         include_working_subdirs_as_data_var: bool = False,
         coord_from_metrics: Optional[str] = None,
         non_multirun_params_as_singleton_dims: bool = False,
-        metrics_filename: Union[str, None] = None,
+        metrics_filename: Union[str, Sequence[str], None] = None,
     ):
         """Convert workflow data to xarray Dataset.
 
@@ -932,7 +935,7 @@ class RobustnessCurve(MultiRunMetricsWorkflow):
         include_working_subdirs_as_data_var: bool = False,
         coord_from_metrics: Optional[str] = None,
         non_multirun_params_as_singleton_dims: bool = False,
-        metrics_filename: Union[str, None] = None,
+        metrics_filename: Union[str, Sequence[str], None] = None,
     ):
         """Convert workflow data to xarray Dataset.
 
@@ -952,6 +955,10 @@ class RobustnessCurve(MultiRunMetricsWorkflow):
             If `True` then non-multirun entries from `workflow_overrides` will be
             included as length-1 dimensions in the xarray. Useful for merging/
             concatenation with other Datasets
+
+        metrics_filename: Optional[str]
+            The filename or glob-pattern uses to load the metrics.
+            If `None`, the metrics stored in `self.metrics` is used.
 
         Returns
         -------
