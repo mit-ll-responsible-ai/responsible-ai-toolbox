@@ -797,9 +797,11 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
 
 
 class RobustnessCurve(MultiRunMetricsWorkflow):
-    """Abstract class for workflows that measure performance for different perturbation values.
+    """Abstract class for workflows that measure performance for different perturbation
+    values.
 
-    This workflow requires and uses parameter `epsilon` as the configuration option for varying the perturbation.
+    This workflow requires and uses parameter `epsilon` as the configuration option for
+    varying the perturbation.
 
     See Also
     --------
