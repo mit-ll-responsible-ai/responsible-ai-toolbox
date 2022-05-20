@@ -43,6 +43,8 @@ def task_fn_raises(cfg: Any):
         trainer.fit(module)
 
 
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
+@pytest.mark.filterwarnings("ignore::UserWarning")
 @pytest.mark.skipif(
     torch.cuda.device_count() < 2, reason="Need at least 2 GPUs to test"
 )
@@ -59,9 +61,11 @@ def test_ddp_with_hydra_raises_misconfiguration():
     module = builds(SimpleLightningModule)
     Config = make_config(trainer=trainer, wrong_config_name=module, devices=2)
     with pytest.raises(ConfigAttributeError):
-        launch(Config, task_fn_raises)
+        launch(Config, task_fn_raises, version_base="1.1")
 
 
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
+@pytest.mark.filterwarnings("ignore::UserWarning")
 @pytest.mark.skipif(
     torch.cuda.device_count() < 2, reason="Need at least 2 GPUs to test"
 )
@@ -92,6 +96,7 @@ def test_ddp_with_hydra_output_subdir(subdir):
     assert cfg_file.exists()
 
 
+@pytest.mark.filterwarnings("ignore::UserWarning")
 @pytest.mark.skipif(
     torch.cuda.device_count() < 2, reason="Need at least 2 GPUs to test"
 )
@@ -112,9 +117,10 @@ def test_ddp_with_hydra_with_datamodule(testing):
     Config = make_config(
         trainer=trainer, module=module, datamodule=datamodule, devices=2
     )
-    launch(Config, task_fn_with_datamodule, overrides=overrides)
+    launch(Config, task_fn_with_datamodule, overrides=overrides, version_base="1.1")
 
 
+@pytest.mark.filterwarnings("ignore::UserWarning")
 @pytest.mark.skipif(
     torch.cuda.device_count() < 2, reason="Need at least 2 GPUs to test"
 )
@@ -147,7 +153,7 @@ def test_ddp_with_hydra_runjob(num_jobs, testing):
     )
     module = builds(SimpleLightningModule)
     Config = make_config(trainer=trainer, module=module, devices=2)
-    launch(Config, task_fn, overrides, multirun=multirun)
+    launch(Config, task_fn, overrides, multirun=multirun, version_base="1.1")
 
     # Make sure config.yaml was created for each job
     yamls = list(Path.cwd().glob("**/config.yaml"))
