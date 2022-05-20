@@ -25,6 +25,7 @@ import torch as tr
 from hydra.core.override_parser.overrides_parser import OverridesParser
 from hydra.core.utils import JobReturn
 from hydra_zen import launch, load_from_yaml, make_config
+from hydra_zen._compatibility import HYDRA_VERSION
 from hydra_zen._launch import _NotSet
 from typing_extensions import Self, TypeAlias, TypeGuard
 
@@ -45,6 +46,9 @@ __all__ = [
 
 T = TypeVar("T", List[Any], Tuple[Any])
 T1 = TypeVar("T1")
+
+
+_VERSION_BASE_DEFAULT = _NotSet if HYDRA_VERSION < (1, 2, 0) else "1.1"
 
 
 class multirun(UserList):
@@ -213,7 +217,7 @@ class BaseWorkflow(ABC):
         sweeper: Optional[str] = None,
         launcher: Optional[str] = None,
         overrides: Optional[List[str]] = None,
-        version_base: Optional[Union[str, Type[_NotSet]]] = _NotSet,
+        version_base: Optional[Union[str, Type[_NotSet]]] = _VERSION_BASE_DEFAULT,
         to_dictconfig: bool = False,
         config_name: str = "rai_workflow",
         job_name: str = "rai_workflow",
@@ -250,7 +254,7 @@ class BaseWorkflow(ABC):
             This is helpful for filtering out parameters stored in
             `self.workflow_overrides`.
 
-        version_base : Optional[str], optional (default=_NotSet)
+        version_base : Optional[str], optional (default=1.1)
             Available starting with Hydra 1.2.0.
             - If the `version_base parameter` is not specified, Hydra 1.x will use defaults compatible with version 1.1. Also in this case, a warning is issued to indicate an explicit version_base is preferred.
             - If the `version_base parameter` is `None`, then the defaults are chosen for the current minor Hydra version. For example for Hydra 1.2, then would imply `config_path=None` and `hydra.job.chdir=False`.
@@ -471,7 +475,7 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
         sweeper: Optional[str] = None,
         launcher: Optional[str] = None,
         overrides: Optional[List[str]] = None,
-        version_base: Optional[Union[str, Type[_NotSet]]] = _NotSet,
+        version_base: Optional[Union[str, Type[_NotSet]]] = _VERSION_BASE_DEFAULT,
         target_job_dirs: Optional[Sequence[Union[str, Path]]] = None,
         to_dictconfig: bool = False,
         config_name: str = "rai_workflow",
@@ -816,6 +820,7 @@ class RobustnessCurve(MultiRunMetricsWorkflow):
             Callable[[Callable[..., T1]], Callable[[Any], T1]], None
         ] = zen,
         target_job_dirs: Optional[Sequence[Union[str, Path]]] = None,  # TODO: add docs
+        version_base: Optional[Union[str, Type[_NotSet]]] = _VERSION_BASE_DEFAULT,
         working_dir: Optional[str] = None,
         sweeper: Optional[str] = None,
         launcher: Optional[str] = None,
@@ -868,6 +873,7 @@ class RobustnessCurve(MultiRunMetricsWorkflow):
             working_dir=working_dir,
             sweeper=sweeper,
             launcher=launcher,
+            version_base=version_base,
             overrides=overrides,
             **workflow_overrides,
             # for multiple multi-run params, epsilon should fastest-varying param;
