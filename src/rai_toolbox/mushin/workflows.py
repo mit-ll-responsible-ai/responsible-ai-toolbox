@@ -361,6 +361,12 @@ def _non_str_sequence(x: Any) -> TypeGuard[Sequence[Any]]:
     return isinstance(x, Sequence) and not isinstance(x, str)
 
 
+def _coerce_list_of_arraylikes(v: List[Any]):
+    if v and hasattr(v[0], "__array__"):
+        return [np.asarray(i) for i in v]
+    return v
+
+
 class MultiRunMetricsWorkflow(BaseWorkflow):
     """Abstract class for workflows that record metrics using Hydra multirun.
 
@@ -720,8 +726,10 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
                     f"key `{coord_from_metrics}` not in metrics (available: {list(self.metrics.keys())})"
                 )
 
-            v = self.metrics[coord_from_metrics]
-            if np.asarray(v).ndim > 1:  # pragma: no cover
+            v = _coerce_list_of_arraylikes(self.metrics[coord_from_metrics])
+            v = np.asarray(v)
+
+            if v.ndim > 1:  # pragma: no cover
                 # assume this coord was repeated across experiments, e.g., "epochs"
                 v = v[0]
             metric_coords[coord_from_metrics] = v
@@ -750,6 +758,9 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
         for k, v in metrics_to_add.items():
             if coord_from_metrics and k == coord_from_metrics:
                 continue
+
+            if v and hasattr(v[0], "__array__"):
+                v = [np.asarray(i) for i in v]
 
             datum = np.asarray(v).reshape(shape + np.asarray(v[0]).shape)
 
