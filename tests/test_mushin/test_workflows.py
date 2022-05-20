@@ -327,6 +327,14 @@ def test_xarray_from_loaded_workflow():
     xarray2 = wf2.to_xarray()
     assert_identical(xarray1, xarray2)
 
+    wf3 = MultiDimMetrics(working_dir=wf.working_dir)
+    xarray3 = wf3.to_xarray(metrics_filename="test_metrics.pt")
+    assert_identical(xarray1, xarray3)
+
+    wf4 = MultiDimMetrics().load_from_dir(wf.working_dir, metrics_filename=None)
+    xarray4 = wf4.to_xarray(metrics_filename="test_metrics.pt")
+    assert_identical(xarray1, xarray4)
+
 
 class LocalBasicSweeper(Sweeper):
     def setup(self, *, hydra_context, task_function, config):
@@ -482,3 +490,29 @@ def test_working_subdirs(
 
     # ensure working_subdir is serializable
     xdata.to_netcdf("tmp.nc")
+
+
+class MultiSaveFile(MultiRunMetricsWorkflow):
+    # returns     "images" -> shape-(4, 1)
+    #         "accuracies" -> scalar
+    @staticmethod
+    def evaluation_task(epsilon, acc):
+        val = 100 - epsilon**2
+        result = dict(images=np.array([[val] * 1] * 4), accuracies=acc)
+        tr.save(dict(images=result["images"]), "images.pt")
+        tr.save(dict(accuracies=result["accuracies"]), "acc.pt")
+
+        return result
+
+
+@pytest.mark.usefixtures("cleandir")
+def test_globbed_xarray():
+    # saves multiple metrics files that we load/merge via glob pattern
+    wf = MultiSaveFile()
+    wf.run(epsilon=multirun([1, 2, 3]), acc=multirun([0.9, 0.95, 0.99]))
+    xdata1 = wf.to_xarray()
+
+    wf2 = MultiSaveFile(working_dir=wf.working_dir)
+    xdata2 = wf2.to_xarray(metrics_filename="*.pt")
+
+    assert_identical(xdata1, xdata2)
