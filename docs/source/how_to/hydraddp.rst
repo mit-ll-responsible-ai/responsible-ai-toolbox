@@ -83,7 +83,7 @@ launched for each subprocess:
            trainer.test(module)
         elif pl_predicting:
             log.info(f"Rank {pl_local_rank}: Launched subprocess using Training.predict")
-            trainer.test(module, datamodule=datamodule)
+            trainer.predict(module, datamodule=datamodule)
        else:
            log.info(f"Rank {pl_local_rank}: Launched subprocess using Training.fit")
            trainer.fit(module)
