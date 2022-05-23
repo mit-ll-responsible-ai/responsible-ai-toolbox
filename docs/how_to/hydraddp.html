@@ -275,6 +275,7 @@ must contain the following two sub-configurations:</p>
 <div class="highlight-reStructuredText notranslate"><div class="highlight"><pre><span></span>Config
  ├── trainer: A <span class="s">``pytorch_lightning.Trainer``</span> configuration
  ├── module: A <span class="s">``pytorch_lightning.LightningModule``</span> configuration
+ ├── datamodule: [OPTIONAL] A <span class="nv">`pytorch_lightning.LightningDataModule`</span> configuration
 </pre></div>
 </div>
 </div>
@@ -283,17 +284,20 @@ toolbox-provided task function (<code class="docutils literal notranslate"><span
 launched for each subprocess:</p>
 <div class="literal-block-wrapper docutils container" id="id3">
 <div class="code-block-caption"><span class="caption-text">The task function automatically run by each HydraDDP subprocess</span><a class="headerlink" href="#id3" title="Permalink to this code">#</a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">task</span><span class="p">(</span><span class="n">trainer</span><span class="p">:</span> <span class="n">Trainer</span><span class="p">,</span> <span class="n">module</span><span class="p">:</span> <span class="n">LightningModule</span><span class="p">,</span> <span class="n">pl_testing</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">pl_local_rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">task</span><span class="p">(</span><span class="n">trainer</span><span class="p">:</span> <span class="n">Trainer</span><span class="p">,</span> <span class="n">module</span><span class="p">:</span> <span class="n">LightningModule</span><span class="p">,</span> <span class="n">pl_testing</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">pl_predicting</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">pl_local_rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">pl_testing</span><span class="p">:</span>
         <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Rank </span><span class="si">{</span><span class="n">pl_local_rank</span><span class="si">}</span><span class="s2">: Launched subprocess using Training.test&quot;</span><span class="p">)</span>
         <span class="n">trainer</span><span class="o">.</span><span class="n">test</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
+     <span class="k">elif</span> <span class="n">pl_predicting</span><span class="p">:</span>
+         <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Rank </span><span class="si">{</span><span class="n">pl_local_rank</span><span class="si">}</span><span class="s2">: Launched subprocess using Training.predict&quot;</span><span class="p">)</span>
+         <span class="n">trainer</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">=</span><span class="n">datamodule</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Rank </span><span class="si">{</span><span class="n">pl_local_rank</span><span class="si">}</span><span class="s2">: Launched subprocess using Training.fit&quot;</span><span class="p">)</span>
         <span class="n">trainer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
-<p>Note that the configuration flags for <code class="docutils literal notranslate"><span class="pre">pl_testing</span></code> and <code class="docutils literal notranslate"><span class="pre">pl_local_rank</span></code> are
+<p>Note that the configuration flags for <code class="docutils literal notranslate"><span class="pre">pl_testing</span></code>, <code class="docutils literal notranslate"><span class="pre">pl_predicting</span></code>, and <code class="docutils literal notranslate"><span class="pre">pl_local_rank</span></code> are
 automatically set by <a class="reference internal" href="../generated/rai_toolbox.mushin.HydraDDP.html#rai_toolbox.mushin.HydraDDP" title="rai_toolbox.mushin.HydraDDP"><code class="xref py py-func docutils literal notranslate"><span class="pre">HydraDDP()</span></code></a> before execution.</p>
 <p>Next let’s create an example configuration and task function using <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/">hydra-zen</a>:</p>
 <div class="literal-block-wrapper docutils container" id="id4">

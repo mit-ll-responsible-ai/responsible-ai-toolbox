@@ -313,7 +313,7 @@
 
 <div class="viewcode-block" id="ClampedParameterOptimizer"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.ClampedParameterOptimizer.html#rai_toolbox.optim.ClampedParameterOptimizer">[docs]</a><span class="k">class</span> <span class="nc">ClampedParameterOptimizer</span><span class="p">(</span><span class="n">_ClampedOptim</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;A parameter optimizer that clamps the elements of a parameter to fall within</span>
-<span class="sd">    user-specified bounds **after** `InnerOp.step` has updated the parameter</span>
+<span class="sd">    user-specified bounds **after** `InnerOpt.step()` has updated the parameter</span>
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
@@ -321,7 +321,8 @@
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
-<span class="sd">    Let&#39;s perform a step with `SGD` using a learning rate of `1.0` to each of our parameters and then clamp their parameters to `[-1.0, 3.0]`.</span>
+<span class="sd">    Let&#39;s perform a step with `SGD` using a learning rate of `1.0` to each of our</span>
+<span class="sd">    parameters and then clamp their parameters to `[-1.0, 3.0]`.</span>
 
 <span class="sd">    &gt;&gt;&gt; import torch as tr</span>
 <span class="sd">    &gt;&gt;&gt; from rai_toolbox.optim import ClampedParameterOptimizer</span>
@@ -341,8 +342,8 @@
 
 <div class="viewcode-block" id="TopQGradientOptimizer"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.TopQGradientOptimizer.html#rai_toolbox.optim.TopQGradientOptimizer">[docs]</a><span class="k">class</span> <span class="nc">TopQGradientOptimizer</span><span class="p">(</span><span class="n">ParamTransformingOptimizer</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;A gradient-tranforming  optimizer that zeros the elements of a gradient whose</span>
-<span class="sd">    absolue magnitudes fall below the Qth percentile. `InnerOp.step` is then to update</span>
-<span class="sd">    the corresponding parameter.</span>
+<span class="sd">    absolue magnitudes fall below the Qth percentile. `InnerOpt.step()` is then to</span>
+<span class="sd">    update the corresponding parameter.</span>
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>

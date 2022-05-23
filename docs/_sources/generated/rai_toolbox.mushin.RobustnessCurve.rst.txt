@@ -22,7 +22,6 @@ rai\_toolbox.mushin.RobustnessCurve
       ~RobustnessCurve.load_from_dir
       ~RobustnessCurve.plot
       ~RobustnessCurve.run
-      ~RobustnessCurve.to_dataframe
       ~RobustnessCurve.to_xarray
       ~RobustnessCurve.validate
    

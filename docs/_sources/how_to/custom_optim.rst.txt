@@ -154,7 +154,8 @@ Using the optimizer
 ===================
 
 First, we'll study the effect of `param_ndim` on our optimizer's behavior.
-Let's create a simple shape-`(2, 2)` tensor, which will be the sole parameter that our optimizer will update. We will clamp the parameter's elements to fill within :math:`(-\infty, 18.75]`.
+Let's create a simple shape-`(2, 2)` tensor, which will be the sole parameter that our optimizer will update.
+We will clamp the parameter's elements to fall within :math:`(-\infty, 18.75]`.
 The actual gradient-based parameter update will be performed by `torch.optim.SGD` with `lr=1.0`.
 
 We'll perform a single update to our parameter, but with using `param_ndim` values of 0, 1, and 2 respectively.

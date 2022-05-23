@@ -463,7 +463,8 @@
 <span class="sd">        **Controlling the gradient transformation with param_ndim**</span>
 
 <span class="sd">        To understand the role of `param_ndim` let&#39;s design an optimizer that</span>
-<span class="sd">        normalizes a parameter&#39;s gradient by its max value – along some user-specified dimension – prior to performing the gradient-based update to its parameter.</span>
+<span class="sd">        normalizes a parameter&#39;s gradient by its max value – along some user-specified</span>
+<span class="sd">        dimension – prior to performing the gradient-based update to its parameter.</span>
 
 <span class="sd">        &gt;&gt;&gt; class MaxNormedGradientOptim(ParamTransformingOptimizer):</span>
 <span class="sd">        ...</span>
@@ -609,7 +610,8 @@
 <div class="viewcode-block" id="ParamTransformingOptimizer._pre_step_transform_"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer._pre_step_transform_">[docs]</a>    <span class="k">def</span> <span class="nf">_pre_step_transform_</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">optim_group</span><span class="p">:</span> <span class="n">DatumParamGroup</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sd">&quot;&quot;&quot;Applies an in-place transform on each parameter in the given param group **before** that parameter has been updated via `InnerOpt.step`.</span>
+        <span class="sd">&quot;&quot;&quot;Applies an in-place transform on each parameter in the given param group</span>
+<span class="sd">        **before** that parameter has been updated via `InnerOpt.step`.</span>
 
 <span class="sd">        This defaults to a no-op.</span>
 
@@ -627,7 +629,8 @@
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        This transform should *always* be designed to broadcast over the leading</span>
-<span class="sd">        dimension of the tensor being modified. That is, each parameter/gradient should be assumed to have the shape-`(N, d0, ...)` and the transformation should be</span>
+<span class="sd">        dimension of the tensor being modified. That is, each parameter/gradient should</span>
+<span class="sd">        be assumed to have the shape-`(N, d0, ...)` and the transformation should be</span>
 <span class="sd">        applied - in-place - to each shape-`(d0, ...)` sub-tensor.</span>
 
 <span class="sd">        Prior to calling `_pre_step_transform_`, `ParamTransformingOptimizer`</span>
@@ -645,7 +648,8 @@
 <div class="viewcode-block" id="ParamTransformingOptimizer._post_step_transform_"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer._post_step_transform_">[docs]</a>    <span class="k">def</span> <span class="nf">_post_step_transform_</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">optim_group</span><span class="p">:</span> <span class="n">DatumParamGroup</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sd">&quot;&quot;&quot;Applies an in-place transform on each parameter in the given param group **after** that parameter has been updated via `InnerOpt.step`.</span>
+        <span class="sd">&quot;&quot;&quot;Applies an in-place transform on each parameter in the given param group</span>
+<span class="sd">        **after** that parameter has been updated via `InnerOpt.step`.</span>
 
 <span class="sd">        This defaults to a no-op.</span>
 
@@ -663,7 +667,8 @@
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        This transform should *always* be designed to broadcast over the leading</span>
-<span class="sd">        dimension of the tensor being modified. That is, each parameter/gradient should be assumed to have the shape-(N, d0, ...) and the transformation should be</span>
+<span class="sd">        dimension of the tensor being modified. That is, each parameter/gradient should</span>
+<span class="sd">         be assumed to have the shape-(N, d0, ...) and the transformation should be</span>
 <span class="sd">        applied - in-place - to each shape-`(d0, ...)` sub-tensor.</span>
 
 <span class="sd">        Prior to calling `_post_step_transform_`, `ParamTransformingOptimizer`</span>
@@ -679,12 +684,12 @@
         <span class="k">del</span> <span class="n">optim_group</span>
         <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="ParamTransformingOptimizer.project"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer.project">[docs]</a>    <span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
-    <span class="k">def</span> <span class="nf">project</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="ParamTransformingOptimizer._apply_post_step_transform_"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer._apply_post_step_transform_">[docs]</a>    <span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">_apply_post_step_transform_</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Update each parameter in-place by calling `_post_step_transform_` on the</span>
 <span class="sd">        parameter.</span>
 
-<span class="sd">        `.project` is called automatically by `.step`.&quot;&quot;&quot;</span>
+<span class="sd">        This is called automatically by `.step` after `InnerOpt.step()` has been called.&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_groups</span><span class="p">:</span>
             <span class="n">param_ndim</span> <span class="o">=</span> <span class="n">group</span><span class="p">[</span><span class="s2">&quot;param_ndim&quot;</span><span class="p">]</span>
 
@@ -692,7 +697,15 @@
                 <span class="n">p</span> <span class="o">=</span> <span class="n">_to_batch</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">param_ndim</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_post_step_transform_</span><span class="p">(</span><span class="n">param</span><span class="o">=</span><span class="n">p</span><span class="p">,</span> <span class="n">optim_group</span><span class="o">=</span><span class="n">group</span><span class="p">)</span></div>
 
+    <span class="n">project</span> <span class="o">=</span> <span class="n">_apply_post_step_transform_</span>  <span class="c1"># TODO: deprecate this</span>
+
+<div class="viewcode-block" id="ParamTransformingOptimizer._apply_pre_step_transform_"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer._apply_pre_step_transform_">[docs]</a>    <span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
     <span class="k">def</span> <span class="nf">_apply_pre_step_transform_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Update each parameter in-place by calling `_pre_step_transform_` on the</span>
+<span class="sd">        parameter.</span>
+
+<span class="sd">        This is called automatically by `.step` before `InnerOpt.step()` has been</span>
+<span class="sd">        called.&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_groups</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">group</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">]:</span>
                 <span class="n">p</span><span class="p">:</span> <span class="n">Tensor</span>
@@ -718,7 +731,7 @@
                         <span class="s2">&quot; not modify the gradient of the parameter in-place.&quot;</span>
                         <span class="s2">&quot; </span><span class="se">\n</span><span class="s2">Note that setting `p.grad` directly replaces the&quot;</span>
                         <span class="s2">&quot; tensor, rather than writing to the tensor.&quot;</span>
-                    <span class="p">)</span>
+                    <span class="p">)</span></div>
 
     <span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
     <span class="k">def</span> <span class="nf">_create_closure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">closure</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">_T</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">Optional</span><span class="p">[</span><span class="n">_T</span><span class="p">]]:</span>
@@ -754,14 +767,15 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_apply_pre_step_transform_</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">inner_opt</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
             <span class="n">loss</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">project</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_apply_post_step_transform_</span><span class="p">()</span>
         <span class="n">loss</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]],</span> <span class="n">loss</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">loss</span></div>
 
 
 <div class="viewcode-block" id="ChainedParamTransformingOptimizer"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.ChainedParamTransformingOptimizer.html#rai_toolbox.optim.ChainedParamTransformingOptimizer">[docs]</a><span class="k">class</span> <span class="nc">ChainedParamTransformingOptimizer</span><span class="p">(</span><span class="n">ParamTransformingOptimizer</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Chains together an arbitrary number of parameter-transforming optimizers,</span>
-<span class="sd">    composing their pre- and post-step transformation functions to modify the parameters (and their gradients) in-place. `InnerOpt.step()` applies the gradient-based update</span>
+<span class="sd">    composing their pre- and post-step transformation functions to modify the parameters</span>
+<span class="sd">    (and their gradients) in-place. `InnerOpt.step()` applies the gradient-based update</span>
 <span class="sd">    to each parameter.</span>
 
 <span class="sd">    I.e., passing `Opt1, Opt2, ..., OptN` to `ChainedParamTransformingOptimizer` will</span>
@@ -797,18 +811,20 @@
 <span class="sd">            An arbitrary number of parameter-transforming optimizers, whose</span>
 <span class="sd">            `_pre_step_transform_` and `_post_step_transform_` methods, respectively,</span>
 <span class="sd">            will be composed from left to right –</span>
-<span class="sd">            `Opt1, Opt2, ..., OptN -&gt; fN_(...f2_(f1_(grad)))` – to modify a parameter prior to / after being updated by `InnerOpt.step`</span>
+<span class="sd">            `Opt1, Opt2, ..., OptN -&gt; fN_(...f2_(f1_(grad)))` – to modify a parameter</span>
+<span class="sd">            prior to / after being updated by `InnerOpt.step`</span>
 
 <span class="sd">        params : Optional[Sequence[Tensor] | Iterable[ParamGroup]]</span>
 <span class="sd">            Iterable of parameters to optimize or dicts defining parameter groups</span>
 
 <span class="sd">        InnerOpt : Type[Optimizer] | Partial[Optimizer], optional (default=`torch.nn.optim.SGD`)</span>
-<span class="sd">            The optimizer that updates the parameters after `_pre_step_transform_` has been applied to each of them.</span>
+<span class="sd">            The optimizer that updates the parameters after `_pre_step_transform_` has</span>
+<span class="sd">            been applied to each of them.</span>
 
 <span class="sd">        param_ndim : int | None, optional (default=-1)</span>
 <span class="sd">            Determines how a parameter and its gradient is temporarily reshaped prior</span>
 <span class="sd">            to being passed to both `_pre_step_transform_` and `_post_step_transform_`.</span>
-<span class="sd">            By default,the transformation broadcasts over the tensor&#39;s first dimension</span>
+<span class="sd">            By default, the transformation broadcasts over the tensor&#39;s first dimension</span>
 <span class="sd">            in a batch-like style.</span>
 
 <span class="sd">            - A positive number determines the dimensionality of the tensor that the transformation will act on.</span>
@@ -889,7 +905,8 @@
 <span class="sd">        &gt;&gt;&gt; x1.grad  # element-0 should be zero&#39;d by top-q; element-2 should be clamped to 2.8</span>
 <span class="sd">        tensor([0.0000, 2.0000, 2.8000])</span>
 
-<span class="sd">        See that `SGD([x1], lr=1.0).step()` is used to update our parameters; this can be controlled via the `InnerOpt` argument.</span>
+<span class="sd">        See that `SGD([x1], lr=1.0).step()` is used to update our parameters; this can</span>
+<span class="sd">        be controlled via the `InnerOpt` argument.</span>
 
 <span class="sd">        &gt;&gt;&gt; x1</span>
 <span class="sd">        tensor([ 1.0000, -1.0000, -1.8000], requires_grad=True)</span>
@@ -959,7 +976,8 @@
         <span class="k">for</span> <span class="n">_opt</span> <span class="ow">in</span> <span class="n">transforming_optimizers</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">instantiates_to</span><span class="p">(</span><span class="n">_opt</span><span class="p">,</span> <span class="n">ParamTransformingOptimizer</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;*transforming_optimizers must contain `Type[ParamTransformingOptimizer]`, got: </span><span class="si">{</span><span class="n">transforming_optimizers</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;*transforming_optimizers must contain &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;`Type[ParamTransformingOptimizer]`, got: </span><span class="si">{</span><span class="n">transforming_optimizers</span><span class="si">}</span><span class="s2">&quot;</span>
                 <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_chain</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
             <span class="n">opt</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">InnerOpt</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">inner_opt</span><span class="p">,</span> <span class="n">defaults</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">defaults</span><span class="p">)</span>

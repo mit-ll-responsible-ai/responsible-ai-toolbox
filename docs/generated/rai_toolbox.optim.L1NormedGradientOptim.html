@@ -362,7 +362,8 @@ a gradient.</p>
 <span class="go">tensor([2., 2.])</span>
 </pre></div>
 </div>
-<p>Performing a step with our optimizer transforms the gradient in-place, and then updates the parameter using <code class="xref py py-obj docutils literal notranslate"><span class="pre">SGD([x],</span> <span class="pre">lr=1.0).step()</span></code>.</p>
+<p>Performing a step with our optimizer transforms the gradient in-place, and then
+updates the parameter using <code class="xref py py-obj docutils literal notranslate"><span class="pre">SGD([x],</span> <span class="pre">lr=1.0).step()</span></code>.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">optim</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="o">.</span><span class="n">grad</span> <span class="c1"># the normalized gradient</span>
 <span class="go">tensor([0.5000, 0.5000])</span>

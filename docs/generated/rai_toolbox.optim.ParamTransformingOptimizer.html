@@ -370,7 +370,7 @@ is applied after the closure call and prior to the parameter steps.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#rai_toolbox.optim.ParamTransformingOptimizer._post_step_transform_" title="rai_toolbox.optim.ParamTransformingOptimizer._post_step_transform_"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_post_step_transform_</span></code></a>(param, optim_group)</p></td>
 <td><p>Applies an in-place transform on each parameter in the given param group <strong>after</strong> that parameter has been updated via <code class="xref py py-obj docutils literal notranslate"><span class="pre">InnerOpt.step</span></code>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#rai_toolbox.optim.ParamTransformingOptimizer.project" title="rai_toolbox.optim.ParamTransformingOptimizer.project"><code class="xref py py-obj docutils literal notranslate"><span class="pre">project</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">project</span></code>()</p></td>
 <td><p>Update each parameter in-place by calling <a class="reference internal" href="#rai_toolbox.optim.ParamTransformingOptimizer._post_step_transform_" title="rai_toolbox.optim.ParamTransformingOptimizer._post_step_transform_"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_post_step_transform_</span></code></a> on the parameter.</p></td>
 </tr>
 </tbody>
@@ -464,7 +464,8 @@ parameter-update functionality – to update the parameter.</p>
 gradient transformation; the next example will involve broadcasting.</p>
 <p><strong>Controlling the gradient transformation with param_ndim</strong></p>
 <p>To understand the role of <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim</span></code> let’s design an optimizer that
-normalizes a parameter’s gradient by its max value – along some user-specified dimension – prior to performing the gradient-based update to its parameter.</p>
+normalizes a parameter’s gradient by its max value – along some user-specified
+dimension – prior to performing the gradient-based update to its parameter.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">MaxNormedGradientOptim</span><span class="p">(</span><span class="n">ParamTransformingOptimizer</span><span class="p">):</span>
 <span class="gp">...</span>
 <span class="gp">... </span>    <span class="k">def</span> <span class="nf">_pre_step_transform_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">:</span> <span class="n">tr</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="o">**</span><span class="n">_kwds</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -541,7 +542,8 @@ optimizer’s param-groups.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="rai_toolbox.optim.ParamTransformingOptimizer._pre_step_transform_">
 <span class="sig-name descname"><span class="pre">_pre_step_transform_</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim_group</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/optim/optimizer.html#ParamTransformingOptimizer._pre_step_transform_"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.optim.ParamTransformingOptimizer._pre_step_transform_" title="Permalink to this definition">#</a></dt>
-<dd><p>Applies an in-place transform on each parameter in the given param group <strong>before</strong> that parameter has been updated via <code class="xref py py-obj docutils literal notranslate"><span class="pre">InnerOpt.step</span></code>.</p>
+<dd><p>Applies an in-place transform on each parameter in the given param group
+<strong>before</strong> that parameter has been updated via <code class="xref py py-obj docutils literal notranslate"><span class="pre">InnerOpt.step</span></code>.</p>
 <p>This defaults to a no-op.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -557,7 +559,8 @@ shape-<code class="xref py py-obj docutils literal notranslate"><span class="pre
 </dl>
 <p class="rubric">Notes</p>
 <p>This transform should <em>always</em> be designed to broadcast over the leading
-dimension of the tensor being modified. That is, each parameter/gradient should be assumed to have the shape-<code class="xref py py-obj docutils literal notranslate"><span class="pre">(N,</span> <span class="pre">d0,</span> <span class="pre">...)</span></code> and the transformation should be
+dimension of the tensor being modified. That is, each parameter/gradient should
+be assumed to have the shape-<code class="xref py py-obj docutils literal notranslate"><span class="pre">(N,</span> <span class="pre">d0,</span> <span class="pre">...)</span></code> and the transformation should be
 applied - in-place - to each shape-<code class="xref py py-obj docutils literal notranslate"><span class="pre">(d0,</span> <span class="pre">...)</span></code> sub-tensor.</p>
 <p>Prior to calling <a class="reference internal" href="#rai_toolbox.optim.ParamTransformingOptimizer._pre_step_transform_" title="rai_toolbox.optim.ParamTransformingOptimizer._pre_step_transform_"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_pre_step_transform_</span></code></a>, <a class="reference internal" href="#rai_toolbox.optim.ParamTransformingOptimizer" title="rai_toolbox.optim.ParamTransformingOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParamTransformingOptimizer</span></code></a>
 will temporarily reshape each parameter and its gradient to have the appropriate
@@ -571,7 +574,8 @@ in the tensor.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="rai_toolbox.optim.ParamTransformingOptimizer._post_step_transform_">
 <span class="sig-name descname"><span class="pre">_post_step_transform_</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim_group</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/optim/optimizer.html#ParamTransformingOptimizer._post_step_transform_"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.optim.ParamTransformingOptimizer._post_step_transform_" title="Permalink to this definition">#</a></dt>
-<dd><p>Applies an in-place transform on each parameter in the given param group <strong>after</strong> that parameter has been updated via <code class="xref py py-obj docutils literal notranslate"><span class="pre">InnerOpt.step</span></code>.</p>
+<dd><p>Applies an in-place transform on each parameter in the given param group
+<strong>after</strong> that parameter has been updated via <code class="xref py py-obj docutils literal notranslate"><span class="pre">InnerOpt.step</span></code>.</p>
 <p>This defaults to a no-op.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -587,8 +591,11 @@ shape-<code class="xref py py-obj docutils literal notranslate"><span class="pre
 </dl>
 <p class="rubric">Notes</p>
 <p>This transform should <em>always</em> be designed to broadcast over the leading
-dimension of the tensor being modified. That is, each parameter/gradient should be assumed to have the shape-(N, d0, …) and the transformation should be
-applied - in-place - to each shape-<code class="xref py py-obj docutils literal notranslate"><span class="pre">(d0,</span> <span class="pre">...)</span></code> sub-tensor.</p>
+dimension of the tensor being modified. That is, each parameter/gradient should</p>
+<blockquote>
+<div><p>be assumed to have the shape-(N, d0, …) and the transformation should be</p>
+</div></blockquote>
+<p>applied - in-place - to each shape-<code class="xref py py-obj docutils literal notranslate"><span class="pre">(d0,</span> <span class="pre">...)</span></code> sub-tensor.</p>
 <p>Prior to calling <a class="reference internal" href="#rai_toolbox.optim.ParamTransformingOptimizer._post_step_transform_" title="rai_toolbox.optim.ParamTransformingOptimizer._post_step_transform_"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_post_step_transform_</span></code></a>, <a class="reference internal" href="#rai_toolbox.optim.ParamTransformingOptimizer" title="rai_toolbox.optim.ParamTransformingOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParamTransformingOptimizer</span></code></a>
 will temporarily reshape each parameter and its gradient to have the appropriate
 shape – in accordance with the value specified for <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim</span></code> – such that
@@ -599,11 +606,20 @@ in the tensor.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="rai_toolbox.optim.ParamTransformingOptimizer.project">
-<span class="sig-name descname"><span class="pre">project</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/optim/optimizer.html#ParamTransformingOptimizer.project"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.optim.ParamTransformingOptimizer.project" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="rai_toolbox.optim.ParamTransformingOptimizer._apply_pre_step_transform_">
+<span class="sig-name descname"><span class="pre">_apply_pre_step_transform_</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/optim/optimizer.html#ParamTransformingOptimizer._apply_pre_step_transform_"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.optim.ParamTransformingOptimizer._apply_pre_step_transform_" title="Permalink to this definition">#</a></dt>
+<dd><p>Update each parameter in-place by calling <a class="reference internal" href="#rai_toolbox.optim.ParamTransformingOptimizer._pre_step_transform_" title="rai_toolbox.optim.ParamTransformingOptimizer._pre_step_transform_"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_pre_step_transform_</span></code></a> on the
+parameter.</p>
+<p>This is called automatically by <code class="xref py py-obj docutils literal notranslate"><span class="pre">step</span></code> before <code class="xref py py-obj docutils literal notranslate"><span class="pre">InnerOpt.step()</span></code> has been
+called.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rai_toolbox.optim.ParamTransformingOptimizer._apply_post_step_transform_">
+<span class="sig-name descname"><span class="pre">_apply_post_step_transform_</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/optim/optimizer.html#ParamTransformingOptimizer._apply_post_step_transform_"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.optim.ParamTransformingOptimizer._apply_post_step_transform_" title="Permalink to this definition">#</a></dt>
 <dd><p>Update each parameter in-place by calling <a class="reference internal" href="#rai_toolbox.optim.ParamTransformingOptimizer._post_step_transform_" title="rai_toolbox.optim.ParamTransformingOptimizer._post_step_transform_"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_post_step_transform_</span></code></a> on the
 parameter.</p>
-<p><a class="reference internal" href="#rai_toolbox.optim.ParamTransformingOptimizer.project" title="rai_toolbox.optim.ParamTransformingOptimizer.project"><code class="xref py py-obj docutils literal notranslate"><span class="pre">project</span></code></a> is called automatically by <code class="xref py py-obj docutils literal notranslate"><span class="pre">step</span></code>.</p>
+<p>This is called automatically by <code class="xref py py-obj docutils literal notranslate"><span class="pre">step</span></code> after <code class="xref py py-obj docutils literal notranslate"><span class="pre">InnerOpt.step()</span></code> has been called.</p>
 </dd></dl>
 
 <p class="rubric">Methods</p>
@@ -626,7 +642,10 @@ parameter.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#rai_toolbox.optim.ParamTransformingOptimizer._post_step_transform_" title="rai_toolbox.optim.ParamTransformingOptimizer._post_step_transform_"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_post_step_transform_</span></code></a>(param, optim_group)</p></td>
 <td><p>Applies an in-place transform on each parameter in the given param group <strong>after</strong> that parameter has been updated via <code class="xref py py-obj docutils literal notranslate"><span class="pre">InnerOpt.step</span></code>.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#rai_toolbox.optim.ParamTransformingOptimizer.project" title="rai_toolbox.optim.ParamTransformingOptimizer.project"><code class="xref py py-obj docutils literal notranslate"><span class="pre">project</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#rai_toolbox.optim.ParamTransformingOptimizer._apply_pre_step_transform_" title="rai_toolbox.optim.ParamTransformingOptimizer._apply_pre_step_transform_"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_apply_pre_step_transform_</span></code></a>()</p></td>
+<td><p>Update each parameter in-place by calling <a class="reference internal" href="#rai_toolbox.optim.ParamTransformingOptimizer._pre_step_transform_" title="rai_toolbox.optim.ParamTransformingOptimizer._pre_step_transform_"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_pre_step_transform_</span></code></a> on the parameter.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#rai_toolbox.optim.ParamTransformingOptimizer._apply_post_step_transform_" title="rai_toolbox.optim.ParamTransformingOptimizer._apply_post_step_transform_"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_apply_post_step_transform_</span></code></a>()</p></td>
 <td><p>Update each parameter in-place by calling <a class="reference internal" href="#rai_toolbox.optim.ParamTransformingOptimizer._post_step_transform_" title="rai_toolbox.optim.ParamTransformingOptimizer._post_step_transform_"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_post_step_transform_</span></code></a> on the parameter.</p></td>
 </tr>
 </tbody>

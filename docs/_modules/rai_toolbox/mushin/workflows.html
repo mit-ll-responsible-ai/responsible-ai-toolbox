@@ -177,20 +177,35 @@
 <span class="c1"># Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).</span>
 <span class="c1"># SPDX-License-Identifier: MIT</span>
 
-<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span><span class="p">,</span> <span class="n">abstractstaticmethod</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">UserList</span><span class="p">,</span> <span class="n">defaultdict</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Any</span><span class="p">,</span>
+    <span class="n">Callable</span><span class="p">,</span>
+    <span class="n">DefaultDict</span><span class="p">,</span>
+    <span class="n">Dict</span><span class="p">,</span>
+    <span class="n">Iterable</span><span class="p">,</span>
+    <span class="n">List</span><span class="p">,</span>
+    <span class="n">Optional</span><span class="p">,</span>
+    <span class="n">Sequence</span><span class="p">,</span>
+    <span class="n">Tuple</span><span class="p">,</span>
+    <span class="n">Type</span><span class="p">,</span>
+    <span class="n">TypeVar</span><span class="p">,</span>
+    <span class="n">Union</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">torch</span> <span class="k">as</span> <span class="nn">tr</span>
+<span class="kn">from</span> <span class="nn">hydra.core.override_parser.overrides_parser</span> <span class="kn">import</span> <span class="n">OverridesParser</span>
 <span class="kn">from</span> <span class="nn">hydra.core.utils</span> <span class="kn">import</span> <span class="n">JobReturn</span>
-<span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">load_from_yaml</span><span class="p">,</span> <span class="n">make_config</span>
+<span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">launch</span><span class="p">,</span> <span class="n">load_from_yaml</span><span class="p">,</span> <span class="n">make_config</span>
+<span class="kn">from</span> <span class="nn">hydra_zen._compatibility</span> <span class="kn">import</span> <span class="n">HYDRA_VERSION</span>
+<span class="kn">from</span> <span class="nn">hydra_zen._launch</span> <span class="kn">import</span> <span class="n">_NotSet</span>
 <span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Self</span><span class="p">,</span> <span class="n">TypeAlias</span><span class="p">,</span> <span class="n">TypeGuard</span>
 
 <span class="kn">from</span> <span class="nn">rai_toolbox._utils</span> <span class="kn">import</span> <span class="n">value_check</span>
 
-<span class="kn">from</span> <span class="nn">.hydra</span> <span class="kn">import</span> <span class="n">launch</span><span class="p">,</span> <span class="n">zen</span>
+<span class="kn">from</span> <span class="nn">.hydra</span> <span class="kn">import</span> <span class="n">zen</span>
 
 <span class="n">LoadedValue</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span>
 
@@ -201,6 +216,13 @@
     <span class="s2">&quot;multirun&quot;</span><span class="p">,</span>
     <span class="s2">&quot;hydra_list&quot;</span><span class="p">,</span>
 <span class="p">]</span>
+
+
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">])</span>
+<span class="n">T1</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T1&quot;</span><span class="p">)</span>
+
+
+<span class="n">_VERSION_BASE_DEFAULT</span> <span class="o">=</span> <span class="n">_NotSet</span> <span class="k">if</span> <span class="n">HYDRA_VERSION</span> <span class="o">&lt;</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;1.1&quot;</span>
 
 
 <span class="k">class</span> <span class="nc">multirun</span><span class="p">(</span><span class="n">UserList</span><span class="p">):</span>
@@ -216,7 +238,18 @@
     <span class="k">pass</span>
 
 
-<div class="viewcode-block" id="BaseWorkflow"><a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.BaseWorkflow.html#rai_toolbox.mushin.BaseWorkflow">[docs]</a><span class="k">class</span> <span class="nc">BaseWorkflow</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_sort_x_by_k</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+    <span class="n">sorted_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="nb">sorted</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">k</span><span class="p">),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)(</span><span class="n">sorted_</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_identity</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">T1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T1</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">x</span>
+
+
+<div class="viewcode-block" id="BaseWorkflow"><a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.BaseWorkflow.html#rai_toolbox.mushin.BaseWorkflow">[docs]</a><span class="k">class</span> <span class="nc">BaseWorkflow</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Provides an interface for creating a reusable workflow: encapsulated</span>
 <span class="sd">    &quot;boilerplate&quot; for running, aggregating, and analyzing one or more Hydra jobs.</span>
 
@@ -234,7 +267,7 @@
 <span class="sd">    jobs : List[Any]</span>
 <span class="sd">        List of jobs returned for each experiment within the workflow.</span>
 
-<span class="sd">    working_dir: pathlib.Path</span>
+<span class="sd">    working_dir: Optional[pathlib.Path]</span>
 <span class="sd">        The working directory of the experiment defined by Hydra&#39;s sweep directory</span>
 <span class="sd">        (`hydra.sweep.dir`).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -242,8 +275,7 @@
     <span class="n">cfgs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span>
     <span class="n">metrics</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span>
     <span class="n">workflow_overrides</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
-    <span class="n">jobs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span>
-    <span class="n">working_dir</span><span class="p">:</span> <span class="n">Path</span>
+    <span class="n">jobs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">JobReturn</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">JobReturn</span><span class="p">]</span>
 
 <div class="viewcode-block" id="BaseWorkflow.__init__"><a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.BaseWorkflow.html#rai_toolbox.mushin.BaseWorkflow.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eval_task_cfg</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Workflows and experiments using Hydra.</span>
@@ -265,7 +297,50 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">workflow_overrides</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_multirun_task_overrides</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">jobs</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span>  <span class="c1"># TODO: I don&#39;t think we should assume this</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_working_dir</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">working_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_working_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`self.working_dir` must be set.&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_working_dir</span>
+
+    <span class="nd">@working_dir</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">working_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">value_check</span><span class="p">(</span><span class="s2">&quot;path&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">type_</span><span class="o">=</span><span class="n">Path</span><span class="p">)</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;`path` point to an existing directory, got </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_working_dir</span> <span class="o">=</span> <span class="n">path</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_parse_overrides</span><span class="p">(</span><span class="n">overrides</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="n">parser</span> <span class="o">=</span> <span class="n">OverridesParser</span><span class="o">.</span><span class="n">create</span><span class="p">()</span>
+        <span class="n">parsed_overrides</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_overrides</span><span class="p">(</span><span class="n">overrides</span><span class="o">=</span><span class="n">overrides</span><span class="p">)</span>
+
+        <span class="n">output</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">override</span> <span class="ow">in</span> <span class="n">parsed_overrides</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">override</span><span class="o">.</span><span class="n">is_sweep_override</span><span class="p">():</span>
+                <span class="n">param_name</span> <span class="o">=</span> <span class="n">override</span><span class="o">.</span><span class="n">get_key_element</span><span class="p">()</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="n">_num_from_string</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">override</span><span class="o">.</span><span class="n">sweep_string_iterator</span><span class="p">()</span>
+                <span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">param_name</span> <span class="o">=</span> <span class="n">override</span><span class="o">.</span><span class="n">get_key_element</span><span class="p">()</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="n">override</span><span class="o">.</span><span class="n">get_value_element_as_str</span><span class="p">()</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="n">_num_from_string</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+
+            <span class="n">param_name</span> <span class="o">=</span> <span class="n">param_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;+&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">output</span><span class="p">[</span><span class="n">param_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+
+        <span class="k">return</span> <span class="n">output</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">multirun_task_overrides</span><span class="p">(</span>
@@ -273,25 +348,22 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="n">LoadedValue</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">LoadedValue</span><span class="p">]]]:</span>
         <span class="c1"># e.g. {&#39;epsilon&#39;: [1.0, 2.0, 3.0], &quot;foo&quot;: &quot;apple&quot;}</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_multirun_task_overrides</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">load_from_yaml</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span> <span class="o">/</span> <span class="s2">&quot;multirun.yaml&quot;</span>
-            <span class="p">)</span><span class="o">.</span><span class="n">hydra</span><span class="o">.</span><span class="n">overrides</span><span class="o">.</span><span class="n">task</span><span class="p">:</span>
-                <span class="n">entry</span><span class="p">:</span> <span class="nb">str</span>  <span class="c1"># e.g. +epsilon=1.0,3.0,2.0</span>
-                <span class="n">param_name</span><span class="p">,</span> <span class="n">val</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-                <span class="k">if</span> <span class="s2">&quot;,&quot;</span> <span class="ow">in</span> <span class="n">val</span><span class="p">:</span>
-                    <span class="n">val</span> <span class="o">=</span> <span class="p">[</span><span class="n">_num_from_string</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">val</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)]</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">val</span> <span class="o">=</span> <span class="n">_num_from_string</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
 
-                <span class="n">param_name</span> <span class="o">=</span> <span class="n">param_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;+&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_multirun_task_overrides</span><span class="p">[</span><span class="n">param_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+            <span class="n">overrides</span> <span class="o">=</span> <span class="n">load_from_yaml</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span> <span class="o">/</span> <span class="s2">&quot;multirun.yaml&quot;</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">hydra</span><span class="o">.</span><span class="n">overrides</span><span class="o">.</span><span class="n">task</span>
+
+            <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_overrides</span><span class="p">(</span><span class="n">overrides</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_multirun_task_overrides</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_multirun_task_overrides</span>
 
-<div class="viewcode-block" id="BaseWorkflow.evaluation_task"><a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.BaseWorkflow.html#rai_toolbox.mushin.BaseWorkflow.evaluation_task">[docs]</a>    <span class="nd">@abstractstaticmethod</span>
+<div class="viewcode-block" id="BaseWorkflow.evaluation_task"><a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.BaseWorkflow.html#rai_toolbox.mushin.BaseWorkflow.evaluation_task">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">evaluation_task</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;User-defined evaluation task to run the workflow.</span>
+        <span class="sd">&quot;&quot;&quot;User-defined evaluation task to run the workflow. This should be</span>
+<span class="sd">        a static method.</span>
 
-<span class="sd">        Arguments should be instantiated configuration variables.  For example,</span>
+<span class="sd">        Arguments will be instantiated configuration variables.  For example,</span>
 <span class="sd">        if the the workflow configuration is structured as::</span>
 
 <span class="sd">            ├── eval_task_cfg</span>
@@ -302,6 +374,7 @@
 <span class="sd">        The inputs to `evaluation_task` can be any of the three configurations:</span>
 <span class="sd">        `trainer`, `module`, or `another_config` such as::</span>
 
+<span class="sd">            @staticmethod</span>
 <span class="sd">            def evaluation_task(trainer: Trainer, module: LightningModule) -&gt; None:</span>
 <span class="sd">                trainer.fit(module)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -314,10 +387,18 @@
 <div class="viewcode-block" id="BaseWorkflow.run"><a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.BaseWorkflow.html#rai_toolbox.mushin.BaseWorkflow.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
+        <span class="n">task_fn_wrapper</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
+            <span class="n">Callable</span><span class="p">[[</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">T1</span><span class="p">]],</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="n">T1</span><span class="p">]],</span> <span class="kc">None</span>
+        <span class="p">]</span> <span class="o">=</span> <span class="n">zen</span><span class="p">,</span>
         <span class="n">working_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">sweeper</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">launcher</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">overrides</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">version_base</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">_NotSet</span><span class="p">]]]</span> <span class="o">=</span> <span class="n">_VERSION_BASE_DEFAULT</span><span class="p">,</span>
+        <span class="n">to_dictconfig</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">config_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;rai_workflow&quot;</span><span class="p">,</span>
+        <span class="n">job_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;rai_workflow&quot;</span><span class="p">,</span>
+        <span class="n">with_log_configuration</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="o">**</span><span class="n">workflow_overrides</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">multirun</span><span class="p">,</span> <span class="n">hydra_list</span><span class="p">],</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Run the experiment.</span>
@@ -328,6 +409,11 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
+<span class="sd">        task_fn_wrapper: Callable[[Callable[..., T1]], Callable[[Any], T1]] | None, optional (default=rai_toolbox.mushin.zen)</span>
+<span class="sd">            A wrapper applied to `self.evaluation_task` prior to launching the task.</span>
+<span class="sd">            The default wrapper is `rai_toolbox.mushin.zen`. Specify `None` for no</span>
+<span class="sd">            wrapper to be applied.</span>
+
 <span class="sd">        working_dir: str (default: None, the Hydra default will be used)</span>
 <span class="sd">            The directory to run the experiment in.  This value is used for</span>
 <span class="sd">            setting `hydra.sweep.dir`.</span>
@@ -345,6 +431,25 @@
 <span class="sd">            This is helpful for filtering out parameters stored in</span>
 <span class="sd">            `self.workflow_overrides`.</span>
 
+<span class="sd">        version_base : Optional[str], optional (default=1.1)</span>
+<span class="sd">            Available starting with Hydra 1.2.0.</span>
+<span class="sd">            - If the `version_base parameter` is not specified, Hydra 1.x will use defaults compatible with version 1.1. Also in this case, a warning is issued to indicate an explicit version_base is preferred.</span>
+<span class="sd">            - If the `version_base parameter` is `None`, then the defaults are chosen for the current minor Hydra version. For example for Hydra 1.2, then would imply `config_path=None` and `hydra.job.chdir=False`.</span>
+<span class="sd">            - If the `version_base` parameter is an explicit version string like &quot;1.1&quot;, then the defaults appropriate to that version are used.</span>
+
+<span class="sd">        to_dictconfig: bool (default: False)</span>
+<span class="sd">            If ``True``, convert a ``dataclasses.dataclass`` to a ``omegaconf.DictConfig``. Note, this</span>
+<span class="sd">            will remove Hydra&#39;s cabability for validation with structured configurations.</span>
+
+<span class="sd">        config_name : str (default: &quot;rai_workflow&quot;)</span>
+<span class="sd">            Name of the stored configuration in Hydra&#39;s ConfigStore API.</span>
+
+<span class="sd">        job_name : str (default: &quot;rai_workflow&quot;)</span>
+<span class="sd">            Name of job for logging.</span>
+
+<span class="sd">        with_log_configuration : bool (default: True)</span>
+<span class="sd">            If ``True``, enables the configuration of the logging subsystem from the loaded config.</span>
+
 <span class="sd">        **workflow_overrides: str | int | float | bool | multirun | hydra_list | dict</span>
 <span class="sd">            These parameters represent the values for configurations to use for the</span>
 <span class="sd">            experiment.</span>
@@ -355,8 +460,6 @@
 
 <span class="sd">            These values will be appended to the `overrides` for the Hydra job.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_workflow_overrides</span> <span class="o">=</span> <span class="n">workflow_overrides</span>
-
         <span class="n">launch_overrides</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="k">if</span> <span class="n">overrides</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -385,30 +488,41 @@
 
             <span class="n">launch_overrides</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}{</span><span class="n">k</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
+        <span class="k">if</span> <span class="n">task_fn_wrapper</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">task_fn_wrapper</span> <span class="o">=</span> <span class="n">_identity</span>
+
         <span class="c1"># Run a Multirun over epsilons</span>
-        <span class="p">(</span><span class="n">jobs</span><span class="p">,)</span> <span class="o">=</span> <span class="n">launch</span><span class="p">(</span>
+        <span class="n">jobs</span> <span class="o">=</span> <span class="n">launch</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">eval_task_cfg</span><span class="p">,</span>
-            <span class="n">zen</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evaluation_task</span><span class="p">),</span>
+            <span class="n">task_fn_wrapper</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evaluation_task</span><span class="p">),</span>
             <span class="n">overrides</span><span class="o">=</span><span class="n">launch_overrides</span><span class="p">,</span>
             <span class="n">multirun</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">version_base</span><span class="o">=</span><span class="n">version_base</span><span class="p">,</span>
+            <span class="n">to_dictconfig</span><span class="o">=</span><span class="n">to_dictconfig</span><span class="p">,</span>
+            <span class="n">config_name</span><span class="o">=</span><span class="n">config_name</span><span class="p">,</span>
+            <span class="n">job_name</span><span class="o">=</span><span class="n">job_name</span><span class="p">,</span>
+            <span class="n">with_log_configuration</span><span class="o">=</span><span class="n">with_log_configuration</span><span class="p">,</span>
         <span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">jobs</span><span class="p">,</span> <span class="n">List</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">jobs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c1"># hydra returns [jobs]</span>
+            <span class="n">jobs</span> <span class="o">=</span> <span class="n">jobs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">_job_nums</span> <span class="o">=</span> <span class="p">[</span><span class="n">j</span><span class="o">.</span><span class="n">hydra_cfg</span><span class="o">.</span><span class="n">hydra</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">num</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">jobs</span><span class="p">]</span>
+            <span class="c1"># ensure jobs are always sorted by job-num</span>
+            <span class="n">jobs</span> <span class="o">=</span> <span class="n">_sort_x_by_k</span><span class="p">(</span><span class="n">jobs</span><span class="p">,</span> <span class="n">_job_nums</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">jobs</span> <span class="o">=</span> <span class="n">jobs</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">jobs_post_process</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="BaseWorkflow.jobs_post_process"><a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.BaseWorkflow.html#rai_toolbox.mushin.BaseWorkflow.jobs_post_process">[docs]</a>    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">jobs_post_process</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Method to extract attributes and metrics relevant to the workflow.&quot;&quot;&quot;</span></div>
+<div class="viewcode-block" id="BaseWorkflow.jobs_post_process"><a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.BaseWorkflow.html#rai_toolbox.mushin.BaseWorkflow.jobs_post_process">[docs]</a>    <span class="k">def</span> <span class="nf">jobs_post_process</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+        <span class="sd">&quot;&quot;&quot;Method to extract attributes and metrics relevant to the workflow.&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
 
-    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
         <span class="sd">&quot;&quot;&quot;Plot workflow metrics.&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">to_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Convert workflow data to Pandas DataFrame.&quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
-
-    <span class="k">def</span> <span class="nf">to_xarray</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">to_xarray</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
         <span class="sd">&quot;&quot;&quot;Convert workflow data to xArray Dataset or DataArray.&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
 
@@ -426,6 +540,12 @@
 
 <span class="k">def</span> <span class="nf">_non_str_sequence</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TypeGuard</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
     <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_coerce_list_of_arraylikes</span><span class="p">(</span><span class="n">v</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]):</span>
+    <span class="k">if</span> <span class="n">v</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;__array__&quot;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">v</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">v</span>
 
 
 <div class="viewcode-block" id="MultiRunMetricsWorkflow"><a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.MultiRunMetricsWorkflow.html#rai_toolbox.mushin.MultiRunMetricsWorkflow">[docs]</a><span class="k">class</span> <span class="nc">MultiRunMetricsWorkflow</span><span class="p">(</span><span class="n">BaseWorkflow</span><span class="p">):</span>
@@ -465,7 +585,8 @@
 <span class="sd">    ...         tr.save(result, &quot;test_metrics.pt&quot;)</span>
 <span class="sd">    ...         return result</span>
 
-<span class="sd">    We&#39;ll run this workflow for six total configurations of three `epsilon` values and two `scale` values. This will launch a Hydra multirun job and aggregate the results.</span>
+<span class="sd">    We&#39;ll run this workflow for six total configurations of three `epsilon` values and</span>
+<span class="sd">    two `scale` values. This will launch a Hydra multirun job and aggregate the results.</span>
 
 <span class="sd">    &gt;&gt;&gt; wf = LocalRobustness()</span>
 <span class="sd">    &gt;&gt;&gt; wf.run(epsilon=multirun([1.0, 2.0, 3.0]), scale=multirun([0.1, 1.0]))</span>
@@ -478,7 +599,8 @@
 <span class="sd">    [2022-05-02 11:57:59,683][HYDRA] 	#5 : +epsilon=3.0 +scale=1.0</span>
 
 <span class="sd">    Now that this workflow has run, we can view the results as an xarray-dataset whose</span>
-<span class="sd">    coordinates reflect the multirun parameters that were varied, and whose data-variables are our recorded metrics: &quot;accuracies&quot; and &quot;loss&quot;.</span>
+<span class="sd">    coordinates reflect the multirun parameters that were varied, and whose</span>
+<span class="sd">    data-variables are our recorded metrics: &quot;accuracies&quot; and &quot;loss&quot;.</span>
 
 <span class="sd">    &gt;&gt;&gt; ds = wf.to_xarray()</span>
 <span class="sd">    &gt;&gt;&gt; ds</span>
@@ -505,36 +627,194 @@
 <span class="sd">        loss        (epsilon, scale) float64 0.01 1.0 0.04 4.0 0.09 9.0</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="nd">@abstractstaticmethod</span>
-    <span class="k">def</span> <span class="nf">evaluation_task</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<div class="viewcode-block" id="MultiRunMetricsWorkflow.__init__"><a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.MultiRunMetricsWorkflow.html#rai_toolbox.mushin.MultiRunMetricsWorkflow.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eval_task_cfg</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">working_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">eval_task_cfg</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_working_dir</span> <span class="o">=</span> <span class="n">working_dir</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_working_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">load_from_dir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="p">,</span> <span class="n">metrics_filename</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></div>
+
+    <span class="c1"># TODO: add target_job_dirs example</span>
+    <span class="c1">#      Document .swap_dims({&quot;job_dir&quot;: &lt;...&gt;}) and .set_index(job_dir=[...]).unstack(&quot;job_dir&quot;)</span>
+    <span class="c1">#      for re-indexing based on overrides values</span>
+
+    <span class="n">_JOBDIR_NAME</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;job_dir&quot;</span>
+    <span class="n">_target_dir_multirun_overrides</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DefaultDict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">output_subdir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1"># List of all the dirs that the multirun writes to; sorted by job-num</span>
+    <span class="n">multirun_working_dirs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Path</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">evaluation_task</span><span class="p">(</span>
+        <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>  <span class="c1"># pragma: no cover</span>
+        <span class="sd">&quot;&quot;&quot;Abstract `staticmethod` for users to define the evalultion task&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+
+<div class="viewcode-block" id="MultiRunMetricsWorkflow.run"><a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.MultiRunMetricsWorkflow.html#rai_toolbox.mushin.MultiRunMetricsWorkflow.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">task_fn_wrapper</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
+            <span class="n">Callable</span><span class="p">[[</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">T1</span><span class="p">]],</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="n">T1</span><span class="p">]],</span> <span class="kc">None</span>
+        <span class="p">]</span> <span class="o">=</span> <span class="n">zen</span><span class="p">,</span>
+        <span class="n">working_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">sweeper</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">launcher</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">overrides</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">version_base</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">_NotSet</span><span class="p">]]]</span> <span class="o">=</span> <span class="n">_VERSION_BASE_DEFAULT</span><span class="p">,</span>
+        <span class="n">target_job_dirs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">to_dictconfig</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">config_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;rai_workflow&quot;</span><span class="p">,</span>
+        <span class="n">job_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;rai_workflow&quot;</span><span class="p">,</span>
+        <span class="n">with_log_configuration</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">workflow_overrides</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">multirun</span><span class="p">,</span> <span class="n">hydra_list</span><span class="p">],</span>
+    <span class="p">):</span>
+        <span class="c1"># TODO: add docs</span>
+
+        <span class="k">if</span> <span class="n">target_job_dirs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target_job_dirs</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;`target_job_dirs` must be a sequence of pathlike objects, got: </span><span class="si">{</span><span class="n">target_job_dirs</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+            <span class="n">value_check</span><span class="p">(</span><span class="s2">&quot;target_job_dirs&quot;</span><span class="p">,</span> <span class="n">target_job_dirs</span><span class="p">,</span> <span class="n">type_</span><span class="o">=</span><span class="n">Sequence</span><span class="p">)</span>
+
+            <span class="n">target_job_dirs</span> <span class="o">=</span> <span class="p">[</span><span class="n">Path</span><span class="p">(</span><span class="n">s</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">target_job_dirs</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">target_job_dirs</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">d</span><span class="o">.</span><span class="n">is_dir</span><span class="p">()</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">d</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                    <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;The specified target directory – </span><span class="si">{</span><span class="n">d</span><span class="si">}</span><span class="s2"> – does not exist.&quot;</span>
+                    <span class="p">)</span>
+            <span class="n">target_job_dirs</span> <span class="o">=</span> <span class="n">multirun</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">target_job_dirs</span><span class="p">])</span>
+            <span class="n">workflow_overrides</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_JOBDIR_NAME</span><span class="p">]</span> <span class="o">=</span> <span class="n">target_job_dirs</span>
+
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+            <span class="n">task_fn_wrapper</span><span class="o">=</span><span class="n">task_fn_wrapper</span><span class="p">,</span>
+            <span class="n">working_dir</span><span class="o">=</span><span class="n">working_dir</span><span class="p">,</span>
+            <span class="n">sweeper</span><span class="o">=</span><span class="n">sweeper</span><span class="p">,</span>
+            <span class="n">launcher</span><span class="o">=</span><span class="n">launcher</span><span class="p">,</span>
+            <span class="n">overrides</span><span class="o">=</span><span class="n">overrides</span><span class="p">,</span>
+            <span class="n">version_base</span><span class="o">=</span><span class="n">version_base</span><span class="p">,</span>
+            <span class="n">to_dictconfig</span><span class="o">=</span><span class="n">to_dictconfig</span><span class="p">,</span>
+            <span class="n">config_name</span><span class="o">=</span><span class="n">config_name</span><span class="p">,</span>
+            <span class="n">job_name</span><span class="o">=</span><span class="n">job_name</span><span class="p">,</span>
+            <span class="n">with_log_configuration</span><span class="o">=</span><span class="n">with_log_configuration</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">workflow_overrides</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">target_dir_multirun_overrides</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        For a multirun that sweeps over the target directories of a</span>
+<span class="sd">        previous multirun, `target_dir_multirun_overrides` provides</span>
+<span class="sd">        the flattened overrides for that previous run.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; class A(MultiRunMetricsWorkflow):</span>
+<span class="sd">        ...     @staticmethod</span>
+<span class="sd">        ...     def evaluation_task(value: float, scale: float):</span>
+<span class="sd">        ...         pass</span>
+<span class="sd">        ...</span>
+
+<span class="sd">        &gt;&gt;&gt; class B(MultiRunMetricsWorkflow):</span>
+<span class="sd">        ...     @staticmethod</span>
+<span class="sd">        ...     def evaluation_task():</span>
+<span class="sd">        ...         pass</span>
+
+<span class="sd">        &gt;&gt;&gt; a = A()</span>
+<span class="sd">        &gt;&gt;&gt; a.run(value=multirun([-1.0, 0.0, 1.0]), scale=multirun([11.0, 9.0]))</span>
+<span class="sd">        [2022-05-13 17:19:51,497][HYDRA] Launching 6 jobs locally</span>
+<span class="sd">        [2022-05-13 17:19:51,497][HYDRA] 	#0 : +value=-1.0 +scale=11.0</span>
+<span class="sd">        [2022-05-13 17:19:51,555][HYDRA] 	#1 : +value=-1.0 +scale=9.0</span>
+<span class="sd">        [2022-05-13 17:19:51,729][HYDRA] 	#2 : +value=1.0 +scale=11.0</span>
+<span class="sd">        [2022-05-13 17:19:51,787][HYDRA] 	#3 : +value=1.0 +scale=9.0</span>
+
+<span class="sd">        &gt;&gt;&gt; b = B()</span>
+<span class="sd">        &gt;&gt;&gt; b.run(target_job_dirs=a.multirun_working_dirs)</span>
+<span class="sd">        [2022-05-13 17:19:59,900][HYDRA] Launching 6 jobs locally</span>
+<span class="sd">        [2022-05-13 17:19:59,900][HYDRA] 	#0 : +job_dir=/home/scratch/multirun/0</span>
+<span class="sd">        [2022-05-13 17:19:59,958][HYDRA] 	#1 : +job_dir=/home/scratch/multirun/1</span>
+<span class="sd">        [2022-05-13 17:20:00,015][HYDRA] 	#2 : +job_dir=/home/scratch/multirun/2</span>
+<span class="sd">        [2022-05-13 17:20:00,073][HYDRA] 	#3 : +job_dir=/home/scratch/multirun/3</span>
+
+<span class="sd">        &gt;&gt;&gt; b.target_dir_multirun_overrides</span>
+<span class="sd">        {&#39;value&#39;: [-1.0, -1.0, 1.0, 1.0],</span>
+<span class="sd">         &#39;scale&#39;: [11.0, 9.0, 11.0, 9.0]}&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_target_dir_multirun_overrides</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_target_dir_multirun_overrides</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_subdir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+
+        <span class="n">multirun_cfg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span> <span class="o">/</span> <span class="s2">&quot;multirun.yaml&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_target_dir_multirun_overrides</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+
+        <span class="n">overrides</span> <span class="o">=</span> <span class="n">load_from_yaml</span><span class="p">(</span><span class="n">multirun_cfg</span><span class="p">)</span><span class="o">.</span><span class="n">hydra</span><span class="o">.</span><span class="n">overrides</span><span class="o">.</span><span class="n">task</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">overrides</span> <span class="o">=</span> <span class="n">overrides</span>
+
+        <span class="n">dirs</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">overrides</span><span class="p">:</span>
+            <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">o</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)</span>
+            <span class="n">k</span> <span class="o">=</span> <span class="n">k</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;+&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_JOBDIR_NAME</span><span class="p">:</span>
+                <span class="n">dirs</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
+                <span class="k">break</span>
+
+        <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dirs</span><span class="p">:</span>
+            <span class="n">overrides</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+                <span class="n">load_from_yaml</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">output_subdir</span><span class="si">}</span><span class="s2">/overrides.yaml&quot;</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_overrides</span><span class="p">(</span><span class="n">overrides</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">ko</span><span class="p">,</span> <span class="n">vo</span> <span class="ow">in</span> <span class="n">output</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_target_dir_multirun_overrides</span><span class="p">[</span><span class="n">ko</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vo</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_target_dir_multirun_overrides</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">jobs_post_process</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">jobs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
         <span class="c1"># TODO: Make protocol type for JobReturn</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">jobs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">JobReturn</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jobs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">JobReturn</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">multirun_working_dirs</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">job</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">jobs</span><span class="p">:</span>
+            <span class="n">_hydra_cfg</span> <span class="o">=</span> <span class="n">job</span><span class="o">.</span><span class="n">hydra_cfg</span>
+            <span class="k">assert</span> <span class="n">_hydra_cfg</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="k">assert</span> <span class="n">job</span><span class="o">.</span><span class="n">working_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="n">_cwd</span> <span class="o">=</span> <span class="n">_hydra_cfg</span><span class="o">.</span><span class="n">hydra</span><span class="o">.</span><span class="n">runtime</span><span class="o">.</span><span class="n">cwd</span>
+            <span class="n">working_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">_cwd</span><span class="p">)</span> <span class="o">/</span> <span class="n">job</span><span class="o">.</span><span class="n">working_dir</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">multirun_working_dirs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">working_dir</span><span class="p">)</span>
 
         <span class="c1"># set working directory of this workflow</span>
-        <span class="n">first_job_working_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">jobs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">working_dir</span>
-        <span class="k">assert</span> <span class="n">first_job_working_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">first_job_working_dir</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">multirun_working_dirs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">parent</span>
+
+        <span class="n">hydra_cfg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">jobs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">hydra_cfg</span>
+        <span class="k">assert</span> <span class="n">hydra_cfg</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_subdir</span> <span class="o">=</span> <span class="n">hydra_cfg</span><span class="o">.</span><span class="n">hydra</span><span class="o">.</span><span class="n">output_subdir</span>
 
         <span class="c1"># extract configs, overrides, and metrics</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cfgs</span> <span class="o">=</span> <span class="p">[</span><span class="n">j</span><span class="o">.</span><span class="n">cfg</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">jobs</span><span class="p">]</span>
-        <span class="n">job_overrides</span> <span class="o">=</span> <span class="p">[</span><span class="n">j</span><span class="o">.</span><span class="n">hydra_cfg</span><span class="o">.</span><span class="n">hydra</span><span class="o">.</span><span class="n">overrides</span><span class="o">.</span><span class="n">task</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">jobs</span><span class="p">]</span>
         <span class="n">job_metrics</span> <span class="o">=</span> <span class="p">[</span><span class="n">j</span><span class="o">.</span><span class="n">return_value</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">jobs</span><span class="p">]</span>
-        <span class="n">workflow_params</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_workflow_overrides</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_metrics</span><span class="p">(</span><span class="n">job_metrics</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">workflow_overrides</span> <span class="o">=</span> <span class="n">_load_metrics</span><span class="p">(</span>
-            <span class="n">job_overrides</span><span class="p">,</span> <span class="n">job_metrics</span><span class="p">,</span> <span class="n">workflow_params</span>
-        <span class="p">)</span>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_process_metrics</span><span class="p">(</span><span class="n">job_metrics</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="n">metrics</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">task_metrics</span> <span class="ow">in</span> <span class="n">job_metrics</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">task_metrics</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">task_metrics</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="c1"># get item if it&#39;s a single element array</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">v</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+                <span class="n">metrics</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">metrics</span>
 
 <div class="viewcode-block" id="MultiRunMetricsWorkflow.load_from_dir"><a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.MultiRunMetricsWorkflow.html#rai_toolbox.mushin.MultiRunMetricsWorkflow.load_from_dir">[docs]</a>    <span class="k">def</span> <span class="nf">load_from_dir</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span>
         <span class="n">working_dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
-        <span class="n">config_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;.hydra&quot;</span><span class="p">,</span>
-        <span class="n">metrics_filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;test_metrics.pt&quot;</span><span class="p">,</span>
-        <span class="n">workflow_params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">metrics_filename</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="kc">None</span><span class="p">],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Loading workflow job data from a given working directory. The workflow</span>
 <span class="sd">        is loaded in-place and &quot;self&quot; is returned by this method.</span>
@@ -546,85 +826,145 @@
 <span class="sd">            that subdirectories within this working directory will contain</span>
 <span class="sd">            individual Hydra jobs data (yaml configurations) and saved metrics files.</span>
 
-<span class="sd">        config_dir: str (default: &quot;.hydra&quot;)</span>
-<span class="sd">            The directory in an experiment that stores Hydra configurations (`hydra.output_subdir`)</span>
-
-<span class="sd">        metrics_filename: str (default: &quot;test_metrics.pt&quot;)</span>
-<span class="sd">            The filename used to save metrics for each individual Hydra job. This can</span>
-<span class="sd">            be a search pattern as well since this is appended to</span>
-
-<span class="sd">                `Path(working_dir).glob(&quot;**/*/&lt;metrics_filename&quot;)`</span>
-
-<span class="sd">        workflow_params: Sequence[str] | None (default: None)</span>
-<span class="sd">            A string of parameters to use for `workflow_params`.  If `None` it will</span>
-<span class="sd">            default to all parameters saved in Hydra&#39;s `overrides.yaml` file.</span>
+<span class="sd">        metrics_filename: str | Sequence[str] | None</span>
+<span class="sd">            The filename(s) or glob-pattern(s) uses to load the metrics.</span>
+<span class="sd">            If `None`, the metrics stored in `self.metrics` is used.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        loaded_workflow : Self</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">working_dir</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">working_dir</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_subdir</span> <span class="o">=</span> <span class="n">load_from_yaml</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span> <span class="o">/</span> <span class="s2">&quot;multirun.yaml&quot;</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">hydra</span><span class="o">.</span><span class="n">output_subdir</span>
 
-        <span class="n">multirun_cfg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span> <span class="o">/</span> <span class="s2">&quot;multirun.yaml&quot;</span>
-        <span class="k">assert</span> <span class="p">(</span>
-            <span class="n">multirun_cfg</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>
-        <span class="p">),</span> <span class="s2">&quot;Working directory does not contain `multirun.yaml` file.  Be sure to use the value of the Hydra sweep directory for the workflow&quot;</span>
-
-        <span class="c1"># Load saved YAML configurations for each job (in hydra.job.output_subdir)</span>
-        <span class="n">job_cfgs</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">load_from_yaml</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;**/*/</span><span class="si">{</span><span class="n">config_dir</span><span class="si">}</span><span class="s2">/config.yaml&quot;</span><span class="p">))</span>
-        <span class="p">]</span>
-
-        <span class="c1"># Load saved YAML overrides for each job (in hydra.job.output_subdir)</span>
-        <span class="n">job_overrides</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="nb">list</span><span class="p">(</span><span class="n">load_from_yaml</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
-            <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;**/*/</span><span class="si">{</span><span class="n">config_dir</span><span class="si">}</span><span class="s2">/overrides.yaml&quot;</span><span class="p">))</span>
-        <span class="p">]</span>
-
-        <span class="c1"># Load metrics for each job</span>
-        <span class="n">job_metrics</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">tr</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;**/*/</span><span class="si">{</span><span class="n">metrics_filename</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
-        <span class="p">]</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">cfgs</span> <span class="o">=</span> <span class="n">job_cfgs</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">workflow_overrides</span> <span class="o">=</span> <span class="n">_load_metrics</span><span class="p">(</span>
-            <span class="n">job_overrides</span><span class="p">,</span> <span class="n">job_metrics</span><span class="p">,</span> <span class="n">workflow_params</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">multirun_working_dirs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">parent</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;**/*/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">output_subdir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
         <span class="p">)</span>
+
+        <span class="c1"># ensure working dirs are sorted by job num</span>
+        <span class="n">_job_nums</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">load_from_yaml</span><span class="p">(</span><span class="n">dir_</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">output_subdir</span><span class="si">}</span><span class="s2">/hydra.yaml&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">hydra</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">num</span>
+            <span class="k">for</span> <span class="n">dir_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">multirun_working_dirs</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">multirun_working_dirs</span> <span class="o">=</span> <span class="n">_sort_x_by_k</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">multirun_working_dirs</span><span class="p">,</span> <span class="n">_job_nums</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cfgs</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">dir_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">multirun_working_dirs</span><span class="p">:</span>
+            <span class="c1"># Ensure we load saved YAML configurations for each job (in hydra.job.output_subdir)</span>
+            <span class="n">cfg_file</span> <span class="o">=</span> <span class="n">dir_</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">output_subdir</span><span class="si">}</span><span class="s2">/config.yaml&quot;</span>
+            <span class="k">assert</span> <span class="n">cfg_file</span><span class="o">.</span><span class="n">exists</span><span class="p">(),</span> <span class="n">cfg_file</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cfgs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">load_from_yaml</span><span class="p">(</span><span class="n">cfg_file</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">metrics_filename</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">load_metrics</span><span class="p">(</span><span class="n">metrics_filename</span><span class="p">)</span>
+
         <span class="k">return</span> <span class="bp">self</span></div>
 
-    <span class="k">def</span> <span class="nf">to_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Convert workflow data to Pandas DataFrame.&quot;&quot;&quot;</span>
-        <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+    <span class="k">def</span> <span class="nf">load_metrics</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">metrics_filename</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
+        <span class="sd">&quot;&quot;&quot;Loads and aggregates across all multirun working dirs, and stores</span>
+<span class="sd">        the metrics in `self.metrics`</span>
 
-        <span class="n">d</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">d</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">)</span>
-        <span class="n">d</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">workflow_overrides</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        metrics_filename: str | Sequence[str]</span>
+<span class="sd">            The filename(s) or glob-pattern(s) uses to load the metrics.</span>
+<span class="sd">            If `None`, the metrics stored in `self.metrics` is used.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">multirun_working_dirs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">load_from_dir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="p">,</span> <span class="n">metrics_filename</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">multirun_working_dirs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">to_xarray</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">non_multirun_params_as_singleton_dims</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">metrics_filename</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">metrics_filename</span> <span class="o">=</span> <span class="p">[</span><span class="n">metrics_filename</span><span class="p">]</span>
+
+        <span class="n">job_metrics</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">dir_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">multirun_working_dirs</span><span class="p">:</span>
+            <span class="n">_metrics</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">metrics_filename</span><span class="p">:</span>
+                <span class="n">files</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">dir_</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">files</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;No files with the path/pattern </span><span class="si">{</span><span class="n">dir_</span><span class="o">/</span><span class="n">name</span><span class="si">}</span><span class="s2"> were found&quot;</span>
+                    <span class="p">)</span>
+
+                <span class="k">for</span> <span class="n">f_</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+                    <span class="n">_metrics</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">tr</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f_</span><span class="p">))</span>
+            <span class="n">job_metrics</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_metrics</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_metrics</span><span class="p">(</span><span class="n">job_metrics</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span>
+
+    <span class="k">def</span> <span class="nf">to_xarray</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">include_working_subdirs_as_data_var</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">coord_from_metrics</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">non_multirun_params_as_singleton_dims</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">metrics_filename</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Convert workflow data to xarray Dataset.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
+<span class="sd">        include_working_subdirs_as_data_var : bool, optional (default=False)</span>
+<span class="sd">            If `True` then the data-variable &quot;working_subdir&quot; will be included in the</span>
+<span class="sd">            xarray. This data variable is used to lookup the working sub-dir path</span>
+<span class="sd">            (a string) by multirun coordinate.</span>
+
+<span class="sd">        coord_from_metrics : str | None (default: None)</span>
+<span class="sd">            If not `None` defines the metric key to use as a coordinate</span>
+<span class="sd">            in the `Dataset`.  This function assumes that this coordinate</span>
+<span class="sd">            represents the leading dimension for all data-variables.</span>
+
 <span class="sd">        non_multirun_params_as_singleton_dims : bool, optional (default=False)</span>
 <span class="sd">            If `True` then non-multirun entries from `workflow_overrides` will be</span>
 <span class="sd">            included as length-1 dimensions in the xarray. Useful for merging/</span>
 <span class="sd">            concatenation with other Datasets</span>
 
+<span class="sd">        metrics_filename: Optional[str]</span>
+<span class="sd">            The filename or glob-pattern uses to load the metrics.</span>
+<span class="sd">            If `None`, the metrics stored in `self.metrics` is used.</span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        results : xarray.Dataset</span>
 <span class="sd">            A dataset whose dimensions and coordinate-values are determined by the</span>
-<span class="sd">            quantities over which the multi-run was performed. The data variables correspond to the named results returned by the jobs.&quot;&quot;&quot;</span>
+<span class="sd">            quantities over which the multi-run was performed. The data variables</span>
+<span class="sd">            correspond to the named results returned by the jobs.&quot;&quot;&quot;</span>
         <span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+
+        <span class="k">if</span> <span class="n">metrics_filename</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">multirun_working_dirs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">load_from_dir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="p">,</span> <span class="n">metrics_filename</span><span class="o">=</span><span class="n">metrics_filename</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">load_metrics</span><span class="p">(</span><span class="n">metrics_filename</span><span class="p">)</span>
 
         <span class="n">orig_coords</span> <span class="o">=</span> <span class="p">{</span>
             <span class="n">k</span><span class="p">:</span> <span class="p">(</span><span class="n">v</span> <span class="k">if</span> <span class="n">_non_str_sequence</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">else</span> <span class="p">[</span><span class="n">v</span><span class="p">])</span>
             <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">multirun_task_overrides</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">non_multirun_params_as_singleton_dims</span> <span class="ow">or</span> <span class="n">_non_str_sequence</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
         <span class="p">}</span>
+
+        <span class="n">metric_coords</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">coord_from_metrics</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">coord_from_metrics</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;key `</span><span class="si">{</span><span class="n">coord_from_metrics</span><span class="si">}</span><span class="s2">` not in metrics (available: &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">)&quot;</span>
+                <span class="p">)</span>
+
+            <span class="n">v</span> <span class="o">=</span> <span class="n">_coerce_list_of_arraylikes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="n">coord_from_metrics</span><span class="p">])</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+                <span class="c1"># assume this coord was repeated across experiments, e.g., &quot;epochs&quot;</span>
+                <span class="n">v</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">metric_coords</span><span class="p">[</span><span class="n">coord_from_metrics</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
 
         <span class="c1"># non-multirun overrides</span>
         <span class="n">attrs</span> <span class="o">=</span> <span class="p">{</span>
@@ -637,27 +977,61 @@
         <span class="n">coords</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">orig_coords</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">shape</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">coords</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
 
-        <span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="n">datum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-            <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">datum</span><span class="o">.</span><span class="n">ndim</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">coords</span><span class="p">)):</span>
-                <span class="c1"># Create additional arbitrary coordinates as-needed for non-scalar</span>
-                <span class="c1"># metrics</span>
-                <span class="n">coords</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">_dim</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">datum</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">orig_coords</span><span class="p">)</span> <span class="o">+</span> <span class="n">n</span><span class="p">])</span>
+        <span class="n">metrics_to_add</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">include_working_subdirs_as_data_var</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">multirun_working_dirs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="p">):</span>
+            <span class="n">metrics_to_add</span><span class="p">[</span><span class="s2">&quot;working_subdir&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">multirun_working_dirs</span>
+            <span class="p">]</span>
 
-            <span class="n">data</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="nb">list</span><span class="p">(</span><span class="n">orig_coords</span><span class="p">)</span>
-                <span class="o">+</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">_dim</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">datum</span><span class="o">.</span><span class="n">ndim</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">shape</span><span class="p">))],</span>
-                <span class="n">datum</span><span class="p">,</span>
-            <span class="p">)</span>
-        <span class="k">return</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span><span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span> <span class="n">data_vars</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="n">attrs</span><span class="p">)</span></div>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">metrics_to_add</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">coord_from_metrics</span> <span class="ow">and</span> <span class="n">k</span> <span class="o">==</span> <span class="n">coord_from_metrics</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="n">v</span> <span class="o">=</span> <span class="n">_coerce_list_of_arraylikes</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+
+            <span class="n">datum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+            <span class="n">k_coords</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">orig_coords</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">datum</span><span class="o">.</span><span class="n">ndim</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">orig_coords</span><span class="p">)):</span>
+
+                <span class="k">if</span> <span class="n">coord_from_metrics</span> <span class="ow">and</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">metric_coords</span><span class="p">):</span>
+                    <span class="c1"># Assume the first coordinate of the metric is the metric coordinate dimension</span>
+                    <span class="n">k_coords</span> <span class="o">+=</span> <span class="nb">list</span><span class="p">(</span><span class="n">metric_coords</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+                    <span class="k">for</span> <span class="n">mk</span><span class="p">,</span> <span class="n">mv</span> <span class="ow">in</span> <span class="n">metric_coords</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                        <span class="n">coords</span><span class="p">[</span><span class="n">mk</span><span class="p">]</span> <span class="o">=</span> <span class="n">mv</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># Create additional arbitrary coordinates as-needed for non-scalar</span>
+                    <span class="c1"># metrics</span>
+                    <span class="n">k_coords</span> <span class="o">+=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">_dim</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+                    <span class="n">coords</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">_dim</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">datum</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">orig_coords</span><span class="p">)</span> <span class="o">+</span> <span class="n">n</span><span class="p">])</span>
+
+            <span class="n">data</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">k_coords</span><span class="p">,</span> <span class="n">datum</span><span class="p">)</span>
+
+        <span class="n">coords</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">metric_coords</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span><span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span> <span class="n">data_vars</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="n">attrs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_JOBDIR_NAME</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">coords</span><span class="p">):</span>
+            <span class="n">exp_dir</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_JOBDIR_NAME</span><span class="p">]</span>
+            <span class="n">coords</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_dir_multirun_overrides</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">exp_dir</span><span class="p">):</span>
+                    <span class="n">uv</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">v</span><span class="p">)))</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">uv</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">non_multirun_params_as_singleton_dims</span><span class="p">:</span>
+                        <span class="n">coords</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_JOBDIR_NAME</span><span class="p">],</span> <span class="n">v</span><span class="p">)</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div>
 
 
 <div class="viewcode-block" id="RobustnessCurve"><a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.RobustnessCurve.html#rai_toolbox.mushin.RobustnessCurve">[docs]</a><span class="k">class</span> <span class="nc">RobustnessCurve</span><span class="p">(</span><span class="n">MultiRunMetricsWorkflow</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Abstract class for workflows that measure performance for different perturbation values.</span>
+    <span class="sd">&quot;&quot;&quot;Abstract class for workflows that measure performance for different perturbation</span>
+<span class="sd">    values.</span>
 
-<span class="sd">    This workflow requires and uses parameter `epsilon` as the configuration option for varying the perturbation.</span>
+<span class="sd">    This workflow requires and uses parameter `epsilon` as the configuration option for</span>
+<span class="sd">    varying the perturbation.</span>
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
@@ -668,6 +1042,11 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">epsilon</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]],</span>
+        <span class="n">task_fn_wrapper</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
+            <span class="n">Callable</span><span class="p">[[</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">T1</span><span class="p">]],</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="n">T1</span><span class="p">]],</span> <span class="kc">None</span>
+        <span class="p">]</span> <span class="o">=</span> <span class="n">zen</span><span class="p">,</span>
+        <span class="n">target_job_dirs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># TODO: add docs</span>
+        <span class="n">version_base</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">_NotSet</span><span class="p">]]]</span> <span class="o">=</span> <span class="n">_VERSION_BASE_DEFAULT</span><span class="p">,</span>
         <span class="n">working_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">sweeper</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">launcher</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -682,6 +1061,11 @@
 <span class="sd">            The configuration parameter for the perturbation.  Unlike Hydra overrides,</span>
 <span class="sd">            this parameter can be a list of floats that will be converted into a</span>
 <span class="sd">            multirun sequence override for Hydra.</span>
+
+<span class="sd">        task_fn_wrapper: Callable[[Callable[..., T1]], Callable[[Any], T1]] | None, optional (default=rai_toolbox.mushin.zen)</span>
+<span class="sd">            A wrapper applied to `self.evaluation_task` prior to launching the task.</span>
+<span class="sd">            The default wrapper is `rai_toolbox.mushin.zen`. Specify `None` for no</span>
+<span class="sd">            wrapper to be applied.</span>
 
 <span class="sd">        working_dir: str (default: None, the Hydra default will be used)</span>
 <span class="sd">            The directory to run the experiment in.  This value is used for</span>
@@ -711,39 +1095,62 @@
             <span class="n">epsilon</span> <span class="o">=</span> <span class="n">multirun</span><span class="p">(</span><span class="n">epsilon</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+            <span class="n">task_fn_wrapper</span><span class="o">=</span><span class="n">task_fn_wrapper</span><span class="p">,</span>
             <span class="n">working_dir</span><span class="o">=</span><span class="n">working_dir</span><span class="p">,</span>
             <span class="n">sweeper</span><span class="o">=</span><span class="n">sweeper</span><span class="p">,</span>
             <span class="n">launcher</span><span class="o">=</span><span class="n">launcher</span><span class="p">,</span>
+            <span class="n">version_base</span><span class="o">=</span><span class="n">version_base</span><span class="p">,</span>
             <span class="n">overrides</span><span class="o">=</span><span class="n">overrides</span><span class="p">,</span>
             <span class="o">**</span><span class="n">workflow_overrides</span><span class="p">,</span>
             <span class="c1"># for multiple multi-run params, epsilon should fastest-varying param;</span>
             <span class="c1"># i.e. epsilon should be the trailing dim in the multi-dim array of results</span>
+            <span class="n">target_job_dirs</span><span class="o">=</span><span class="n">target_job_dirs</span><span class="p">,</span>
             <span class="n">epsilon</span><span class="o">=</span><span class="n">epsilon</span><span class="p">,</span>
         <span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">to_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Convert workflow data to Pandas DataFrame.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s2">&quot;epsilon&quot;</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">to_xarray</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">non_multirun_params_as_singleton_dims</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">to_xarray</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">include_working_subdirs_as_data_var</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">coord_from_metrics</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">non_multirun_params_as_singleton_dims</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">metrics_filename</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Convert workflow data to xarray Dataset.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
+<span class="sd">        include_working_subdirs_as_data_var : bool, optional (default=False)</span>
+<span class="sd">            If `True` then the data-variable &quot;working_subdir&quot; will be included in the</span>
+<span class="sd">            xarray. This data variable is used to lookup the working sub-dir path</span>
+<span class="sd">            (a string) by multirun coordinate.</span>
+
+<span class="sd">        coord_from_metrics : str | None (default: None)</span>
+<span class="sd">            If not `None` defines the metric key to use as a coordinate</span>
+<span class="sd">            in the `Dataset`.  This function assumes that this coordinate</span>
+<span class="sd">            represents the leading dimension for all data-variables.</span>
+
 <span class="sd">        non_multirun_params_as_singleton_dims : bool, optional (default=False)</span>
 <span class="sd">            If `True` then non-multirun entries from `workflow_overrides` will be</span>
 <span class="sd">            included as length-1 dimensions in the xarray. Useful for merging/</span>
 <span class="sd">            concatenation with other Datasets</span>
 
+<span class="sd">        metrics_filename: Optional[str]</span>
+<span class="sd">            The filename or glob-pattern uses to load the metrics.</span>
+<span class="sd">            If `None`, the metrics stored in `self.metrics` is used.</span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        results : xarray.Dataset</span>
 <span class="sd">            A dataset whose dimensions and coordinate-values are determined by the</span>
-<span class="sd">            quantities over which the multi-run was performed. The data variables correspond to the named results returned by the jobs.&quot;&quot;&quot;</span>
+<span class="sd">            quantities over which the multi-run was performed. The data variables</span>
+<span class="sd">            correspond to the named results returned by the jobs.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="nb">super</span><span class="p">()</span>
             <span class="o">.</span><span class="n">to_xarray</span><span class="p">(</span>
-                <span class="n">non_multirun_params_as_singleton_dims</span><span class="o">=</span><span class="n">non_multirun_params_as_singleton_dims</span>
+                <span class="n">include_working_subdirs_as_data_var</span><span class="o">=</span><span class="n">include_working_subdirs_as_data_var</span><span class="p">,</span>
+                <span class="n">coord_from_metrics</span><span class="o">=</span><span class="n">coord_from_metrics</span><span class="p">,</span>
+                <span class="n">non_multirun_params_as_singleton_dims</span><span class="o">=</span><span class="n">non_multirun_params_as_singleton_dims</span><span class="p">,</span>
+                <span class="n">metrics_filename</span><span class="o">=</span><span class="n">metrics_filename</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="o">.</span><span class="n">sortby</span><span class="p">(</span><span class="s2">&quot;epsilon&quot;</span><span class="p">)</span>
         <span class="p">)</span>
@@ -807,32 +1214,6 @@
             <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">save_filename</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">plots</span></div></div>
-
-
-<span class="k">def</span> <span class="nf">_load_metrics</span><span class="p">(</span>
-    <span class="n">job_overrides</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
-    <span class="n">job_metrics</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
-    <span class="n">workflow_params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]]]:</span>
-    <span class="n">workflow_overrides</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
-    <span class="n">metrics</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">task_overrides</span><span class="p">,</span> <span class="n">task_metrics</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">job_overrides</span><span class="p">,</span> <span class="n">job_metrics</span><span class="p">):</span>
-        <span class="k">for</span> <span class="n">override</span> <span class="ow">in</span> <span class="n">task_overrides</span><span class="p">:</span>
-            <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">override</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)</span>
-            <span class="c1"># remove any hydra override prefix</span>
-            <span class="n">param</span> <span class="o">=</span> <span class="n">k</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;+&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">workflow_params</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">workflow_params</span><span class="p">:</span>
-                <span class="n">v</span> <span class="o">=</span> <span class="n">_num_from_string</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
-                <span class="n">workflow_overrides</span><span class="p">[</span><span class="n">param</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
-
-        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">task_metrics</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="c1"># get item if it&#39;s a single element array</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="n">v</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-
-            <span class="n">metrics</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">metrics</span><span class="p">,</span> <span class="n">workflow_overrides</span>
 </pre></div>
 
               </div>

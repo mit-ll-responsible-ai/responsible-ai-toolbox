@@ -328,7 +328,8 @@
 <dt class="sig sig-object py" id="rai_toolbox.optim.ChainedParamTransformingOptimizer">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rai_toolbox.optim.</span></span><span class="sig-name descname"><span class="pre">ChainedParamTransformingOptimizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*transforming_optimizers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">InnerOpt=&lt;class</span> <span class="pre">'torch.optim.sgd.SGD'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_ndim=-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grad_scale=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grad_bias=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defaults=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**inner_opt_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/optim/optimizer.html#ChainedParamTransformingOptimizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.optim.ChainedParamTransformingOptimizer" title="Permalink to this definition">#</a></dt>
 <dd><p>Chains together an arbitrary number of parameter-transforming optimizers,
-composing their pre- and post-step transformation functions to modify the parameters (and their gradients) in-place. <code class="xref py py-obj docutils literal notranslate"><span class="pre">InnerOpt.step()</span></code> applies the gradient-based update
+composing their pre- and post-step transformation functions to modify the parameters
+(and their gradients) in-place. <code class="xref py py-obj docutils literal notranslate"><span class="pre">InnerOpt.step()</span></code> applies the gradient-based update
 to each parameter.</p>
 <p>I.e., passing <code class="xref py py-obj docutils literal notranslate"><span class="pre">Opt1,</span> <span class="pre">Opt2,</span> <span class="pre">...,</span> <span class="pre">OptN</span></code> to <a class="reference internal" href="#rai_toolbox.optim.ChainedParamTransformingOptimizer" title="rai_toolbox.optim.ChainedParamTransformingOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ChainedParamTransformingOptimizer</span></code></a> will
 update a parameter using: <code class="xref py py-obj docutils literal notranslate"><span class="pre">OptN.fn_(...(Opt2.fn_(Opt1.fn_(param)))</span></code>,
@@ -352,15 +353,17 @@ the user-specified chained gradient-trasnformers, so that their <code class="xre
 <dt><strong>*transforming_optimizers: InstantiatesTo[ParamTransformingOptimizer],</strong></dt><dd><p>An arbitrary number of parameter-transforming optimizers, whose
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">_pre_step_transform_</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">_post_step_transform_</span></code> methods, respectively,
 will be composed from left to right –
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">Opt1,</span> <span class="pre">Opt2,</span> <span class="pre">...,</span> <span class="pre">OptN</span> <span class="pre">-&gt;</span> <span class="pre">fN_(...f2_(f1_(grad)))</span></code> – to modify a parameter prior to / after being updated by <code class="xref py py-obj docutils literal notranslate"><span class="pre">InnerOpt.step</span></code></p>
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">Opt1,</span> <span class="pre">Opt2,</span> <span class="pre">...,</span> <span class="pre">OptN</span> <span class="pre">-&gt;</span> <span class="pre">fN_(...f2_(f1_(grad)))</span></code> – to modify a parameter
+prior to / after being updated by <code class="xref py py-obj docutils literal notranslate"><span class="pre">InnerOpt.step</span></code></p>
 </dd>
 <dt><strong>params</strong><span class="classifier">Optional[Sequence[Tensor] | Iterable[ParamGroup]]</span></dt><dd><p>Iterable of parameters to optimize or dicts defining parameter groups</p>
 </dd>
-<dt><strong>InnerOpt</strong><span class="classifier">Type[Optimizer] | Partial[Optimizer], optional (default=`torch.nn.optim.SGD`)</span></dt><dd><p>The optimizer that updates the parameters after <code class="xref py py-obj docutils literal notranslate"><span class="pre">_pre_step_transform_</span></code> has been applied to each of them.</p>
+<dt><strong>InnerOpt</strong><span class="classifier">Type[Optimizer] | Partial[Optimizer], optional (default=`torch.nn.optim.SGD`)</span></dt><dd><p>The optimizer that updates the parameters after <code class="xref py py-obj docutils literal notranslate"><span class="pre">_pre_step_transform_</span></code> has
+been applied to each of them.</p>
 </dd>
 <dt><strong>param_ndim</strong><span class="classifier">int | None, optional (default=-1)</span></dt><dd><p>Determines how a parameter and its gradient is temporarily reshaped prior
 to being passed to both <code class="xref py py-obj docutils literal notranslate"><span class="pre">_pre_step_transform_</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">_post_step_transform_</span></code>.
-By default,the transformation broadcasts over the tensor’s first dimension
+By default, the transformation broadcasts over the tensor’s first dimension
 in a batch-like style.</p>
 <ul class="simple">
 <li><p>A positive number determines the dimensionality of the tensor that the transformation will act on.</p></li>
@@ -438,7 +441,8 @@ defaults is achieved most naturally using <a class="reference external" href="ht
 <span class="go">tensor([0.0000, 2.0000, 2.8000])</span>
 </pre></div>
 </div>
-<p>See that <code class="xref py py-obj docutils literal notranslate"><span class="pre">SGD([x1],</span> <span class="pre">lr=1.0).step()</span></code> is used to update our parameters; this can be controlled via the <code class="xref py py-obj docutils literal notranslate"><span class="pre">InnerOpt</span></code> argument.</p>
+<p>See that <code class="xref py py-obj docutils literal notranslate"><span class="pre">SGD([x1],</span> <span class="pre">lr=1.0).step()</span></code> is used to update our parameters; this can
+be controlled via the <code class="xref py py-obj docutils literal notranslate"><span class="pre">InnerOpt</span></code> argument.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x1</span>
 <span class="go">tensor([ 1.0000, -1.0000, -1.8000], requires_grad=True)</span>
 </pre></div>

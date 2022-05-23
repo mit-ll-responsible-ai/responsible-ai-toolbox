@@ -217,7 +217,7 @@
         <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_subprocess_call</span><span class="p">(</span><span class="n">local_rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">testing</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">_subprocess_call</span><span class="p">(</span><span class="n">local_rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">testing</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">predicting</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="n">env_copy</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="n">env_copy</span><span class="p">[</span><span class="s2">&quot;LOCAL_RANK&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">local_rank</span><span class="si">}</span><span class="s2">&quot;</span>
     <span class="c1"># CWD is the Hydra working directory</span>
@@ -253,6 +253,9 @@
 
     <span class="c1"># Set flag to run Trainer.fit or Trainer.test in `_pl_main.py`</span>
     <span class="n">command</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">&quot;++pl_testing=&quot;</span> <span class="o">+</span> <span class="p">(</span><span class="s2">&quot;false&quot;</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">testing</span> <span class="k">else</span> <span class="s2">&quot;true&quot;</span><span class="p">)]</span>
+
+    <span class="c1"># Set flag to run Trainer.fit or Trainer.test in `_pl_main.py`</span>
+    <span class="n">command</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">&quot;++pl_predicting=&quot;</span> <span class="o">+</span> <span class="p">(</span><span class="s2">&quot;false&quot;</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">predicting</span> <span class="k">else</span> <span class="s2">&quot;true&quot;</span><span class="p">)]</span>
 
     <span class="c1"># Set flag for local rank</span>
     <span class="n">command</span> <span class="o">+=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;++pl_local_rank=</span><span class="si">{</span><span class="n">local_rank</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
@@ -400,13 +403,16 @@
 <span class="sd">            ReturnType</span>
 <span class="sd">            &quot;&quot;&quot;</span>
             <span class="k">del</span> <span class="n">trainer</span>  <span class="c1"># unused</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">cluster_environment</span><span class="o">.</span><span class="n">creates_processes_externally</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">cluster_environment</span><span class="o">.</span><span class="n">creates_processes_externally</span>
+            <span class="p">):</span>  <span class="c1"># pragma: no cover</span>
                 <span class="n">testing</span> <span class="o">=</span> <span class="n">function</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;_test_impl&quot;</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_call_children_scripts</span><span class="p">(</span><span class="n">testing</span><span class="o">=</span><span class="n">testing</span><span class="p">)</span>
+                <span class="n">predicting</span> <span class="o">=</span> <span class="n">function</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;_predict_impl&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_call_children_scripts</span><span class="p">(</span><span class="n">testing</span><span class="o">=</span><span class="n">testing</span><span class="p">,</span> <span class="n">predicting</span><span class="o">=</span><span class="n">predicting</span><span class="p">)</span>
 
             <span class="k">return</span> <span class="n">function</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-        <span class="k">def</span> <span class="nf">_call_children_scripts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">testing</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">_call_children_scripts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">testing</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">predicting</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
             <span class="c1"># bookkeeping of spawned processes</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_check_can_spawn_children</span><span class="p">()</span>
 
@@ -420,7 +426,7 @@
             <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;WORLD_SIZE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">num_processes</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_nodes</span><span class="si">}</span><span class="s2">&quot;</span>
 
             <span class="k">for</span> <span class="n">local_rank</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_processes</span><span class="p">):</span>
-                <span class="n">_subprocess_call</span><span class="p">(</span><span class="n">local_rank</span><span class="p">,</span> <span class="n">testing</span><span class="p">)</span>
+                <span class="n">_subprocess_call</span><span class="p">(</span><span class="n">local_rank</span><span class="p">,</span> <span class="n">testing</span><span class="p">,</span> <span class="n">predicting</span><span class="p">)</span>
 
                 <span class="c1"># starting all processes at once can cause issues</span>
                 <span class="c1"># with dataloaders delay between 1-10 seconds</span>
@@ -535,7 +541,10 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">interactive_ddp_procs</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="n">local_rank</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_processes</span><span class="p">):</span>
                 <span class="n">testing</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lightning_module</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">fn</span> <span class="o">==</span> <span class="n">TrainerFn</span><span class="o">.</span><span class="n">TESTING</span>
-                <span class="n">_subprocess_call</span><span class="p">(</span><span class="n">local_rank</span><span class="p">,</span> <span class="n">testing</span><span class="o">=</span><span class="n">testing</span><span class="p">)</span>
+                <span class="n">predicting</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">lightning_module</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">fn</span> <span class="o">==</span> <span class="n">TrainerFn</span><span class="o">.</span><span class="n">PREDICTING</span>
+                <span class="p">)</span>
+                <span class="n">_subprocess_call</span><span class="p">(</span><span class="n">local_rank</span><span class="p">,</span> <span class="n">testing</span><span class="o">=</span><span class="n">testing</span><span class="p">,</span> <span class="n">predicting</span><span class="o">=</span><span class="n">predicting</span><span class="p">)</span>
 
                 <span class="c1"># starting all processes at once can cause issues</span>
                 <span class="c1"># with dataloaders delay between 1-10 seconds</span>

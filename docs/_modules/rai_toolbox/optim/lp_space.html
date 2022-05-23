@@ -384,7 +384,8 @@
 <span class="sd">        &gt;&gt;&gt; x.grad # the original gradient</span>
 <span class="sd">        tensor([-2., 20.])</span>
 
-<span class="sd">        Performing a step with our optimizer transforms the gradient in-place, and then updates the parameter using `SGD([x], lr=1.0).step()`.</span>
+<span class="sd">        Performing a step with our optimizer transforms the gradient in-place, and</span>
+<span class="sd">        then updates the parameter using `SGD([x], lr=1.0).step()`.</span>
 
 <span class="sd">        &gt;&gt;&gt; optim.step()</span>
 <span class="sd">        &gt;&gt;&gt; x.grad # the normalized gradient</span>
@@ -443,7 +444,8 @@
 <span class="sd">    &gt;&gt;&gt; x.grad # the un-normed gradient</span>
 <span class="sd">    tensor([2., 2.])</span>
 
-<span class="sd">    Performing a step with our optimizer transforms the gradient in-place, and then updates the parameter using `SGD([x], lr=1.0).step()`.</span>
+<span class="sd">    Performing a step with our optimizer transforms the gradient in-place, and then</span>
+<span class="sd">    updates the parameter using `SGD([x], lr=1.0).step()`.</span>
 
 <span class="sd">    &gt;&gt;&gt; optim.step()</span>
 <span class="sd">    &gt;&gt;&gt; x.grad # the normalized gradient</span>
@@ -490,7 +492,8 @@
 <span class="sd">    &gt;&gt;&gt; x.grad # the un-normed gradient</span>
 <span class="sd">    tensor([2., 2.])</span>
 
-<span class="sd">    Performing a step with our optimizer transforms the gradient in-place, and then updates the parameter using `SGD([x], lr=1.0).step()`.</span>
+<span class="sd">    Performing a step with our optimizer transforms the gradient in-place, and then</span>
+<span class="sd">    updates the parameter using `SGD([x], lr=1.0).step()`.</span>
 
 <span class="sd">    &gt;&gt;&gt; optim.step()</span>
 <span class="sd">    &gt;&gt;&gt; x.grad # the normalized gradient</span>
@@ -636,7 +639,8 @@
 
 
 <div class="viewcode-block" id="LinfProjectedOptim"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.LinfProjectedOptim.html#rai_toolbox.optim.LinfProjectedOptim">[docs]</a><span class="k">class</span> <span class="nc">LinfProjectedOptim</span><span class="p">(</span><span class="n">SignedGradientOptim</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;A gradient-tranforming optimizer that constrains the updated parameter values to fall within :math:`[-\epsilon, \epsilon]`.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;A gradient-tranforming optimizer that constrains the updated parameter values to</span>
+<span class="sd">    fall within :math:`[-\epsilon, \epsilon]`.</span>
 
 <span class="sd">    A step with this optimizer takes the elementwise sign of a parameter&#39;s gradient</span>
 <span class="sd">    prior to using `InnerOp.step` to update the corresponding parameter. The updated</span>
@@ -860,7 +864,8 @@
 <span class="sd">        &gt;&gt;&gt; x.grad # the original gradient</span>
 <span class="sd">        tensor([0., 1., 2.])</span>
 
-<span class="sd">        Performing a step with our optimizer sparsifies and normalizes the gradient in-place, and then updates the parameter using `SGD([x], lr=1.0).step()`.</span>
+<span class="sd">        Performing a step with our optimizer sparsifies and normalizes the gradient</span>
+<span class="sd">        in-place, and then updates the parameter using `SGD([x], lr=1.0).step()`.</span>
 
 <span class="sd">        &gt;&gt;&gt; optim.step()</span>
 <span class="sd">        &gt;&gt;&gt; x.grad # the signed, sparsified, and normalized gradient</span>

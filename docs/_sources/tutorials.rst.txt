@@ -16,6 +16,7 @@ familiarity with PyTorch and common concepts from the field of deep learning.
 
    tutorials/CIFAR10-Adversarial-Perturbations.ipynb
    tutorials/ImageNet-Concept-Probing.ipynb
+   tutorials/Building-Workflows.ipynb
 
 
 .. tip::

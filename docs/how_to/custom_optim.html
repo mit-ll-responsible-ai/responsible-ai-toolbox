@@ -369,7 +369,8 @@ Note that we do not need to worry about doing any parameter reshaping for this m
 <section id="using-the-optimizer">
 <h2>Using the optimizer<a class="headerlink" href="#using-the-optimizer" title="Permalink to this headline">#</a></h2>
 <p>First, we’ll study the effect of <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim</span></code> on our optimizer’s behavior.
-Let’s create a simple shape-<code class="xref py py-obj docutils literal notranslate"><span class="pre">(2,</span> <span class="pre">2)</span></code> tensor, which will be the sole parameter that our optimizer will update. We will clamp the parameter’s elements to fill within <span class="math notranslate nohighlight">\((-\infty, 18.75]\)</span>.
+Let’s create a simple shape-<code class="xref py py-obj docutils literal notranslate"><span class="pre">(2,</span> <span class="pre">2)</span></code> tensor, which will be the sole parameter that our optimizer will update.
+We will clamp the parameter’s elements to fall within <span class="math notranslate nohighlight">\((-\infty, 18.75]\)</span>.
 The actual gradient-based parameter update will be performed by <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.optim.SGD</span></code> with <code class="xref py py-obj docutils literal notranslate"><span class="pre">lr=1.0</span></code>.</p>
 <p>We’ll perform a single update to our parameter, but with using <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim</span></code> values of 0, 1, and 2 respectively.</p>
 <div class="literal-block-wrapper docutils container" id="id5">

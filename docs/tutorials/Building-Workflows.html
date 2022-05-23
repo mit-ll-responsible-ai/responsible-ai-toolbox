@@ -1,0 +1,2589 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<meta content="Using the responsible AI toolbox to build workflows." name="description" />
+
+    <title>Building a Workflows for Cross Validation and Adversarial Robustness &#8212; rai-toolbox  documentation</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/tabs.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="How-To Guides" href="../how_tos.html" />
+    <link rel="prev" title="Concept Probing" href="ImageNet-Concept-Probing.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+      
+      <link rel="icon" sizes="16x16" href="../_static/favicon-16x16.png">
+      
+    
+      
+      <link rel="icon" sizes="32x32" href="../_static/favicon-32x32.png">
+      
+    
+      
+      <link rel="apple-touch-icon" sizes="180x180" href="../_static/apple-touch-icon.png">
+      
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+
+<a class="navbar-brand" href="../index.html">
+  <img src="../_static/logo_no_text.png" class="logo" alt="logo">
+</a>
+
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="../tutorials.html">
+  Tutorials
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../how_tos.html">
+  How-To Guides
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../explanation.html">
+  Explanation
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../api_reference.html">
+  Reference
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../changes.html">
+  Changelog
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    <p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Contents:
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="CIFAR10-Adversarial-Perturbations.html">
+   Generating Adversarial Perturbations
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="ImageNet-Concept-Probing.html">
+   Concept Probing
+  </a>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   Building a Workflows for Cross Validation and Adversarial Robustness
+  </a>
+ </li>
+</ul>
+
+  </div>
+</nav>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Getting-Started">
+   Getting Started
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#Installing-rai_toolbox">
+     Installing
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       rai_toolbox
+      </span>
+     </code>
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Opening-a-Jupyter-notebook">
+   Opening a Jupyter notebook
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Imports">
+   Imports
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Experiment-Functions-and-Classes">
+   Experiment Functions and Classes
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#hydra-zen-Configuration">
+   hydra-zen Configuration
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Cross-Validation-Workflow">
+   Cross Validation Workflow
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Robustness-Curve">
+   Robustness Curve
+  </a>
+ </li>
+</ul>
+
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt .copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<blockquote>
+<div><div class="line-block">
+<div class="line">Copyright (c) 2022 Massachusetts Institute of Technology</div>
+<div class="line">SPDX-License-Identifier: MIT</div>
+</div>
+</div></blockquote>
+<section id="Building-a-Workflows-for-Cross-Validation-and-Adversarial-Robustness">
+<h1>Building a Workflows for Cross Validation and Adversarial Robustness<a class="headerlink" href="#Building-a-Workflows-for-Cross-Validation-and-Adversarial-Robustness" title="Permalink to this headline">#</a></h1>
+<p>This notebook demonstrates how the to build experiment workflows for configurable, repeatable, and scalable (CRS) experimentation. Two basic workflows will be demonstrated in this tutorial:</p>
+<ul class="simple">
+<li><p>Cross-Validation Workflow: Performs cross-validation training that logs accuracy and loss across data folds</p></li>
+<li><p>Robustness Curve Workflow: Loads a trained model and assesses the impact of adversarial perturbations on the model’s performance; the model’s performance metric is plotted against the increasing “severity” of the perturbation</p></li>
+</ul>
+<p>Here, “workflow” has a precise meaning. In the parlance of <a class="reference external" href="https://mit-ll-responsible-ai.github.io/responsible-ai-toolbox/ref_mushin.html">mushin</a> a workflow is an API for describing how we configure, launch, and post-process one or more tasks. These workflows leverage <a class="reference external" href="https://hydra.cc/">Hydra</a> and <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen">hydra-zen</a> so that they are highly configurable and so that each job launched by a workflow is self-documenting and reproducible. In
+this tutorial, we also make use of <a class="reference external" href="https://www.pytorchlightning.ai/">PyTorch Lightning</a> to eliminate boilerplate code associated with training and testing a PyTorch model.</p>
+<section id="Getting-Started">
+<h2>Getting Started<a class="headerlink" href="#Getting-Started" title="Permalink to this headline">#</a></h2>
+<p>We will install the rAI-toolbox and then we will create a Jupyter notebook in which we will complete this tutorial.</p>
+<section id="Installing-rai_toolbox">
+<h3>Installing <code class="docutils literal notranslate"><span class="pre">rai_toolbox</span></code><a class="headerlink" href="#Installing-rai_toolbox" title="Permalink to this headline">#</a></h3>
+<p>To install the toolbox (along with its <code class="docutils literal notranslate"><span class="pre">mushin</span></code> capabilities) in your Python environment, run the following command in your terminal:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pip install rai-toolbox<span class="o">[</span>mushin<span class="o">]</span>
+</pre></div>
+</div>
+<p>To verify that the toolbox is installed as-expected, open a Python console and try importing <code class="docutils literal notranslate"><span class="pre">rai_toolbox</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">rai_toolbox</span>
+</pre></div>
+</div>
+<p>You will also need to install scikit-learn; please follow <a class="reference external" href="https://scikit-learn.org/stable/install.html#installing-scikit-learn">these instructions</a>.</p>
+</section>
+</section>
+<section id="Opening-a-Jupyter-notebook">
+<h2>Opening a Jupyter notebook<a class="headerlink" href="#Opening-a-Jupyter-notebook" title="Permalink to this headline">#</a></h2>
+<p>If you do not have Jupyter Notebook or Jupyter Lab installed in your Python environment, please follow <a class="reference external" href="https://jupyter.org/install">these instructions</a>. Now open a terminal on your computer and <a class="reference external" href="http://www.pythonlikeyoumeanit.com/Module1_GettingStartedWithPython/Jupyter_Notebooks.html">start a notebook/lab session</a>. A file-viewer will open in an internet browser; pick a directory where you are okay with saving some PyTorch model weights. Create a notebook called
+<code class="docutils literal notranslate"><span class="pre">Building-Workflows.ipynb</span></code>. You can then follow along with this tutorial by copying, pasting, and running the code blocks below in the cells of your notebook.</p>
+<p>Note: you may also need to install the <code class="docutils literal notranslate"><span class="pre">ipywidgets</span></code> package in your Python environment to configure the notebook to display ipywidgets:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pip install ipywidgets
+</pre></div>
+</div>
+</section>
+<section id="Imports">
+<h2>Imports<a class="headerlink" href="#Imports" title="Permalink to this headline">#</a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">torch</span> <span class="k">as</span> <span class="nn">tr</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Hydra and hydra-zen</span>
+<span class="kn">from</span> <span class="nn">hydra.core.config_store</span> <span class="kn">import</span> <span class="n">ConfigStore</span>
+<span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">MISSING</span><span class="p">,</span> <span class="n">builds</span><span class="p">,</span> <span class="n">instantiate</span><span class="p">,</span> <span class="n">load_from_yaml</span><span class="p">,</span> <span class="n">make_config</span>
+
+<span class="c1"># Lightning</span>
+<span class="kn">from</span> <span class="nn">pytorch_lightning</span> <span class="kn">import</span> <span class="n">LightningModule</span><span class="p">,</span> <span class="n">Trainer</span>
+
+<span class="c1"># sklearn and torch</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">StratifiedKFold</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">nn</span>
+<span class="kn">from</span> <span class="nn">torch.optim</span> <span class="kn">import</span> <span class="n">Optimizer</span>
+<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">Subset</span>
+<span class="kn">from</span> <span class="nn">torchmetrics</span> <span class="kn">import</span> <span class="n">Accuracy</span>
+<span class="kn">from</span> <span class="nn">torchvision</span> <span class="kn">import</span> <span class="n">transforms</span>
+<span class="kn">from</span> <span class="nn">torchvision.datasets</span> <span class="kn">import</span> <span class="n">MNIST</span>
+
+<span class="c1"># rAI-toolbox</span>
+<span class="kn">from</span> <span class="nn">rai_toolbox._typing</span> <span class="kn">import</span> <span class="n">Partial</span>
+<span class="kn">from</span> <span class="nn">rai_toolbox.mushin</span> <span class="kn">import</span> <span class="n">load_from_checkpoint</span>
+<span class="kn">from</span> <span class="nn">rai_toolbox.mushin.lightning</span> <span class="kn">import</span> <span class="n">MetricsCallback</span>
+<span class="kn">from</span> <span class="nn">rai_toolbox.mushin.workflows</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">MultiRunMetricsWorkflow</span><span class="p">,</span>
+    <span class="n">RobustnessCurve</span><span class="p">,</span>
+    <span class="n">multirun</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">rai_toolbox.optim</span> <span class="kn">import</span> <span class="n">L2ProjectedOptim</span><span class="p">,</span> <span class="n">LinfProjectedOptim</span>
+<span class="kn">from</span> <span class="nn">rai_toolbox.perturbations</span> <span class="kn">import</span> <span class="n">gradient_ascent</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Experiment-Functions-and-Classes">
+<h2>Experiment Functions and Classes<a class="headerlink" href="#Experiment-Functions-and-Classes" title="Permalink to this headline">#</a></h2>
+<p>Here we define two Neural Network models, a fully linear neural network and a convolutional neural network.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">LinearModel</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Flatten</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">28</span> <span class="o">*</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">256</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="mi">128</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">64</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">ConvModel</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="s2">&quot;same&quot;</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm2d</span><span class="p">(</span><span class="mi">32</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">MaxPool2d</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="s2">&quot;same&quot;</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm2d</span><span class="p">(</span><span class="mi">32</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">MaxPool2d</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="s2">&quot;same&quot;</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm2d</span><span class="p">(</span><span class="mi">32</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Flatten</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<br/><br/></pre></div>
+</div>
+</div>
+<p>Next lets define a function that takes the <code class="docutils literal notranslate"><span class="pre">MNIST</span></code> dataset and splits the data into training and validation sets using SciKit-Learn’s <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.StratifiedKFold.html">StratifiedKFold</a>. This allows us to split the dataset into “folds” and select the fold for each experiment.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">split_dataset</span><span class="p">(</span>
+    <span class="n">dataset</span><span class="p">:</span> <span class="n">MNIST</span><span class="p">,</span> <span class="n">n_splits</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">fold</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">random_state</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">49</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Subset</span><span class="p">,</span> <span class="n">Subset</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;Provide training and validation splits using `sklearn.model_selection.StratifiedKfold`&quot;&quot;&quot;</span>
+
+    <span class="n">kfold</span> <span class="o">=</span> <span class="n">StratifiedKFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="n">n_splits</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">)</span>
+    <span class="n">train_indices</span><span class="p">,</span> <span class="n">val_indices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+        <span class="n">kfold</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)),</span> <span class="n">dataset</span><span class="o">.</span><span class="n">targets</span><span class="p">)</span>
+    <span class="p">)[</span><span class="n">fold</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">Subset</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">train_indices</span><span class="p">),</span> <span class="n">Subset</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">val_indices</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<p>Now define the <a class="reference external" href="https://pytorch-lightning.readthedocs.io/en/latest/api/pytorch_lightning.core.LightningModule.html#pytorch_lightning.core.LightningModule">LightningModule</a> for training and testing.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">StandardModule</span><span class="p">(</span><span class="n">LightningModule</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">model</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span>
+        <span class="n">dataset</span><span class="p">:</span> <span class="n">MNIST</span><span class="p">,</span>
+        <span class="n">optimizer</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Partial</span><span class="p">[</span><span class="n">Optimizer</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">perturber</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">fold</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">n_splits</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
+        <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+        <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">optimizer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">perturber</span> <span class="o">=</span> <span class="n">perturber</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_splits</span> <span class="o">=</span> <span class="n">n_splits</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fold</span> <span class="o">=</span> <span class="n">fold</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span> <span class="o">=</span> <span class="n">num_workers</span>
+
+        <span class="c1"># Metrics</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">acc_metric</span> <span class="o">=</span> <span class="n">Accuracy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">perturber</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">clean_acc_metric</span> <span class="o">=</span> <span class="n">Accuracy</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">train_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
+        <span class="n">train_dataset</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">split_dataset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_splits</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fold</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">DataLoader</span><span class="p">(</span>
+            <span class="n">train_dataset</span><span class="p">,</span>
+            <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span>
+            <span class="n">num_workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span><span class="p">,</span>
+            <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">val_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">val_dataset</span> <span class="o">=</span> <span class="n">split_dataset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_splits</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fold</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">DataLoader</span><span class="p">(</span>
+            <span class="n">val_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">test_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">DataLoader</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">configure_optimizers</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Optimizer</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">stage</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+        <span class="n">data_orig</span><span class="p">,</span> <span class="n">target</span> <span class="o">=</span> <span class="n">batch</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">perturber</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">tr</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+                <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">data_orig</span><span class="p">)</span>
+                <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+                <span class="n">acc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">clean_acc_metric</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stage</span><span class="si">}</span><span class="s2">_clean_accuracy&quot;</span><span class="p">,</span> <span class="n">acc</span><span class="p">)</span>
+
+            <span class="n">data</span><span class="p">,</span> <span class="n">adv_loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">perturber</span><span class="p">(</span>
+                <span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data_orig</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">target</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stage</span><span class="si">}</span><span class="s2">_adversarial_loss&quot;</span><span class="p">,</span> <span class="n">adv_loss</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">data_orig</span>
+
+        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+        <span class="n">acc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">acc_metric</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stage</span><span class="si">}</span><span class="s2">_loss&quot;</span><span class="p">,</span> <span class="n">loss</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stage</span><span class="si">}</span><span class="s2">_accuracy&quot;</span><span class="p">,</span> <span class="n">acc</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">loss</span>
+
+    <span class="k">def</span> <span class="nf">training_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_step</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="s2">&quot;train&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">validation_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_step</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="s2">&quot;val&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">test_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_step</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="s2">&quot;test&quot;</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+</section>
+<section id="hydra-zen-Configuration">
+<h2>hydra-zen Configuration<a class="headerlink" href="#hydra-zen-Configuration" title="Permalink to this headline">#</a></h2>
+<p>Now that we have our models lets setup the configurations for our experiments.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Augmentations</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span>
+    <span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">,</span>
+    <span class="p">[</span><span class="n">builds</span><span class="p">(</span><span class="n">transforms</span><span class="o">.</span><span class="n">RandomCrop</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">28</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">4</span><span class="p">),</span> <span class="n">builds</span><span class="p">(</span><span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">)],</span>
+<span class="p">)</span>
+<span class="n">TrainDataset</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">MNIST</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="s2">&quot;$</span><span class="si">{data_dir}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">Augmentations</span><span class="p">)</span>
+<span class="n">TestDataset</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span>
+    <span class="n">MNIST</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="s2">&quot;$</span><span class="si">{data_dir}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">builds</span><span class="p">(</span><span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="n">ConvModelCfg</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">ConvModel</span><span class="p">)</span>
+<span class="n">LinearModelCfg</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">LinearModel</span><span class="p">)</span>
+<span class="n">Optim</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">tr</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">,</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">zen_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+
+<span class="n">L2PGD</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">L2ProjectedOptim</span><span class="p">,</span> <span class="n">zen_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">LinfPGD</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">LinfProjectedOptim</span><span class="p">,</span> <span class="n">zen_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">lr_for_pgd</span><span class="p">(</span><span class="n">epsilon</span><span class="p">,</span> <span class="n">num_steps</span><span class="p">):</span>
+    <span class="k">return</span> <span class="mf">2.5</span> <span class="o">*</span> <span class="n">epsilon</span> <span class="o">/</span> <span class="n">num_steps</span>
+
+
+<span class="n">Perturber</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span>
+    <span class="n">gradient_ascent</span><span class="p">,</span>
+    <span class="n">optimizer</span><span class="o">=</span><span class="s2">&quot;$</span><span class="si">{optimizer}</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="n">epsilon</span><span class="o">=</span><span class="s2">&quot;$</span><span class="si">{epsilon}</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="n">steps</span><span class="o">=</span><span class="s2">&quot;$</span><span class="si">{steps}</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="n">lr</span><span class="o">=</span><span class="n">builds</span><span class="p">(</span><span class="n">lr_for_pgd</span><span class="p">,</span> <span class="s2">&quot;$</span><span class="si">{epsilon}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;$</span><span class="si">{steps}</span><span class="s2">&quot;</span><span class="p">),</span>
+    <span class="n">zen_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">populate_full_signature</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">PLModule</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span>
+    <span class="n">StandardModule</span><span class="p">,</span>
+    <span class="n">model</span><span class="o">=</span><span class="s2">&quot;$</span><span class="si">{model}</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="n">fold</span><span class="o">=</span><span class="s2">&quot;$</span><span class="si">{fold}</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="n">n_splits</span><span class="o">=</span><span class="s2">&quot;$</span><span class="si">{n_splits}</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="n">TrainDataset</span><span class="p">,</span>
+    <span class="n">optimizer</span><span class="o">=</span><span class="n">Optim</span><span class="p">,</span>
+    <span class="n">perturber</span><span class="o">=</span><span class="s2">&quot;$</span><span class="si">{perturber}</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="n">populate_full_signature</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="n">EvalPLModule</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span>
+    <span class="n">StandardModule</span><span class="p">,</span>
+    <span class="n">model</span><span class="o">=</span><span class="s2">&quot;$</span><span class="si">{model}</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="n">TestDataset</span><span class="p">,</span>
+    <span class="n">perturber</span><span class="o">=</span><span class="s2">&quot;$</span><span class="si">{perturber}</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="n">populate_full_signature</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="n">TrainerCfg</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span>
+    <span class="n">Trainer</span><span class="p">,</span>
+    <span class="n">max_epochs</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">accelerator</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span>
+    <span class="n">devices</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">enable_progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">enable_model_summary</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">builds</span><span class="p">(</span><span class="n">MetricsCallback</span><span class="p">)],</span>
+    <span class="n">populate_full_signature</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<p>Now we use Hydra’s <a class="reference external" href="https://hydra.cc/docs/tutorials/structured_config/config_store/">ConfigStore</a> API to create named configuration groups that can be specified/swapped when we run our workflow.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cs</span> <span class="o">=</span> <span class="n">ConfigStore</span><span class="o">.</span><span class="n">instance</span><span class="p">()</span>
+<span class="n">cs</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;cnn&quot;</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="s2">&quot;model&quot;</span><span class="p">,</span> <span class="n">node</span><span class="o">=</span><span class="n">ConvModelCfg</span><span class="p">)</span>
+<span class="n">cs</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="s2">&quot;model&quot;</span><span class="p">,</span> <span class="n">node</span><span class="o">=</span><span class="n">LinearModelCfg</span><span class="p">)</span>
+<span class="n">cs</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;l2pgd&quot;</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="s2">&quot;optimizer&quot;</span><span class="p">,</span> <span class="n">node</span><span class="o">=</span><span class="n">L2PGD</span><span class="p">)</span>
+<span class="n">cs</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;linfpgd&quot;</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="s2">&quot;optimizer&quot;</span><span class="p">,</span> <span class="n">node</span><span class="o">=</span><span class="n">LinfPGD</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+</section>
+<section id="Cross-Validation-Workflow">
+<h2>Cross Validation Workflow<a class="headerlink" href="#Cross-Validation-Workflow" title="Permalink to this headline">#</a></h2>
+<p>With all the configurations in place we can now define our first experiment workflow: train multiple models on <code class="docutils literal notranslate"><span class="pre">MNIST</span></code> data using cross-validation. First define the main experiment configuration:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Config</span> <span class="o">=</span> <span class="n">make_config</span><span class="p">(</span>
+    <span class="n">defaults</span><span class="o">=</span><span class="p">[</span>
+        <span class="s2">&quot;_self_&quot;</span><span class="p">,</span>
+        <span class="p">{</span><span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="s2">&quot;linear&quot;</span><span class="p">},</span>
+    <span class="p">],</span>
+    <span class="n">data_dir</span><span class="o">=</span><span class="s2">&quot;${oc.env:HOME}/.torch/data&quot;</span><span class="p">,</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">MISSING</span><span class="p">,</span>
+    <span class="n">module</span><span class="o">=</span><span class="n">PLModule</span><span class="p">,</span>
+    <span class="n">trainer</span><span class="o">=</span><span class="n">TrainerCfg</span><span class="p">,</span>
+    <span class="n">perturber</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">fold</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">n_splits</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+<span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<p>Create <code class="docutils literal notranslate"><span class="pre">CrossValWorkflow</span></code> by inheriting from <a class="reference external" href="https://mit-ll-responsible-ai.github.io/responsible-ai-toolbox/generated/rai_toolbox.mushin.MultiRunMetricsWorkflow.html">MultiRunMetricsWorkflow</a> to train a given model for a given a cross validation dataset (fold). The task function simply runs PyTorch Lightning’s <a class="reference external" href="https://pytorch-lightning.readthedocs.io/en/latest/api/pytorch_lightning.trainer.trainer.Trainer.html#pytorch_lightning.trainer.trainer.Trainer">Trainer.fit</a> and returns the
+metrics saved from <a class="reference external" href="https://mit-ll-responsible-ai.github.io/responsible-ai-toolbox/generated/rai_toolbox.mushin.MetricsCallback.html">MetricsCallback</a>. To run this workflow simply define the number of cross validation splits to use via <code class="docutils literal notranslate"><span class="pre">n_splits</span></code>.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">CrossValWorkFlow</span><span class="p">(</span><span class="n">MultiRunMetricsWorkflow</span><span class="p">):</span>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">evaluation_task</span><span class="p">(</span><span class="n">trainer</span><span class="p">:</span> <span class="n">Trainer</span><span class="p">,</span> <span class="n">module</span><span class="p">:</span> <span class="n">LightningModule</span><span class="p">):</span>
+        <span class="n">trainer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">tr</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;fit_metrics.pt&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_splits</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="o">**</span><span class="n">run_kwargs</span><span class="p">):</span>
+        <span class="n">fold</span> <span class="o">=</span> <span class="n">multirun</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n_splits</span><span class="p">))</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="n">n_splits</span><span class="p">,</span> <span class="n">fold</span><span class="o">=</span><span class="n">fold</span><span class="p">,</span> <span class="o">**</span><span class="n">run_kwargs</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<p>Now run the workflow by defining the requried <code class="docutils literal notranslate"><span class="pre">n_splits</span></code> and the models (names defined in the <a class="reference external" href="https://hydra.cc/docs/tutorials/structured_config/config_store/">ConfigStore</a> above). Additionally we define the working directory of the experiment by setting <code class="docutils literal notranslate"><span class="pre">hydra.sweep.dir</span></code> configuration via <code class="docutils literal notranslate"><span class="pre">overrides</span></code>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">kfold_task</span> <span class="o">=</span> <span class="n">CrossValWorkFlow</span><span class="p">(</span><span class="n">Config</span><span class="p">)</span>
+<span class="n">kfold_task</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+    <span class="n">n_splits</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">multirun</span><span class="p">([</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span> <span class="s2">&quot;cnn&quot;</span><span class="p">]),</span>
+    <span class="n">overrides</span><span class="o">=</span><span class="p">[</span>
+        <span class="s2">&quot;hydra.sweep.dir=outputs/cross_validation/${now:%Y-%m-</span><span class="si">%d</span><span class="s2">}/${now:%H-%M-%S}&quot;</span>
+    <span class="p">],</span>
+<span class="p">)</span>
+<span class="c1">## You can load previous experiments</span>
+<span class="c1"># kfold_task = CrossValWorkFlow().load_from_dir(&quot;outputs/cross_validation/2022-05-11/14-42-14&quot;, metrics_filename=&quot;fit_metrics.pt&quot;)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[2022-05-13 18:08:27,893][HYDRA] Launching 4 jobs locally
+[2022-05-13 18:08:27,893][HYDRA]        #0 : n_splits=2 fold=0 model=linear
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+GPU available: True, used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+/home/ry26099/miniconda3/envs/foolme/lib/python3.8/site-packages/torchvision/datasets/mnist.py:498: UserWarning: The given NumPy array is not writeable, and PyTorch does not support non-writeable tensors. This means you can write to the underlying (supposedly non-writeable) NumPy array using the tensor. You may want to copy the array to protect its data or make it writeable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at  /opt/conda/conda-bld/pytorch_1631630815121/work/torch/csrc/utils/tensor_numpy.cpp:180.)
+  return torch.from_numpy(parsed.astype(m[2], copy=False)).view(*s)
+Missing logger folder: /home/ry26099/public-responsible-ai-toolbox/docs/source/tutorials/outputs/cross_validation/2022-05-13/18-08-27/0/lightning_logs
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0,1]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[2022-05-13 18:09:05,793][HYDRA]        #1 : n_splits=2 fold=0 model=cnn
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+GPU available: True, used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+Missing logger folder: /home/ry26099/public-responsible-ai-toolbox/docs/source/tutorials/outputs/cross_validation/2022-05-13/18-08-27/1/lightning_logs
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0,1]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[2022-05-13 18:09:41,277][HYDRA]        #2 : n_splits=2 fold=1 model=linear
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+GPU available: True, used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+Missing logger folder: /home/ry26099/public-responsible-ai-toolbox/docs/source/tutorials/outputs/cross_validation/2022-05-13/18-08-27/2/lightning_logs
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0,1]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[2022-05-13 18:10:14,888][HYDRA]        #3 : n_splits=2 fold=1 model=cnn
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+GPU available: True, used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+Missing logger folder: /home/ry26099/public-responsible-ai-toolbox/docs/source/tutorials/outputs/cross_validation/2022-05-13/18-08-27/3/lightning_logs
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0,1]
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">kfold_task</span><span class="o">.</span><span class="n">working_dir</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+PosixPath(&#39;/home/ry26099/public-responsible-ai-toolbox/docs/source/tutorials/outputs/cross_validation/2022-05-13/18-08-27&#39;)
+</pre></div></div>
+</div>
+<p>Once the task is finished we can load in the metrics to an <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html">xarray.Dataset</a> using the <code class="docutils literal notranslate"><span class="pre">to_xarray</span></code> method.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">xdata</span> <span class="o">=</span> <span class="n">kfold_task</span><span class="o">.</span><span class="n">to_xarray</span><span class="p">(</span><span class="n">coord_from_metrics</span><span class="o">=</span><span class="s2">&quot;epoch&quot;</span><span class="p">)</span>
+<span class="n">xdata</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div><svg style="position: absolute; width: 0; height: 0; overflow: hidden">
+<defs>
+<symbol id="icon-database" viewBox="0 0 32 32">
+<path d="M16 0c-8.837 0-16 2.239-16 5v4c0 2.761 7.163 5 16 5s16-2.239 16-5v-4c0-2.761-7.163-5-16-5z"></path>
+<path d="M16 17c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+<path d="M16 26c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+</symbol>
+<symbol id="icon-file-text2" viewBox="0 0 32 32">
+<path d="M28.681 7.159c-0.694-0.947-1.662-2.053-2.724-3.116s-2.169-2.030-3.116-2.724c-1.612-1.182-2.393-1.319-2.841-1.319h-15.5c-1.378 0-2.5 1.121-2.5 2.5v27c0 1.378 1.122 2.5 2.5 2.5h23c1.378 0 2.5-1.122 2.5-2.5v-19.5c0-0.448-0.137-1.23-1.319-2.841zM24.543 5.457c0.959 0.959 1.712 1.825 2.268 2.543h-4.811v-4.811c0.718 0.556 1.584 1.309 2.543 2.268zM28 29.5c0 0.271-0.229 0.5-0.5 0.5h-23c-0.271 0-0.5-0.229-0.5-0.5v-27c0-0.271 0.229-0.5 0.5-0.5 0 0 15.499-0 15.5 0v7c0 0.552 0.448 1 1 1h7v19.5z"></path>
+<path d="M23 26h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+<path d="M23 22h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+<path d="M23 18h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+</symbol>
+</defs>
+</svg>
+<style>/* CSS stylesheet for displaying xarray objects in jupyterlab.
+ *
+ */
+
+:root {
+  --xr-font-color0: var(--jp-content-font-color0, rgba(0, 0, 0, 1));
+  --xr-font-color2: var(--jp-content-font-color2, rgba(0, 0, 0, 0.54));
+  --xr-font-color3: var(--jp-content-font-color3, rgba(0, 0, 0, 0.38));
+  --xr-border-color: var(--jp-border-color2, #e0e0e0);
+  --xr-disabled-color: var(--jp-layout-color3, #bdbdbd);
+  --xr-background-color: var(--jp-layout-color0, white);
+  --xr-background-color-row-even: var(--jp-layout-color1, white);
+  --xr-background-color-row-odd: var(--jp-layout-color2, #eeeeee);
+}
+
+html[theme=dark],
+body.vscode-dark {
+  --xr-font-color0: rgba(255, 255, 255, 1);
+  --xr-font-color2: rgba(255, 255, 255, 0.54);
+  --xr-font-color3: rgba(255, 255, 255, 0.38);
+  --xr-border-color: #1F1F1F;
+  --xr-disabled-color: #515151;
+  --xr-background-color: #111111;
+  --xr-background-color-row-even: #111111;
+  --xr-background-color-row-odd: #313131;
+}
+
+.xr-wrap {
+  display: block;
+  min-width: 300px;
+  max-width: 700px;
+}
+
+.xr-text-repr-fallback {
+  /* fallback to plain text repr when CSS is not injected (untrusted notebook) */
+  display: none;
+}
+
+.xr-header {
+  padding-top: 6px;
+  padding-bottom: 6px;
+  margin-bottom: 4px;
+  border-bottom: solid 1px var(--xr-border-color);
+}
+
+.xr-header > div,
+.xr-header > ul {
+  display: inline;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.xr-obj-type,
+.xr-array-name {
+  margin-left: 2px;
+  margin-right: 10px;
+}
+
+.xr-obj-type {
+  color: var(--xr-font-color2);
+}
+
+.xr-sections {
+  padding-left: 0 !important;
+  display: grid;
+  grid-template-columns: 150px auto auto 1fr 20px 20px;
+}
+
+.xr-section-item {
+  display: contents;
+}
+
+.xr-section-item input {
+  display: none;
+}
+
+.xr-section-item input + label {
+  color: var(--xr-disabled-color);
+}
+
+.xr-section-item input:enabled + label {
+  cursor: pointer;
+  color: var(--xr-font-color2);
+}
+
+.xr-section-item input:enabled + label:hover {
+  color: var(--xr-font-color0);
+}
+
+.xr-section-summary {
+  grid-column: 1;
+  color: var(--xr-font-color2);
+  font-weight: 500;
+}
+
+.xr-section-summary > span {
+  display: inline-block;
+  padding-left: 0.5em;
+}
+
+.xr-section-summary-in:disabled + label {
+  color: var(--xr-font-color2);
+}
+
+.xr-section-summary-in + label:before {
+  display: inline-block;
+  content: '►';
+  font-size: 11px;
+  width: 15px;
+  text-align: center;
+}
+
+.xr-section-summary-in:disabled + label:before {
+  color: var(--xr-disabled-color);
+}
+
+.xr-section-summary-in:checked + label:before {
+  content: '▼';
+}
+
+.xr-section-summary-in:checked + label > span {
+  display: none;
+}
+
+.xr-section-summary,
+.xr-section-inline-details {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.xr-section-inline-details {
+  grid-column: 2 / -1;
+}
+
+.xr-section-details {
+  display: none;
+  grid-column: 1 / -1;
+  margin-bottom: 5px;
+}
+
+.xr-section-summary-in:checked ~ .xr-section-details {
+  display: contents;
+}
+
+.xr-array-wrap {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 20px auto;
+}
+
+.xr-array-wrap > label {
+  grid-column: 1;
+  vertical-align: top;
+}
+
+.xr-preview {
+  color: var(--xr-font-color3);
+}
+
+.xr-array-preview,
+.xr-array-data {
+  padding: 0 5px !important;
+  grid-column: 2;
+}
+
+.xr-array-data,
+.xr-array-in:checked ~ .xr-array-preview {
+  display: none;
+}
+
+.xr-array-in:checked ~ .xr-array-data,
+.xr-array-preview {
+  display: inline-block;
+}
+
+.xr-dim-list {
+  display: inline-block !important;
+  list-style: none;
+  padding: 0 !important;
+  margin: 0;
+}
+
+.xr-dim-list li {
+  display: inline-block;
+  padding: 0;
+  margin: 0;
+}
+
+.xr-dim-list:before {
+  content: '(';
+}
+
+.xr-dim-list:after {
+  content: ')';
+}
+
+.xr-dim-list li:not(:last-child):after {
+  content: ',';
+  padding-right: 5px;
+}
+
+.xr-has-index {
+  font-weight: bold;
+}
+
+.xr-var-list,
+.xr-var-item {
+  display: contents;
+}
+
+.xr-var-item > div,
+.xr-var-item label,
+.xr-var-item > .xr-var-name span {
+  background-color: var(--xr-background-color-row-even);
+  margin-bottom: 0;
+}
+
+.xr-var-item > .xr-var-name:hover span {
+  padding-right: 5px;
+}
+
+.xr-var-list > li:nth-child(odd) > div,
+.xr-var-list > li:nth-child(odd) > label,
+.xr-var-list > li:nth-child(odd) > .xr-var-name span {
+  background-color: var(--xr-background-color-row-odd);
+}
+
+.xr-var-name {
+  grid-column: 1;
+}
+
+.xr-var-dims {
+  grid-column: 2;
+}
+
+.xr-var-dtype {
+  grid-column: 3;
+  text-align: right;
+  color: var(--xr-font-color2);
+}
+
+.xr-var-preview {
+  grid-column: 4;
+}
+
+.xr-var-name,
+.xr-var-dims,
+.xr-var-dtype,
+.xr-preview,
+.xr-attrs dt {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 10px;
+}
+
+.xr-var-name:hover,
+.xr-var-dims:hover,
+.xr-var-dtype:hover,
+.xr-attrs dt:hover {
+  overflow: visible;
+  width: auto;
+  z-index: 1;
+}
+
+.xr-var-attrs,
+.xr-var-data {
+  display: none;
+  background-color: var(--xr-background-color) !important;
+  padding-bottom: 5px !important;
+}
+
+.xr-var-attrs-in:checked ~ .xr-var-attrs,
+.xr-var-data-in:checked ~ .xr-var-data {
+  display: block;
+}
+
+.xr-var-data > table {
+  float: right;
+}
+
+.xr-var-name span,
+.xr-var-data,
+.xr-attrs {
+  padding-left: 25px !important;
+}
+
+.xr-attrs,
+.xr-var-attrs,
+.xr-var-data {
+  grid-column: 1 / -1;
+}
+
+dl.xr-attrs {
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 125px auto;
+}
+
+.xr-attrs dt,
+.xr-attrs dd {
+  padding: 0;
+  margin: 0;
+  float: left;
+  padding-right: 10px;
+  width: auto;
+}
+
+.xr-attrs dt {
+  font-weight: normal;
+  grid-column: 1;
+}
+
+.xr-attrs dt:hover span {
+  display: inline-block;
+  background: var(--xr-background-color);
+  padding-right: 10px;
+}
+
+.xr-attrs dd {
+  grid-column: 2;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.xr-icon-database,
+.xr-icon-file-text2 {
+  display: inline-block;
+  vertical-align: middle;
+  width: 1em;
+  height: 1.5em !important;
+  stroke-width: 0;
+  stroke: currentColor;
+  fill: currentColor;
+}
+</style><pre class='xr-text-repr-fallback'>&lt;xarray.Dataset&gt;
+Dimensions:         (fold: 2, model: 2, epoch: 10)
+Coordinates:
+  * fold            (fold) int64 0 1
+  * model           (model) &lt;U6 &#x27;linear&#x27; &#x27;cnn&#x27;
+  * epoch           (epoch) int64 0 1 2 3 4 5 6 7 8 9
+Data variables:
+    train_loss      (fold, model, epoch) float64 1.843 0.9141 ... 0.01429
+    train_accuracy  (fold, model, epoch) float64 0.34 0.67 0.84 ... 0.98 1.0
+    val_loss        (fold, model, epoch) float64 1.751 0.982 ... 0.05559 0.05875
+    val_accuracy    (fold, model, epoch) float64 0.3953 0.6775 ... 0.9822 0.9809
+Attributes:
+    n_splits:  2</pre><div class='xr-wrap' hidden><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-fb156af9-52d8-48fa-8e72-dc5f38819708' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-fb156af9-52d8-48fa-8e72-dc5f38819708' class='xr-section-summary'  title='Expand/collapse section'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span class='xr-has-index'>fold</span>: 2</li><li><span class='xr-has-index'>model</span>: 2</li><li><span class='xr-has-index'>epoch</span>: 10</li></ul></div><div class='xr-section-details'></div></li><li class='xr-section-item'><input id='section-fcebbc43-b5b2-47cd-9b0c-826133db0705' class='xr-section-summary-in' type='checkbox'  checked><label for='section-fcebbc43-b5b2-47cd-9b0c-826133db0705' class='xr-section-summary' >Coordinates: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>fold</span></div><div class='xr-var-dims'>(fold)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1</div><input id='attrs-82c85500-a14b-413c-aa2d-079f9aa46f26' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-82c85500-a14b-413c-aa2d-079f9aa46f26' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-5fca8d1b-177c-4e04-bb29-a84d2fb2ef32' class='xr-var-data-in' type='checkbox'><label for='data-5fca8d1b-177c-4e04-bb29-a84d2fb2ef32' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>model</span></div><div class='xr-var-dims'>(model)</div><div class='xr-var-dtype'>&lt;U6</div><div class='xr-var-preview xr-preview'>&#x27;linear&#x27; &#x27;cnn&#x27;</div><input id='attrs-d42ec20e-a28f-4de4-ad9a-9ae946139180' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-d42ec20e-a28f-4de4-ad9a-9ae946139180' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-b2894281-6e1c-41d3-9bb3-241b62e521cb' class='xr-var-data-in' type='checkbox'><label for='data-b2894281-6e1c-41d3-9bb3-241b62e521cb' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([&#x27;linear&#x27;, &#x27;cnn&#x27;], dtype=&#x27;&lt;U6&#x27;)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>epoch</span></div><div class='xr-var-dims'>(epoch)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 5 6 7 8 9</div><input id='attrs-1f111530-fff6-4128-ba66-1cc0031fdcfa' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-1f111530-fff6-4128-ba66-1cc0031fdcfa' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-5228cd0b-1b4d-4c51-93c3-479959957747' class='xr-var-data-in' type='checkbox'><label for='data-5228cd0b-1b4d-4c51-93c3-479959957747' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-9110dbab-99bc-4083-9acb-24108c3e6187' class='xr-section-summary-in' type='checkbox'  checked><label for='section-9110dbab-99bc-4083-9acb-24108c3e6187' class='xr-section-summary' >Data variables: <span>(4)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>train_loss</span></div><div class='xr-var-dims'>(fold, model, epoch)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>1.843 0.9141 ... 0.06187 0.01429</div><input id='attrs-9ce377f6-babd-4cd6-9bc8-a28c85e265b5' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-9ce377f6-babd-4cd6-9bc8-a28c85e265b5' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-8c9837c3-db6e-4919-9cf8-0922c870a3f9' class='xr-var-data-in' type='checkbox'><label for='data-8c9837c3-db6e-4919-9cf8-0922c870a3f9' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[[1.84292114, 0.91411453, 0.56601125, 0.40735164, 0.25742462,
+         0.38516247, 0.22364628, 0.30317438, 0.23015535, 0.24520712],
+        [0.14596678, 0.09687925, 0.11298358, 0.0231307 , 0.07498793,
+         0.0575781 , 0.04878395, 0.04890716, 0.03334936, 0.02317524]],
+
+       [[1.80253327, 0.95794898, 0.72493637, 0.3126767 , 0.34714097,
+         0.41859066, 0.26270753, 0.18462013, 0.1319288 , 0.20296416],
+        [0.10246996, 0.03364224, 0.19099446, 0.08976926, 0.04811488,
+         0.03640365, 0.06905943, 0.04545942, 0.06187333, 0.01428588]]])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>train_accuracy</span></div><div class='xr-var-dims'>(fold, model, epoch)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>0.34 0.67 0.84 ... 0.99 0.98 1.0</div><input id='attrs-313fa6ca-44c0-4c1c-a2e6-d6c06c10a3aa' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-313fa6ca-44c0-4c1c-a2e6-d6c06c10a3aa' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-0f345a85-4a8b-4120-a1c8-dc0c625f1021' class='xr-var-data-in' type='checkbox'><label for='data-0f345a85-4a8b-4120-a1c8-dc0c625f1021' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[[0.34      , 0.67000002, 0.83999997, 0.88      , 0.91000003,
+         0.91000003, 0.91000003, 0.92000002, 0.93000001, 0.91000003],
+        [0.97000003, 0.95999998, 0.97000003, 0.99000001, 0.97000003,
+         0.99000001, 0.98000002, 0.98000002, 0.98000002, 0.99000001]],
+
+       [[0.38999999, 0.66000003, 0.76999998, 0.88999999, 0.92000002,
+         0.86000001, 0.88      , 0.94999999, 0.97000003, 0.94999999],
+        [0.98000002, 0.99000001, 0.94999999, 0.98000002, 0.99000001,
+         0.99000001, 0.98000002, 0.99000001, 0.98000002, 1.        ]]])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>val_loss</span></div><div class='xr-var-dims'>(fold, model, epoch)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>1.751 0.982 ... 0.05559 0.05875</div><input id='attrs-8131e489-77bb-4b9f-b0c6-c7cb686b53d5' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-8131e489-77bb-4b9f-b0c6-c7cb686b53d5' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-d1c566d7-487a-4f66-8305-5c77aafa7b49' class='xr-var-data-in' type='checkbox'><label for='data-d1c566d7-487a-4f66-8305-5c77aafa7b49' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[[1.75138438, 0.98202723, 0.58188194, 0.38777778, 0.31018761,
+         0.321367  , 0.25354946, 0.23486698, 0.20577776, 0.18905197],
+        [0.17589222, 0.09561242, 0.09094732, 0.08628079, 0.061953  ,
+         0.0535531 , 0.06413647, 0.05337955, 0.05904228, 0.0466436 ]],
+
+       [[1.85520816, 0.95965004, 0.75001425, 0.39720115, 0.35004416,
+         0.29357648, 0.26241106, 0.22999182, 0.19612788, 0.18846357],
+        [0.12823881, 0.10106483, 0.08617733, 0.0842027 , 0.07335975,
+         0.07860082, 0.06697194, 0.05830069, 0.05559341, 0.05875233]]])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>val_accuracy</span></div><div class='xr-var-dims'>(fold, model, epoch)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>0.3953 0.6775 ... 0.9822 0.9809</div><input id='attrs-80c8ad6e-661a-45fc-bab7-b14a33eb8569' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-80c8ad6e-661a-45fc-bab7-b14a33eb8569' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-7da2714d-b0d5-4493-9ad3-3e9d77cd2add' class='xr-var-data-in' type='checkbox'><label for='data-7da2714d-b0d5-4493-9ad3-3e9d77cd2add' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[[0.39533332, 0.67746669, 0.82709998, 0.88673335, 0.90746665,
+         0.90090001, 0.92396665, 0.92919999, 0.93866664, 0.94346666],
+        [0.94736665, 0.97180003, 0.97170001, 0.97386664, 0.98126668,
+         0.98416668, 0.98086667, 0.98393333, 0.98150003, 0.98526669]],
+
+       [[0.34740001, 0.69139999, 0.73876667, 0.88429999, 0.89256668,
+         0.91210002, 0.91886669, 0.92986667, 0.93943334, 0.94300002],
+        [0.96063334, 0.9691    , 0.97363335, 0.97503334, 0.97829998,
+         0.97606665, 0.9788667 , 0.98210001, 0.98220003, 0.98093331]]])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-198b631e-f98c-43e6-a909-6758827bc349' class='xr-section-summary-in' type='checkbox'  checked><label for='section-198b631e-f98c-43e6-a909-6758827bc349' class='xr-section-summary' >Attributes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'><dt><span>n_splits :</span></dt><dd>2</dd></dl></div></li></ul></div></div></div>
+</div>
+<p>We can use xarray to plot the validation accuracy over training epochs for each fold or aggregrate the mean across all folds.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">xdata</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;model&quot;</span><span class="p">):</span>
+    <span class="n">g</span><span class="o">.</span><span class="n">val_accuracy</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s2">&quot;epoch&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> (fold)&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+    <span class="n">g</span><span class="o">.</span><span class="n">val_accuracy</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="s2">&quot;fold&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span>
+        <span class="n">x</span><span class="o">=</span><span class="s2">&quot;epoch&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;k&quot;</span>
+    <span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;matplotlib.legend.Legend at 0x7f7b4cfbd5b0&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_Building-Workflows_25_1.png" src="../_images/tutorials_Building-Workflows_25_1.png" />
+</div>
+</div>
+</section>
+<section id="Robustness-Curve">
+<h2>Robustness Curve<a class="headerlink" href="#Robustness-Curve" title="Permalink to this headline">#</a></h2>
+<p>Now that we have trained some models let’s evalulate robustness of each model to adversarial perturbations. To create a configuration and workflow we need to provide the following for our task:</p>
+<ul class="simple">
+<li><p>The experiment directory containing the experiment parameters and model checkpoint for training</p></li>
+<li><p>The perturbation type and perturbation magnitude (<code class="docutils literal notranslate"><span class="pre">epsilon</span></code>)</p></li>
+</ul>
+<p>Below we define a function that extracts the configuration of the model defined by in the experiment YAML file while the checkpoint is found within the training experiment directory. This makes sure we load the correct model configuration and checkpoint for testing.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">load_model_from_experiment</span><span class="p">(</span><span class="n">job_dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
+    <span class="c1"># Load configuration for experiment</span>
+    <span class="n">job_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">job_dir</span><span class="p">)</span>
+    <span class="n">exp_cfg</span> <span class="o">=</span> <span class="n">job_dir</span> <span class="o">/</span> <span class="s2">&quot;.hydra/config.yaml&quot;</span>
+    <span class="k">assert</span> <span class="n">exp_cfg</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>
+    <span class="n">exp_cfg</span> <span class="o">=</span> <span class="n">load_from_yaml</span><span class="p">(</span><span class="n">exp_cfg</span><span class="p">)</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">instantiate</span><span class="p">(</span><span class="n">exp_cfg</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
+
+    <span class="c1"># get path to model checkpoint in experiment directory</span>
+    <span class="c1"># and load to model</span>
+    <span class="n">ckpts</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">job_dir</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;**/*.ckpt&quot;</span><span class="p">))</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">ckpts</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+    <span class="n">ckpt</span> <span class="o">=</span> <span class="n">ckpts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">load_from_checkpoint</span><span class="p">(</span>
+        <span class="n">model</span><span class="p">,</span>
+        <span class="n">ckpt</span><span class="o">=</span><span class="n">ckpt</span><span class="p">,</span>
+        <span class="n">weights_key</span><span class="o">=</span><span class="s2">&quot;state_dict&quot;</span><span class="p">,</span>
+        <span class="n">weights_key_strip</span><span class="o">=</span><span class="s2">&quot;model.&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">model</span>
+<br/></pre></div>
+</div>
+</div>
+<p>Now we can define our experiment configuration file.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">TestConfig</span> <span class="o">=</span> <span class="n">make_config</span><span class="p">(</span>
+    <span class="n">defaults</span><span class="o">=</span><span class="p">[</span>
+        <span class="s2">&quot;_self_&quot;</span><span class="p">,</span>
+        <span class="p">{</span><span class="s2">&quot;optimizer&quot;</span><span class="p">:</span> <span class="s2">&quot;l2pgd&quot;</span><span class="p">},</span>
+    <span class="p">],</span>
+    <span class="n">data_dir</span><span class="o">=</span><span class="s2">&quot;${oc.env:HOME}/.torch/data&quot;</span><span class="p">,</span>
+    <span class="n">job_dir</span><span class="o">=</span><span class="n">MISSING</span><span class="p">,</span>  <span class="c1"># will be auto-populated by our workflow</span>
+    <span class="n">trainer</span><span class="o">=</span><span class="n">TrainerCfg</span><span class="p">,</span>
+    <span class="n">module</span><span class="o">=</span><span class="n">EvalPLModule</span><span class="p">,</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">builds</span><span class="p">(</span><span class="n">load_model_from_experiment</span><span class="p">,</span> <span class="n">job_dir</span><span class="o">=</span><span class="s2">&quot;$</span><span class="si">{job_dir}</span><span class="s2">&quot;</span><span class="p">),</span>
+    <span class="n">perturber</span><span class="o">=</span><span class="n">Perturber</span><span class="p">,</span>
+    <span class="n">optimizer</span><span class="o">=</span><span class="n">MISSING</span><span class="p">,</span>
+    <span class="n">epsilon</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">steps</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+<span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<p>The workflow inherits from <a class="reference external" href="https://mit-ll-responsible-ai.github.io/responsible-ai-toolbox/generated/rai_toolbox.mushin.RobustnessCurve.html">RobustnessCurve</a>. Other than the basic task function to use <a class="reference external" href="https://pytorch-lightning.readthedocs.io/en/latest/api/pytorch_lightning.trainer.trainer.Trainer.html#pytorch_lightning.trainer.trainer.Trainer">Trainer.test</a> and return the test metrics saved by
+<a class="reference external" href="https://mit-ll-responsible-ai.github.io/responsible-ai-toolbox/generated/rai_toolbox.mushin.MetricsCallback.html">MetricsCallback</a>, this workflow extends the basic interface for <code class="docutils literal notranslate"><span class="pre">RobustnessCurve</span></code> to:</p>
+<ul class="simple">
+<li><p>Load and correlate the training experiment parameters model and fold to the robustness curve experiments</p></li>
+<li><p>Update the <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html">xarray.Dataset</a> with the training experiment parameters</p></li>
+</ul>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">ExperimentRobustnessCurve</span><span class="p">(</span><span class="n">RobustnessCurve</span><span class="p">):</span>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">evaluation_task</span><span class="p">(</span><span class="n">trainer</span><span class="p">:</span> <span class="n">Trainer</span><span class="p">,</span> <span class="n">module</span><span class="p">:</span> <span class="n">LightningModule</span><span class="p">):</span>
+        <span class="n">trainer</span><span class="o">.</span><span class="n">test</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">tr</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;test_metrics.pt&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Run the experiment by first defining the main experiment directory for each cross-validation experiment and providing the <code class="docutils literal notranslate"><span class="pre">epsilon</span></code> values for the calculating the <span class="math notranslate nohighlight">\(\ell_2\)</span> adverarial perturbations.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">robustness_curve_task</span> <span class="o">=</span> <span class="n">ExperimentRobustnessCurve</span><span class="p">(</span><span class="n">TestConfig</span><span class="p">)</span>
+<span class="n">robustness_curve_task</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+    <span class="n">epsilon</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+    <span class="n">target_job_dirs</span><span class="o">=</span><span class="n">kfold_task</span><span class="o">.</span><span class="n">multirun_working_dirs</span><span class="p">,</span>
+    <span class="n">overrides</span><span class="o">=</span><span class="p">[</span>
+        <span class="s2">&quot;hydra.sweep.dir=outputs/robustness_curves/${now:%Y-%m-</span><span class="si">%d</span><span class="s2">}/${now:%H-%M-%S}&quot;</span>
+    <span class="p">],</span>
+<span class="p">)</span>
+
+<span class="c1">## You can load an old experiment</span>
+<span class="c1"># robustness_curve_task = ExperimentRobustnessCurve().load_from_dir(&quot;outputs/robustness_curves/2022-05-11/14-45-02&quot;)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[2022-05-13 18:20:31,595][HYDRA] Launching 12 jobs locally
+[2022-05-13 18:20:31,595][HYDRA]        #0 : epsilon=0 job_dir=/home/ry26099/public-responsible-ai-toolbox/docs/source/tutorials/outputs/cross_validation/2022-05-13/18-08-27/0
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+GPU available: True, used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[2022-05-13 18:20:31,690][rai_toolbox.mushin._utils][INFO] - Loading model checkpoint from /home/ry26099/public-responsible-ai-toolbox/docs/source/tutorials/outputs/cross_validation/2022-05-13/18-08-27/0/lightning_logs/version_0/checkpoints/epoch=9-step=3000.ckpt
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Missing logger folder: /home/ry26099/public-responsible-ai-toolbox/docs/source/tutorials/outputs/robustness_curves/2022-05-13/18-20-30/0/lightning_logs
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0,1]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+       Test metric             DataLoader 0
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+      test_accuracy          0.960099995136261
+  test_adversarial_loss     0.12364722788333893
+   test_clean_accuracy       0.960099995136261
+        test_loss           0.12364724278450012
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+[2022-05-13 18:20:33,112][HYDRA]        #1 : epsilon=0 job_dir=/home/ry26099/public-responsible-ai-toolbox/docs/source/tutorials/outputs/cross_validation/2022-05-13/18-08-27/1
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+GPU available: True, used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[2022-05-13 18:20:33,209][rai_toolbox.mushin._utils][INFO] - Loading model checkpoint from /home/ry26099/public-responsible-ai-toolbox/docs/source/tutorials/outputs/cross_validation/2022-05-13/18-08-27/1/lightning_logs/version_0/checkpoints/epoch=9-step=3000.ckpt
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Missing logger folder: /home/ry26099/public-responsible-ai-toolbox/docs/source/tutorials/outputs/robustness_curves/2022-05-13/18-20-30/1/lightning_logs
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0,1]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+       Test metric             DataLoader 0
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+      test_accuracy         0.9864000082015991
+  test_adversarial_loss     0.04095040634274483
+   test_clean_accuracy      0.9864000082015991
+        test_loss          0.040950410068035126
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+[2022-05-13 18:20:35,175][HYDRA]        #2 : epsilon=0 job_dir=/home/ry26099/public-responsible-ai-toolbox/docs/source/tutorials/outputs/cross_validation/2022-05-13/18-08-27/2
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+GPU available: True, used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[2022-05-13 18:20:35,273][rai_toolbox.mushin._utils][INFO] - Loading model checkpoint from /home/ry26099/public-responsible-ai-toolbox/docs/source/tutorials/outputs/cross_validation/2022-05-13/18-08-27/2/lightning_logs/version_0/checkpoints/epoch=9-step=3000.ckpt
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Missing logger folder: /home/ry26099/public-responsible-ai-toolbox/docs/source/tutorials/outputs/robustness_curves/2022-05-13/18-20-30/2/lightning_logs
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0,1]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+       Test metric             DataLoader 0
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+      test_accuracy         0.9627000093460083
+  test_adversarial_loss     0.12427180260419846
+   test_clean_accuracy      0.9627000093460083
+        test_loss           0.12427180260419846
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+[2022-05-13 18:20:36,677][HYDRA]        #3 : epsilon=0 job_dir=/home/ry26099/public-responsible-ai-toolbox/docs/source/tutorials/outputs/cross_validation/2022-05-13/18-08-27/3
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+GPU available: True, used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[2022-05-13 18:20:36,773][rai_toolbox.mushin._utils][INFO] - Loading model checkpoint from /home/ry26099/public-responsible-ai-toolbox/docs/source/tutorials/outputs/cross_validation/2022-05-13/18-08-27/3/lightning_logs/version_0/checkpoints/epoch=9-step=3000.ckpt
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Missing logger folder: /home/ry26099/public-responsible-ai-toolbox/docs/source/tutorials/outputs/robustness_curves/2022-05-13/18-20-30/3/lightning_logs
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0,1]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+       Test metric             DataLoader 0
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+      test_accuracy         0.9857000112533569
+  test_adversarial_loss    0.040786076337099075
+   test_clean_accuracy      0.9857000112533569
+        test_loss           0.04078606888651848
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+[2022-05-13 18:20:38,720][HYDRA]        #4 : epsilon=1 job_dir=/home/ry26099/public-responsible-ai-toolbox/docs/source/tutorials/outputs/cross_validation/2022-05-13/18-08-27/0
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+GPU available: True, used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[2022-05-13 18:20:38,817][rai_toolbox.mushin._utils][INFO] - Loading model checkpoint from /home/ry26099/public-responsible-ai-toolbox/docs/source/tutorials/outputs/cross_validation/2022-05-13/18-08-27/0/lightning_logs/version_0/checkpoints/epoch=9-step=3000.ckpt
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Missing logger folder: /home/ry26099/public-responsible-ai-toolbox/docs/source/tutorials/outputs/robustness_curves/2022-05-13/18-20-30/4/lightning_logs
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0,1]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+       Test metric             DataLoader 0
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+      test_accuracy         0.25429999828338623
+  test_adversarial_loss     3.1336989402770996
+   test_clean_accuracy       0.960099995136261
+        test_loss           3.1336989402770996
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+[2022-05-13 18:20:40,136][HYDRA]        #5 : epsilon=1 job_dir=/home/ry26099/public-responsible-ai-toolbox/docs/source/tutorials/outputs/cross_validation/2022-05-13/18-08-27/1
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+GPU available: True, used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[2022-05-13 18:20:40,236][rai_toolbox.mushin._utils][INFO] - Loading model checkpoint from /home/ry26099/public-responsible-ai-toolbox/docs/source/tutorials/outputs/cross_validation/2022-05-13/18-08-27/1/lightning_logs/version_0/checkpoints/epoch=9-step=3000.ckpt
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Missing logger folder: /home/ry26099/public-responsible-ai-toolbox/docs/source/tutorials/outputs/robustness_curves/2022-05-13/18-20-30/5/lightning_logs
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0,1]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+       Test metric             DataLoader 0
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+      test_accuracy         0.09880000352859497
+  test_adversarial_loss      4.911465167999268
+   test_clean_accuracy      0.9864000082015991
+        test_loss            4.911465167999268
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+[2022-05-13 18:20:42,173][HYDRA]        #6 : epsilon=1 job_dir=/home/ry26099/public-responsible-ai-toolbox/docs/source/tutorials/outputs/cross_validation/2022-05-13/18-08-27/2
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+GPU available: True, used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[2022-05-13 18:20:42,276][rai_toolbox.mushin._utils][INFO] - Loading model checkpoint from /home/ry26099/public-responsible-ai-toolbox/docs/source/tutorials/outputs/cross_validation/2022-05-13/18-08-27/2/lightning_logs/version_0/checkpoints/epoch=9-step=3000.ckpt
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Missing logger folder: /home/ry26099/public-responsible-ai-toolbox/docs/source/tutorials/outputs/robustness_curves/2022-05-13/18-20-30/6/lightning_logs
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0,1]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+       Test metric             DataLoader 0
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+      test_accuracy         0.2134000062942505
+  test_adversarial_loss     3.3395023345947266
+   test_clean_accuracy      0.9627000093460083
+        test_loss           3.3395028114318848
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+[2022-05-13 18:20:43,690][HYDRA]        #7 : epsilon=1 job_dir=/home/ry26099/public-responsible-ai-toolbox/docs/source/tutorials/outputs/cross_validation/2022-05-13/18-08-27/3
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+GPU available: True, used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[2022-05-13 18:20:43,787][rai_toolbox.mushin._utils][INFO] - Loading model checkpoint from /home/ry26099/public-responsible-ai-toolbox/docs/source/tutorials/outputs/cross_validation/2022-05-13/18-08-27/3/lightning_logs/version_0/checkpoints/epoch=9-step=3000.ckpt
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Missing logger folder: /home/ry26099/public-responsible-ai-toolbox/docs/source/tutorials/outputs/robustness_curves/2022-05-13/18-20-30/7/lightning_logs
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0,1]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+       Test metric             DataLoader 0
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+      test_accuracy         0.11240000277757645
+  test_adversarial_loss      4.659071922302246
+   test_clean_accuracy      0.9857000112533569
+        test_loss            4.659071922302246
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+[2022-05-13 18:20:45,733][HYDRA]        #8 : epsilon=2 job_dir=/home/ry26099/public-responsible-ai-toolbox/docs/source/tutorials/outputs/cross_validation/2022-05-13/18-08-27/0
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+GPU available: True, used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[2022-05-13 18:20:45,832][rai_toolbox.mushin._utils][INFO] - Loading model checkpoint from /home/ry26099/public-responsible-ai-toolbox/docs/source/tutorials/outputs/cross_validation/2022-05-13/18-08-27/0/lightning_logs/version_0/checkpoints/epoch=9-step=3000.ckpt
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Missing logger folder: /home/ry26099/public-responsible-ai-toolbox/docs/source/tutorials/outputs/robustness_curves/2022-05-13/18-20-30/8/lightning_logs
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0,1]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+       Test metric             DataLoader 0
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+      test_accuracy         0.00800000037997961
+  test_adversarial_loss     10.397013664245605
+   test_clean_accuracy       0.960099995136261
+        test_loss           10.397013664245605
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+[2022-05-13 18:20:47,178][HYDRA]        #9 : epsilon=2 job_dir=/home/ry26099/public-responsible-ai-toolbox/docs/source/tutorials/outputs/cross_validation/2022-05-13/18-08-27/1
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+GPU available: True, used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[2022-05-13 18:20:47,274][rai_toolbox.mushin._utils][INFO] - Loading model checkpoint from /home/ry26099/public-responsible-ai-toolbox/docs/source/tutorials/outputs/cross_validation/2022-05-13/18-08-27/1/lightning_logs/version_0/checkpoints/epoch=9-step=3000.ckpt
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Missing logger folder: /home/ry26099/public-responsible-ai-toolbox/docs/source/tutorials/outputs/robustness_curves/2022-05-13/18-20-30/9/lightning_logs
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0,1]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+       Test metric             DataLoader 0
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+      test_accuracy                 0.0
+  test_adversarial_loss     17.151403427124023
+   test_clean_accuracy      0.9864000082015991
+        test_loss           17.151405334472656
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+[2022-05-13 18:20:49,221][HYDRA]        #10 : epsilon=2 job_dir=/home/ry26099/public-responsible-ai-toolbox/docs/source/tutorials/outputs/cross_validation/2022-05-13/18-08-27/2
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+GPU available: True, used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[2022-05-13 18:20:49,320][rai_toolbox.mushin._utils][INFO] - Loading model checkpoint from /home/ry26099/public-responsible-ai-toolbox/docs/source/tutorials/outputs/cross_validation/2022-05-13/18-08-27/2/lightning_logs/version_0/checkpoints/epoch=9-step=3000.ckpt
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Missing logger folder: /home/ry26099/public-responsible-ai-toolbox/docs/source/tutorials/outputs/robustness_curves/2022-05-13/18-20-30/10/lightning_logs
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0,1]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+       Test metric             DataLoader 0
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+      test_accuracy         0.00430000014603138
+  test_adversarial_loss     10.642273902893066
+   test_clean_accuracy      0.9627000093460083
+        test_loss           10.642273902893066
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+[2022-05-13 18:20:50,693][HYDRA]        #11 : epsilon=2 job_dir=/home/ry26099/public-responsible-ai-toolbox/docs/source/tutorials/outputs/cross_validation/2022-05-13/18-08-27/3
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+GPU available: True, used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[2022-05-13 18:20:50,877][rai_toolbox.mushin._utils][INFO] - Loading model checkpoint from /home/ry26099/public-responsible-ai-toolbox/docs/source/tutorials/outputs/cross_validation/2022-05-13/18-08-27/3/lightning_logs/version_0/checkpoints/epoch=9-step=3000.ckpt
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Missing logger folder: /home/ry26099/public-responsible-ai-toolbox/docs/source/tutorials/outputs/robustness_curves/2022-05-13/18-20-30/11/lightning_logs
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0,1]
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+       Test metric             DataLoader 0
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+      test_accuracy        0.0003000000142492354
+  test_adversarial_loss      16.9349308013916
+   test_clean_accuracy      0.9857000112533569
+        test_loss            16.9349308013916
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">robustness_curve_task</span><span class="o">.</span><span class="n">working_dir</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+PosixPath(&#39;/home/ry26099/public-responsible-ai-toolbox/docs/source/tutorials/outputs/robustness_curves/2022-05-13/18-20-30&#39;)
+</pre></div></div>
+</div>
+<p>Extract the <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html">xarray.Dataset</a>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rdata</span> <span class="o">=</span> <span class="n">robustness_curve_task</span><span class="o">.</span><span class="n">to_xarray</span><span class="p">()</span>
+<span class="n">rdata</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div><svg style="position: absolute; width: 0; height: 0; overflow: hidden">
+<defs>
+<symbol id="icon-database" viewBox="0 0 32 32">
+<path d="M16 0c-8.837 0-16 2.239-16 5v4c0 2.761 7.163 5 16 5s16-2.239 16-5v-4c0-2.761-7.163-5-16-5z"></path>
+<path d="M16 17c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+<path d="M16 26c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+</symbol>
+<symbol id="icon-file-text2" viewBox="0 0 32 32">
+<path d="M28.681 7.159c-0.694-0.947-1.662-2.053-2.724-3.116s-2.169-2.030-3.116-2.724c-1.612-1.182-2.393-1.319-2.841-1.319h-15.5c-1.378 0-2.5 1.121-2.5 2.5v27c0 1.378 1.122 2.5 2.5 2.5h23c1.378 0 2.5-1.122 2.5-2.5v-19.5c0-0.448-0.137-1.23-1.319-2.841zM24.543 5.457c0.959 0.959 1.712 1.825 2.268 2.543h-4.811v-4.811c0.718 0.556 1.584 1.309 2.543 2.268zM28 29.5c0 0.271-0.229 0.5-0.5 0.5h-23c-0.271 0-0.5-0.229-0.5-0.5v-27c0-0.271 0.229-0.5 0.5-0.5 0 0 15.499-0 15.5 0v7c0 0.552 0.448 1 1 1h7v19.5z"></path>
+<path d="M23 26h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+<path d="M23 22h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+<path d="M23 18h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+</symbol>
+</defs>
+</svg>
+<style>/* CSS stylesheet for displaying xarray objects in jupyterlab.
+ *
+ */
+
+:root {
+  --xr-font-color0: var(--jp-content-font-color0, rgba(0, 0, 0, 1));
+  --xr-font-color2: var(--jp-content-font-color2, rgba(0, 0, 0, 0.54));
+  --xr-font-color3: var(--jp-content-font-color3, rgba(0, 0, 0, 0.38));
+  --xr-border-color: var(--jp-border-color2, #e0e0e0);
+  --xr-disabled-color: var(--jp-layout-color3, #bdbdbd);
+  --xr-background-color: var(--jp-layout-color0, white);
+  --xr-background-color-row-even: var(--jp-layout-color1, white);
+  --xr-background-color-row-odd: var(--jp-layout-color2, #eeeeee);
+}
+
+html[theme=dark],
+body.vscode-dark {
+  --xr-font-color0: rgba(255, 255, 255, 1);
+  --xr-font-color2: rgba(255, 255, 255, 0.54);
+  --xr-font-color3: rgba(255, 255, 255, 0.38);
+  --xr-border-color: #1F1F1F;
+  --xr-disabled-color: #515151;
+  --xr-background-color: #111111;
+  --xr-background-color-row-even: #111111;
+  --xr-background-color-row-odd: #313131;
+}
+
+.xr-wrap {
+  display: block;
+  min-width: 300px;
+  max-width: 700px;
+}
+
+.xr-text-repr-fallback {
+  /* fallback to plain text repr when CSS is not injected (untrusted notebook) */
+  display: none;
+}
+
+.xr-header {
+  padding-top: 6px;
+  padding-bottom: 6px;
+  margin-bottom: 4px;
+  border-bottom: solid 1px var(--xr-border-color);
+}
+
+.xr-header > div,
+.xr-header > ul {
+  display: inline;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.xr-obj-type,
+.xr-array-name {
+  margin-left: 2px;
+  margin-right: 10px;
+}
+
+.xr-obj-type {
+  color: var(--xr-font-color2);
+}
+
+.xr-sections {
+  padding-left: 0 !important;
+  display: grid;
+  grid-template-columns: 150px auto auto 1fr 20px 20px;
+}
+
+.xr-section-item {
+  display: contents;
+}
+
+.xr-section-item input {
+  display: none;
+}
+
+.xr-section-item input + label {
+  color: var(--xr-disabled-color);
+}
+
+.xr-section-item input:enabled + label {
+  cursor: pointer;
+  color: var(--xr-font-color2);
+}
+
+.xr-section-item input:enabled + label:hover {
+  color: var(--xr-font-color0);
+}
+
+.xr-section-summary {
+  grid-column: 1;
+  color: var(--xr-font-color2);
+  font-weight: 500;
+}
+
+.xr-section-summary > span {
+  display: inline-block;
+  padding-left: 0.5em;
+}
+
+.xr-section-summary-in:disabled + label {
+  color: var(--xr-font-color2);
+}
+
+.xr-section-summary-in + label:before {
+  display: inline-block;
+  content: '►';
+  font-size: 11px;
+  width: 15px;
+  text-align: center;
+}
+
+.xr-section-summary-in:disabled + label:before {
+  color: var(--xr-disabled-color);
+}
+
+.xr-section-summary-in:checked + label:before {
+  content: '▼';
+}
+
+.xr-section-summary-in:checked + label > span {
+  display: none;
+}
+
+.xr-section-summary,
+.xr-section-inline-details {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.xr-section-inline-details {
+  grid-column: 2 / -1;
+}
+
+.xr-section-details {
+  display: none;
+  grid-column: 1 / -1;
+  margin-bottom: 5px;
+}
+
+.xr-section-summary-in:checked ~ .xr-section-details {
+  display: contents;
+}
+
+.xr-array-wrap {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 20px auto;
+}
+
+.xr-array-wrap > label {
+  grid-column: 1;
+  vertical-align: top;
+}
+
+.xr-preview {
+  color: var(--xr-font-color3);
+}
+
+.xr-array-preview,
+.xr-array-data {
+  padding: 0 5px !important;
+  grid-column: 2;
+}
+
+.xr-array-data,
+.xr-array-in:checked ~ .xr-array-preview {
+  display: none;
+}
+
+.xr-array-in:checked ~ .xr-array-data,
+.xr-array-preview {
+  display: inline-block;
+}
+
+.xr-dim-list {
+  display: inline-block !important;
+  list-style: none;
+  padding: 0 !important;
+  margin: 0;
+}
+
+.xr-dim-list li {
+  display: inline-block;
+  padding: 0;
+  margin: 0;
+}
+
+.xr-dim-list:before {
+  content: '(';
+}
+
+.xr-dim-list:after {
+  content: ')';
+}
+
+.xr-dim-list li:not(:last-child):after {
+  content: ',';
+  padding-right: 5px;
+}
+
+.xr-has-index {
+  font-weight: bold;
+}
+
+.xr-var-list,
+.xr-var-item {
+  display: contents;
+}
+
+.xr-var-item > div,
+.xr-var-item label,
+.xr-var-item > .xr-var-name span {
+  background-color: var(--xr-background-color-row-even);
+  margin-bottom: 0;
+}
+
+.xr-var-item > .xr-var-name:hover span {
+  padding-right: 5px;
+}
+
+.xr-var-list > li:nth-child(odd) > div,
+.xr-var-list > li:nth-child(odd) > label,
+.xr-var-list > li:nth-child(odd) > .xr-var-name span {
+  background-color: var(--xr-background-color-row-odd);
+}
+
+.xr-var-name {
+  grid-column: 1;
+}
+
+.xr-var-dims {
+  grid-column: 2;
+}
+
+.xr-var-dtype {
+  grid-column: 3;
+  text-align: right;
+  color: var(--xr-font-color2);
+}
+
+.xr-var-preview {
+  grid-column: 4;
+}
+
+.xr-var-name,
+.xr-var-dims,
+.xr-var-dtype,
+.xr-preview,
+.xr-attrs dt {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 10px;
+}
+
+.xr-var-name:hover,
+.xr-var-dims:hover,
+.xr-var-dtype:hover,
+.xr-attrs dt:hover {
+  overflow: visible;
+  width: auto;
+  z-index: 1;
+}
+
+.xr-var-attrs,
+.xr-var-data {
+  display: none;
+  background-color: var(--xr-background-color) !important;
+  padding-bottom: 5px !important;
+}
+
+.xr-var-attrs-in:checked ~ .xr-var-attrs,
+.xr-var-data-in:checked ~ .xr-var-data {
+  display: block;
+}
+
+.xr-var-data > table {
+  float: right;
+}
+
+.xr-var-name span,
+.xr-var-data,
+.xr-attrs {
+  padding-left: 25px !important;
+}
+
+.xr-attrs,
+.xr-var-attrs,
+.xr-var-data {
+  grid-column: 1 / -1;
+}
+
+dl.xr-attrs {
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 125px auto;
+}
+
+.xr-attrs dt,
+.xr-attrs dd {
+  padding: 0;
+  margin: 0;
+  float: left;
+  padding-right: 10px;
+  width: auto;
+}
+
+.xr-attrs dt {
+  font-weight: normal;
+  grid-column: 1;
+}
+
+.xr-attrs dt:hover span {
+  display: inline-block;
+  background: var(--xr-background-color);
+  padding-right: 10px;
+}
+
+.xr-attrs dd {
+  grid-column: 2;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.xr-icon-database,
+.xr-icon-file-text2 {
+  display: inline-block;
+  vertical-align: middle;
+  width: 1em;
+  height: 1.5em !important;
+  stroke-width: 0;
+  stroke: currentColor;
+  fill: currentColor;
+}
+</style><pre class='xr-text-repr-fallback'>&lt;xarray.Dataset&gt;
+Dimensions:                (epsilon: 3, job_dir: 4)
+Coordinates:
+  * epsilon                (epsilon) int64 0 1 2
+  * job_dir                (job_dir) &lt;U112 &#x27;/home/ry26099/public-responsible-...
+    fold                   (job_dir) int64 0 0 1 1
+    model                  (job_dir) &lt;U6 &#x27;linear&#x27; &#x27;cnn&#x27; &#x27;linear&#x27; &#x27;cnn&#x27;
+Data variables:
+    test_clean_accuracy    (epsilon, job_dir) float64 0.9601 0.9864 ... 0.9857
+    test_adversarial_loss  (epsilon, job_dir) float64 0.1236 0.04095 ... 16.93
+    test_loss              (epsilon, job_dir) float64 0.1236 0.04095 ... 16.93
+    test_accuracy          (epsilon, job_dir) float64 0.9601 0.9864 ... 0.0003</pre><div class='xr-wrap' hidden><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-017457d5-85a3-447f-9782-2ae5138cc21e' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-017457d5-85a3-447f-9782-2ae5138cc21e' class='xr-section-summary'  title='Expand/collapse section'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span class='xr-has-index'>epsilon</span>: 3</li><li><span class='xr-has-index'>job_dir</span>: 4</li></ul></div><div class='xr-section-details'></div></li><li class='xr-section-item'><input id='section-b9fc8649-a0ec-437b-a0ec-739f79e2240a' class='xr-section-summary-in' type='checkbox'  checked><label for='section-b9fc8649-a0ec-437b-a0ec-739f79e2240a' class='xr-section-summary' >Coordinates: <span>(4)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>epsilon</span></div><div class='xr-var-dims'>(epsilon)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2</div><input id='attrs-4725cfed-1ae2-46ae-abad-667207ef8b39' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-4725cfed-1ae2-46ae-abad-667207ef8b39' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-e09a4bc1-8473-462f-8464-3ac4074d481e' class='xr-var-data-in' type='checkbox'><label for='data-e09a4bc1-8473-462f-8464-3ac4074d481e' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 1, 2])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>job_dir</span></div><div class='xr-var-dims'>(job_dir)</div><div class='xr-var-dtype'>&lt;U112</div><div class='xr-var-preview xr-preview'>&#x27;/home/ry26099/public-responsibl...</div><input id='attrs-f8d22829-1731-493d-b575-95099501a3e7' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-f8d22829-1731-493d-b575-95099501a3e7' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-05491bd2-f59f-4c42-bb46-bfdf3291dd3c' class='xr-var-data-in' type='checkbox'><label for='data-05491bd2-f59f-4c42-bb46-bfdf3291dd3c' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([&#x27;/home/ry26099/public-responsible-ai-toolbox/docs/source/tutorials/outputs/cross_validation/2022-05-13/18-08-27/0&#x27;,
+       &#x27;/home/ry26099/public-responsible-ai-toolbox/docs/source/tutorials/outputs/cross_validation/2022-05-13/18-08-27/1&#x27;,
+       &#x27;/home/ry26099/public-responsible-ai-toolbox/docs/source/tutorials/outputs/cross_validation/2022-05-13/18-08-27/2&#x27;,
+       &#x27;/home/ry26099/public-responsible-ai-toolbox/docs/source/tutorials/outputs/cross_validation/2022-05-13/18-08-27/3&#x27;],
+      dtype=&#x27;&lt;U112&#x27;)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>fold</span></div><div class='xr-var-dims'>(job_dir)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 0 1 1</div><input id='attrs-d873ab29-0cd4-4f7d-b927-89ed380333b1' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-d873ab29-0cd4-4f7d-b927-89ed380333b1' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-27b62817-5698-4007-9f6e-2a5fa1b41c26' class='xr-var-data-in' type='checkbox'><label for='data-27b62817-5698-4007-9f6e-2a5fa1b41c26' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 0, 1, 1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>model</span></div><div class='xr-var-dims'>(job_dir)</div><div class='xr-var-dtype'>&lt;U6</div><div class='xr-var-preview xr-preview'>&#x27;linear&#x27; &#x27;cnn&#x27; &#x27;linear&#x27; &#x27;cnn&#x27;</div><input id='attrs-12734266-7ae4-492d-9f39-8da5d590c7de' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-12734266-7ae4-492d-9f39-8da5d590c7de' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-1c594f43-73c8-4913-82e7-54debf4904d5' class='xr-var-data-in' type='checkbox'><label for='data-1c594f43-73c8-4913-82e7-54debf4904d5' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([&#x27;linear&#x27;, &#x27;cnn&#x27;, &#x27;linear&#x27;, &#x27;cnn&#x27;], dtype=&#x27;&lt;U6&#x27;)</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-ca108d63-2d8f-4238-9b99-1661f734b8c0' class='xr-section-summary-in' type='checkbox'  checked><label for='section-ca108d63-2d8f-4238-9b99-1661f734b8c0' class='xr-section-summary' >Data variables: <span>(4)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>test_clean_accuracy</span></div><div class='xr-var-dims'>(epsilon, job_dir)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>0.9601 0.9864 ... 0.9627 0.9857</div><input id='attrs-8ed6f702-4d47-4d0d-b696-b885eba23b0d' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-8ed6f702-4d47-4d0d-b696-b885eba23b0d' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-469b0421-2eb9-43f1-af8f-aab43eb9858f' class='xr-var-data-in' type='checkbox'><label for='data-469b0421-2eb9-43f1-af8f-aab43eb9858f' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[0.9601    , 0.98640001, 0.96270001, 0.98570001],
+       [0.9601    , 0.98640001, 0.96270001, 0.98570001],
+       [0.9601    , 0.98640001, 0.96270001, 0.98570001]])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>test_adversarial_loss</span></div><div class='xr-var-dims'>(epsilon, job_dir)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>0.1236 0.04095 ... 10.64 16.93</div><input id='attrs-f5223cd3-92b9-4a58-94dd-1414fe87d33d' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-f5223cd3-92b9-4a58-94dd-1414fe87d33d' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-07e438fe-dfe2-4b21-b7c0-13fad2a23ffb' class='xr-var-data-in' type='checkbox'><label for='data-07e438fe-dfe2-4b21-b7c0-13fad2a23ffb' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[ 0.12364723,  0.04095041,  0.1242718 ,  0.04078608],
+       [ 3.13369894,  4.91146517,  3.33950233,  4.65907192],
+       [10.39701366, 17.15140343, 10.6422739 , 16.9349308 ]])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>test_loss</span></div><div class='xr-var-dims'>(epsilon, job_dir)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>0.1236 0.04095 ... 10.64 16.93</div><input id='attrs-cde87d90-72a2-4b9a-a096-8eb43ea0de8b' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-cde87d90-72a2-4b9a-a096-8eb43ea0de8b' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-12c0359e-2169-4169-b296-382d62eee2cb' class='xr-var-data-in' type='checkbox'><label for='data-12c0359e-2169-4169-b296-382d62eee2cb' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[ 0.12364724,  0.04095041,  0.1242718 ,  0.04078607],
+       [ 3.13369894,  4.91146517,  3.33950281,  4.65907192],
+       [10.39701366, 17.15140533, 10.6422739 , 16.9349308 ]])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>test_accuracy</span></div><div class='xr-var-dims'>(epsilon, job_dir)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>0.9601 0.9864 ... 0.0043 0.0003</div><input id='attrs-ead2f3e3-7b21-49fd-854d-7ddf7fe1d11c' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-ead2f3e3-7b21-49fd-854d-7ddf7fe1d11c' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-a896d8d9-809b-4eea-9387-4f6158cefda6' class='xr-var-data-in' type='checkbox'><label for='data-a896d8d9-809b-4eea-9387-4f6158cefda6' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[9.60099995e-01, 9.86400008e-01, 9.62700009e-01, 9.85700011e-01],
+       [2.54299998e-01, 9.88000035e-02, 2.13400006e-01, 1.12400003e-01],
+       [8.00000038e-03, 0.00000000e+00, 4.30000015e-03, 3.00000014e-04]])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-6fe67978-2327-4aad-af1e-aa462dffcaeb' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-6fe67978-2327-4aad-af1e-aa462dffcaeb' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div></div>
+</div>
+<p>And lastly plot the curves for each cross-validation experiment along with the mean curve for each model.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">rdata</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;model&quot;</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">fold</span><span class="p">,</span> <span class="n">gf</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;fold&quot;</span><span class="p">):</span>
+        <span class="n">gf</span><span class="o">.</span><span class="n">test_accuracy</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s2">&quot;epsilon&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> (folds: </span><span class="si">{</span><span class="n">fold</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+    <span class="n">g</span><span class="o">.</span><span class="n">test_accuracy</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="s2">&quot;job_dir&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span>
+        <span class="n">x</span><span class="o">=</span><span class="s2">&quot;epsilon&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> (average)&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;k&quot;</span>
+    <span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;matplotlib.legend.Legend at 0x7f7b2dfb2550&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_Building-Workflows_38_1.png" src="../_images/tutorials_Building-Workflows_38_1.png" />
+</div>
+</div>
+<p>That’s it! Workflows have the potential to help scale experiments while easily allowing one to load and evalulate results.</p>
+</section>
+</section>
+
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="ImageNet-Concept-Probing.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">Concept Probing</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="../how_tos.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">How-To Guides</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2022 Massachusetts Institute of Technology.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
+</html>
