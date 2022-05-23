@@ -7,7 +7,7 @@
 Solve for a Universal Perturbation
 ==================================
 
-A universal adversarial perturbation (UAP) is a *single* perturbation that can be applied to *uniformly to any data* in order to substantially reduce the quality of a machine learning model's predicitons on that data.
+A universal adversarial perturbation (UAP) is a *single* perturbation that can be applied *uniformly to any data* in order to substantially reduce the quality of a machine learning model's predicitons on that data.
 In the case of an additive perturbation (i.e., :math:`x \rightarrow x + \delta`), the single perturbation, :math:`\delta`, is optimized over a data distribution:
 
 .. math::
