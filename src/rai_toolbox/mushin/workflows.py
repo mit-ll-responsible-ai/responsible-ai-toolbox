@@ -2,7 +2,6 @@
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 
-from abc import ABC, abstractmethod, abstractstaticmethod
 from collections import UserList, defaultdict
 from pathlib import Path
 from typing import (
@@ -25,6 +24,7 @@ import torch as tr
 from hydra.core.override_parser.overrides_parser import OverridesParser
 from hydra.core.utils import JobReturn
 from hydra_zen import launch, load_from_yaml, make_config
+from hydra_zen._compatibility import HYDRA_VERSION
 from hydra_zen._launch import _NotSet
 from typing_extensions import Self, TypeAlias, TypeGuard
 
@@ -45,6 +45,9 @@ __all__ = [
 
 T = TypeVar("T", List[Any], Tuple[Any])
 T1 = TypeVar("T1")
+
+
+_VERSION_BASE_DEFAULT = _NotSet if HYDRA_VERSION < (1, 2, 0) else "1.1"
 
 
 class multirun(UserList):
@@ -71,7 +74,7 @@ def _identity(x: T1) -> T1:
     return x
 
 
-class BaseWorkflow(ABC):
+class BaseWorkflow:
     """Provides an interface for creating a reusable workflow: encapsulated
     "boilerplate" for running, aggregating, and analyzing one or more Hydra jobs.
 
@@ -180,9 +183,10 @@ class BaseWorkflow(ABC):
 
         return self._multirun_task_overrides
 
-    @abstractstaticmethod
+    @staticmethod
     def evaluation_task(*args: Any, **kwargs: Any) -> Any:
-        """User-defined evaluation task to run the workflow.
+        """User-defined evaluation task to run the workflow. This should be
+        a static method.
 
         Arguments will be instantiated configuration variables.  For example,
         if the the workflow configuration is structured as::
@@ -195,9 +199,11 @@ class BaseWorkflow(ABC):
         The inputs to `evaluation_task` can be any of the three configurations:
         `trainer`, `module`, or `another_config` such as::
 
+            @staticmethod
             def evaluation_task(trainer: Trainer, module: LightningModule) -> None:
                 trainer.fit(module)
         """
+        raise NotImplementedError()
 
     def validate(self):
         """Valide the configuration will execute with the user defined evaluation task"""
@@ -213,7 +219,7 @@ class BaseWorkflow(ABC):
         sweeper: Optional[str] = None,
         launcher: Optional[str] = None,
         overrides: Optional[List[str]] = None,
-        version_base: Optional[Union[str, Type[_NotSet]]] = _NotSet,
+        version_base: Optional[Union[str, Type[_NotSet]]] = _VERSION_BASE_DEFAULT,
         to_dictconfig: bool = False,
         config_name: str = "rai_workflow",
         job_name: str = "rai_workflow",
@@ -250,7 +256,7 @@ class BaseWorkflow(ABC):
             This is helpful for filtering out parameters stored in
             `self.workflow_overrides`.
 
-        version_base : Optional[str], optional (default=_NotSet)
+        version_base : Optional[str], optional (default=1.1)
             Available starting with Hydra 1.2.0.
             - If the `version_base parameter` is not specified, Hydra 1.x will use defaults compatible with version 1.1. Also in this case, a warning is issued to indicate an explicit version_base is preferred.
             - If the `version_base parameter` is `None`, then the defaults are chosen for the current minor Hydra version. For example for Hydra 1.2, then would imply `config_path=None` and `hydra.job.chdir=False`.
@@ -333,15 +339,15 @@ class BaseWorkflow(ABC):
         self.jobs = jobs
         self.jobs_post_process()
 
-    @abstractmethod
-    def jobs_post_process(self):
+    def jobs_post_process(self):  # pragma: no cover
         """Method to extract attributes and metrics relevant to the workflow."""
+        raise NotImplementedError()
 
-    def plot(self, **kwargs) -> None:
+    def plot(self, **kwargs) -> None:  # pragma: no cover
         """Plot workflow metrics."""
         raise NotImplementedError()
 
-    def to_xarray(self):
+    def to_xarray(self):  # pragma: no cover
         """Convert workflow data to xArray Dataset or DataArray."""
         raise NotImplementedError()
 
@@ -359,6 +365,12 @@ def _num_from_string(str_input: str) -> LoadedValue:
 
 def _non_str_sequence(x: Any) -> TypeGuard[Sequence[Any]]:
     return isinstance(x, Sequence) and not isinstance(x, str)
+
+
+def _coerce_list_of_arraylikes(v: List[Any]):
+    if v and hasattr(v[0], "__array__"):
+        return [np.asarray(i) for i in v]
+    return v
 
 
 class MultiRunMetricsWorkflow(BaseWorkflow):
@@ -440,6 +452,13 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
         loss        (epsilon, scale) float64 0.01 1.0 0.04 4.0 0.09 9.0
     """
 
+    def __init__(self, eval_task_cfg=None, working_dir: Optional[Path] = None) -> None:
+        super().__init__(eval_task_cfg)
+        self._working_dir = working_dir
+
+        if self._working_dir is not None:
+            self.load_from_dir(self.working_dir, metrics_filename=None)
+
     # TODO: add target_job_dirs example
     #      Document .swap_dims({"job_dir": <...>}) and .set_index(job_dir=[...]).unstack("job_dir")
     #      for re-indexing based on overrides values
@@ -451,9 +470,11 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
     # List of all the dirs that the multirun writes to; sorted by job-num
     multirun_working_dirs: Optional[List[Path]] = None
 
-    @abstractstaticmethod
-    def evaluation_task(*args: Any, **kwargs: Any) -> Dict[str, Any]:  # type: ignore
+    def evaluation_task(
+        *args: Any, **kwargs: Any
+    ) -> Dict[str, Any]:  # pragma: no cover
         """Abstract `staticmethod` for users to define the evalultion task"""
+        raise NotImplementedError()
 
     def run(
         self,
@@ -465,7 +486,7 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
         sweeper: Optional[str] = None,
         launcher: Optional[str] = None,
         overrides: Optional[List[str]] = None,
-        version_base: Optional[Union[str, Type[_NotSet]]] = _NotSet,
+        version_base: Optional[Union[str, Type[_NotSet]]] = _VERSION_BASE_DEFAULT,
         target_job_dirs: Optional[Sequence[Union[str, Path]]] = None,
         to_dictconfig: bool = False,
         config_name: str = "rai_workflow",
@@ -602,7 +623,7 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
         self.metrics = self._process_metrics(job_metrics)
 
     @staticmethod
-    def _process_metrics(job_metrics) -> Dict[str, Any]:
+    def _process_metrics(job_metrics: List[Dict[str, Any]]) -> Dict[str, Any]:
         metrics = defaultdict(list)
         for task_metrics in job_metrics:
             if task_metrics is None:
@@ -618,7 +639,7 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
     def load_from_dir(
         self: Self,
         working_dir: Union[Path, str],
-        metrics_filename: Union[str, None],
+        metrics_filename: Union[str, Sequence[str], None],
     ) -> Self:
         """Loading workflow job data from a given working directory. The workflow
         is loaded in-place and "self" is returned by this method.
@@ -630,13 +651,9 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
             that subdirectories within this working directory will contain
             individual Hydra jobs data (yaml configurations) and saved metrics files.
 
-        metrics_filename: Union[str, None]
-            The filename used to save metrics for each individual Hydra job. This can
-            be a search pattern as well since this is appended to
-
-                `Path(working_dir).glob("**/*/<metrics_filename")`
-
-            If `None`, no metrics are loaded.
+        metrics_filename: str | Sequence[str] | None
+            The filename(s) or glob-pattern(s) uses to load the metrics.
+            If `None`, the metrics stored in `self.metrics` is used.
 
         Returns
         -------
@@ -658,27 +675,62 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
         )
 
         self.multirun_working_dirs = _sort_x_by_k(self.multirun_working_dirs, _job_nums)
-
         self.cfgs = []
-        job_metrics = []
+
         for dir_ in self.multirun_working_dirs:
-            if metrics_filename is None:
-                break
             # Ensure we load saved YAML configurations for each job (in hydra.job.output_subdir)
             cfg_file = dir_ / f"{self.output_subdir}/config.yaml"
             assert cfg_file.exists(), cfg_file
             self.cfgs.append(load_from_yaml(cfg_file))
-            job_metrics.append(tr.load(dir_ / metrics_filename))
+
+        if metrics_filename is not None:
+            self.load_metrics(metrics_filename)
+
+        return self
+
+    def load_metrics(
+        self, metrics_filename: Union[str, Sequence[str]]
+    ) -> Dict[str, List[Any]]:
+        """Loads and aggregates across all multirun working dirs, and stores
+        the metrics in `self.metrics`
+
+        Parameters
+        ----------
+        metrics_filename: str | Sequence[str]
+            The filename(s) or glob-pattern(s) uses to load the metrics.
+            If `None`, the metrics stored in `self.metrics` is used.
+        """
+        if self.multirun_working_dirs is None:
+            self.load_from_dir(self.working_dir, metrics_filename=None)
+            assert self.multirun_working_dirs is not None
+
+        if isinstance(metrics_filename, str):
+            metrics_filename = [metrics_filename]
+
+        job_metrics = []
+        for dir_ in self.multirun_working_dirs:
+            _metrics = {}
+            for name in metrics_filename:
+                files = sorted(dir_.glob(name))
+                if not files:
+                    raise FileNotFoundError(
+                        f"No files with the path/pattern {dir_/name} were found"
+                    )
+
+                for f_ in files:
+                    _metrics.update(tr.load(f_))
+            job_metrics.append(_metrics)
 
         self.metrics = self._process_metrics(job_metrics)
 
-        return self
+        return self.metrics
 
     def to_xarray(
         self,
         include_working_subdirs_as_data_var: bool = False,
         coord_from_metrics: Optional[str] = None,
         non_multirun_params_as_singleton_dims: bool = False,
+        metrics_filename: Union[str, Sequence[str], None] = None,
     ):
         """Convert workflow data to xarray Dataset.
 
@@ -699,6 +751,10 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
             included as length-1 dimensions in the xarray. Useful for merging/
             concatenation with other Datasets
 
+        metrics_filename: Optional[str]
+            The filename or glob-pattern uses to load the metrics.
+            If `None`, the metrics stored in `self.metrics` is used.
+
         Returns
         -------
         results : xarray.Dataset
@@ -706,6 +762,12 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
             quantities over which the multi-run was performed. The data variables
             correspond to the named results returned by the jobs."""
         import xarray as xr
+
+        if metrics_filename is not None:
+            if self.multirun_working_dirs is None:
+                self.load_from_dir(self.working_dir, metrics_filename=metrics_filename)
+            else:
+                self.load_metrics(metrics_filename)
 
         orig_coords = {
             k: (v if _non_str_sequence(v) else [v])
@@ -717,11 +779,14 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
         if coord_from_metrics:
             if coord_from_metrics not in self.metrics:
                 raise ValueError(
-                    f"key `{coord_from_metrics}` not in metrics (available: {list(self.metrics.keys())})"
+                    f"key `{coord_from_metrics}` not in metrics (available: "
+                    f"{list(self.metrics.keys())})"
                 )
 
-            v = self.metrics[coord_from_metrics]
-            if np.asarray(v).ndim > 1:  # pragma: no cover
+            v = _coerce_list_of_arraylikes(self.metrics[coord_from_metrics])
+            v = np.asarray(v)
+
+            if v.ndim > 1:  # pragma: no cover
                 # assume this coord was repeated across experiments, e.g., "epochs"
                 v = v[0]
             metric_coords[coord_from_metrics] = v
@@ -750,6 +815,8 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
         for k, v in metrics_to_add.items():
             if coord_from_metrics and k == coord_from_metrics:
                 continue
+
+            v = _coerce_list_of_arraylikes(v)
 
             datum = np.asarray(v).reshape(shape + np.asarray(v[0]).shape)
 
@@ -785,9 +852,11 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
 
 
 class RobustnessCurve(MultiRunMetricsWorkflow):
-    """Abstract class for workflows that measure performance for different perturbation values.
+    """Abstract class for workflows that measure performance for different perturbation
+    values.
 
-    This workflow requires and uses parameter `epsilon` as the configuration option for varying the perturbation.
+    This workflow requires and uses parameter `epsilon` as the configuration option for
+    varying the perturbation.
 
     See Also
     --------
@@ -802,6 +871,7 @@ class RobustnessCurve(MultiRunMetricsWorkflow):
             Callable[[Callable[..., T1]], Callable[[Any], T1]], None
         ] = zen,
         target_job_dirs: Optional[Sequence[Union[str, Path]]] = None,  # TODO: add docs
+        version_base: Optional[Union[str, Type[_NotSet]]] = _VERSION_BASE_DEFAULT,
         working_dir: Optional[str] = None,
         sweeper: Optional[str] = None,
         launcher: Optional[str] = None,
@@ -854,6 +924,7 @@ class RobustnessCurve(MultiRunMetricsWorkflow):
             working_dir=working_dir,
             sweeper=sweeper,
             launcher=launcher,
+            version_base=version_base,
             overrides=overrides,
             **workflow_overrides,
             # for multiple multi-run params, epsilon should fastest-varying param;
@@ -867,6 +938,7 @@ class RobustnessCurve(MultiRunMetricsWorkflow):
         include_working_subdirs_as_data_var: bool = False,
         coord_from_metrics: Optional[str] = None,
         non_multirun_params_as_singleton_dims: bool = False,
+        metrics_filename: Union[str, Sequence[str], None] = None,
     ):
         """Convert workflow data to xarray Dataset.
 
@@ -887,6 +959,10 @@ class RobustnessCurve(MultiRunMetricsWorkflow):
             included as length-1 dimensions in the xarray. Useful for merging/
             concatenation with other Datasets
 
+        metrics_filename: Optional[str]
+            The filename or glob-pattern uses to load the metrics.
+            If `None`, the metrics stored in `self.metrics` is used.
+
         Returns
         -------
         results : xarray.Dataset
@@ -899,6 +975,7 @@ class RobustnessCurve(MultiRunMetricsWorkflow):
                 include_working_subdirs_as_data_var=include_working_subdirs_as_data_var,
                 coord_from_metrics=coord_from_metrics,
                 non_multirun_params_as_singleton_dims=non_multirun_params_as_singleton_dims,
+                metrics_filename=metrics_filename,
             )
             .sortby("epsilon")
         )
