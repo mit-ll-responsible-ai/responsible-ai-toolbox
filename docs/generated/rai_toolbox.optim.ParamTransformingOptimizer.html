@@ -591,11 +591,9 @@ shape-<code class="xref py py-obj docutils literal notranslate"><span class="pre
 </dl>
 <p class="rubric">Notes</p>
 <p>This transform should <em>always</em> be designed to broadcast over the leading
-dimension of the tensor being modified. That is, each parameter/gradient should</p>
-<blockquote>
-<div><p>be assumed to have the shape-(N, d0, …) and the transformation should be</p>
-</div></blockquote>
-<p>applied - in-place - to each shape-<code class="xref py py-obj docutils literal notranslate"><span class="pre">(d0,</span> <span class="pre">...)</span></code> sub-tensor.</p>
+dimension of the tensor being modified. That is, each parameter/gradient should
+be assumed to have the shape-(N, d0, …) and the transformation should be
+applied - in-place - to each shape-<code class="xref py py-obj docutils literal notranslate"><span class="pre">(d0,</span> <span class="pre">...)</span></code> sub-tensor.</p>
 <p>Prior to calling <a class="reference internal" href="#rai_toolbox.optim.ParamTransformingOptimizer._post_step_transform_" title="rai_toolbox.optim.ParamTransformingOptimizer._post_step_transform_"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_post_step_transform_</span></code></a>, <a class="reference internal" href="#rai_toolbox.optim.ParamTransformingOptimizer" title="rai_toolbox.optim.ParamTransformingOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParamTransformingOptimizer</span></code></a>
 will temporarily reshape each parameter and its gradient to have the appropriate
 shape – in accordance with the value specified for <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim</span></code> – such that
