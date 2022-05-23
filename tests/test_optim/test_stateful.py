@@ -162,3 +162,24 @@ def test_custom_repr_for_chained():
     )
     assert repr(opt).startswith("ClampedGradientOptimizer ○ SignedGradientOptim [SGD](")
     assert repr(opt).count("[SGD]") == 1  # make sure we didn't replace too many times
+
+
+class SimpleOptim(ParamTransformingOptimizer):
+    def _pre_step_transform_(self, param, optim_group) -> None:
+        param *= 2
+        assert param.grad is not None
+        param.grad *= 2
+
+    _post_step_transform_ = _pre_step_transform_
+
+
+def test_inplace_transforms_occur_in_no_grad_context():
+    x = tr.tensor(1.0, requires_grad=True)
+    x.backward(tr.tensor(2.0))
+    optim = SimpleOptim([x], lr=1.0, param_ndim=0)
+    optim._apply_pre_step_transform_()
+    optim._apply_post_step_transform_()
+
+    assert x.item() == 4.0
+    assert x.grad is not None
+    assert x.grad.item() == 8.0

@@ -12,6 +12,8 @@ from rai_toolbox.mushin.lightning import MetricsCallback
 from rai_toolbox.mushin.testing.lightning import SimpleLightningModule
 
 
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
+@pytest.mark.filterwarnings("ignore::UserWarning")
 @pytest.mark.usefixtures("cleandir")
 @pytest.mark.parametrize("testing", [True, False])
 def test_metrics_callback(testing):

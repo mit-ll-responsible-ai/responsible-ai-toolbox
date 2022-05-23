@@ -24,7 +24,8 @@ CLASSIFIERS = [
 KEYWORDS = "machine learning robustness pytorch responsible AI"
 INSTALL_REQUIRES = [
     "torchvision >= 0.10.0",
-    "torch >= 1.9.0",
+    # pytorch 1.9.1 has bug for its view inplace-update checks
+    "torch >= 1.9.0, != 1.9.1",
     "torchmetrics >= 0.6.0",
     "typing-extensions >= 4.1.1",
 ]

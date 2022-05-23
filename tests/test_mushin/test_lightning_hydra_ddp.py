@@ -67,6 +67,11 @@ def task_fn_raises(cfg: Any):
         trainer.fit(module)
 
 
+@pytest.mark.skipif(
+    torch.cuda.device_count() < 2, reason="Need at least 2 GPUs to test"
+)
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
+@pytest.mark.filterwarnings("ignore::UserWarning")
 @pytest.mark.parametrize(
     "testing, predicting", [(True, False), (False, True), (False, False)]
 )
@@ -93,11 +98,16 @@ def test_ddp_with_hydra_raises_misconfiguration():
     module = builds(SimpleLightningModule)
     Config = make_config(trainer=TrainerConfig, wrong_config_name=module, devices=2)
     with pytest.raises(ConfigAttributeError):
-        launch(Config, task_fn_raises)
+        launch(Config, task_fn_raises, version_base="1.1")
 
 
-@pytest.mark.usefixtures("cleandir")
+@pytest.mark.skipif(
+    torch.cuda.device_count() < 2, reason="Need at least 2 GPUs to test"
+)
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
+@pytest.mark.filterwarnings("ignore::UserWarning")
 @pytest.mark.parametrize("subdir", [None, ".hydra", "dksa"])
+@pytest.mark.usefixtures("cleandir")
 def test_ddp_with_hydra_output_subdir(subdir):
     overrides = []
 
@@ -115,10 +125,14 @@ def test_ddp_with_hydra_output_subdir(subdir):
     assert cfg_file.exists()
 
 
-@pytest.mark.usefixtures("cleandir")
+@pytest.mark.skipif(
+    torch.cuda.device_count() < 2, reason="Need at least 2 GPUs to test"
+)
+@pytest.mark.filterwarnings("ignore::UserWarning")
 @pytest.mark.parametrize(
     "testing, predicting", [(True, False), (False, True), (False, False)]
 )
+@pytest.mark.usefixtures("cleandir")
 def test_ddp_with_hydra_subprocess_runs_correct_mode(testing, predicting):
     overrides = [f"+run_test={testing}", f"+run_predict={predicting}"]
     module = builds(SimpleLightningModule)
@@ -153,9 +167,13 @@ def test_ddp_with_hydra_with_datamodule():
     Config = make_config(
         trainer=TrainerConfig, module=module, datamodule=datamodule, devices=2
     )
-    launch(Config, task_fn_with_datamodule)
+    launch(Config, task_fn_with_datamodule, version_base="1.1")
 
 
+@pytest.mark.filterwarnings("ignore::UserWarning")
+@pytest.mark.skipif(
+    torch.cuda.device_count() < 2, reason="Need at least 2 GPUs to test"
+)
 @pytest.mark.usefixtures("cleandir")
 @pytest.mark.parametrize("num_jobs", [1, 2])
 def test_ddp_with_hydra_runjob(num_jobs):
@@ -175,7 +193,9 @@ def test_ddp_with_hydra_runjob(num_jobs):
 
     module = builds(SimpleLightningModule)
     Config = make_config(trainer=TrainerConfig, module=module, devices=2)
-    launch_job = launch(Config, task_fn, overrides, multirun=multirun)
+    launch_job = launch(
+        Config, task_fn, overrides, multirun=multirun, version_base="1.1"
+    )
 
     if multirun:
         assert isinstance(launch_job, list)

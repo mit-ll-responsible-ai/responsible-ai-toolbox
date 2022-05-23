@@ -138,7 +138,7 @@ class ClampedGradientOptimizer(_ClampedOptim):
 
 class ClampedParameterOptimizer(_ClampedOptim):
     """A parameter optimizer that clamps the elements of a parameter to fall within
-    user-specified bounds **after** `InnerOp.step` has updated the parameter
+    user-specified bounds **after** `InnerOpt.step()` has updated the parameter
 
     See Also
     --------
@@ -146,7 +146,8 @@ class ClampedParameterOptimizer(_ClampedOptim):
 
     Examples
     --------
-    Let's perform a step with `SGD` using a learning rate of `1.0` to each of our parameters and then clamp their parameters to `[-1.0, 3.0]`.
+    Let's perform a step with `SGD` using a learning rate of `1.0` to each of our
+    parameters and then clamp their parameters to `[-1.0, 3.0]`.
 
     >>> import torch as tr
     >>> from rai_toolbox.optim import ClampedParameterOptimizer
@@ -166,8 +167,8 @@ class ClampedParameterOptimizer(_ClampedOptim):
 
 class TopQGradientOptimizer(ParamTransformingOptimizer):
     """A gradient-tranforming  optimizer that zeros the elements of a gradient whose
-    absolue magnitudes fall below the Qth percentile. `InnerOp.step` is then to update
-    the corresponding parameter.
+    absolue magnitudes fall below the Qth percentile. `InnerOpt.step()` is then to
+    update the corresponding parameter.
 
     See Also
     --------

@@ -181,7 +181,7 @@ def test_robustnesscurve_load_from_dir():
 
 @pytest.mark.usefixtures("cleandir")
 @pytest.mark.parametrize("fake_param_string", [True, False])
-def test_robustnesscurve_extra_param(fake_param_string):
+def test_robustnesscurve_extra_param(fake_param_string: bool):
     class BadVal:
         pass
 
@@ -202,7 +202,7 @@ def test_robustnesscurve_extra_param(fake_param_string):
 
 @pytest.mark.usefixtures("cleandir")
 @pytest.mark.parametrize("fake_param_string", [True, False])
-def test_robustnesscurve_extra_param_multirun(fake_param_string):
+def test_robustnesscurve_extra_param_multirun(fake_param_string: bool):
     LocalRobustness = create_workflow()
     task = LocalRobustness(make_config(epsilon=0))
 
@@ -271,22 +271,28 @@ def test_robustness_with_multidim_metrics(foo, foo_expected, bar):
 
 
 class MultiDimIterationMetrics(MultiRunMetricsWorkflow):
+    def __init__(self, eval_task_cfg=None, as_tensor: bool = False) -> None:
+        super().__init__(eval_task_cfg)
+        self.as_tensor = as_tensor
+
     # returns "images" -> shape-(N, 4, 4)
     #         "accuracies" -> N
     #         "epochs" -> (N, 10)
-    @staticmethod
-    def evaluation_task(epsilon):
-        val = 100 * np.ones(10) - epsilon**2
-        epochs = np.arange(10)
-        images = 100 * np.ones((10, 4, 4)) - epsilon**2
+
+    def evaluation_task(self, epsilon):
+        backend = np if self.as_tensor else tr
+        val = 100 * backend.ones(10) - epsilon**2
+        epochs = backend.arange(10)
+        images = 100 * backend.ones((10, 4, 4)) - epsilon**2
         result = dict(images=images, accuracies=val + 2, epochs=epochs)
         tr.save(result, "test_metrics.pt")
         return result
 
 
 @pytest.mark.usefixtures("cleandir")
-def test_robustness_with_multidim_metrics_with_iteration():
-    wf = MultiDimIterationMetrics()
+@pytest.mark.parametrize("as_tensor", [False, True])
+def test_robustness_with_multidim_metrics_with_iteration(as_tensor: bool):
+    wf = MultiDimIterationMetrics(as_tensor=as_tensor)
     wf.run(epsilon=multirun([1.0, 3.0, 2.0]), foo="val", bar=multirun(["a", "b"]))
     xarray = wf.to_xarray(coord_from_metrics="epochs")
     assert list(xarray.data_vars.keys()) == ["images", "accuracies"]
@@ -320,6 +326,14 @@ def test_xarray_from_loaded_workflow():
     wf2 = MultiDimMetrics().load_from_dir(wf.working_dir, "test_metrics.pt")
     xarray2 = wf2.to_xarray()
     assert_identical(xarray1, xarray2)
+
+    wf3 = MultiDimMetrics(working_dir=wf.working_dir)
+    xarray3 = wf3.to_xarray(metrics_filename="test_metrics.pt")
+    assert_identical(xarray1, xarray3)
+
+    wf4 = MultiDimMetrics().load_from_dir(wf.working_dir, metrics_filename=None)
+    xarray4 = wf4.to_xarray(metrics_filename="test_metrics.pt")
+    assert_identical(xarray1, xarray4)
 
 
 class LocalBasicSweeper(Sweeper):
@@ -476,3 +490,32 @@ def test_working_subdirs(
 
     # ensure working_subdir is serializable
     xdata.to_netcdf("tmp.nc")
+
+
+class MultiSaveFile(MultiRunMetricsWorkflow):
+    # returns     "images" -> shape-(4, 1)
+    #         "accuracies" -> scalar
+    @staticmethod
+    def evaluation_task(epsilon, acc):
+        val = 100 - epsilon**2
+        result = dict(images=np.array([[val] * 1] * 4), accuracies=acc)
+        tr.save(dict(images=result["images"]), "images.pt")
+        tr.save(dict(accuracies=result["accuracies"]), "acc.pt")
+
+        return result
+
+
+@pytest.mark.usefixtures("cleandir")
+@pytest.mark.parametrize(
+    "file_pattern", ["*.pt", ("*.pt",), ("images.pt", "acc.pt"), ("images.*", "acc.*")]
+)
+def test_globbed_xarray(file_pattern):
+    # saves multiple metrics files that we load/merge via glob pattern
+    wf = MultiSaveFile()
+    wf.run(epsilon=multirun([1, 2, 3]), acc=multirun([0.9, 0.95, 0.99]))
+    xdata1 = wf.to_xarray()
+
+    wf2 = MultiSaveFile(working_dir=wf.working_dir)
+    xdata2 = wf2.to_xarray(metrics_filename=file_pattern)
+
+    assert_identical(xdata1, xdata2)
