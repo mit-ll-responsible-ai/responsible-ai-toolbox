@@ -31,9 +31,11 @@ def test_metrics_callback(testing):
     metrics = torch.load(metric_files[0])
     assert isinstance(metrics, dict)
 
-    assert "Tensor Metric" in metrics
-    if not testing:
-        assert "Val Tensor Metric" in metrics
+    if testing:
+        assert "test_tensor_metric" in metrics
+    else:
+        assert "fit_tensor_metric" in metrics
+        assert "val_tensor_metric" in metrics
 
     for k, v in metrics.items():
         assert not isinstance(v, torch.Tensor)

@@ -67,6 +67,7 @@ must contain the following two sub-configurations:
    Config
     ├── trainer: A ``pytorch_lightning.Trainer`` configuration
     ├── module: A ``pytorch_lightning.LightningModule`` configuration
+    ├── datamodule: [OPTIONAL] A `pytorch_lightning.LightningDataModule` configuration
 
 
 This configuration requirement enables :func:`~rai_toolbox.mushin.HydraDDP` to use a 
@@ -76,15 +77,18 @@ launched for each subprocess:
 .. code-block:: python
    :caption: The task function automatically run by each HydraDDP subprocess
 
-   def task(trainer: Trainer, module: LightningModule, pl_testing: bool, pl_local_rank: int) -> None:
+   def task(trainer: Trainer, module: LightningModule, pl_testing: bool, pl_predicting: bool, pl_local_rank: int) -> None:
        if pl_testing:
            log.info(f"Rank {pl_local_rank}: Launched subprocess using Training.test")
            trainer.test(module)
+        elif pl_predicting:
+            log.info(f"Rank {pl_local_rank}: Launched subprocess using Training.predict")
+            trainer.predict(module, datamodule=datamodule)
        else:
            log.info(f"Rank {pl_local_rank}: Launched subprocess using Training.fit")
            trainer.fit(module)
 
-Note that the configuration flags for ``pl_testing`` and ``pl_local_rank`` are 
+Note that the configuration flags for ``pl_testing``, ``pl_predicting``, and ``pl_local_rank`` are 
 automatically set by :func:`~rai_toolbox.mushin.HydraDDP` before execution.
 
 Next let's create an example configuration and task function using `hydra-zen <https://github.com/mit-ll-responsible-ai/hydra-zen/>`_:

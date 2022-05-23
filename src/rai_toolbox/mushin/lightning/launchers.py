@@ -42,7 +42,7 @@ def _teardown() -> None:
         os.environ.pop(name, None)
 
 
-def _subprocess_call(local_rank: int, testing: bool) -> None:
+def _subprocess_call(local_rank: int, testing: bool, predicting: bool) -> None:
     env_copy = os.environ.copy()
     env_copy["LOCAL_RANK"] = f"{local_rank}"
     # CWD is the Hydra working directory
@@ -78,6 +78,9 @@ def _subprocess_call(local_rank: int, testing: bool) -> None:
 
     # Set flag to run Trainer.fit or Trainer.test in `_pl_main.py`
     command += ["++pl_testing=" + ("false" if not testing else "true")]
+
+    # Set flag to run Trainer.fit or Trainer.test in `_pl_main.py`
+    command += ["++pl_predicting=" + ("false" if not predicting else "true")]
 
     # Set flag for local rank
     command += [f"++pl_local_rank={local_rank}"]
@@ -225,13 +228,16 @@ if PL_VERSION >= Version(1, 6, 0):
             ReturnType
             """
             del trainer  # unused
-            if not self.cluster_environment.creates_processes_externally:
+            if (
+                not self.cluster_environment.creates_processes_externally
+            ):  # pragma: no cover
                 testing = function.__name__ == "_test_impl"
-                self._call_children_scripts(testing=testing)
+                predicting = function.__name__ == "_predict_impl"
+                self._call_children_scripts(testing=testing, predicting=predicting)
 
             return function(*args, **kwargs)
 
-        def _call_children_scripts(self, testing: bool):
+        def _call_children_scripts(self, testing: bool, predicting: bool):
             # bookkeeping of spawned processes
             self._check_can_spawn_children()
 
@@ -245,7 +251,7 @@ if PL_VERSION >= Version(1, 6, 0):
             os.environ["WORLD_SIZE"] = f"{self.num_processes * self.num_nodes}"
 
             for local_rank in range(1, self.num_processes):
-                _subprocess_call(local_rank, testing)
+                _subprocess_call(local_rank, testing, predicting)
 
                 # starting all processes at once can cause issues
                 # with dataloaders delay between 1-10 seconds
@@ -360,7 +366,10 @@ else:  # pragma: no cover
             self.interactive_ddp_procs = []
             for local_rank in range(1, self.num_processes):
                 testing = self.lightning_module.trainer.state.fn == TrainerFn.TESTING
-                _subprocess_call(local_rank, testing=testing)
+                predicting = (
+                    self.lightning_module.trainer.state.fn == TrainerFn.PREDICTING
+                )
+                _subprocess_call(local_rank, testing=testing, predicting=predicting)
 
                 # starting all processes at once can cause issues
                 # with dataloaders delay between 1-10 seconds
