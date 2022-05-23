@@ -21,7 +21,7 @@ class MetricsCallback(Callback):
 
     filename : str, optional (default="metrics.pt")
         The base filename used to store metrics.  For `FITTING` the file is prepended
-        with "fit_" and and for `TESTING` the file is prepended with `test_`.
+        with "fit_" and for `TESTING` the file is prepended with `test_`.
 
     Notes
     -----
@@ -31,7 +31,6 @@ class MetricsCallback(Callback):
 
     Examples
     --------
-
     >>> from pytorch_lightning import Trainer
     >>> from rai_toolbox.mushin import MetricsCallback
 
