@@ -36,6 +36,12 @@ from rai_toolbox.optim import (
 )
 from rai_toolbox.optim.lp_space import _LpNormOptimizer
 
+TINY64 = tr.finfo(tr.float64).tiny
+
+nonzero_floats = st.floats(-1e6, 1e6).filter(
+    lambda x: abs(x) > tr.finfo(tr.float32).tiny
+)
+
 simple_arrays = hnp.arrays(
     shape=hnp.array_shapes(min_dims=2, max_dims=4),
     dtype=np.float64,
@@ -44,12 +50,20 @@ simple_arrays = hnp.arrays(
 
 
 @st.composite
-def tensor_pairs(draw: st.DrawFn) -> Tuple[Tensor, Tensor]:
+def tensor_pairs(
+    draw: st.DrawFn, el1=st.floats(-1e6, 1e6), el2=st.floats(-1e6, 1e6)
+) -> Tuple[Tensor, Tensor]:
     """
     Hypothesis strategy that draws two equal-shape, tensors.
     """
-    x1: np.ndarray = draw(simple_arrays)
-    x2 = draw(hnp.arrays(shape=x1.shape, dtype=x1.dtype, elements=st.floats(-1e6, 1e6)))
+    x1: np.ndarray = draw(
+        hnp.arrays(
+            shape=hnp.array_shapes(min_dims=2, max_dims=4),
+            dtype=np.float64,
+            elements=el1,
+        )
+    )
+    x2 = draw(hnp.arrays(shape=x1.shape, dtype=x1.dtype, elements=el2))
     return (tr.tensor(x1), tr.tensor(x2))
 
 
@@ -286,15 +300,15 @@ def test_step_scales_linearly_with_stepsize(
 @pytest.mark.parametrize(
     "Step",
     [
-        L1NormedGradientOptim,
-        L2NormedGradientOptim,
-        partial(L2ProjectedOptim, epsilon=1),
+        partial(L1NormedGradientOptim, div_by_zero_eps=TINY64),
+        partial(L2NormedGradientOptim, div_by_zero_eps=TINY64),
+        partial(L2ProjectedOptim, epsilon=1, div_by_zero_eps=TINY64),
         SignedGradientOptim,
         partial(LinfProjectedOptim, epsilon=1),
     ],
 )
 @given(
-    tensors=tensor_pairs(),
+    tensors=tensor_pairs(el2=nonzero_floats),
     step_size=st.floats(1e-6, 1e3),
     scaling_factor=st.floats(1e-3, 1e3),
 )
@@ -328,14 +342,16 @@ def test_transform_gradient_step_is_invariant_to_grad_scale(
 def normed(x: Tensor) -> Tensor:
     """Return x such that each entry along axis-0 is L2-normalized"""
     flat_x = x.view(len(x), -1)
-    return (flat_x / (1e-20 + tr.norm(flat_x, dim=-1, keepdim=True))).view(x.shape)
+    return (
+        flat_x / tr.clamp(tr.norm(flat_x, dim=-1, keepdim=True), TINY64, None)
+    ).view(x.shape)
 
 
 @pytest.mark.parametrize(
     "Step, sign_only",
     [
-        (L1NormedGradientOptim, False),
-        (L2NormedGradientOptim, False),
+        (partial(L1NormedGradientOptim, div_by_zero_eps=TINY64), False),
+        (partial(L2NormedGradientOptim, div_by_zero_eps=TINY64), False),
         (SignedGradientOptim, True),
         # projection with large epsilon should not affect grad-direction
         (partial(L2ProjectedOptim, epsilon=1e20), False),
@@ -343,7 +359,7 @@ def normed(x: Tensor) -> Tensor:
     ],
 )
 @given(
-    tensors=tensor_pairs(),
+    tensors=tensor_pairs(el2=nonzero_floats),
     step_size=st.floats(1e-3, 1e3),
 )
 def test_step_is_parallel_to_grad(
@@ -410,7 +426,7 @@ def test_fw_lr_disabled_lr_sched(start: float, n: int, epsilon: float):
     start=hnp.arrays(
         dtype="float64",
         shape=hnp.array_shapes(min_dims=2, max_dims=2, max_side=10),
-        elements=st.floats(-100, 100).filter(lambda x: 0.1 < abs(x)),
+        elements=st.floats(-100, -0.1) | st.floats(0.1, 100),
     ).map(lambda x: x.tolist()),
     epsilon=st.floats(1.0, 10.0),
 )
@@ -665,12 +681,6 @@ def test_grad_scale_and_bias(
 
     assert_allclose(g1_unnormed, g2_unnormed)
     assert_allclose(g1_unnormed, g3_unnormed)
-
-    if b1 != b2 or s1 != s2:
-        assert tr.any(x1 != x2), (x1, x2)
-
-    if b1 != b3 or s1 != s3:
-        assert tr.any(x1 != x3), (x1, x3)
 
 
 def test_l1q_regression():

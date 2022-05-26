@@ -493,7 +493,7 @@ class ParamTransformingOptimizer(Optimizer, metaclass=ABCMeta):
         -----
         This transform should *always* be designed to broadcast over the leading
         dimension of the tensor being modified. That is, each parameter/gradient should
-         be assumed to have the shape-(N, d0, ...) and the transformation should be
+        be assumed to have the shape-(N, d0, ...) and the transformation should be
         applied - in-place - to each shape-`(d0, ...)` sub-tensor.
 
         Prior to calling `_post_step_transform_`, `ParamTransformingOptimizer`
