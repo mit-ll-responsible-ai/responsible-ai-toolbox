@@ -17,3 +17,4 @@ towards concrete objectives.
    how_to/custom_optim
    how_to/univ_adv_pert
    how_to/hydraddp
+   how_to/deterministic_workflow
