@@ -259,7 +259,7 @@ class BaseWorkflow:
             Callable[[Callable[..., T1]], Callable[[Any], T1]], None
         ] = zen,
         pre_task_fn_wrapper: Union[
-            Callable[[Callable[..., T1]], Callable[[Any], T1]], None
+            Callable[[Callable[..., None]], Callable[[Any], None]], None
         ] = zen,
         version_base: Optional[Union[str, Type[_NotSet]]] = _VERSION_BASE_DEFAULT,
         to_dictconfig: bool = False,
