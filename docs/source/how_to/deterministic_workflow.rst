@@ -49,26 +49,26 @@ Lastly, we will run our task three independent times.
 .. code-block:: pycon
    :caption: Running our task 3 times
 
-    >>> wf = TorchWorkflow(Config)
-    >>> wf.run(trial_id=multirun("abc"))
-    [2022-05-26 14:49:42,656][HYDRA] Launching 3 jobs locally
-    [2022-05-26 14:49:42,657][HYDRA] 	#0 : +trial_id=a
-    [2022-05-26 14:49:42,717][HYDRA] 	#1 : +trial_id=b
-    [2022-05-26 14:49:42,776][HYDRA] 	#2 : +trial_id=c
+   >>> wf = TorchWorkflow(Config)
+   >>> wf.run(trial_id=multirun("abc"))
+   [2022-05-26 14:49:42,656][HYDRA] Launching 3 jobs locally
+   [2022-05-26 14:49:42,657][HYDRA] 	#0 : +trial_id=a
+   [2022-05-26 14:49:42,717][HYDRA] 	#1 : +trial_id=b
+   [2022-05-26 14:49:42,776][HYDRA] 	#2 : +trial_id=c
 
 Accumulating and printing our results reveals that our output varies randomly from trial to trial.
 
 .. code-block:: pycon
    :caption: Viewing the results
 
-    >>> wf.to_xarray().out
-    <xarray.DataArray 'out' (trial_id: 3, out_dim0: 1)>
-    array([[ 4.452395 ],
-           [ 3.0512874],
-           [-2.3163323]], dtype=float32)
-    Coordinates:
-      * trial_id  (trial_id) <U1 'a' 'b' 'c'
-      * out_dim0  (out_dim0) int64 0
+   >>> wf.to_xarray().out
+   <xarray.DataArray 'out' (trial_id: 3, out_dim0: 1)>
+   array([[ 4.452395 ],
+          [ 3.0512874],
+          [-2.3163323]], dtype=float32)
+   Coordinates:
+     * trial_id  (trial_id) <U1 'a' 'b' 'c'
+     * out_dim0  (out_dim0) int64 0
 
 
 This random variation is caused by the fact that instantiating ``torch.nn.Linear(10, 1)`` uses PyTorch's global random number generator to draw random values for the weights and bias for this module.
@@ -102,7 +102,7 @@ Adding a ``pre_task`` method to our workflow enables us to seed PyTorch's global
        data=builds(tr.arange, 10.0),
    )
 
-Now we can run our workflow for three times for each of two seeds to verify that the results are deterministic for a given seed.
+To verify that the results are deterministic for a given seed, we will run our workflow three times for each of two seeds.
 
 
 .. code-block:: pycon
@@ -134,8 +134,7 @@ Now we can run our workflow for three times for each of two seeds to verify that
 
 Great! Now our workflow always produces the same result when it is configured with a consistent seed.
   
-.. note:: Best practices with random number generation
-
+.. note:: 
+    
     It is inadvisable to rely on global random state in your code, as we have done in this How-To. Please
-    refer to `this resource <https://albertcthomas.github.io/good-practices-random-number-generators/>`_
-    for more information.
+    refer to `this guide to good practices with random number generation <https://albertcthomas.github.io/good-practices-random-number-generators/>`_ for a better alternative.
