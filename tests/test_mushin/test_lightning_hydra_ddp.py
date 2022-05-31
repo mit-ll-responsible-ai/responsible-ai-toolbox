@@ -121,6 +121,7 @@ def test_ddp_with_hydra_output_subdir(subdir):
     if subdir is None:
         subdir = ".hydra"
 
+    assert isinstance(job.working_dir, str)
     cfg_file = Path(job.working_dir) / subdir / "config.yaml"
     assert cfg_file.exists()
 
@@ -139,6 +140,7 @@ def test_ddp_with_hydra_subprocess_runs_correct_mode(testing, predicting):
     Config = make_config(trainer=TrainerConfig, module=module, devices=2)
     job = launch(Config, task_fn, overrides=overrides)
 
+    assert isinstance(job.working_dir, str)
     cfg_file_run = Path(job.working_dir) / ".hydra/config.yaml"
     assert cfg_file_run.exists()
     cfg_run = load_from_yaml(cfg_file_run)
@@ -148,6 +150,7 @@ def test_ddp_with_hydra_subprocess_runs_correct_mode(testing, predicting):
     assert "run_predict" in cfg_run
     assert cfg_run.run_predict == predicting
 
+    assert isinstance(job.working_dir, str)
     cfg_file_subprocess = Path(job.working_dir) / ".pl_hydra_rank_1/config.yaml"
     assert cfg_file_subprocess.exists()
     cfg_subprocess = load_from_yaml(cfg_file_subprocess)

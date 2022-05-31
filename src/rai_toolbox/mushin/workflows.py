@@ -1048,7 +1048,7 @@ class RobustnessCurve(MultiRunMetricsWorkflow):
         save_filename: Optional[str] = None,
         non_multirun_params_as_singleton_dims: bool = False,
         **kwargs,
-    ) -> None:
+    ) -> Any:
         """Plot metrics versus `epsilon`.
 
         Using the `xarray.Dataset` from `to_xarray`, plot the metrics

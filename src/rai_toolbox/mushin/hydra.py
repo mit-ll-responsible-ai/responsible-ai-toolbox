@@ -18,14 +18,15 @@ from typing import (
 
 from hydra_zen import instantiate
 from hydra_zen.errors import HydraZenValidationError
-from omegaconf import OmegaConf
-from typing_extensions import Literal, ParamSpec
+from hydra_zen.typing._implementations import DataClass
+from omegaconf import DictConfig, ListConfig, OmegaConf
+from typing_extensions import Literal, ParamSpec, TypeGuard
 
 T1 = TypeVar("T1")
 P = ParamSpec("P")
 
 
-def is_config(cfg: Any) -> bool:
+def is_config(cfg: Any) -> TypeGuard[Union[DataClass, DictConfig, ListConfig]]:
     return is_dataclass(cfg) or OmegaConf.is_config(cfg)
 
 
