@@ -17,7 +17,9 @@ chronological order. All previous releases should still be available on pip.
 .. note:: This is documentation for an unreleased version of the toolbox
 
 
-- Added the method `ParamTransformingOptimizer._post_step_transform_` to fulfill the role of `ParamTransformingOptimizer.project`, for the sake of having parity among the names of the pre-step and post-step methods. See :pull:`54` for details.
+Deprecations
+------------
+`~ParamTransformingOptimizer.project` is now deprecated in favor of `~ParamTransformingOptimizer._post_step_transform_`. It will be removed in rAI-toolbox v0.3.0. See :pull:`54` for details.
 
 
 .. _v0.1.1:
