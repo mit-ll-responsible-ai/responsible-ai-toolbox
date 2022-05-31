@@ -400,6 +400,7 @@ class dummy_stateful_solver:
         return tr.tensor([[self.state - 1]]), tr.tensor([[self.state - 1]])
 
 
+@settings(deadline=None)
 @given(repeats=st.integers(1, 10), targeted=st.booleans())
 def test_random_restart_targeted(repeats, targeted: bool):
 

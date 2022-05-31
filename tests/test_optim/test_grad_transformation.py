@@ -208,7 +208,7 @@ def test_project_returns_fixed_point(
     # don't permit no-op
     assume(not tr.all(x1 == x_orig))
 
-    s.project()
+    s._apply_post_step_transform_()
     x2 = x.detach().clone()
 
     note(f"x1: {x1}")
@@ -692,3 +692,11 @@ def test_l1q_regression():
     p.backward(g)
     opt.step()
     assert_allclose(actual=p.grad, expected=tr.tensor([0.0, -0.5, 0.5, 0.0]))
+
+
+def test_project_is_deprecated():
+    x = tr.tensor(1.0, requires_grad=True)
+    optim = L2ProjectedOptim([x], lr=1.0, epsilon=2.0, param_ndim=None)
+
+    with pytest.warns(FutureWarning):
+        optim.project()
