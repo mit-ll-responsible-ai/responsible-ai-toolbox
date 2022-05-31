@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 from collections import UserList, defaultdict
+from inspect import getattr_static
 from pathlib import Path
 from typing import (
     Any,
@@ -74,6 +75,16 @@ def _identity(x: T1) -> T1:
     return x
 
 
+def _task_calls(
+    pre_task: Callable[[Any], None], task: Callable[[Any], T1]
+) -> Callable[[Any], T1]:
+    def wrapped(cfg: Any) -> T1:
+        pre_task(cfg)
+        return task(cfg)
+
+    return wrapped
+
+
 class BaseWorkflow:
     """Provides an interface for creating a reusable workflow: encapsulated
     "boilerplate" for running, aggregating, and analyzing one or more Hydra jobs.
@@ -96,6 +107,8 @@ class BaseWorkflow:
         The working directory of the experiment defined by Hydra's sweep directory
         (`hydra.sweep.dir`).
     """
+
+    _REQUIRED_STATIC_METHODS = ("evaluation_task", "pre_task")
 
     cfgs: List[Any]
     metrics: Dict[str, List[Any]]
@@ -184,6 +197,22 @@ class BaseWorkflow:
         return self._multirun_task_overrides
 
     @staticmethod
+    def pre_task(*args: Any, **kwargs: Any) -> None:
+        """Called prior to `evaluation_task`
+
+        This can be useful for doing things like setting random seeds,
+        which must occur prior to instantiating objects for the evaluation
+        task.
+
+        Notes
+        -----
+        This function is automatically wrapped by `zen`, which is responsible
+        for parsing the function's signature and then extracting and instantiating
+        the correspending fields from a Hydra config object – passing them to the
+        function. This behavior can be modified by `self.run(pre_task_fn_wrapper=...)`"""
+        pass
+
+    @staticmethod
     def evaluation_task(*args: Any, **kwargs: Any) -> Any:
         """User-defined evaluation task to run the workflow. This should be
         a static method.
@@ -202,23 +231,36 @@ class BaseWorkflow:
             @staticmethod
             def evaluation_task(trainer: Trainer, module: LightningModule) -> None:
                 trainer.fit(module)
+
+        Notes
+        -----
+        This function is automatically wrapped by `zen`, which is responsible
+        for parsing the function's signature and then extracting and instantiating
+        the correspending fields from a Hydra config object – passing them to the
+        function. This behavior can be modified by `self.run(task_fn_wrapper=...)`
         """
         raise NotImplementedError()
 
-    def validate(self):
+    def validate(self, include_pre_task: bool = True):
         """Valide the configuration will execute with the user defined evaluation task"""
+        if include_pre_task:
+            zen(self.pre_task).validate(self.eval_task_cfg)
+
         zen(self.evaluation_task).validate(self.eval_task_cfg)
 
     def run(
         self,
         *,
-        task_fn_wrapper: Union[
-            Callable[[Callable[..., T1]], Callable[[Any], T1]], None
-        ] = zen,
         working_dir: Optional[str] = None,
         sweeper: Optional[str] = None,
         launcher: Optional[str] = None,
         overrides: Optional[List[str]] = None,
+        task_fn_wrapper: Union[
+            Callable[[Callable[..., T1]], Callable[[Any], T1]], None
+        ] = zen,
+        pre_task_fn_wrapper: Union[
+            Callable[[Callable[..., None]], Callable[[Any], None]], None
+        ] = zen,
         version_base: Optional[Union[str, Type[_NotSet]]] = _VERSION_BASE_DEFAULT,
         to_dictconfig: bool = False,
         config_name: str = "rai_workflow",
@@ -313,13 +355,25 @@ class BaseWorkflow:
 
             launch_overrides.append(f"{prefix}{k}={v}")
 
+        for _name in self._REQUIRED_STATIC_METHODS:
+            if not isinstance(getattr_static(self, _name), staticmethod):
+                raise TypeError(
+                    f"{type(self).__name__}.{_name} must be a static method"
+                )
+
         if task_fn_wrapper is None:
             task_fn_wrapper = _identity
+
+        if pre_task_fn_wrapper is None:
+            pre_task_fn_wrapper = _identity
 
         # Run a Multirun over epsilons
         jobs = launch(
             self.eval_task_cfg,
-            task_fn_wrapper(self.evaluation_task),
+            _task_calls(
+                pre_task=pre_task_fn_wrapper(self.pre_task),
+                task=task_fn_wrapper(self.evaluation_task),
+            ),
             overrides=launch_overrides,
             multirun=True,
             version_base=version_base,
@@ -470,6 +524,7 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
     # List of all the dirs that the multirun writes to; sorted by job-num
     multirun_working_dirs: Optional[List[Path]] = None
 
+    @staticmethod
     def evaluation_task(
         *args: Any, **kwargs: Any
     ) -> Dict[str, Any]:  # pragma: no cover
@@ -696,9 +751,13 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
 
         Parameters
         ----------
-        metrics_filename: str | Sequence[str]
+        metrics_filename : str | Sequence[str]
             The filename(s) or glob-pattern(s) uses to load the metrics.
             If `None`, the metrics stored in `self.metrics` is used.
+
+        Returns
+        ------
+        metrics : Dict[str, List[Any]]
         """
         if self.multirun_working_dirs is None:
             self.load_from_dir(self.working_dir, metrics_filename=None)
@@ -792,6 +851,7 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
             metric_coords[coord_from_metrics] = v
 
         # non-multirun overrides
+        # TODO: cast "True"/"False" to bool
         attrs = {
             k: v
             for k, v in self.multirun_task_overrides.items()

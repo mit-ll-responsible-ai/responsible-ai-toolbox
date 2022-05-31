@@ -271,16 +271,14 @@ def test_robustness_with_multidim_metrics(foo, foo_expected, bar):
 
 
 class MultiDimIterationMetrics(MultiRunMetricsWorkflow):
-    def __init__(self, eval_task_cfg=None, as_tensor: bool = False) -> None:
-        super().__init__(eval_task_cfg)
-        self.as_tensor = as_tensor
-
     # returns "images" -> shape-(N, 4, 4)
     #         "accuracies" -> N
     #         "epochs" -> (N, 10)
 
-    def evaluation_task(self, epsilon):
-        backend = np if self.as_tensor else tr
+    @staticmethod
+    def evaluation_task(epsilon, as_tensor: bool):
+        assert isinstance(as_tensor, bool)
+        backend = np if as_tensor else tr
         val = 100 * backend.ones(10) - epsilon**2
         epochs = backend.arange(10)
         images = 100 * backend.ones((10, 4, 4)) - epsilon**2
@@ -292,8 +290,13 @@ class MultiDimIterationMetrics(MultiRunMetricsWorkflow):
 @pytest.mark.usefixtures("cleandir")
 @pytest.mark.parametrize("as_tensor", [False, True])
 def test_robustness_with_multidim_metrics_with_iteration(as_tensor: bool):
-    wf = MultiDimIterationMetrics(as_tensor=as_tensor)
-    wf.run(epsilon=multirun([1.0, 3.0, 2.0]), foo="val", bar=multirun(["a", "b"]))
+    wf = MultiDimIterationMetrics()
+    wf.run(
+        epsilon=multirun([1.0, 3.0, 2.0]),
+        foo="val",
+        bar=multirun(["a", "b"]),
+        as_tensor=as_tensor,
+    )
     xarray = wf.to_xarray(coord_from_metrics="epochs")
     assert list(xarray.data_vars.keys()) == ["images", "accuracies"]
     assert list(xarray.coords.keys()) == [
@@ -305,7 +308,7 @@ def test_robustness_with_multidim_metrics_with_iteration(as_tensor: bool):
     ]
     assert xarray.accuracies.shape == (3, 2, 10)
     assert xarray.images.shape == (3, 2, 10, 4, 4)
-    assert xarray.attrs == {"foo": "val"}
+    assert xarray.attrs == {"foo": "val", "as_tensor": str(as_tensor)}
 
     for eps, expected in zip([1.0, 2.0, 3.0], [99.0, 96.0, 91.0]):
         # test that results were organized as-expected
@@ -492,24 +495,23 @@ def test_working_subdirs(
     xdata.to_netcdf("tmp.nc")
 
 
-class MultiSaveFile(MultiRunMetricsWorkflow):
-    # returns     "images" -> shape-(4, 1)
-    #         "accuracies" -> scalar
-    @staticmethod
-    def evaluation_task(epsilon, acc):
-        val = 100 - epsilon**2
-        result = dict(images=np.array([[val] * 1] * 4), accuracies=acc)
-        tr.save(dict(images=result["images"]), "images.pt")
-        tr.save(dict(accuracies=result["accuracies"]), "acc.pt")
-
-        return result
-
-
 @pytest.mark.usefixtures("cleandir")
 @pytest.mark.parametrize(
     "file_pattern", ["*.pt", ("*.pt",), ("images.pt", "acc.pt"), ("images.*", "acc.*")]
 )
 def test_globbed_xarray(file_pattern):
+    class MultiSaveFile(MultiRunMetricsWorkflow):
+        # returns     "images" -> shape-(4, 1)
+        #         "accuracies" -> scalar
+        @staticmethod
+        def evaluation_task(epsilon, acc):
+            val = 100 - epsilon**2
+            result = dict(images=np.array([[val] * 1] * 4), accuracies=acc)
+            tr.save(dict(images=result["images"]), "images.pt")
+            tr.save(dict(accuracies=result["accuracies"]), "acc.pt")
+
+            return result
+
     # saves multiple metrics files that we load/merge via glob pattern
     wf = MultiSaveFile()
     wf.run(epsilon=multirun([1, 2, 3]), acc=multirun([0.9, 0.95, 0.99]))
@@ -519,3 +521,40 @@ def test_globbed_xarray(file_pattern):
     xdata2 = wf2.to_xarray(metrics_filename=file_pattern)
 
     assert_identical(xdata1, xdata2)
+
+
+@pytest.mark.parametrize("seed", [0, 123])
+@pytest.mark.usefixtures("cleandir")
+def test_pre_task_seeding(seed: int):
+    class HasPreTask(MultiRunMetricsWorkflow):
+        @staticmethod
+        def pre_task(seed: int):
+            np.random.seed(seed)
+
+        @staticmethod
+        def evaluation_task(rand_val: int):
+            return {"rand_val": rand_val}
+
+    wf = HasPreTask(make_config(rand_val=builds(np.random.rand)))
+    wf.run(seed=seed)
+    actual = wf.jobs[0].return_value["rand_val"]
+
+    np.random.seed(seed)
+    expected = np.random.rand()
+    assert expected == actual
+
+
+def test_raises_on_non_static_method():
+    class NonStaticEvalTask(MultiRunMetricsWorkflow):
+        def evaluation_task(self):
+            pass
+
+    class NonStaticPreTask(MultiRunMetricsWorkflow):
+        def pre_task(self):
+            pass
+
+    with pytest.raises(TypeError, match="evaluation_task must be a static method"):
+        NonStaticEvalTask().run()
+
+    with pytest.raises(TypeError, match="pre_task must be a static method"):
+        NonStaticPreTask().run()
