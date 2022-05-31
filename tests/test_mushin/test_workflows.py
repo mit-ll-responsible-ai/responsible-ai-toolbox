@@ -308,7 +308,7 @@ def test_robustness_with_multidim_metrics_with_iteration(as_tensor: bool):
     ]
     assert xarray.accuracies.shape == (3, 2, 10)
     assert xarray.images.shape == (3, 2, 10, 4, 4)
-    assert xarray.attrs == {"foo": "val", "as_tensor": str(as_tensor)}
+    assert xarray.attrs == {"foo": "val", "as_tensor": as_tensor}
 
     for eps, expected in zip([1.0, 2.0, 3.0], [99.0, 96.0, 91.0]):
         # test that results were organized as-expected
