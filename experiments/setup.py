@@ -6,8 +6,9 @@ from setuptools import find_packages, setup
 
 INSTALL_REQUIRES = [
     "matplotlib >= 2.0.0",
-    "hydra_zen >= 0.5.0",
+    "hydra_zen >= 0.7.0",
     "pytorch-lightning >= 1.5.0",
+    "protobuf <= 3.20.1",
 ]
 
 setup(
