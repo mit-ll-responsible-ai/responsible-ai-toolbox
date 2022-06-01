@@ -389,7 +389,6 @@ class BaseWorkflow:
         if pre_task_fn_wrapper is None:
             pre_task_fn_wrapper = _identity
 
-        print(launch_overrides)
         # Run a Multirun over epsilons
         jobs = launch(
             self.eval_task_cfg,
