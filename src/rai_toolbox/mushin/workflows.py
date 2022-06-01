@@ -826,6 +826,33 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
         Returns
         ------
         metrics : Dict[str, List[Any]]
+
+        Examples
+        --------
+        Creating a workflow that saves named metrics using `torch.save`
+
+        >>> from rai_toolbox.mushin.workflows import MultiRunMetricsWorkflow, multirun
+        >>> import torch as tr
+        >>>
+        ... class TorchWorkFlow(MultiRunMetricsWorkflow):
+        ...     @staticmethod
+        ...     def task(a, b):
+        ...         tr.save(dict(a=a, b=b), "metrics.pt")
+        ...
+        >>> wf = TorchWorkFlow()
+        >>> wf.run(a=multirun([1, 2, 3]), b=False)
+        [2022-06-01 12:35:51,650][HYDRA] Launching 3 jobs locally
+        [2022-06-01 12:35:51,650][HYDRA] 	#0 : +a=1 +b=False
+        [2022-06-01 12:35:51,715][HYDRA] 	#1 : +a=2 +b=False
+        [2022-06-01 12:35:51,780][HYDRA] 	#2 : +a=3 +b=False
+
+        `~MultiRunMetricsWorkflow` uses `torch.load` by default to load metrics files
+        (refer to `~MultiRunMetricsWorkflow.metric_load_fn` to change this behavior).
+
+        >>> wf.load_metrics("metrics.pt")
+        defaultdict(list, {'a': [1, 2, 3], 'b': [False, False, False]})
+        >>> wf.metrics
+        defaultdict(list, {'a': [1, 2, 3], 'b': [False, False, False]})
         """
         if self.multirun_working_dirs is None:
             self.load_from_dir(self.working_dir, metrics_filename=None)
