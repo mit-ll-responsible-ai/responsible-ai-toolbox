@@ -626,3 +626,23 @@ def test_evaluation_task_is_deprecated():
     wf.run(a=10)
     out = wf.jobs[0]
     assert out.return_value == dict(a=10)
+
+
+@pytest.mark.usefixtures("cleandir")
+def test_custom_metric_load_fn():
+    import pickle
+
+    class PickleWorkFlow(MultiRunMetricsWorkflow):
+        def metric_load_fn(self, file_path: Path):
+            with file_path.open("rb") as f:
+                return pickle.load(f)
+
+        @staticmethod
+        def task(a, b):
+            with open("./metrics.pkl", "wb") as f:
+                pickle.dump(dict(a=[[a] * 2], b=b), f)
+
+    wf = PickleWorkFlow()
+    wf.run(a=multirun([1, 2, 3]), b=False)
+    wf.load_metrics("metrics.pkl")
+    assert wf.metrics == dict(a=[[1] * 2, [2] * 2, [3] * 2], b=[False] * 3)

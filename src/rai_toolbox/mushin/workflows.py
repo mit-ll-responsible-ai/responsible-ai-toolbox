@@ -553,7 +553,8 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
 
     @staticmethod
     def task(*args: Any, **kwargs: Any) -> Mapping[str, Any]:  # pragma: no cover
-        """Abstract `staticmethod` for users to define the evalultion task"""
+        """Abstract `staticmethod` for users to define the task that is configured and
+        launched by the workflow"""
         raise NotImplementedError()
 
     def metric_load_fn(self, file_path: Path) -> Mapping[str, Any]:
@@ -569,7 +570,31 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
         Returns
         -------
         named_metrics : Mapping[str, Any]
-            metric-name -> metric-value(s)"""
+            metric-name -> metric-value(s)
+
+        Examples
+        --------
+        Designing a workflow that uses the `pickle` module to save and load
+        metrics
+
+        >>> from rai_toolbox.mushin import MultiRunMetricsWorkflow, multirun
+        >>> import pickle
+        >>>
+        >>> class PickledWorkFlow(MultiRunMetricsWorkflow):
+        ...     def metric_load_fn(self, file_path: Path):
+        ...         with file_path.open("rb") as f:
+        ...             return pickle.load(f)
+        ...
+        ...     @staticmethod
+        ...     def task(a, b):
+        ...         with open("./metrics.pkl", "wb") as f:
+        ...             pickle.dump(dict(a=a, b=b), f)
+        >>>
+        >>> wf = PickleWorkFlow()
+        >>> wf.run(a=multirun([1, 2, 3]), b=False)
+        >>> wf.load_metrics("metrics.pkl")
+        >>> wf.metrics
+        dict(a=[1, 2, 3], b=[False, False, False])"""
         return tr.load(file_path)
 
     def run(
