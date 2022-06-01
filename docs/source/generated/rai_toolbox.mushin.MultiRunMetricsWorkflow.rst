@@ -16,7 +16,7 @@ rai\_toolbox.mushin.MultiRunMetricsWorkflow
    .. autosummary::
    
       ~MultiRunMetricsWorkflow.__init__
-      ~MultiRunMetricsWorkflow.evaluation_task
+      ~MultiRunMetricsWorkflow.task
       ~MultiRunMetricsWorkflow.jobs_post_process
       ~MultiRunMetricsWorkflow.load_from_dir
       ~MultiRunMetricsWorkflow.plot

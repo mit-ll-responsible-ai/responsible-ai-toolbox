@@ -39,7 +39,7 @@ epsilons = arrays(
 
 class MyWorkflow(BaseWorkflow):
     @staticmethod
-    def evaluation_task():
+    def task():
         return dict(result=1)
 
     def jobs_post_process(self):
@@ -49,7 +49,7 @@ class MyWorkflow(BaseWorkflow):
 def create_workflow(as_array=False):
     class LocalRobustness(RobustnessCurve):
         @staticmethod
-        def evaluation_task(epsilon):
+        def task(epsilon):
             val = 100 - epsilon**2
             if as_array:
                 val = [val]
@@ -236,7 +236,7 @@ class MultiDimMetrics(RobustnessCurve):
     # returns     "images" -> shape-(4, 1)
     #         "accuracies" -> scalar
     @staticmethod
-    def evaluation_task(epsilon):
+    def task(epsilon):
         val = 100 - epsilon**2
         result = dict(images=[[val] * 1] * 4, accuracies=val + 2)
         tr.save(result, "test_metrics.pt")
@@ -276,7 +276,7 @@ class MultiDimIterationMetrics(MultiRunMetricsWorkflow):
     #         "epochs" -> (N, 10)
 
     @staticmethod
-    def evaluation_task(epsilon, as_tensor: bool):
+    def task(epsilon, as_tensor: bool):
         assert isinstance(as_tensor, bool)
         backend = np if as_tensor else tr
         val = 100 * backend.ones(10) - epsilon**2
@@ -361,7 +361,7 @@ class FirstMultiRun(RobustnessCurve):
     # returns     "images" -> shape-(4, 1)
     #         "accuracies" -> scalar
     @staticmethod
-    def evaluation_task(epsilon, acc):
+    def task(epsilon, acc):
         val = 100 - epsilon**2
         result = dict(images=np.array([[val] * 1] * 4), accuracies=acc)
         tr.save(result, "test_metrics.pt")
@@ -371,7 +371,7 @@ class FirstMultiRun(RobustnessCurve):
 class ScndMultiRun(MultiRunMetricsWorkflow):
     # loads test metrics, multiplies each by `val` and saves
     @staticmethod
-    def evaluation_task(job_dir, val):
+    def task(job_dir, val):
         result = tr.load(f"{job_dir}/test_metrics.pt")
 
         # val multiplies each metric
@@ -425,7 +425,7 @@ def test_multirun_over_jobdir(load_from_working_dir):
 
 class NoMetrics(MultiRunMetricsWorkflow):
     @staticmethod
-    def evaluation_task(x: int, y: int):
+    def task(x: int, y: int):
         pass
 
 
@@ -448,7 +448,7 @@ def test_multirun_metrics_workflow_no_metrics(load_from_working_dir):
 
 class GridMetrics(MultiRunMetricsWorkflow):
     @staticmethod
-    def evaluation_task(x: int, y: int):
+    def task(x: int, y: int):
         results = dict(xx=x, yy=y)
         tr.save(results, "test_metrics.pt")
         return results
@@ -504,7 +504,7 @@ def test_globbed_xarray(file_pattern):
         # returns     "images" -> shape-(4, 1)
         #         "accuracies" -> scalar
         @staticmethod
-        def evaluation_task(epsilon, acc):
+        def task(epsilon, acc):
             val = 100 - epsilon**2
             result = dict(images=np.array([[val] * 1] * 4), accuracies=acc)
             tr.save(dict(images=result["images"]), "images.pt")
@@ -532,7 +532,7 @@ def test_pre_task_seeding(seed: int):
             np.random.seed(seed)
 
         @staticmethod
-        def evaluation_task(rand_val: int):
+        def task(rand_val: int):
             return {"rand_val": rand_val}
 
     wf = HasPreTask(make_config(rand_val=builds(np.random.rand)))
@@ -546,14 +546,14 @@ def test_pre_task_seeding(seed: int):
 
 def test_raises_on_non_static_method():
     class NonStaticEvalTask(MultiRunMetricsWorkflow):
-        def evaluation_task(self):
+        def task(self):
             pass
 
     class NonStaticPreTask(MultiRunMetricsWorkflow):
         def pre_task(self):
             pass
 
-    with pytest.raises(TypeError, match="evaluation_task must be a static method"):
+    with pytest.raises(TypeError, match="task must be a static method"):
         NonStaticEvalTask().run()
 
     with pytest.raises(TypeError, match="pre_task must be a static method"):
@@ -586,7 +586,7 @@ def test_overrides_roundtrip(
 ):
     class WorkFlow(MultiDimIterationMetrics):
         @staticmethod
-        def evaluation_task():
+        def task():
             pass
 
     wf = WorkFlow()
@@ -611,3 +611,18 @@ def test_overrides_roundtrip(
         assert xdata.mrun.data.tolist() == mrun
     else:
         assert xdata.mrun.data.tolist() == [str(i) for i in mrun]
+
+
+@pytest.mark.usefixtures("cleandir")
+def test_evaluation_task_is_deprecated():
+    class OldWorkflow(MultiRunMetricsWorkflow):
+        @staticmethod
+        def evaluation_task(a: int):
+            return dict(a=a)
+
+    with pytest.warns(FutureWarning):
+        wf = OldWorkflow()
+
+    wf.run(a=10)
+    out = wf.jobs[0]
+    assert out.return_value == dict(a=10)

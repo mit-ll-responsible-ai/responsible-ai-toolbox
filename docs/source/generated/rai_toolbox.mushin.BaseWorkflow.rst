@@ -7,7 +7,7 @@ rai\_toolbox.mushin.BaseWorkflow
 
    
    .. automethod:: __init__
-   .. automethod:: evaluation_task
+   .. automethod:: task
    .. automethod:: jobs_post_process
    .. automethod:: run
    
@@ -16,7 +16,7 @@ rai\_toolbox.mushin.BaseWorkflow
    .. autosummary::
    
       ~BaseWorkflow.__init__
-      ~BaseWorkflow.evaluation_task
+      ~BaseWorkflow.task
       ~BaseWorkflow.jobs_post_process
       ~BaseWorkflow.plot
       ~BaseWorkflow.run
