@@ -14,16 +14,16 @@ chronological order. All previous releases should still be available on pip.
 0.2.0 - 2022-06-01
 ------------------
 
-This release predominantly focuses on improvements to `~MultiRunMetricsWorkflow`, which is still in early-beta and may be subject to substantial future changes
+This release predominantly focuses on improvements to `rai_toolbox.mushin.MultiRunMetricsWorkflow`, which is still in early-beta and may be subject to substantial future changes
 
 Improvements to `MultiRunMetricsWorkflow`
 -----------------------------------------
 - A `pre_task` step can be defined for a workflow; this is useful for seeding random number generators prior to the task's instantiation phase. See :ref:`this how-to guide <how-to-deterministic>` for examples.
-- Loaded workflow overrides now roundtrip appropriately. See :pull:`61`
-- `metric_load_fn` can be overriden to customize how `~MultiRunMetricsWorkflow` loads metric files; the default behavior is to use `torch.load`.
+- Loaded workflow overrides now roundtrip appropriately. See :pull:`61`.
+- `metric_load_fn` can be overriden to customize how `~MultiRunMetricsWorkflow` loads metric files; the default behavior is to use `torch.load`. See :pull:`63`.
 - `working_subdir` can be included as a data-variable in a workflow's xarray; this enables users to lookup subdirs by override values. See :pull:`52`.
 - `to_xarray` works on lists of array-likes, not just lists of numpy arrays
-- `load_metrics` can be called directly from `~MultiRunMetricsWorkflow`
+- `load_metrics` can be called directly from `~MultiRunMetricsWorkflow`.
 - `load_metrics` and `to_xarray` support loading multiple files; multiple file names can be specified as a sequence and/or a glob patterns can be provided.
 
 
