@@ -301,9 +301,9 @@
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="rai_toolbox.mushin.BaseWorkflow.evaluation_task">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">evaluation_task</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/mushin/workflows.html#BaseWorkflow.evaluation_task"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.mushin.BaseWorkflow.evaluation_task" title="Permalink to this definition">#</a></dt>
-<dd><p>User-defined evaluation task to run the workflow. This should be
+<dt class="sig sig-object py" id="rai_toolbox.mushin.BaseWorkflow.task">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">task</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/mushin/workflows.html#BaseWorkflow.task"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.mushin.BaseWorkflow.task" title="Permalink to this definition">#</a></dt>
+<dd><p>User-defined task that is run by the workflow. This should be
 a static method.</p>
 <p>Arguments will be instantiated configuration variables.  For example,
 if the the workflow configuration is structured as:</p>
@@ -313,13 +313,18 @@ if the the workflow configuration is structured as:</p>
 |    ├── another_config
 </pre></div>
 </div>
-<p>The inputs to <a class="reference internal" href="#rai_toolbox.mushin.BaseWorkflow.evaluation_task" title="rai_toolbox.mushin.BaseWorkflow.evaluation_task"><code class="xref py py-obj docutils literal notranslate"><span class="pre">evaluation_task</span></code></a> can be any of the three configurations:
+<p>The inputs to <a class="reference internal" href="#rai_toolbox.mushin.BaseWorkflow.task" title="rai_toolbox.mushin.BaseWorkflow.task"><code class="xref py py-obj docutils literal notranslate"><span class="pre">task</span></code></a> can be any of the three configurations:
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">trainer</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">module</span></code>, or <code class="xref py py-obj docutils literal notranslate"><span class="pre">another_config</span></code> such as:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@staticmethod</span>
-<span class="k">def</span> <span class="nf">evaluation_task</span><span class="p">(</span><span class="n">trainer</span><span class="p">:</span> <span class="n">Trainer</span><span class="p">,</span> <span class="n">module</span><span class="p">:</span> <span class="n">LightningModule</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">task</span><span class="p">(</span><span class="n">trainer</span><span class="p">:</span> <span class="n">Trainer</span><span class="p">,</span> <span class="n">module</span><span class="p">:</span> <span class="n">LightningModule</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="n">trainer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
 </pre></div>
 </div>
+<p class="rubric">Notes</p>
+<p>This function is automatically wrapped by <code class="xref py py-obj docutils literal notranslate"><span class="pre">zen</span></code>, which is responsible
+for parsing the function’s signature and then extracting and instantiating
+the correspending fields from a Hydra config object – passing them to the
+function. This behavior can be modified by <code class="xref py py-obj docutils literal notranslate"><span class="pre">self.run(task_fn_wrapper=...)</span></code></p>
 </dd></dl>
 
 <dl class="py method">
@@ -330,7 +335,7 @@ if the the workflow configuration is structured as:</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="rai_toolbox.mushin.BaseWorkflow.run">
-<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_fn_wrapper=&lt;function</span> <span class="pre">zen&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">working_dir=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sweeper=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">launcher=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overrides=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version_base='1.1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_dictconfig=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_name='rai_workflow'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">job_name='rai_workflow'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">with_log_configuration=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**workflow_overrides</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/mushin/workflows.html#BaseWorkflow.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.mushin.BaseWorkflow.run" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">working_dir=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sweeper=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">launcher=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overrides=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_fn_wrapper=&lt;function</span> <span class="pre">zen&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pre_task_fn_wrapper=&lt;function</span> <span class="pre">zen&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version_base='1.1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_dictconfig=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_name='rai_workflow'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">job_name='rai_workflow'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">with_log_configuration=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**workflow_overrides</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/mushin/workflows.html#BaseWorkflow.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.mushin.BaseWorkflow.run" title="Permalink to this definition">#</a></dt>
 <dd><p>Run the experiment.</p>
 <p>Individual workflows can expclitly define <code class="xref py py-obj docutils literal notranslate"><span class="pre">workflow_overrides</span></code> to improve
 readability and undstanding of what parameters are expected for a particular
@@ -338,7 +343,7 @@ workflow.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
-<dt><strong>task_fn_wrapper: Callable[[Callable[…, T1]], Callable[[Any], T1]] | None, optional (default=rai_toolbox.mushin.zen)</strong></dt><dd><p>A wrapper applied to <code class="xref py py-obj docutils literal notranslate"><span class="pre">self.evaluation_task</span></code> prior to launching the task.
+<dt><strong>task_fn_wrapper: Callable[[Callable[…, T1]], Callable[[Any], T1]] | None, optional (default=rai_toolbox.mushin.zen)</strong></dt><dd><p>A wrapper applied to <code class="xref py py-obj docutils literal notranslate"><span class="pre">self.task</span></code> prior to launching the task.
 The default wrapper is <code class="xref py py-obj docutils literal notranslate"><span class="pre">rai_toolbox.mushin.zen</span></code>. Specify <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> for no
 wrapper to be applied.</p>
 </dd>
@@ -391,8 +396,8 @@ pass the entire list as a single input.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#rai_toolbox.mushin.BaseWorkflow.__init__" title="rai_toolbox.mushin.BaseWorkflow.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>([eval_task_cfg])</p></td>
 <td><p>Workflows and experiments using Hydra.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#rai_toolbox.mushin.BaseWorkflow.evaluation_task" title="rai_toolbox.mushin.BaseWorkflow.evaluation_task"><code class="xref py py-obj docutils literal notranslate"><span class="pre">evaluation_task</span></code></a>(*args, **kwargs)</p></td>
-<td><p>User-defined evaluation task to run the workflow.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#rai_toolbox.mushin.BaseWorkflow.task" title="rai_toolbox.mushin.BaseWorkflow.task"><code class="xref py py-obj docutils literal notranslate"><span class="pre">task</span></code></a>(*args, **kwargs)</p></td>
+<td><p>User-defined task that is run by the workflow.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#rai_toolbox.mushin.BaseWorkflow.jobs_post_process" title="rai_toolbox.mushin.BaseWorkflow.jobs_post_process"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jobs_post_process</span></code></a>()</p></td>
 <td><p>Method to extract attributes and metrics relevant to the workflow.</p></td>
@@ -400,13 +405,13 @@ pass the entire list as a single input.</p>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code>(**kwargs)</p></td>
 <td><p>Plot workflow metrics.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#rai_toolbox.mushin.BaseWorkflow.run" title="rai_toolbox.mushin.BaseWorkflow.run"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run</span></code></a>(*[, task_fn_wrapper, working_dir, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#rai_toolbox.mushin.BaseWorkflow.run" title="rai_toolbox.mushin.BaseWorkflow.run"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run</span></code></a>(*[, working_dir, sweeper, launcher, ...])</p></td>
 <td><p>Run the experiment.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_xarray</span></code>()</p></td>
 <td><p>Convert workflow data to xArray Dataset or DataArray.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate</span></code>([include_pre_task])</p></td>
 <td><p>Valide the configuration will execute with the user defined evaluation task</p></td>
 </tr>
 </tbody>

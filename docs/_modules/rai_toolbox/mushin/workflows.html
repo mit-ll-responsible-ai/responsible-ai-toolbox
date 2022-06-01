@@ -177,7 +177,9 @@
 <span class="c1"># Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).</span>
 <span class="c1"># SPDX-License-Identifier: MIT</span>
 
+<span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">UserList</span><span class="p">,</span> <span class="n">defaultdict</span>
+<span class="kn">from</span> <span class="nn">inspect</span> <span class="kn">import</span> <span class="n">getattr_static</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">Any</span><span class="p">,</span>
@@ -186,6 +188,7 @@
     <span class="n">Dict</span><span class="p">,</span>
     <span class="n">Iterable</span><span class="p">,</span>
     <span class="n">List</span><span class="p">,</span>
+    <span class="n">Mapping</span><span class="p">,</span>
     <span class="n">Optional</span><span class="p">,</span>
     <span class="n">Sequence</span><span class="p">,</span>
     <span class="n">Tuple</span><span class="p">,</span>
@@ -207,7 +210,7 @@
 
 <span class="kn">from</span> <span class="nn">.hydra</span> <span class="kn">import</span> <span class="n">zen</span>
 
-<span class="n">LoadedValue</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span>
+<span class="n">LoadedValue</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s2">&quot;BaseWorkflow&quot;</span><span class="p">,</span>
@@ -249,6 +252,16 @@
     <span class="k">return</span> <span class="n">x</span>
 
 
+<span class="k">def</span> <span class="nf">_task_calls</span><span class="p">(</span>
+    <span class="n">pre_task</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="kc">None</span><span class="p">],</span> <span class="n">task</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="n">T1</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="n">T1</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">wrapped</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T1</span><span class="p">:</span>
+        <span class="n">pre_task</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">task</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">wrapped</span>
+
+
 <div class="viewcode-block" id="BaseWorkflow"><a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.BaseWorkflow.html#rai_toolbox.mushin.BaseWorkflow">[docs]</a><span class="k">class</span> <span class="nc">BaseWorkflow</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Provides an interface for creating a reusable workflow: encapsulated</span>
 <span class="sd">    &quot;boilerplate&quot; for running, aggregating, and analyzing one or more Hydra jobs.</span>
@@ -271,6 +284,8 @@
 <span class="sd">        The working directory of the experiment defined by Hydra&#39;s sweep directory</span>
 <span class="sd">        (`hydra.sweep.dir`).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_REQUIRED_STATIC_METHODS</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;task&quot;</span><span class="p">,</span> <span class="s2">&quot;pre_task&quot;</span><span class="p">)</span>
 
     <span class="n">cfgs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span>
     <span class="n">metrics</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span>
@@ -297,7 +312,18 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">workflow_overrides</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_multirun_task_overrides</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">jobs</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_working_dir</span> <span class="o">=</span> <span class="kc">None</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_working_dir</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;evaluation_task&quot;</span><span class="p">):</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;The static method `evaluation_task` is deprecated in favor of the &quot;</span>
+                <span class="s2">&quot;static method  `task`. Support for `evaluation_task` will be removed &quot;</span>
+                <span class="s2">&quot;in version 0.3.0 of rai-toolbox. To fix this, simply rename &quot;</span>
+                <span class="s2">&quot;`evaluation_task` method to `task`.&quot;</span><span class="p">,</span>
+                <span class="ne">FutureWarning</span><span class="p">,</span>
+                <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">task</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluation_task</span>  <span class="c1"># type: ignore</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">working_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
@@ -321,21 +347,19 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_working_dir</span> <span class="o">=</span> <span class="n">path</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_parse_overrides</span><span class="p">(</span><span class="n">overrides</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">_parse_overrides</span><span class="p">(</span>
+        <span class="n">overrides</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="n">LoadedValue</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">LoadedValue</span><span class="p">]]]:</span>
         <span class="n">parser</span> <span class="o">=</span> <span class="n">OverridesParser</span><span class="o">.</span><span class="n">create</span><span class="p">()</span>
         <span class="n">parsed_overrides</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_overrides</span><span class="p">(</span><span class="n">overrides</span><span class="o">=</span><span class="n">overrides</span><span class="p">)</span>
 
         <span class="n">output</span> <span class="o">=</span> <span class="p">{}</span>
+
         <span class="k">for</span> <span class="n">override</span> <span class="ow">in</span> <span class="n">parsed_overrides</span><span class="p">:</span>
+            <span class="n">param_name</span> <span class="o">=</span> <span class="n">override</span><span class="o">.</span><span class="n">get_key_element</span><span class="p">()</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">override</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">override</span><span class="o">.</span><span class="n">is_sweep_override</span><span class="p">():</span>
-                <span class="n">param_name</span> <span class="o">=</span> <span class="n">override</span><span class="o">.</span><span class="n">get_key_element</span><span class="p">()</span>
-                <span class="n">val</span> <span class="o">=</span> <span class="p">[</span>
-                    <span class="n">_num_from_string</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">override</span><span class="o">.</span><span class="n">sweep_string_iterator</span><span class="p">()</span>
-                <span class="p">]</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">param_name</span> <span class="o">=</span> <span class="n">override</span><span class="o">.</span><span class="n">get_key_element</span><span class="p">()</span>
-                <span class="n">val</span> <span class="o">=</span> <span class="n">override</span><span class="o">.</span><span class="n">get_value_element_as_str</span><span class="p">()</span>
-                <span class="n">val</span> <span class="o">=</span> <span class="n">_num_from_string</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="n">multirun</span><span class="p">(</span><span class="n">val</span><span class="o">.</span><span class="n">list</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
 
             <span class="n">param_name</span> <span class="o">=</span> <span class="n">param_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;+&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
             <span class="n">output</span><span class="p">[</span><span class="n">param_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
@@ -346,7 +370,31 @@
     <span class="k">def</span> <span class="nf">multirun_task_overrides</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="n">LoadedValue</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">LoadedValue</span><span class="p">]]]:</span>
-        <span class="c1"># e.g. {&#39;epsilon&#39;: [1.0, 2.0, 3.0], &quot;foo&quot;: &quot;apple&quot;}</span>
+        <span class="sd">&quot;&quot;&quot;Returns override param-name -&gt; value.</span>
+
+<span class="sd">        A sequence of overrides associated with a multirun will</span>
+<span class="sd">        be stored in a `rai_toolbox.mushin.multirun` list. This</span>
+<span class="sd">        enables one to distinguish this from an override whose sole</span>
+<span class="sd">        value was a list of values.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        multirun_task_overrides: Dict[str, LoadedValue | Sequence[LoadedValue]]</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; from rai_toolbox.mushin import multirun, hydra_list</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; class WorkFlow(MultiRunMetricsWorkflow):</span>
+<span class="sd">        ...     @staticmethod</span>
+<span class="sd">        ...     def task(*args, **kwargs):</span>
+<span class="sd">        ...         return None</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; wf = WorkFlow()</span>
+<span class="sd">        &gt;&gt;&gt; wf.run(foo=hydra_list([&quot;val&quot;]), bar=multirun([&quot;a&quot;, &quot;b&quot;]), apple=1)</span>
+<span class="sd">        &gt;&gt;&gt; wf.multirun_task_overrides</span>
+<span class="sd">        {&#39;foo&#39;: [&#39;val&#39;], &#39;bar&#39;: multirun([&#39;a&#39;, &#39;b&#39;]), &#39;apple&#39;: 1}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_multirun_task_overrides</span><span class="p">:</span>
 
             <span class="n">overrides</span> <span class="o">=</span> <span class="n">load_from_yaml</span><span class="p">(</span>
@@ -354,13 +402,29 @@
             <span class="p">)</span><span class="o">.</span><span class="n">hydra</span><span class="o">.</span><span class="n">overrides</span><span class="o">.</span><span class="n">task</span>
 
             <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_overrides</span><span class="p">(</span><span class="n">overrides</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_multirun_task_overrides</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_multirun_task_overrides</span> <span class="o">=</span> <span class="n">output</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_multirun_task_overrides</span>
 
-<div class="viewcode-block" id="BaseWorkflow.evaluation_task"><a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.BaseWorkflow.html#rai_toolbox.mushin.BaseWorkflow.evaluation_task">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">evaluation_task</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;User-defined evaluation task to run the workflow. This should be</span>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">pre_task</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Called prior to `task`</span>
+
+<span class="sd">        This can be useful for doing things like setting random seeds,</span>
+<span class="sd">        which must occur prior to instantiating objects for the evaluation</span>
+<span class="sd">        task.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This function is automatically wrapped by `zen`, which is responsible</span>
+<span class="sd">        for parsing the function&#39;s signature and then extracting and instantiating</span>
+<span class="sd">        the correspending fields from a Hydra config object – passing them to the</span>
+<span class="sd">        function. This behavior can be modified by `self.run(pre_task_fn_wrapper=...)`&quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="BaseWorkflow.task"><a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.BaseWorkflow.html#rai_toolbox.mushin.BaseWorkflow.task">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">task</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;User-defined task that is run by the workflow. This should be</span>
 <span class="sd">        a static method.</span>
 
 <span class="sd">        Arguments will be instantiated configuration variables.  For example,</span>
@@ -371,29 +435,42 @@
 <span class="sd">            |    ├── module</span>
 <span class="sd">            |    ├── another_config</span>
 
-<span class="sd">        The inputs to `evaluation_task` can be any of the three configurations:</span>
+<span class="sd">        The inputs to `task` can be any of the three configurations:</span>
 <span class="sd">        `trainer`, `module`, or `another_config` such as::</span>
 
 <span class="sd">            @staticmethod</span>
-<span class="sd">            def evaluation_task(trainer: Trainer, module: LightningModule) -&gt; None:</span>
+<span class="sd">            def task(trainer: Trainer, module: LightningModule) -&gt; None:</span>
 <span class="sd">                trainer.fit(module)</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This function is automatically wrapped by `zen`, which is responsible</span>
+<span class="sd">        for parsing the function&#39;s signature and then extracting and instantiating</span>
+<span class="sd">        the correspending fields from a Hydra config object – passing them to the</span>
+<span class="sd">        function. This behavior can be modified by `self.run(task_fn_wrapper=...)`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
 
-    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">include_pre_task</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Valide the configuration will execute with the user defined evaluation task&quot;&quot;&quot;</span>
-        <span class="n">zen</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evaluation_task</span><span class="p">)</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eval_task_cfg</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">include_pre_task</span><span class="p">:</span>
+            <span class="n">zen</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pre_task</span><span class="p">)</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eval_task_cfg</span><span class="p">)</span>
+
+        <span class="n">zen</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">task</span><span class="p">)</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eval_task_cfg</span><span class="p">)</span>
 
 <div class="viewcode-block" id="BaseWorkflow.run"><a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.BaseWorkflow.html#rai_toolbox.mushin.BaseWorkflow.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">task_fn_wrapper</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
-            <span class="n">Callable</span><span class="p">[[</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">T1</span><span class="p">]],</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="n">T1</span><span class="p">]],</span> <span class="kc">None</span>
-        <span class="p">]</span> <span class="o">=</span> <span class="n">zen</span><span class="p">,</span>
         <span class="n">working_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">sweeper</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">launcher</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">overrides</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">task_fn_wrapper</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
+            <span class="n">Callable</span><span class="p">[[</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">T1</span><span class="p">]],</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="n">T1</span><span class="p">]],</span> <span class="kc">None</span>
+        <span class="p">]</span> <span class="o">=</span> <span class="n">zen</span><span class="p">,</span>
+        <span class="n">pre_task_fn_wrapper</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
+            <span class="n">Callable</span><span class="p">[[</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="kc">None</span><span class="p">]],</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="kc">None</span><span class="p">]],</span> <span class="kc">None</span>
+        <span class="p">]</span> <span class="o">=</span> <span class="n">zen</span><span class="p">,</span>
         <span class="n">version_base</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">_NotSet</span><span class="p">]]]</span> <span class="o">=</span> <span class="n">_VERSION_BASE_DEFAULT</span><span class="p">,</span>
         <span class="n">to_dictconfig</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">config_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;rai_workflow&quot;</span><span class="p">,</span>
@@ -410,7 +487,7 @@
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        task_fn_wrapper: Callable[[Callable[..., T1]], Callable[[Any], T1]] | None, optional (default=rai_toolbox.mushin.zen)</span>
-<span class="sd">            A wrapper applied to `self.evaluation_task` prior to launching the task.</span>
+<span class="sd">            A wrapper applied to `self.task` prior to launching the task.</span>
 <span class="sd">            The default wrapper is `rai_toolbox.mushin.zen`. Specify `None` for no</span>
 <span class="sd">            wrapper to be applied.</span>
 
@@ -488,13 +565,28 @@
 
             <span class="n">launch_overrides</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}{</span><span class="n">k</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
+        <span class="k">for</span> <span class="n">_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_REQUIRED_STATIC_METHODS</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">_name</span> <span class="o">==</span> <span class="s2">&quot;task&quot;</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;evaluation_task&quot;</span><span class="p">):</span>
+                <span class="c1"># TODO: remove when evaluation_task support is removed</span>
+                <span class="n">_name</span> <span class="o">=</span> <span class="s2">&quot;evaluation_task&quot;</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">getattr_static</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_name</span><span class="p">),</span> <span class="nb">staticmethod</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">_name</span><span class="si">}</span><span class="s2"> must be a static method&quot;</span>
+                <span class="p">)</span>
+
         <span class="k">if</span> <span class="n">task_fn_wrapper</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">task_fn_wrapper</span> <span class="o">=</span> <span class="n">_identity</span>
+
+        <span class="k">if</span> <span class="n">pre_task_fn_wrapper</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">pre_task_fn_wrapper</span> <span class="o">=</span> <span class="n">_identity</span>
 
         <span class="c1"># Run a Multirun over epsilons</span>
         <span class="n">jobs</span> <span class="o">=</span> <span class="n">launch</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">eval_task_cfg</span><span class="p">,</span>
-            <span class="n">task_fn_wrapper</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evaluation_task</span><span class="p">),</span>
+            <span class="n">_task_calls</span><span class="p">(</span>
+                <span class="n">pre_task</span><span class="o">=</span><span class="n">pre_task_fn_wrapper</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pre_task</span><span class="p">),</span>
+                <span class="n">task</span><span class="o">=</span><span class="n">task_fn_wrapper</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">task</span><span class="p">),</span>
+            <span class="p">),</span>
             <span class="n">overrides</span><span class="o">=</span><span class="n">launch_overrides</span><span class="p">,</span>
             <span class="n">multirun</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">version_base</span><span class="o">=</span><span class="n">version_base</span><span class="p">,</span>
@@ -525,17 +617,6 @@
     <span class="k">def</span> <span class="nf">to_xarray</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
         <span class="sd">&quot;&quot;&quot;Convert workflow data to xArray Dataset or DataArray.&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
-
-
-<span class="k">def</span> <span class="nf">_num_from_string</span><span class="p">(</span><span class="n">str_input</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LoadedValue</span><span class="p">:</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">val</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">str_input</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">val</span><span class="o">.</span><span class="n">is_integer</span><span class="p">()</span> <span class="ow">and</span> <span class="s2">&quot;.&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">str_input</span><span class="p">:</span>
-            <span class="c1"># v is e.g., 1 or -2. Not 1.0 or -2.0</span>
-            <span class="n">val</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">str_input</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">val</span>
-    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">str_input</span>
 
 
 <span class="k">def</span> <span class="nf">_non_str_sequence</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TypeGuard</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
@@ -578,7 +659,7 @@
 
 <span class="sd">    &gt;&gt;&gt; class LocalRobustness(MultiRunMetricsWorkflow):</span>
 <span class="sd">    ...     @staticmethod</span>
-<span class="sd">    ...     def evaluation_task(epsilon: float, scale: float) -&gt; dict:</span>
+<span class="sd">    ...     def task(epsilon: float, scale: float) -&gt; dict:</span>
 <span class="sd">    ...         epsilon *= scale</span>
 <span class="sd">    ...         val = 100 - epsilon**2</span>
 <span class="sd">    ...         result = dict(accuracies=val+2, loss=epsilon**2)</span>
@@ -645,11 +726,53 @@
     <span class="c1"># List of all the dirs that the multirun writes to; sorted by job-num</span>
     <span class="n">multirun_working_dirs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Path</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">evaluation_task</span><span class="p">(</span>
-        <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sd">&quot;&quot;&quot;Abstract `staticmethod` for users to define the evalultion task&quot;&quot;&quot;</span>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">task</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>  <span class="c1"># pragma: no cover</span>
+        <span class="sd">&quot;&quot;&quot;Abstract `staticmethod` for users to define the task that is configured and</span>
+<span class="sd">        launched by the workflow&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">metric_load_fn</span><span class="p">(</span><span class="n">file_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Loads a metric file and returns a dictionary of metric-name -&gt; metric-value</span>
+<span class="sd">        mappings.</span>
+
+<span class="sd">        The default metric load function is `torch.load`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        file_path : Path</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        named_metrics : Mapping[str, Any]</span>
+<span class="sd">            metric-name -&gt; metric-value(s)</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        Designing a workflow that uses the `pickle` module to save and load</span>
+<span class="sd">        metrics</span>
+
+<span class="sd">        &gt;&gt;&gt; from rai_toolbox.mushin import MultiRunMetricsWorkflow, multirun</span>
+<span class="sd">        &gt;&gt;&gt; import pickle</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; class PickledWorkFlow(MultiRunMetricsWorkflow):</span>
+<span class="sd">        ...     @staticmethod</span>
+<span class="sd">        ...     def metric_load_fn(file_path: Path):</span>
+<span class="sd">        ...         with file_path.open(&quot;rb&quot;) as f:</span>
+<span class="sd">        ...             return pickle.load(f)</span>
+<span class="sd">        ...</span>
+<span class="sd">        ...     @staticmethod</span>
+<span class="sd">        ...     def task(a, b):</span>
+<span class="sd">        ...         with open(&quot;./metrics.pkl&quot;, &quot;wb&quot;) as f:</span>
+<span class="sd">        ...             pickle.dump(dict(a=a, b=b), f)</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; wf = PickleWorkFlow()</span>
+<span class="sd">        &gt;&gt;&gt; wf.run(a=multirun([1, 2, 3]), b=False)</span>
+<span class="sd">        &gt;&gt;&gt; wf.load_metrics(&quot;metrics.pkl&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; wf.metrics</span>
+<span class="sd">        dict(a=[1, 2, 3], b=[False, False, False])&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">tr</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
 
 <div class="viewcode-block" id="MultiRunMetricsWorkflow.run"><a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.MultiRunMetricsWorkflow.html#rai_toolbox.mushin.MultiRunMetricsWorkflow.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -712,13 +835,13 @@
 <span class="sd">        --------</span>
 <span class="sd">        &gt;&gt;&gt; class A(MultiRunMetricsWorkflow):</span>
 <span class="sd">        ...     @staticmethod</span>
-<span class="sd">        ...     def evaluation_task(value: float, scale: float):</span>
+<span class="sd">        ...     def task(value: float, scale: float):</span>
 <span class="sd">        ...         pass</span>
 <span class="sd">        ...</span>
 
 <span class="sd">        &gt;&gt;&gt; class B(MultiRunMetricsWorkflow):</span>
 <span class="sd">        ...     @staticmethod</span>
-<span class="sd">        ...     def evaluation_task():</span>
+<span class="sd">        ...     def task():</span>
 <span class="sd">        ...         pass</span>
 
 <span class="sd">        &gt;&gt;&gt; a = A()</span>
@@ -867,13 +990,46 @@
         <span class="bp">self</span><span class="p">,</span> <span class="n">metrics_filename</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
         <span class="sd">&quot;&quot;&quot;Loads and aggregates across all multirun working dirs, and stores</span>
-<span class="sd">        the metrics in `self.metrics`</span>
+<span class="sd">        the metrics in `self.metrics`.</span>
+
+<span class="sd">        `self.metric_load_fn` is used to load each job&#39;s metric file(s).</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        metrics_filename: str | Sequence[str]</span>
+<span class="sd">        metrics_filename : str | Sequence[str]</span>
 <span class="sd">            The filename(s) or glob-pattern(s) uses to load the metrics.</span>
 <span class="sd">            If `None`, the metrics stored in `self.metrics` is used.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        ------</span>
+<span class="sd">        metrics : Dict[str, List[Any]]</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        Creating a workflow that saves named metrics using `torch.save`</span>
+
+<span class="sd">        &gt;&gt;&gt; from rai_toolbox.mushin.workflows import MultiRunMetricsWorkflow, multirun</span>
+<span class="sd">        &gt;&gt;&gt; import torch as tr</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        ... class TorchWorkFlow(MultiRunMetricsWorkflow):</span>
+<span class="sd">        ...     @staticmethod</span>
+<span class="sd">        ...     def task(a, b):</span>
+<span class="sd">        ...         tr.save(dict(a=a, b=b), &quot;metrics.pt&quot;)</span>
+<span class="sd">        ...</span>
+<span class="sd">        &gt;&gt;&gt; wf = TorchWorkFlow()</span>
+<span class="sd">        &gt;&gt;&gt; wf.run(a=multirun([1, 2, 3]), b=False)</span>
+<span class="sd">        [2022-06-01 12:35:51,650][HYDRA] Launching 3 jobs locally</span>
+<span class="sd">        [2022-06-01 12:35:51,650][HYDRA] 	#0 : +a=1 +b=False</span>
+<span class="sd">        [2022-06-01 12:35:51,715][HYDRA] 	#1 : +a=2 +b=False</span>
+<span class="sd">        [2022-06-01 12:35:51,780][HYDRA] 	#2 : +a=3 +b=False</span>
+
+<span class="sd">        `~MultiRunMetricsWorkflow` uses `torch.load` by default to load metrics files</span>
+<span class="sd">        (refer to `~MultiRunMetricsWorkflow.metric_load_fn` to change this behavior).</span>
+
+<span class="sd">        &gt;&gt;&gt; wf.load_metrics(&quot;metrics.pt&quot;)</span>
+<span class="sd">        defaultdict(list, {&#39;a&#39;: [1, 2, 3], &#39;b&#39;: [False, False, False]})</span>
+<span class="sd">        &gt;&gt;&gt; wf.metrics</span>
+<span class="sd">        defaultdict(list, {&#39;a&#39;: [1, 2, 3], &#39;b&#39;: [False, False, False]})</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">multirun_working_dirs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">load_from_dir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="p">,</span> <span class="n">metrics_filename</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
@@ -893,7 +1049,7 @@
                     <span class="p">)</span>
 
                 <span class="k">for</span> <span class="n">f_</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
-                    <span class="n">_metrics</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">tr</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f_</span><span class="p">))</span>
+                    <span class="n">_metrics</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metric_load_fn</span><span class="p">(</span><span class="n">f_</span><span class="p">))</span>
             <span class="n">job_metrics</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_metrics</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_metrics</span><span class="p">(</span><span class="n">job_metrics</span><span class="p">)</span>
@@ -944,9 +1100,21 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">load_metrics</span><span class="p">(</span><span class="n">metrics_filename</span><span class="p">)</span>
 
+        <span class="c1"># all overrides containing non-multirun lists must be converted to</span>
+        <span class="c1"># strings so that xarray treats that list value as a &quot;scalar&quot;</span>
+        <span class="n">cast_overrides</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">multirun_task_overrides</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">_non_str_sequence</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">_v</span><span class="p">)</span> <span class="k">if</span> <span class="n">_non_str_sequence</span><span class="p">(</span><span class="n">_v</span><span class="p">)</span> <span class="k">else</span> <span class="n">_v</span> <span class="k">for</span> <span class="n">_v</span> <span class="ow">in</span> <span class="n">value</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">multirun</span><span class="p">)</span>
+                    <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="n">cast_overrides</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
         <span class="n">orig_coords</span> <span class="o">=</span> <span class="p">{</span>
             <span class="n">k</span><span class="p">:</span> <span class="p">(</span><span class="n">v</span> <span class="k">if</span> <span class="n">_non_str_sequence</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">else</span> <span class="p">[</span><span class="n">v</span><span class="p">])</span>
-            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">multirun_task_overrides</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">cast_overrides</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">non_multirun_params_as_singleton_dims</span> <span class="ow">or</span> <span class="n">_non_str_sequence</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
         <span class="p">}</span>
 
@@ -966,12 +1134,7 @@
                 <span class="n">v</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">metric_coords</span><span class="p">[</span><span class="n">coord_from_metrics</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
 
-        <span class="c1"># non-multirun overrides</span>
-        <span class="n">attrs</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="n">k</span><span class="p">:</span> <span class="n">v</span>
-            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">multirun_task_overrides</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">_non_str_sequence</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
-        <span class="p">}</span>
+        <span class="n">attrs</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">cast_overrides</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">_non_str_sequence</span><span class="p">(</span><span class="n">v</span><span class="p">)}</span>
 
         <span class="c1"># we will add additional coordinates as-needed for multi-dim metrics</span>
         <span class="n">coords</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">orig_coords</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -1063,7 +1226,7 @@
 <span class="sd">            multirun sequence override for Hydra.</span>
 
 <span class="sd">        task_fn_wrapper: Callable[[Callable[..., T1]], Callable[[Any], T1]] | None, optional (default=rai_toolbox.mushin.zen)</span>
-<span class="sd">            A wrapper applied to `self.evaluation_task` prior to launching the task.</span>
+<span class="sd">            A wrapper applied to `self.task` prior to launching the task.</span>
 <span class="sd">            The default wrapper is `rai_toolbox.mushin.zen`. Specify `None` for no</span>
 <span class="sd">            wrapper to be applied.</span>
 
@@ -1163,7 +1326,7 @@
         <span class="n">save_filename</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">non_multirun_params_as_singleton_dims</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Plot metrics versus `epsilon`.</span>
 
 <span class="sd">        Using the `xarray.Dataset` from `to_xarray`, plot the metrics</span>

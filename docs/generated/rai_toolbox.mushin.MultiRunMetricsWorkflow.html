@@ -293,7 +293,7 @@ that <code class="xref py py-obj docutils literal notranslate"><span class="pre"
 </div>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">LocalRobustness</span><span class="p">(</span><span class="n">MultiRunMetricsWorkflow</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="nd">@staticmethod</span>
-<span class="gp">... </span>    <span class="k">def</span> <span class="nf">evaluation_task</span><span class="p">(</span><span class="n">epsilon</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">scale</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">task</span><span class="p">(</span><span class="n">epsilon</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">scale</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="gp">... </span>        <span class="n">epsilon</span> <span class="o">*=</span> <span class="n">scale</span>
 <span class="gp">... </span>        <span class="n">val</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">-</span> <span class="n">epsilon</span><span class="o">**</span><span class="mi">2</span>
 <span class="gp">... </span>        <span class="n">result</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">accuracies</span><span class="o">=</span><span class="n">val</span><span class="o">+</span><span class="mi">2</span><span class="p">,</span> <span class="n">loss</span><span class="o">=</span><span class="n">epsilon</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
@@ -366,7 +366,7 @@ workflow.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
-<dt><strong>task_fn_wrapper: Callable[[Callable[…, T1]], Callable[[Any], T1]] | None, optional (default=rai_toolbox.mushin.zen)</strong></dt><dd><p>A wrapper applied to <code class="xref py py-obj docutils literal notranslate"><span class="pre">self.evaluation_task</span></code> prior to launching the task.
+<dt><strong>task_fn_wrapper: Callable[[Callable[…, T1]], Callable[[Any], T1]] | None, optional (default=rai_toolbox.mushin.zen)</strong></dt><dd><p>A wrapper applied to <code class="xref py py-obj docutils literal notranslate"><span class="pre">self.task</span></code> prior to launching the task.
 The default wrapper is <code class="xref py py-obj docutils literal notranslate"><span class="pre">rai_toolbox.mushin.zen</span></code>. Specify <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> for no
 wrapper to be applied.</p>
 </dd>
@@ -444,25 +444,28 @@ If <a class="reference external" href="https://docs.python.org/3/library/constan
 <tr class="row-odd"><td><p><a class="reference internal" href="#rai_toolbox.mushin.MultiRunMetricsWorkflow.__init__" title="rai_toolbox.mushin.MultiRunMetricsWorkflow.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>([eval_task_cfg, working_dir])</p></td>
 <td><p>Workflows and experiments using Hydra.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">evaluation_task</span></code>(**kwargs)</p></td>
-<td><p>Abstract <a class="reference external" href="https://docs.python.org/3/library/functions.html#staticmethod" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">staticmethod</span></code></a> for users to define the evalultion task</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">task</span></code>(*args, **kwargs)</p></td>
+<td><p>Abstract <a class="reference external" href="https://docs.python.org/3/library/functions.html#staticmethod" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">staticmethod</span></code></a> for users to define the task that is configured and launched by the workflow</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#rai_toolbox.mushin.MultiRunMetricsWorkflow.run" title="rai_toolbox.mushin.MultiRunMetricsWorkflow.run"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run</span></code></a>(*[, task_fn_wrapper, working_dir, ...])</p></td>
+<td><p>Run the experiment.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">metric_load_fn</span></code>(file_path)</p></td>
+<td><p>Loads a metric file and returns a dictionary of metric-name -&gt; metric-value mappings.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#rai_toolbox.mushin.MultiRunMetricsWorkflow.load_from_dir" title="rai_toolbox.mushin.MultiRunMetricsWorkflow.load_from_dir"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_from_dir</span></code></a>(working_dir, metrics_filename)</p></td>
+<td><p>Loading workflow job data from a given working directory.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_xarray</span></code>([...])</p></td>
+<td><p>Convert workflow data to xarray Dataset.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">jobs_post_process</span></code>()</p></td>
 <td><p>Method to extract attributes and metrics relevant to the workflow.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#rai_toolbox.mushin.MultiRunMetricsWorkflow.load_from_dir" title="rai_toolbox.mushin.MultiRunMetricsWorkflow.load_from_dir"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_from_dir</span></code></a>(working_dir, metrics_filename)</p></td>
-<td><p>Loading workflow job data from a given working directory.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code>(**kwargs)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code>(**kwargs)</p></td>
 <td><p>Plot workflow metrics.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#rai_toolbox.mushin.MultiRunMetricsWorkflow.run" title="rai_toolbox.mushin.MultiRunMetricsWorkflow.run"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run</span></code></a>(*[, task_fn_wrapper, working_dir, ...])</p></td>
-<td><p>Run the experiment.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_xarray</span></code>([...])</p></td>
-<td><p>Convert workflow data to xarray Dataset.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate</span></code>([include_pre_task])</p></td>
 <td><p>Valide the configuration will execute with the user defined evaluation task</p></td>
 </tr>
 </tbody>

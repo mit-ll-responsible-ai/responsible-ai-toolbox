@@ -371,7 +371,10 @@ is applied after the closure call and prior to the parameter steps.</p>
 <td><p>Applies an in-place transform on each parameter in the given param group <strong>after</strong> that parameter has been updated via <code class="xref py py-obj docutils literal notranslate"><span class="pre">InnerOpt.step</span></code>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">project</span></code>()</p></td>
-<td><p>Update each parameter in-place by calling <a class="reference internal" href="#rai_toolbox.optim.ParamTransformingOptimizer._post_step_transform_" title="rai_toolbox.optim.ParamTransformingOptimizer._post_step_transform_"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_post_step_transform_</span></code></a> on the parameter.</p></td>
+<td><p><div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 0.2.0.</span></p>
+</div>
+</p></td>
 </tr>
 </tbody>
 </table>
@@ -608,7 +611,7 @@ in the tensor.</p>
 <span class="sig-name descname"><span class="pre">_apply_pre_step_transform_</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/optim/optimizer.html#ParamTransformingOptimizer._apply_pre_step_transform_"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.optim.ParamTransformingOptimizer._apply_pre_step_transform_" title="Permalink to this definition">#</a></dt>
 <dd><p>Update each parameter in-place by calling <a class="reference internal" href="#rai_toolbox.optim.ParamTransformingOptimizer._pre_step_transform_" title="rai_toolbox.optim.ParamTransformingOptimizer._pre_step_transform_"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_pre_step_transform_</span></code></a> on the
 parameter.</p>
-<p>This is called automatically by <code class="xref py py-obj docutils literal notranslate"><span class="pre">step</span></code> before <code class="xref py py-obj docutils literal notranslate"><span class="pre">InnerOpt.step()</span></code> has been
+<p>This is called automatically by <code class="xref py py-obj docutils literal notranslate"><span class="pre">step()</span></code> before <code class="xref py py-obj docutils literal notranslate"><span class="pre">InnerOpt.step()</span></code> has been
 called.</p>
 </dd></dl>
 
@@ -617,7 +620,8 @@ called.</p>
 <span class="sig-name descname"><span class="pre">_apply_post_step_transform_</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/optim/optimizer.html#ParamTransformingOptimizer._apply_post_step_transform_"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.optim.ParamTransformingOptimizer._apply_post_step_transform_" title="Permalink to this definition">#</a></dt>
 <dd><p>Update each parameter in-place by calling <a class="reference internal" href="#rai_toolbox.optim.ParamTransformingOptimizer._post_step_transform_" title="rai_toolbox.optim.ParamTransformingOptimizer._post_step_transform_"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_post_step_transform_</span></code></a> on the
 parameter.</p>
-<p>This is called automatically by <code class="xref py py-obj docutils literal notranslate"><span class="pre">step</span></code> after <code class="xref py py-obj docutils literal notranslate"><span class="pre">InnerOpt.step()</span></code> has been called.</p>
+<p>This is called automatically by <code class="xref py py-obj docutils literal notranslate"><span class="pre">step()</span></code> after <code class="xref py py-obj docutils literal notranslate"><span class="pre">InnerOpt.step()</span></code> has been
+called.</p>
 </dd></dl>
 
 <p class="rubric">Methods</p>

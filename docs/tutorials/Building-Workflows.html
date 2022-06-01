@@ -910,7 +910,7 @@ metrics saved from <a class="reference external" href="https://mit-ll-responsibl
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">CrossValWorkFlow</span><span class="p">(</span><span class="n">MultiRunMetricsWorkflow</span><span class="p">):</span>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">evaluation_task</span><span class="p">(</span><span class="n">trainer</span><span class="p">:</span> <span class="n">Trainer</span><span class="p">,</span> <span class="n">module</span><span class="p">:</span> <span class="n">LightningModule</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">task</span><span class="p">(</span><span class="n">trainer</span><span class="p">:</span> <span class="n">Trainer</span><span class="p">,</span> <span class="n">module</span><span class="p">:</span> <span class="n">LightningModule</span><span class="p">):</span>
         <span class="n">trainer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
 
         <span class="c1"># Loads &amp; returns a dictionary of metrics logged by PyTorch Lightning</span>
@@ -1558,7 +1558,7 @@ Text(0.5, 1.0, &#39;Cross Validation Performance&#39;)
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">ExperimentRobustnessCurve</span><span class="p">(</span><span class="n">RobustnessCurve</span><span class="p">):</span>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">evaluation_task</span><span class="p">(</span><span class="n">trainer</span><span class="p">:</span> <span class="n">Trainer</span><span class="p">,</span> <span class="n">module</span><span class="p">:</span> <span class="n">LightningModule</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">task</span><span class="p">(</span><span class="n">trainer</span><span class="p">:</span> <span class="n">Trainer</span><span class="p">,</span> <span class="n">module</span><span class="p">:</span> <span class="n">LightningModule</span><span class="p">):</span>
         <span class="n">trainer</span><span class="o">.</span><span class="n">test</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
 
         <span class="c1"># Loads &amp; returns a dictionary of metrics logged by PyTorch Lightning</span>

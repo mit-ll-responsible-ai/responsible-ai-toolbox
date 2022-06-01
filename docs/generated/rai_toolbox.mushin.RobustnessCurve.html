@@ -302,7 +302,7 @@ varying the perturbation.</p>
 this parameter can be a list of floats that will be converted into a
 multirun sequence override for Hydra.</p>
 </dd>
-<dt><strong>task_fn_wrapper: Callable[[Callable[…, T1]], Callable[[Any], T1]] | None, optional (default=rai_toolbox.mushin.zen)</strong></dt><dd><p>A wrapper applied to <code class="xref py py-obj docutils literal notranslate"><span class="pre">self.evaluation_task</span></code> prior to launching the task.
+<dt><strong>task_fn_wrapper: Callable[[Callable[…, T1]], Callable[[Any], T1]] | None, optional (default=rai_toolbox.mushin.zen)</strong></dt><dd><p>A wrapper applied to <code class="xref py py-obj docutils literal notranslate"><span class="pre">self.task</span></code> prior to launching the task.
 The default wrapper is <code class="xref py py-obj docutils literal notranslate"><span class="pre">rai_toolbox.mushin.zen</span></code>. Specify <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> for no
 wrapper to be applied.</p>
 </dd>
@@ -391,8 +391,8 @@ If <a class="reference external" href="https://docs.python.org/3/library/constan
 <tr class="row-odd"><td><p><a class="reference internal" href="#rai_toolbox.mushin.RobustnessCurve.__init__" title="rai_toolbox.mushin.RobustnessCurve.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>([eval_task_cfg, working_dir])</p></td>
 <td><p>Workflows and experiments using Hydra.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">evaluation_task</span></code>(**kwargs)</p></td>
-<td><p>Abstract <a class="reference external" href="https://docs.python.org/3/library/functions.html#staticmethod" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">staticmethod</span></code></a> for users to define the evalultion task</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">task</span></code>(*args, **kwargs)</p></td>
+<td><p>Abstract <a class="reference external" href="https://docs.python.org/3/library/functions.html#staticmethod" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">staticmethod</span></code></a> for users to define the task that is configured and launched by the workflow</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">jobs_post_process</span></code>()</p></td>
 <td><p>Method to extract attributes and metrics relevant to the workflow.</p></td>
@@ -409,7 +409,7 @@ If <a class="reference external" href="https://docs.python.org/3/library/constan
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_xarray</span></code>([...])</p></td>
 <td><p>Convert workflow data to xarray Dataset.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate</span></code>([include_pre_task])</p></td>
 <td><p>Valide the configuration will execute with the user defined evaluation task</p></td>
 </tr>
 </tbody>

@@ -175,9 +175,36 @@
 <nav id="bd-toc-nav">
     <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#xx-xx">
-   0.2.0 - 2022-XX-XX
+  <a class="reference internal nav-link" href="#v0-2-0">
+   0.2.0 - 2022-06-01
   </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#improvements-to-multirunmetricsworkflow">
+     Improvements to
+     <code class="xref py py-obj docutils literal notranslate">
+      <span class="pre">
+       MultiRunMetricsWorkflow
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#other-improvements">
+     Other Improvements
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#compatibility-breaking-changes">
+     Compatibility-Breaking changes
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#deprecations">
+     Deprecations
+    </a>
+   </li>
+  </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#v0-1-1">
@@ -214,18 +241,42 @@
 <h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">#</a></h1>
 <p>This is a record of all past rAI-toolbox releases and what went into them, in reverse
 chronological order. All previous releases should still be available on pip.</p>
-<section id="xx-xx">
-<span id="v0-2-0"></span><h2>0.2.0 - 2022-XX-XX<a class="headerlink" href="#xx-xx" title="Permalink to this headline">#</a></h2>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>This is documentation for an unreleased version of the toolbox</p>
-</div>
+<section id="v0-2-0">
+<span id="id1"></span><h2>0.2.0 - 2022-06-01<a class="headerlink" href="#v0-2-0" title="Permalink to this headline">#</a></h2>
+<p>This release predominantly focuses on improvements to <a class="reference internal" href="generated/rai_toolbox.mushin.MultiRunMetricsWorkflow.html#rai_toolbox.mushin.MultiRunMetricsWorkflow" title="rai_toolbox.mushin.MultiRunMetricsWorkflow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rai_toolbox.mushin.MultiRunMetricsWorkflow</span></code></a>, which is still in early-beta and may be subject to substantial future changes</p>
+<section id="improvements-to-multirunmetricsworkflow">
+<h3>Improvements to <code class="xref py py-obj docutils literal notranslate"><span class="pre">MultiRunMetricsWorkflow</span></code><a class="headerlink" href="#improvements-to-multirunmetricsworkflow" title="Permalink to this headline">#</a></h3>
 <ul class="simple">
-<li><p>Added the method <code class="xref py py-obj docutils literal notranslate"><span class="pre">ParamTransformingOptimizer._post_step_transform_</span></code> to fulfill the role of <code class="xref py py-obj docutils literal notranslate"><span class="pre">ParamTransformingOptimizer.project</span></code>, for the sake of having parity among the names of the pre-step and post-step methods. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/responsible-ai-toolboxpull/54">pull request #54</a> for details.</p></li>
+<li><p>A <code class="xref py py-obj docutils literal notranslate"><span class="pre">pre_task</span></code> step can be defined for a workflow; this is useful for seeding random number generators prior to the task’s instantiation phase. See <a class="reference internal" href="how_to/deterministic_workflow.html#how-to-deterministic"><span class="std std-ref">this how-to guide</span></a> for examples.</p></li>
+<li><p>Loaded workflow overrides now roundtrip appropriately. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/responsible-ai-toolboxpull/61">pull request #61</a>.</p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">metric_load_fn</span></code> can be overriden to customize how <code class="xref py py-obj docutils literal notranslate"><span class="pre">MultiRunMetricsWorkflow</span></code> loads metric files; the default behavior is to use <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.load</span></code>. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/responsible-ai-toolboxpull/63">pull request #63</a>.</p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">working_subdir</span></code> can be included as a data-variable in a workflow’s xarray; this enables users to lookup subdirs by override values. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/responsible-ai-toolboxpull/52">pull request #52</a>.</p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_xarray</span></code> works on lists of array-likes, not just lists of numpy arrays</p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_metrics</span></code> can be called directly from <code class="xref py py-obj docutils literal notranslate"><span class="pre">MultiRunMetricsWorkflow</span></code>.</p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_metrics</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">to_xarray</span></code> support loading multiple files; multiple file names can be specified as a sequence and/or a glob patterns can be provided.</p></li>
 </ul>
 </section>
+<section id="other-improvements">
+<h3>Other Improvements<a class="headerlink" href="#other-improvements" title="Permalink to this headline">#</a></h3>
+<ul class="simple">
+<li><p>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">HydraDDP</span></code> callback now supports <code class="xref py py-obj docutils literal notranslate"><span class="pre">pytorch_lightning.Trainer.predict</span></code></p></li>
+<li><p>The projects CI now has a nightly job that runs our test suite against pre-releases of its dependencies</p></li>
+</ul>
+</section>
+<section id="compatibility-breaking-changes">
+<h3>Compatibility-Breaking changes<a class="headerlink" href="#compatibility-breaking-changes" title="Permalink to this headline">#</a></h3>
+<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rai_toolbox.mushin.hydra.launch</span></code> was removed. Use <code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra_zen.launch</span></code> instead.</p>
+</section>
+<section id="deprecations">
+<h3>Deprecations<a class="headerlink" href="#deprecations" title="Permalink to this headline">#</a></h3>
+<ul class="simple">
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">evaluation_task</span></code> is deprecated in favor of <code class="xref py py-obj docutils literal notranslate"><span class="pre">task</span></code>. It will be removed in rAI-toolbox v0.3.0. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/responsible-ai-toolboxpull/62">pull request #62</a>.</p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">project</span></code> is now deprecated in favor of <code class="xref py py-obj docutils literal notranslate"><span class="pre">_post_step_transform_</span></code>. It will be removed in rAI-toolbox v0.3.0. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/responsible-ai-toolboxpull/54">pull request #54</a> and <a class="reference external" href="https://github.com/mit-ll-responsible-ai/responsible-ai-toolboxpull/59">pull request #59</a> for details.</p></li>
+</ul>
+</section>
+</section>
 <section id="v0-1-1">
-<span id="id1"></span><h2>0.1.1 - 2022-05-10<a class="headerlink" href="#v0-1-1" title="Permalink to this headline">#</a></h2>
+<span id="id2"></span><h2>0.1.1 - 2022-05-10<a class="headerlink" href="#v0-1-1" title="Permalink to this headline">#</a></h2>
 <p>This patch fixes two bugs in <code class="docutils literal notranslate"><span class="pre">rai_toolbox.perturbations.init</span></code>:</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="generated/rai_toolbox.perturbations.uniform_like_l1_n_ball_.html#rai_toolbox.perturbations.uniform_like_l1_n_ball_" title="rai_toolbox.perturbations.uniform_like_l1_n_ball_"><code class="xref py py-obj docutils literal notranslate"><span class="pre">uniform_like_l1_n_ball_</span></code></a> was not correctly symmeterized; the drawn values only had components in the direction of the positive hemisphere of the <span class="math notranslate nohighlight">\(L^1\)</span> ball.</p></li>
@@ -233,7 +284,7 @@ chronological order. All previous releases should still be available on pip.</p>
 </ul>
 </section>
 <section id="v0-1-0">
-<span id="id2"></span><h2>0.1.0 - 2022-05-04<a class="headerlink" href="#v0-1-0" title="Permalink to this headline">#</a></h2>
+<span id="id3"></span><h2>0.1.0 - 2022-05-04<a class="headerlink" href="#v0-1-0" title="Permalink to this headline">#</a></h2>
 <p>This is rAI-toolbox’s first stable release on PyPI! Please check out the rest of our
 docs to see what the toolbox has to offer.</p>
 <p>We plan to have an aggressive release schedule for compatibility-preserving patches of

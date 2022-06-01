@@ -17,7 +17,7 @@ rai\_toolbox.mushin.RobustnessCurve
    .. autosummary::
    
       ~RobustnessCurve.__init__
-      ~RobustnessCurve.evaluation_task
+      ~RobustnessCurve.task
       ~RobustnessCurve.jobs_post_process
       ~RobustnessCurve.load_from_dir
       ~RobustnessCurve.plot
