@@ -611,3 +611,18 @@ def test_overrides_roundtrip(
         assert xdata.mrun.data.tolist() == mrun
     else:
         assert xdata.mrun.data.tolist() == [str(i) for i in mrun]
+
+
+@pytest.mark.usefixtures("cleandir")
+def test_evaluation_task_is_deprecated():
+    class OldWorkflow(MultiRunMetricsWorkflow):
+        @staticmethod
+        def evaluation_task(a: int):
+            return dict(a=a)
+
+    with pytest.warns(FutureWarning):
+        wf = OldWorkflow()
+
+    wf.run(a=10)
+    out = wf.jobs[0]
+    assert out.return_value == dict(a=10)

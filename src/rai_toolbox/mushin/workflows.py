@@ -142,8 +142,10 @@ class BaseWorkflow:
             warnings.warn(
                 "The static method `evaluation_task` is deprecated in favor of the "
                 "static method  `task`. Support for `evaluation_task` will be removed "
-                "in the next minor version of rai-toolbox.",
+                "in the next minor version of rai-toolbox. To fix this, simply rename "
+                "the method to `task`.",
                 FutureWarning,
+                stacklevel=2,
             )
             self.task = self.evaluation_task  # type: ignore
 
