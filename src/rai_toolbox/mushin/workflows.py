@@ -2,6 +2,7 @@
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 
+import warnings
 from collections import UserList, defaultdict
 from inspect import getattr_static
 from pathlib import Path
@@ -108,7 +109,7 @@ class BaseWorkflow:
         (`hydra.sweep.dir`).
     """
 
-    _REQUIRED_STATIC_METHODS = ("evaluation_task", "pre_task")
+    _REQUIRED_STATIC_METHODS = ("task", "pre_task")
 
     cfgs: List[Any]
     metrics: Dict[str, List[Any]]
@@ -136,6 +137,15 @@ class BaseWorkflow:
         self._multirun_task_overrides = {}
         self.jobs = []
         self._working_dir = None
+
+        if hasattr(self, "evaluation_task"):
+            warnings.warn(
+                "The static method `evaluation_task` is deprecated in favor of the "
+                "static method  `task`. Support for `evaluation_task` will be removed "
+                "in the next minor version of rai-toolbox.",
+                FutureWarning,
+            )
+            self.task = self.evaluation_task  # type: ignore
 
     @property
     def working_dir(self) -> Path:
@@ -199,7 +209,7 @@ class BaseWorkflow:
         >>>
         >>> class WorkFlow(MultiRunMetricsWorkflow):
         ...     @staticmethod
-        ...     def evaluation_task(*args, **kwargs):
+        ...     def task(*args, **kwargs):
         ...         return None
         >>>
         >>> wf = WorkFlow()
@@ -220,7 +230,7 @@ class BaseWorkflow:
 
     @staticmethod
     def pre_task(*args: Any, **kwargs: Any) -> None:
-        """Called prior to `evaluation_task`
+        """Called prior to `task`
 
         This can be useful for doing things like setting random seeds,
         which must occur prior to instantiating objects for the evaluation
@@ -235,8 +245,8 @@ class BaseWorkflow:
         pass
 
     @staticmethod
-    def evaluation_task(*args: Any, **kwargs: Any) -> Any:
-        """User-defined evaluation task to run the workflow. This should be
+    def task(*args: Any, **kwargs: Any) -> Any:
+        """User-defined task that is run by the workflow. This should be
         a static method.
 
         Arguments will be instantiated configuration variables.  For example,
@@ -247,11 +257,11 @@ class BaseWorkflow:
             |    ├── module
             |    ├── another_config
 
-        The inputs to `evaluation_task` can be any of the three configurations:
+        The inputs to `task` can be any of the three configurations:
         `trainer`, `module`, or `another_config` such as::
 
             @staticmethod
-            def evaluation_task(trainer: Trainer, module: LightningModule) -> None:
+            def task(trainer: Trainer, module: LightningModule) -> None:
                 trainer.fit(module)
 
         Notes
@@ -268,7 +278,7 @@ class BaseWorkflow:
         if include_pre_task:
             zen(self.pre_task).validate(self.eval_task_cfg)
 
-        zen(self.evaluation_task).validate(self.eval_task_cfg)
+        zen(self.task).validate(self.eval_task_cfg)
 
     def run(
         self,
@@ -299,7 +309,7 @@ class BaseWorkflow:
         Parameters
         ----------
         task_fn_wrapper: Callable[[Callable[..., T1]], Callable[[Any], T1]] | None, optional (default=rai_toolbox.mushin.zen)
-            A wrapper applied to `self.evaluation_task` prior to launching the task.
+            A wrapper applied to `self.task` prior to launching the task.
             The default wrapper is `rai_toolbox.mushin.zen`. Specify `None` for no
             wrapper to be applied.
 
@@ -378,6 +388,9 @@ class BaseWorkflow:
             launch_overrides.append(f"{prefix}{k}={v}")
 
         for _name in self._REQUIRED_STATIC_METHODS:
+            if _name == "task" and hasattr(self, "evaluation_task"):
+                # TODO: remove when evaluation_task support is removed
+                _name = "evaluation_task"
             if not isinstance(getattr_static(self, _name), staticmethod):
                 raise TypeError(
                     f"{type(self).__name__}.{_name} must be a static method"
@@ -394,7 +407,7 @@ class BaseWorkflow:
             self.eval_task_cfg,
             _task_calls(
                 pre_task=pre_task_fn_wrapper(self.pre_task),
-                task=task_fn_wrapper(self.evaluation_task),
+                task=task_fn_wrapper(self.task),
             ),
             overrides=launch_overrides,
             multirun=True,
@@ -468,7 +481,7 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
 
     >>> class LocalRobustness(MultiRunMetricsWorkflow):
     ...     @staticmethod
-    ...     def evaluation_task(epsilon: float, scale: float) -> dict:
+    ...     def task(epsilon: float, scale: float) -> dict:
     ...         epsilon *= scale
     ...         val = 100 - epsilon**2
     ...         result = dict(accuracies=val+2, loss=epsilon**2)
@@ -536,9 +549,7 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
     multirun_working_dirs: Optional[List[Path]] = None
 
     @staticmethod
-    def evaluation_task(
-        *args: Any, **kwargs: Any
-    ) -> Dict[str, Any]:  # pragma: no cover
+    def task(*args: Any, **kwargs: Any) -> Dict[str, Any]:  # pragma: no cover
         """Abstract `staticmethod` for users to define the evalultion task"""
         raise NotImplementedError()
 
@@ -603,13 +614,13 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
         --------
         >>> class A(MultiRunMetricsWorkflow):
         ...     @staticmethod
-        ...     def evaluation_task(value: float, scale: float):
+        ...     def task(value: float, scale: float):
         ...         pass
         ...
 
         >>> class B(MultiRunMetricsWorkflow):
         ...     @staticmethod
-        ...     def evaluation_task():
+        ...     def task():
         ...         pass
 
         >>> a = A()
@@ -965,7 +976,7 @@ class RobustnessCurve(MultiRunMetricsWorkflow):
             multirun sequence override for Hydra.
 
         task_fn_wrapper: Callable[[Callable[..., T1]], Callable[[Any], T1]] | None, optional (default=rai_toolbox.mushin.zen)
-            A wrapper applied to `self.evaluation_task` prior to launching the task.
+            A wrapper applied to `self.task` prior to launching the task.
             The default wrapper is `rai_toolbox.mushin.zen`. Specify `None` for no
             wrapper to be applied.
 
