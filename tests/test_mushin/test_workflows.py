@@ -1,7 +1,7 @@
 # Copyright 2022, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
-
+import string
 from pathlib import Path
 from typing import Optional, Sequence
 
@@ -308,7 +308,7 @@ def test_robustness_with_multidim_metrics_with_iteration(as_tensor: bool):
     ]
     assert xarray.accuracies.shape == (3, 2, 10)
     assert xarray.images.shape == (3, 2, 10, 4, 4)
-    assert xarray.attrs == {"foo": "val", "as_tensor": str(as_tensor)}
+    assert xarray.attrs == {"foo": "val", "as_tensor": as_tensor}
 
     for eps, expected in zip([1.0, 2.0, 3.0], [99.0, 96.0, 91.0]):
         # test that results were organized as-expected
@@ -558,3 +558,56 @@ def test_raises_on_non_static_method():
 
     with pytest.raises(TypeError, match="pre_task must be a static method"):
         NonStaticPreTask().run()
+
+
+@pytest.mark.usefixtures("cleandir")
+@settings(max_examples=10, deadline=None)
+@given(
+    int_=st.integers(),
+    bool_=st.booleans(),
+    float_=st.floats(-10, 10),
+    list_=st.lists(st.integers()),
+    str_=st.text(alphabet=string.ascii_lowercase).filter(
+        lambda x: x != "true" and x != "false"
+    ),
+    mrun=st.lists(
+        st.booleans() | st.lists(st.integers()),
+        min_size=2,
+        max_size=5,
+    ).map(multirun),
+)
+def test_overrides_roundtrip(
+    int_,
+    bool_,
+    float_,
+    str_,
+    list_,
+    mrun,
+):
+    class WorkFlow(MultiDimIterationMetrics):
+        @staticmethod
+        def evaluation_task():
+            pass
+
+    wf = WorkFlow()
+    overrides = dict(
+        int_=int_,
+        float_=float_,
+        str_=str_,
+        bool_=bool_,
+        list_=hydra_list(list_),
+        mrun=mrun,
+    )
+    wf.run(**overrides)
+
+    assert wf.multirun_task_overrides == overrides
+    xdata = wf.to_xarray(non_multirun_params_as_singleton_dims=True)
+    assert xdata.int_.item() == int_
+    assert xdata.bool_.item() == bool_
+    assert xdata.str_.item() == str_
+    if not isinstance(mrun[0], list) and all(
+        isinstance(i, type(mrun[0])) for i in mrun
+    ):
+        assert xdata.mrun.data.tolist() == mrun
+    else:
+        assert xdata.mrun.data.tolist() == [str(i) for i in mrun]

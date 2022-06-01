@@ -33,7 +33,7 @@ from rai_toolbox._utils import value_check
 
 from .hydra import zen
 
-LoadedValue: TypeAlias = Union[str, int, float]
+LoadedValue: TypeAlias = Union[str, int, float, bool, List[Any], Dict[str, Any]]
 
 __all__ = [
     "BaseWorkflow",
@@ -159,21 +159,19 @@ class BaseWorkflow:
         self._working_dir = path
 
     @staticmethod
-    def _parse_overrides(overrides: List[str]) -> Dict[str, Any]:
+    def _parse_overrides(
+        overrides,
+    ) -> Dict[str, Union[LoadedValue, Sequence[LoadedValue]]]:
         parser = OverridesParser.create()
         parsed_overrides = parser.parse_overrides(overrides=overrides)
 
         output = {}
+
         for override in parsed_overrides:
+            param_name = override.get_key_element()
+            val = override.value()
             if override.is_sweep_override():
-                param_name = override.get_key_element()
-                val = [
-                    _num_from_string(val) for val in override.sweep_string_iterator()
-                ]
-            else:
-                param_name = override.get_key_element()
-                val = override.get_value_element_as_str()
-                val = _num_from_string(val)
+                val = multirun(val.list)  # type: ignore
 
             param_name = param_name.split("+")[-1]
             output[param_name] = val
@@ -184,7 +182,31 @@ class BaseWorkflow:
     def multirun_task_overrides(
         self,
     ) -> Dict[str, Union[LoadedValue, Sequence[LoadedValue]]]:
-        # e.g. {'epsilon': [1.0, 2.0, 3.0], "foo": "apple"}
+        """Returns override param-name -> value.
+
+        A sequence of overrides associated with a multirun will
+        be stored in a `rai_toolbox.mushin.multirun` list. This
+        enables one to distinguish this from an override whose sole
+        value was a list of values.
+
+        Returns
+        -------
+        multirun_task_overrides: Dict[str, LoadedValue | Sequence[LoadedValue]]
+
+        Examples
+        --------
+        >>> from rai_toolbox.mushin import multirun, hydra_list
+        >>>
+        >>> class WorkFlow(MultiRunMetricsWorkflow):
+        ...     @staticmethod
+        ...     def evaluation_task(*args, **kwargs):
+        ...         return None
+        >>>
+        >>> wf = WorkFlow()
+        >>> wf.run(foo=hydra_list(["val"]), bar=multirun(["a", "b"]), apple=1)
+        >>> wf.multirun_task_overrides
+        {'foo': ['val'], 'bar': multirun(['a', 'b']), 'apple': 1}
+        """
         if not self._multirun_task_overrides:
 
             overrides = load_from_yaml(
@@ -192,7 +214,7 @@ class BaseWorkflow:
             ).hydra.overrides.task
 
             output = self._parse_overrides(overrides)
-            self._multirun_task_overrides.update(output)
+            self._multirun_task_overrides = output
 
         return self._multirun_task_overrides
 
@@ -404,17 +426,6 @@ class BaseWorkflow:
     def to_xarray(self):  # pragma: no cover
         """Convert workflow data to xArray Dataset or DataArray."""
         raise NotImplementedError()
-
-
-def _num_from_string(str_input: str) -> LoadedValue:
-    try:
-        val = float(str_input)
-        if val.is_integer() and "." not in str_input:
-            # v is e.g., 1 or -2. Not 1.0 or -2.0
-            val = int(str_input)
-        return val
-    except ValueError:
-        return str_input
 
 
 def _non_str_sequence(x: Any) -> TypeGuard[Sequence[Any]]:
@@ -828,9 +839,21 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
             else:
                 self.load_metrics(metrics_filename)
 
+        # all overrides containing non-multirun lists must be converted to
+        # strings so that xarray treats that list value as a "scalar"
+        cast_overrides = {}
+        for k, value in self.multirun_task_overrides.items():
+            if _non_str_sequence(value):
+                value = (
+                    [str(_v) if _non_str_sequence(_v) else _v for _v in value]
+                    if isinstance(value, multirun)
+                    else str(value)
+                )
+            cast_overrides[k] = value
+
         orig_coords = {
             k: (v if _non_str_sequence(v) else [v])
-            for k, v in self.multirun_task_overrides.items()
+            for k, v in cast_overrides.items()
             if non_multirun_params_as_singleton_dims or _non_str_sequence(v)
         }
 
@@ -850,13 +873,7 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
                 v = v[0]
             metric_coords[coord_from_metrics] = v
 
-        # non-multirun overrides
-        # TODO: cast "True"/"False" to bool
-        attrs = {
-            k: v
-            for k, v in self.multirun_task_overrides.items()
-            if not _non_str_sequence(v)
-        }
+        attrs = {k: v for k, v in cast_overrides.items() if not _non_str_sequence(v)}
 
         # we will add additional coordinates as-needed for multi-dim metrics
         coords: Dict[str, Any] = orig_coords.copy()
