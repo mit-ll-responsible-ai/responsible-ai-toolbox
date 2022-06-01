@@ -30,7 +30,7 @@ Improvements to `MultiRunMetricsWorkflow`
 Other Improvements
 ------------------
 - The `~HydraDDP` callback now supports `pytorch_lightning.Trainer.predict`
-- The projects CI now has a nightly job that runs our test suite against pre-releases of its dependencies
+- The project's CI now has a nightly job that runs our test suite against pre-releases of its dependencies
 
 Compatibility-Breaking changes
 ------------------------------
@@ -38,8 +38,8 @@ Compatibility-Breaking changes
 
 Deprecations
 ------------
-- `~MultiRunMetricsWorkflow.evaluation_task` is deprecated in favor of `~MultiRunMetricsWorkflow.task`. It will be removed in rAI-toolbox v0.3.0. See :pull:`62`.
-- `~ParamTransformingOptimizer.project` is now deprecated in favor of `~ParamTransformingOptimizer._post_step_transform_`. It will be removed in rAI-toolbox v0.3.0. See :pull:`54` and :pull:`59` for details.
+- `MultiRunMetricsWorkflow.evaluation_task` is deprecated in favor of `MultiRunMetricsWorkflow.task`. It will be removed in rAI-toolbox v0.3.0. See :pull:`62`.
+- `ParamTransformingOptimizer.project` is now deprecated in favor of `ParamTransformingOptimizer._post_step_transform_`. It will be removed in rAI-toolbox v0.3.0. See :pull:`54` and :pull:`59` for details.
 
 
 .. _v0.1.1:
