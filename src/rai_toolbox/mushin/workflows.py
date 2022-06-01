@@ -13,6 +13,7 @@ from typing import (
     Dict,
     Iterable,
     List,
+    Mapping,
     Optional,
     Sequence,
     Tuple,
@@ -551,9 +552,52 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
     multirun_working_dirs: Optional[List[Path]] = None
 
     @staticmethod
-    def task(*args: Any, **kwargs: Any) -> Dict[str, Any]:  # pragma: no cover
-        """Abstract `staticmethod` for users to define the evalultion task"""
+    def task(*args: Any, **kwargs: Any) -> Mapping[str, Any]:  # pragma: no cover
+        """Abstract `staticmethod` for users to define the task that is configured and
+        launched by the workflow"""
         raise NotImplementedError()
+
+    @staticmethod
+    def metric_load_fn(file_path: Path) -> Mapping[str, Any]:
+        """Loads a metric file and returns a dictionary of metric-name -> metric-value
+        mappings.
+
+        The default metric load function is `torch.load`.
+
+        Parameters
+        ----------
+        file_path : Path
+
+        Returns
+        -------
+        named_metrics : Mapping[str, Any]
+            metric-name -> metric-value(s)
+
+        Examples
+        --------
+        Designing a workflow that uses the `pickle` module to save and load
+        metrics
+
+        >>> from rai_toolbox.mushin import MultiRunMetricsWorkflow, multirun
+        >>> import pickle
+        >>>
+        >>> class PickledWorkFlow(MultiRunMetricsWorkflow):
+        ...     @staticmethod
+        ...     def metric_load_fn(file_path: Path):
+        ...         with file_path.open("rb") as f:
+        ...             return pickle.load(f)
+        ...
+        ...     @staticmethod
+        ...     def task(a, b):
+        ...         with open("./metrics.pkl", "wb") as f:
+        ...             pickle.dump(dict(a=a, b=b), f)
+        >>>
+        >>> wf = PickleWorkFlow()
+        >>> wf.run(a=multirun([1, 2, 3]), b=False)
+        >>> wf.load_metrics("metrics.pkl")
+        >>> wf.metrics
+        dict(a=[1, 2, 3], b=[False, False, False])"""
+        return tr.load(file_path)
 
     def run(
         self,
@@ -771,7 +815,9 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
         self, metrics_filename: Union[str, Sequence[str]]
     ) -> Dict[str, List[Any]]:
         """Loads and aggregates across all multirun working dirs, and stores
-        the metrics in `self.metrics`
+        the metrics in `self.metrics`.
+
+        `self.metric_load_fn` is used to load each job's metric file(s).
 
         Parameters
         ----------
@@ -782,6 +828,33 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
         Returns
         ------
         metrics : Dict[str, List[Any]]
+
+        Examples
+        --------
+        Creating a workflow that saves named metrics using `torch.save`
+
+        >>> from rai_toolbox.mushin.workflows import MultiRunMetricsWorkflow, multirun
+        >>> import torch as tr
+        >>>
+        ... class TorchWorkFlow(MultiRunMetricsWorkflow):
+        ...     @staticmethod
+        ...     def task(a, b):
+        ...         tr.save(dict(a=a, b=b), "metrics.pt")
+        ...
+        >>> wf = TorchWorkFlow()
+        >>> wf.run(a=multirun([1, 2, 3]), b=False)
+        [2022-06-01 12:35:51,650][HYDRA] Launching 3 jobs locally
+        [2022-06-01 12:35:51,650][HYDRA] 	#0 : +a=1 +b=False
+        [2022-06-01 12:35:51,715][HYDRA] 	#1 : +a=2 +b=False
+        [2022-06-01 12:35:51,780][HYDRA] 	#2 : +a=3 +b=False
+
+        `~MultiRunMetricsWorkflow` uses `torch.load` by default to load metrics files
+        (refer to `~MultiRunMetricsWorkflow.metric_load_fn` to change this behavior).
+
+        >>> wf.load_metrics("metrics.pt")
+        defaultdict(list, {'a': [1, 2, 3], 'b': [False, False, False]})
+        >>> wf.metrics
+        defaultdict(list, {'a': [1, 2, 3], 'b': [False, False, False]})
         """
         if self.multirun_working_dirs is None:
             self.load_from_dir(self.working_dir, metrics_filename=None)
@@ -801,7 +874,7 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
                     )
 
                 for f_ in files:
-                    _metrics.update(tr.load(f_))
+                    _metrics.update(self.metric_load_fn(f_))
             job_metrics.append(_metrics)
 
         self.metrics = self._process_metrics(job_metrics)
