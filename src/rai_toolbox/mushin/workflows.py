@@ -13,6 +13,7 @@ from typing import (
     Dict,
     Iterable,
     List,
+    Mapping,
     Optional,
     Sequence,
     Tuple,
@@ -551,9 +552,25 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
     multirun_working_dirs: Optional[List[Path]] = None
 
     @staticmethod
-    def task(*args: Any, **kwargs: Any) -> Dict[str, Any]:  # pragma: no cover
+    def task(*args: Any, **kwargs: Any) -> Mapping[str, Any]:  # pragma: no cover
         """Abstract `staticmethod` for users to define the evalultion task"""
         raise NotImplementedError()
+
+    def metric_load_fn(self, file_path: Path) -> Mapping[str, Any]:
+        """Loads a metric file and returns a dictionary of metric-name -> metric-value
+        mappings.
+
+        The default metric load function is `torch.load`.
+
+        Parameters
+        ----------
+        file_path : Path
+
+        Returns
+        -------
+        named_metrics : Mapping[str, Any]
+            metric-name -> metric-value(s)"""
+        return tr.load(file_path)
 
     def run(
         self,
@@ -771,7 +788,9 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
         self, metrics_filename: Union[str, Sequence[str]]
     ) -> Dict[str, List[Any]]:
         """Loads and aggregates across all multirun working dirs, and stores
-        the metrics in `self.metrics`
+        the metrics in `self.metrics`.
+
+        `self.metric_load_fn` is used to load each job's metric file(s).
 
         Parameters
         ----------
@@ -801,7 +820,7 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
                     )
 
                 for f_ in files:
-                    _metrics.update(tr.load(f_))
+                    _metrics.update(self.metric_load_fn(f_))
             job_metrics.append(_metrics)
 
         self.metrics = self._process_metrics(job_metrics)

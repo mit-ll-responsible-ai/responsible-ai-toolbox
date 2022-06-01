@@ -17,9 +17,10 @@ rai\_toolbox.mushin.MultiRunMetricsWorkflow
    
       ~MultiRunMetricsWorkflow.__init__
       ~MultiRunMetricsWorkflow.task
-      ~MultiRunMetricsWorkflow.jobs_post_process
-      ~MultiRunMetricsWorkflow.load_from_dir
-      ~MultiRunMetricsWorkflow.plot
       ~MultiRunMetricsWorkflow.run
+      ~MultiRunMetricsWorkflow.metric_load_fn
+      ~MultiRunMetricsWorkflow.load_from_dir
       ~MultiRunMetricsWorkflow.to_xarray
+      ~MultiRunMetricsWorkflow.jobs_post_process
+      ~MultiRunMetricsWorkflow.plot
       ~MultiRunMetricsWorkflow.validate
