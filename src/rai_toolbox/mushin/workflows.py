@@ -557,7 +557,8 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
         launched by the workflow"""
         raise NotImplementedError()
 
-    def metric_load_fn(self, file_path: Path) -> Mapping[str, Any]:
+    @staticmethod
+    def metric_load_fn(file_path: Path) -> Mapping[str, Any]:
         """Loads a metric file and returns a dictionary of metric-name -> metric-value
         mappings.
 
@@ -581,7 +582,8 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
         >>> import pickle
         >>>
         >>> class PickledWorkFlow(MultiRunMetricsWorkflow):
-        ...     def metric_load_fn(self, file_path: Path):
+        ...     @staticmethod
+        ...     def metric_load_fn(file_path: Path):
         ...         with file_path.open("rb") as f:
         ...             return pickle.load(f)
         ...
