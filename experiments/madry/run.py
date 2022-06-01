@@ -18,9 +18,7 @@ cs.store(name="madry_config", node=configs.Config)
 
 class MadryLabRobustness(RobustnessCurve):
     @staticmethod
-    def evaluation_task(
-        seed: int, trainer: pl.Trainer, module: pl.LightningModule
-    ) -> dict:
+    def task(seed: int, trainer: pl.Trainer, module: pl.LightningModule) -> dict:
         pl.seed_everything(seed)
         trainer.test(module)
 

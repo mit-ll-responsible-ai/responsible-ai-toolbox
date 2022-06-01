@@ -28,7 +28,7 @@ Our workflow will represent a simplified scenario in which our task accepts an i
 
    class TorchWorkflow(MultiRunMetricsWorkflow):
        @staticmethod
-       def evaluation_task(module: tr.nn.Module, data: tr.Tensor):
+       def task(module: tr.nn.Module, data: tr.Tensor):
            result = module(data)
            return {"out": result.detach()}
 
@@ -91,7 +91,7 @@ Adding a ``pre_task`` method to our workflow enables us to seed PyTorch's global
            tr.manual_seed(torch_seed)
    
        @staticmethod
-       def evaluation_task(module: tr.nn.Module, data: tr.Tensor):
+       def task(module: tr.nn.Module, data: tr.Tensor):
            result = module(data)
            return {"out": result.detach()}
 

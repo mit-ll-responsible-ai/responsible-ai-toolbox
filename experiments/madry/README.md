@@ -40,7 +40,7 @@ os.environ["PYTHONPATH"] = f"{os.getcwd()}:{os.getenv('PYTHONPATH')}"
 # Implement the evaluation task for RobustnessCurv
 class MadryLabRobustness(RobustnessCurve):
     @staticmethod
-    def evaluation_task(
+    def task(
         seed: int, trainer: pl.Trainer, module: pl.LightningModule
     ) -> dict:
         pl.seed_everything(seed)
