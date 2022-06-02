@@ -229,7 +229,7 @@ class AdditivePerturbation(nn.Module, PerturbationModel):
             offset = len(shape) - delta_ndim if delta_ndim >= 0 else abs(delta_ndim)
             shape = shape[offset:]
 
-        self.delta = nn.Parameter(tr.zeros(shape, **_init_kwargs))  # type: ignore
+        self.delta = Parameter(tr.zeros(shape, **_init_kwargs))
         del _init_kwargs
 
         if init_fn is not None:
