@@ -237,15 +237,18 @@ def gradient_ascent(
     else:
         if not isinstance(optimizer, _TorchOptim):
             raise TypeError(
-                f"`optimizer` must be an instance of Optimizer or must instantiate to Optimizer; got: {optimizer}"
+                f"`optimizer` must be an instance of Optimizer or must instantiate to "
+                f"Optimizer; got: {optimizer}"
             )
         if instantiates_to(perturbation_model, PerturbationModel):
             raise TypeError(
-                "An initialized optimizer can only be passed to the solver in combination with an intialized perturbation model."
+                "An initialized optimizer can only be passed to the solver in "
+                "combination with an intialized perturbation model."
             )
         if optim_kwargs:
             raise TypeError(
-                "**optim_kwargs were specified, but the provided `optimizer` has already been instaniated"
+                "**optim_kwargs were specified, but the provided `optimizer` has "
+                "already been instaniated"
             )
 
         optim = optimizer
@@ -330,7 +333,9 @@ def random_restart(
     Examples
     --------
     Let's perturb two data points, `x1=-1.0` and `x2=2.0`, to maximize
-    `L(δ; x) = |x + δ|` w.r.t `δ`. Our perturbation will randomly initialize `δ1` and `δ2` and we will re-run the solver three times – retaining the best perturbation of `x1` and `x2` respectively
+    `L(δ; x) = |x + δ|` w.r.t `δ`. Our perturbation will randomly initialize `δ1` and
+    `δ2` and we will re-run the solver three times – retaining the best perturbation of
+    `x1` and `x2` respectively.
 
     >>> from functools import partial
     >>> import torch as tr
