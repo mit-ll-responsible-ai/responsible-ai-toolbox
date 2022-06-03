@@ -125,7 +125,7 @@
       <div class="navbar-end-item">
         <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
         <li class="nav-item">
-          <a class="nav-link" href="https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+          <a class="nav-link" href="https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox/" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
             <label class="sr-only">GitHub</label></a>
         </li>
       </ul>
@@ -250,13 +250,15 @@
 <span class="sd">    optimizer : Optimizer | Type[Optimizer] | Partial[Optimizer]</span>
 <span class="sd">        The optimizer to use for updating the perturbation model.</span>
 
-<span class="sd">        If `optimizer` is uninstantiated, it will be instantiated as `optimizer(perturbation_model.parameters(), **optim_kwargs)`</span>
+<span class="sd">        If `optimizer` is uninstantiated, it will be instantiated as</span>
+<span class="sd">        `optimizer(perturbation_model.parameters(), **optim_kwargs)`</span>
 
 <span class="sd">    steps : int</span>
 <span class="sd">        Number of projected gradient steps.</span>
 
 <span class="sd">    perturbation_model : PerturbationModel | Type[PerturbationModel], optional (default=AdditivePerturbation)</span>
-<span class="sd">        A `torch.nn.Module` whose parameters are updated by the solver. Its forward-pass applies the perturbation to the data. Default is</span>
+<span class="sd">        A `torch.nn.Module` whose parameters are updated by the solver. Its forward-pass</span>
+<span class="sd">        applies the perturbation to the data. Default is</span>
 <span class="sd">        `AdditivePerturbation`, which simply adds the perturbation to the data.</span>
 
 <span class="sd">        The perturbation model should not modify the data in-place.</span>
@@ -301,7 +303,8 @@
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
-<span class="sd">    `model` is automatically set to eval-mode and its parameters are set to `requires_grad=False` within the context of this function.</span>
+<span class="sd">    `model` is automatically set to eval-mode and its parameters are set to</span>
+<span class="sd">    `requires_grad=False` within the context of this function.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
@@ -353,7 +356,8 @@
 <span class="sd">    **Accessing the perturbations**</span>
 
 <span class="sd">    To gain direct access to the solved perturbations, we can provide our own</span>
-<span class="sd">    perturbation model to the solver. Let&#39;s solve the same optimization problem, but provide our own instance of `AdditivePerturbation`</span>
+<span class="sd">    perturbation model to the solver. Let&#39;s solve the same optimization problem, but</span>
+<span class="sd">    provide our own instance of `AdditivePerturbation`</span>
 
 <span class="sd">    &gt;&gt;&gt; from rai_toolbox.perturbations import AdditivePerturbation</span>
 <span class="sd">    &gt;&gt;&gt; pert_model = AdditivePerturbation(data_or_shape=(2,))</span>
@@ -412,15 +416,18 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">optimizer</span><span class="p">,</span> <span class="n">_TorchOptim</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;`optimizer` must be an instance of Optimizer or must instantiate to Optimizer; got: </span><span class="si">{</span><span class="n">optimizer</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;`optimizer` must be an instance of Optimizer or must instantiate to &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Optimizer; got: </span><span class="si">{</span><span class="n">optimizer</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="n">instantiates_to</span><span class="p">(</span><span class="n">perturbation_model</span><span class="p">,</span> <span class="n">PerturbationModel</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="s2">&quot;An initialized optimizer can only be passed to the solver in combination with an intialized perturbation model.&quot;</span>
+                <span class="s2">&quot;An initialized optimizer can only be passed to the solver in &quot;</span>
+                <span class="s2">&quot;combination with an intialized perturbation model.&quot;</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="n">optim_kwargs</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="s2">&quot;**optim_kwargs were specified, but the provided `optimizer` has already been instaniated&quot;</span>
+                <span class="s2">&quot;**optim_kwargs were specified, but the provided `optimizer` has &quot;</span>
+                <span class="s2">&quot;already been instaniated&quot;</span>
             <span class="p">)</span>
 
         <span class="n">optim</span> <span class="o">=</span> <span class="n">optimizer</span>
@@ -505,7 +512,9 @@
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    Let&#39;s perturb two data points, `x1=-1.0` and `x2=2.0`, to maximize</span>
-<span class="sd">    `L(δ; x) = |x + δ|` w.r.t `δ`. Our perturbation will randomly initialize `δ1` and `δ2` and we will re-run the solver three times – retaining the best perturbation of `x1` and `x2` respectively</span>
+<span class="sd">    `L(δ; x) = |x + δ|` w.r.t `δ`. Our perturbation will randomly initialize `δ1` and</span>
+<span class="sd">    `δ2` and we will re-run the solver three times – retaining the best perturbation of</span>
+<span class="sd">    `x1` and `x2` respectively.</span>
 
 <span class="sd">    &gt;&gt;&gt; from functools import partial</span>
 <span class="sd">    &gt;&gt;&gt; import torch as tr</span>

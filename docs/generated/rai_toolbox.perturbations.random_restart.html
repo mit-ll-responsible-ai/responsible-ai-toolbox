@@ -127,7 +127,7 @@
       <div class="navbar-end-item">
         <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
         <li class="nav-item">
-          <a class="nav-link" href="https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+          <a class="nav-link" href="https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox/" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
             <label class="sr-only">GitHub</label></a>
         </li>
       </ul>
@@ -296,7 +296,9 @@
 </dl>
 <p class="rubric">Examples</p>
 <p>Let’s perturb two data points, <code class="xref py py-obj docutils literal notranslate"><span class="pre">x1=-1.0</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">x2=2.0</span></code>, to maximize
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">L(δ;</span> <span class="pre">x)</span> <span class="pre">=</span> <span class="pre">|x</span> <span class="pre">+</span> <span class="pre">δ|</span></code> w.r.t <code class="xref py py-obj docutils literal notranslate"><span class="pre">δ</span></code>. Our perturbation will randomly initialize <code class="xref py py-obj docutils literal notranslate"><span class="pre">δ1</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">δ2</span></code> and we will re-run the solver three times – retaining the best perturbation of <code class="xref py py-obj docutils literal notranslate"><span class="pre">x1</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">x2</span></code> respectively</p>
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">L(δ;</span> <span class="pre">x)</span> <span class="pre">=</span> <span class="pre">|x</span> <span class="pre">+</span> <span class="pre">δ|</span></code> w.r.t <code class="xref py py-obj docutils literal notranslate"><span class="pre">δ</span></code>. Our perturbation will randomly initialize <code class="xref py py-obj docutils literal notranslate"><span class="pre">δ1</span></code> and
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">δ2</span></code> and we will re-run the solver three times – retaining the best perturbation of
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">x1</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">x2</span></code> respectively.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">torch</span> <span class="k">as</span> <span class="nn">tr</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">torch.optim</span> <span class="kn">import</span> <span class="n">SGD</span>

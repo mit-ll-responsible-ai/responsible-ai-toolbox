@@ -125,7 +125,7 @@
       <div class="navbar-end-item">
         <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
         <li class="nav-item">
-          <a class="nav-link" href="https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+          <a class="nav-link" href="https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox/" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
             <label class="sr-only">GitHub</label></a>
         </li>
       </ul>
@@ -404,7 +404,7 @@
             <span class="n">offset</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span> <span class="o">-</span> <span class="n">delta_ndim</span> <span class="k">if</span> <span class="n">delta_ndim</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="k">else</span> <span class="nb">abs</span><span class="p">(</span><span class="n">delta_ndim</span><span class="p">)</span>
             <span class="n">shape</span> <span class="o">=</span> <span class="n">shape</span><span class="p">[</span><span class="n">offset</span><span class="p">:]</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">delta</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span><span class="n">tr</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="o">**</span><span class="n">_init_kwargs</span><span class="p">))</span>  <span class="c1"># type: ignore</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delta</span> <span class="o">=</span> <span class="n">Parameter</span><span class="p">(</span><span class="n">tr</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="o">**</span><span class="n">_init_kwargs</span><span class="p">))</span>
         <span class="k">del</span> <span class="n">_init_kwargs</span>
 
         <span class="k">if</span> <span class="n">init_fn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
