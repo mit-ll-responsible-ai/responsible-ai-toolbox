@@ -359,7 +359,11 @@ class TopQGradientOptimizer(ParamTransformingOptimizer):
             _qhigh = min(1.0, q + dq)
 
             q = float(
-                (_qhigh - _qlow) * torch.rand(1, generator=self._generator) + _qlow
+                (_qhigh - _qlow)
+                * torch.rand(
+                    1, generator=self._generator, device=self._generator.device
+                )
+                + _qlow
                 if dq and (_qlow < q or _qhigh > q)
                 else q
             )
