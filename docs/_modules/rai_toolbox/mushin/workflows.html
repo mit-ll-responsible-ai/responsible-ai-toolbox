@@ -726,13 +726,13 @@
     <span class="c1"># List of all the dirs that the multirun writes to; sorted by job-num</span>
     <span class="n">multirun_working_dirs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Path</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="MultiRunMetricsWorkflow.task"><a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.MultiRunMetricsWorkflow.html#rai_toolbox.mushin.MultiRunMetricsWorkflow.task">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">task</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>  <span class="c1"># pragma: no cover</span>
         <span class="sd">&quot;&quot;&quot;Abstract `staticmethod` for users to define the task that is configured and</span>
 <span class="sd">        launched by the workflow&quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
 
-    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="MultiRunMetricsWorkflow.metric_load_fn"><a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.MultiRunMetricsWorkflow.html#rai_toolbox.mushin.MultiRunMetricsWorkflow.metric_load_fn">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">metric_load_fn</span><span class="p">(</span><span class="n">file_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Loads a metric file and returns a dictionary of metric-name -&gt; metric-value</span>
 <span class="sd">        mappings.</span>
@@ -772,7 +772,7 @@
 <span class="sd">        &gt;&gt;&gt; wf.load_metrics(&quot;metrics.pkl&quot;)</span>
 <span class="sd">        &gt;&gt;&gt; wf.metrics</span>
 <span class="sd">        dict(a=[1, 2, 3], b=[False, False, False])&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">tr</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">tr</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MultiRunMetricsWorkflow.run"><a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.MultiRunMetricsWorkflow.html#rai_toolbox.mushin.MultiRunMetricsWorkflow.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -986,7 +986,7 @@
 
         <span class="k">return</span> <span class="bp">self</span></div>
 
-    <span class="k">def</span> <span class="nf">load_metrics</span><span class="p">(</span>
+<div class="viewcode-block" id="MultiRunMetricsWorkflow.load_metrics"><a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.MultiRunMetricsWorkflow.html#rai_toolbox.mushin.MultiRunMetricsWorkflow.load_metrics">[docs]</a>    <span class="k">def</span> <span class="nf">load_metrics</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">metrics_filename</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
         <span class="sd">&quot;&quot;&quot;Loads and aggregates across all multirun working dirs, and stores</span>
@@ -1054,9 +1054,9 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_metrics</span><span class="p">(</span><span class="n">job_metrics</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span></div>
 
-    <span class="k">def</span> <span class="nf">to_xarray</span><span class="p">(</span>
+<div class="viewcode-block" id="MultiRunMetricsWorkflow.to_xarray"><a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.MultiRunMetricsWorkflow.html#rai_toolbox.mushin.MultiRunMetricsWorkflow.to_xarray">[docs]</a>    <span class="k">def</span> <span class="nf">to_xarray</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">include_working_subdirs_as_data_var</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">coord_from_metrics</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1186,7 +1186,7 @@
                     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">uv</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">non_multirun_params_as_singleton_dims</span><span class="p">:</span>
                         <span class="n">coords</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_JOBDIR_NAME</span><span class="p">],</span> <span class="n">v</span><span class="p">)</span>
             <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">out</span></div>
+        <span class="k">return</span> <span class="n">out</span></div></div>
 
 
 <div class="viewcode-block" id="RobustnessCurve"><a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.RobustnessCurve.html#rai_toolbox.mushin.RobustnessCurve">[docs]</a><span class="k">class</span> <span class="nc">RobustnessCurve</span><span class="p">(</span><span class="n">MultiRunMetricsWorkflow</span><span class="p">):</span>

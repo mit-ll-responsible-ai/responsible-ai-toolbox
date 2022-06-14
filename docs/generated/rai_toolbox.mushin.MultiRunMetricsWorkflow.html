@@ -357,6 +357,27 @@ data-variables are our recorded metrics: “accuracies” and “loss”.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="rai_toolbox.mushin.MultiRunMetricsWorkflow.pre_task">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pre_task</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rai_toolbox.mushin.MultiRunMetricsWorkflow.pre_task" title="Permalink to this definition">#</a></dt>
+<dd><p>Called prior to <a class="reference internal" href="#rai_toolbox.mushin.MultiRunMetricsWorkflow.task" title="rai_toolbox.mushin.MultiRunMetricsWorkflow.task"><code class="xref py py-obj docutils literal notranslate"><span class="pre">task</span></code></a></p>
+<p>This can be useful for doing things like setting random seeds,
+which must occur prior to instantiating objects for the evaluation
+task.</p>
+<p class="rubric">Notes</p>
+<p>This function is automatically wrapped by <code class="xref py py-obj docutils literal notranslate"><span class="pre">zen</span></code>, which is responsible
+for parsing the function’s signature and then extracting and instantiating
+the correspending fields from a Hydra config object – passing them to the
+function. This behavior can be modified by <code class="xref py py-obj docutils literal notranslate"><span class="pre">self.run(pre_task_fn_wrapper=...)</span></code></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rai_toolbox.mushin.MultiRunMetricsWorkflow.task">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">task</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/mushin/workflows.html#MultiRunMetricsWorkflow.task"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.mushin.MultiRunMetricsWorkflow.task" title="Permalink to this definition">#</a></dt>
+<dd><p>Abstract <a class="reference external" href="https://docs.python.org/3/library/functions.html#staticmethod" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">staticmethod</span></code></a> for users to define the task that is configured and
+launched by the workflow</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="rai_toolbox.mushin.MultiRunMetricsWorkflow.run">
 <span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_fn_wrapper=&lt;function</span> <span class="pre">zen&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">working_dir=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sweeper=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">launcher=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overrides=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version_base='1.1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_job_dirs=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_dictconfig=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_name='rai_workflow'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">job_name='rai_workflow'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">with_log_configuration=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**workflow_overrides</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/mushin/workflows.html#MultiRunMetricsWorkflow.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.mushin.MultiRunMetricsWorkflow.run" title="Permalink to this definition">#</a></dt>
 <dd><p>Run the experiment.</p>
@@ -434,6 +455,177 @@ If <a class="reference external" href="https://docs.python.org/3/library/constan
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="rai_toolbox.mushin.MultiRunMetricsWorkflow.load_metrics">
+<span class="sig-name descname"><span class="pre">load_metrics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metrics_filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/mushin/workflows.html#MultiRunMetricsWorkflow.load_metrics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.mushin.MultiRunMetricsWorkflow.load_metrics" title="Permalink to this definition">#</a></dt>
+<dd><p>Loads and aggregates across all multirun working dirs, and stores
+the metrics in <code class="xref py py-obj docutils literal notranslate"><span class="pre">self.metrics</span></code>.</p>
+<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">self.metric_load_fn</span></code> is used to load each job’s metric file(s).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>metrics_filename</strong><span class="classifier">str | Sequence[str]</span></dt><dd><p>The filename(s) or glob-pattern(s) uses to load the metrics.
+If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, the metrics stored in <code class="xref py py-obj docutils literal notranslate"><span class="pre">self.metrics</span></code> is used.</p>
+</dd>
+<dt><strong>Returns</strong></dt><dd></dd>
+<dt><strong>——</strong></dt><dd></dd>
+<dt><strong>metrics</strong><span class="classifier">Dict[str, List[Any]]</span></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Creating a workflow that saves named metrics using <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.save</span></code></p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">rai_toolbox.mushin.workflows</span> <span class="kn">import</span> <span class="n">MultiRunMetricsWorkflow</span><span class="p">,</span> <span class="n">multirun</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">torch</span> <span class="k">as</span> <span class="nn">tr</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">... </span><span class="k">class</span> <span class="nc">TorchWorkFlow</span><span class="p">(</span><span class="n">MultiRunMetricsWorkflow</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="nd">@staticmethod</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">task</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="n">tr</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">b</span><span class="p">),</span> <span class="s2">&quot;metrics.pt&quot;</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">wf</span> <span class="o">=</span> <span class="n">TorchWorkFlow</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">wf</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="n">multirun</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]),</span> <span class="n">b</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="go">[2022-06-01 12:35:51,650][HYDRA] Launching 3 jobs locally</span>
+<span class="go">[2022-06-01 12:35:51,650][HYDRA]        #0 : +a=1 +b=False</span>
+<span class="go">[2022-06-01 12:35:51,715][HYDRA]        #1 : +a=2 +b=False</span>
+<span class="go">[2022-06-01 12:35:51,780][HYDRA]        #2 : +a=3 +b=False</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="#rai_toolbox.mushin.MultiRunMetricsWorkflow" title="rai_toolbox.mushin.MultiRunMetricsWorkflow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MultiRunMetricsWorkflow</span></code></a> uses <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.load</span></code> by default to load metrics files
+(refer to <a class="reference internal" href="#rai_toolbox.mushin.MultiRunMetricsWorkflow.metric_load_fn" title="rai_toolbox.mushin.MultiRunMetricsWorkflow.metric_load_fn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">metric_load_fn</span></code></a> to change this behavior).</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">wf</span><span class="o">.</span><span class="n">load_metrics</span><span class="p">(</span><span class="s2">&quot;metrics.pt&quot;</span><span class="p">)</span>
+<span class="go">defaultdict(list, {&#39;a&#39;: [1, 2, 3], &#39;b&#39;: [False, False, False]})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">wf</span><span class="o">.</span><span class="n">metrics</span>
+<span class="go">defaultdict(list, {&#39;a&#39;: [1, 2, 3], &#39;b&#39;: [False, False, False]})</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rai_toolbox.mushin.MultiRunMetricsWorkflow.metric_load_fn">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">metric_load_fn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/mushin/workflows.html#MultiRunMetricsWorkflow.metric_load_fn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.mushin.MultiRunMetricsWorkflow.metric_load_fn" title="Permalink to this definition">#</a></dt>
+<dd><p>Loads a metric file and returns a dictionary of metric-name -&gt; metric-value
+mappings.</p>
+<p>The default metric load function is <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.load</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>file_path</strong><span class="classifier">Path</span></dt><dd></dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>named_metrics</strong><span class="classifier">Mapping[str, Any]</span></dt><dd><p>metric-name -&gt; metric-value(s)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Designing a workflow that uses the <a class="reference external" href="https://docs.python.org/3/library/pickle.html#module-pickle" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pickle</span></code></a> module to save and load
+metrics</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">rai_toolbox.mushin</span> <span class="kn">import</span> <span class="n">MultiRunMetricsWorkflow</span><span class="p">,</span> <span class="n">multirun</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pickle</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">PickledWorkFlow</span><span class="p">(</span><span class="n">MultiRunMetricsWorkflow</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="nd">@staticmethod</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">metric_load_fn</span><span class="p">(</span><span class="n">file_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="k">with</span> <span class="n">file_path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<span class="gp">... </span>            <span class="k">return</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">... </span>    <span class="nd">@staticmethod</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">task</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;./metrics.pkl&quot;</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<span class="gp">... </span>            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">b</span><span class="p">),</span> <span class="n">f</span><span class="p">)</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">wf</span> <span class="o">=</span> <span class="n">PickleWorkFlow</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">wf</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="n">multirun</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]),</span> <span class="n">b</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">wf</span><span class="o">.</span><span class="n">load_metrics</span><span class="p">(</span><span class="s2">&quot;metrics.pkl&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">wf</span><span class="o">.</span><span class="n">metrics</span>
+<span class="go">dict(a=[1, 2, 3], b=[False, False, False])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rai_toolbox.mushin.MultiRunMetricsWorkflow.to_xarray">
+<span class="sig-name descname"><span class="pre">to_xarray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">include_working_subdirs_as_data_var</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coord_from_metrics</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">non_multirun_params_as_singleton_dims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metrics_filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/mushin/workflows.html#MultiRunMetricsWorkflow.to_xarray"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.mushin.MultiRunMetricsWorkflow.to_xarray" title="Permalink to this definition">#</a></dt>
+<dd><p>Convert workflow data to xarray Dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>include_working_subdirs_as_data_var</strong><span class="classifier">bool, optional (default=False)</span></dt><dd><p>If <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> then the data-variable “working_subdir” will be included in the
+xarray. This data variable is used to lookup the working sub-dir path
+(a string) by multirun coordinate.</p>
+</dd>
+<dt><strong>coord_from_metrics</strong><span class="classifier">str | None (default: None)</span></dt><dd><p>If not <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> defines the metric key to use as a coordinate
+in the <code class="xref py py-obj docutils literal notranslate"><span class="pre">Dataset</span></code>.  This function assumes that this coordinate
+represents the leading dimension for all data-variables.</p>
+</dd>
+<dt><strong>non_multirun_params_as_singleton_dims</strong><span class="classifier">bool, optional (default=False)</span></dt><dd><p>If <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> then non-multirun entries from <code class="xref py py-obj docutils literal notranslate"><span class="pre">workflow_overrides</span></code> will be
+included as length-1 dimensions in the xarray. Useful for merging/
+concatenation with other Datasets</p>
+</dd>
+<dt><strong>metrics_filename: Optional[str]</strong></dt><dd><p>The filename or glob-pattern uses to load the metrics.
+If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, the metrics stored in <code class="xref py py-obj docutils literal notranslate"><span class="pre">self.metrics</span></code> is used.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>results</strong><span class="classifier">xarray.Dataset</span></dt><dd><p>A dataset whose dimensions and coordinate-values are determined by the
+quantities over which the multi-run was performed. The data variables
+correspond to the named results returned by the jobs.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="rai_toolbox.mushin.MultiRunMetricsWorkflow.target_dir_multirun_overrides">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">target_dir_multirun_overrides</span></span><a class="headerlink" href="#rai_toolbox.mushin.MultiRunMetricsWorkflow.target_dir_multirun_overrides" title="Permalink to this definition">#</a></dt>
+<dd><p>For a multirun that sweeps over the target directories of a
+previous multirun, <a class="reference internal" href="#rai_toolbox.mushin.MultiRunMetricsWorkflow.target_dir_multirun_overrides" title="rai_toolbox.mushin.MultiRunMetricsWorkflow.target_dir_multirun_overrides"><code class="xref py py-obj docutils literal notranslate"><span class="pre">target_dir_multirun_overrides</span></code></a> provides
+the flattened overrides for that previous run.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">A</span><span class="p">(</span><span class="n">MultiRunMetricsWorkflow</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="nd">@staticmethod</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">task</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">scale</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="k">pass</span>
+<span class="gp">...</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">B</span><span class="p">(</span><span class="n">MultiRunMetricsWorkflow</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="nd">@staticmethod</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">task</span><span class="p">():</span>
+<span class="gp">... </span>        <span class="k">pass</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">A</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">multirun</span><span class="p">([</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]),</span> <span class="n">scale</span><span class="o">=</span><span class="n">multirun</span><span class="p">([</span><span class="mf">11.0</span><span class="p">,</span> <span class="mf">9.0</span><span class="p">]))</span>
+<span class="go">[2022-05-13 17:19:51,497][HYDRA] Launching 6 jobs locally</span>
+<span class="go">[2022-05-13 17:19:51,497][HYDRA]        #0 : +value=-1.0 +scale=11.0</span>
+<span class="go">[2022-05-13 17:19:51,555][HYDRA]        #1 : +value=-1.0 +scale=9.0</span>
+<span class="go">[2022-05-13 17:19:51,729][HYDRA]        #2 : +value=1.0 +scale=11.0</span>
+<span class="go">[2022-05-13 17:19:51,787][HYDRA]        #3 : +value=1.0 +scale=9.0</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">B</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">target_job_dirs</span><span class="o">=</span><span class="n">a</span><span class="o">.</span><span class="n">multirun_working_dirs</span><span class="p">)</span>
+<span class="go">[2022-05-13 17:19:59,900][HYDRA] Launching 6 jobs locally</span>
+<span class="go">[2022-05-13 17:19:59,900][HYDRA]        #0 : +job_dir=/home/scratch/multirun/0</span>
+<span class="go">[2022-05-13 17:19:59,958][HYDRA]        #1 : +job_dir=/home/scratch/multirun/1</span>
+<span class="go">[2022-05-13 17:20:00,015][HYDRA]        #2 : +job_dir=/home/scratch/multirun/2</span>
+<span class="go">[2022-05-13 17:20:00,073][HYDRA]        #3 : +job_dir=/home/scratch/multirun/3</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">target_dir_multirun_overrides</span>
+<span class="go">{&#39;value&#39;: [-1.0, -1.0, 1.0, 1.0],</span>
+<span class="go"> &#39;scale&#39;: [11.0, 9.0, 11.0, 9.0]}</span>
+</pre></div>
+</div>
+</dd></dl>
+
 <p class="rubric">Methods</p>
 <table class="autosummary longtable table autosummary">
 <colgroup>
@@ -444,19 +636,31 @@ If <a class="reference external" href="https://docs.python.org/3/library/constan
 <tr class="row-odd"><td><p><a class="reference internal" href="#rai_toolbox.mushin.MultiRunMetricsWorkflow.__init__" title="rai_toolbox.mushin.MultiRunMetricsWorkflow.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>([eval_task_cfg, working_dir])</p></td>
 <td><p>Workflows and experiments using Hydra.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">task</span></code>(*args, **kwargs)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#rai_toolbox.mushin.MultiRunMetricsWorkflow.pre_task" title="rai_toolbox.mushin.MultiRunMetricsWorkflow.pre_task"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pre_task</span></code></a>(*args, **kwargs)</p></td>
+<td><p>Called prior to <a class="reference internal" href="#rai_toolbox.mushin.MultiRunMetricsWorkflow.task" title="rai_toolbox.mushin.MultiRunMetricsWorkflow.task"><code class="xref py py-obj docutils literal notranslate"><span class="pre">task</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#rai_toolbox.mushin.MultiRunMetricsWorkflow.task" title="rai_toolbox.mushin.MultiRunMetricsWorkflow.task"><code class="xref py py-obj docutils literal notranslate"><span class="pre">task</span></code></a>(*args, **kwargs)</p></td>
 <td><p>Abstract <a class="reference external" href="https://docs.python.org/3/library/functions.html#staticmethod" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">staticmethod</span></code></a> for users to define the task that is configured and launched by the workflow</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#rai_toolbox.mushin.MultiRunMetricsWorkflow.run" title="rai_toolbox.mushin.MultiRunMetricsWorkflow.run"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run</span></code></a>(*[, task_fn_wrapper, working_dir, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#rai_toolbox.mushin.MultiRunMetricsWorkflow.run" title="rai_toolbox.mushin.MultiRunMetricsWorkflow.run"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run</span></code></a>(*[, task_fn_wrapper, working_dir, ...])</p></td>
 <td><p>Run the experiment.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">metric_load_fn</span></code>(file_path)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#rai_toolbox.mushin.MultiRunMetricsWorkflow.metric_load_fn" title="rai_toolbox.mushin.MultiRunMetricsWorkflow.metric_load_fn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">metric_load_fn</span></code></a>(file_path)</p></td>
 <td><p>Loads a metric file and returns a dictionary of metric-name -&gt; metric-value mappings.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#rai_toolbox.mushin.MultiRunMetricsWorkflow.load_from_dir" title="rai_toolbox.mushin.MultiRunMetricsWorkflow.load_from_dir"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_from_dir</span></code></a>(working_dir, metrics_filename)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#rai_toolbox.mushin.MultiRunMetricsWorkflow.load_from_dir" title="rai_toolbox.mushin.MultiRunMetricsWorkflow.load_from_dir"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_from_dir</span></code></a>(working_dir, metrics_filename)</p></td>
 <td><p>Loading workflow job data from a given working directory.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_xarray</span></code>([...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#rai_toolbox.mushin.MultiRunMetricsWorkflow.load_metrics" title="rai_toolbox.mushin.MultiRunMetricsWorkflow.load_metrics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_metrics</span></code></a>(metrics_filename)</p></td>
+<td><p>Loads and aggregates across all multirun working dirs, and stores the metrics in <code class="xref py py-obj docutils literal notranslate"><span class="pre">self.metrics</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#rai_toolbox.mushin.MultiRunMetricsWorkflow.metric_load_fn" title="rai_toolbox.mushin.MultiRunMetricsWorkflow.metric_load_fn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">metric_load_fn</span></code></a>(file_path)</p></td>
+<td><p>Loads a metric file and returns a dictionary of metric-name -&gt; metric-value mappings.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#rai_toolbox.mushin.MultiRunMetricsWorkflow.target_dir_multirun_overrides" title="rai_toolbox.mushin.MultiRunMetricsWorkflow.target_dir_multirun_overrides"><code class="xref py py-obj docutils literal notranslate"><span class="pre">target_dir_multirun_overrides</span></code></a></p></td>
+<td><p>For a multirun that sweeps over the target directories of a previous multirun, <a class="reference internal" href="#rai_toolbox.mushin.MultiRunMetricsWorkflow.target_dir_multirun_overrides" title="rai_toolbox.mushin.MultiRunMetricsWorkflow.target_dir_multirun_overrides"><code class="xref py py-obj docutils literal notranslate"><span class="pre">target_dir_multirun_overrides</span></code></a> provides the flattened overrides for that previous run.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#rai_toolbox.mushin.MultiRunMetricsWorkflow.to_xarray" title="rai_toolbox.mushin.MultiRunMetricsWorkflow.to_xarray"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_xarray</span></code></a>([...])</p></td>
 <td><p>Convert workflow data to xarray Dataset.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">jobs_post_process</span></code>()</p></td>

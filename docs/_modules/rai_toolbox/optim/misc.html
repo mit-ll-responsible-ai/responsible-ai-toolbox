@@ -534,7 +534,11 @@
             <span class="n">_qhigh</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">q</span> <span class="o">+</span> <span class="n">dq</span><span class="p">)</span>
 
             <span class="n">q</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span>
-                <span class="p">(</span><span class="n">_qhigh</span> <span class="o">-</span> <span class="n">_qlow</span><span class="p">)</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">generator</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_generator</span><span class="p">)</span> <span class="o">+</span> <span class="n">_qlow</span>
+                <span class="p">(</span><span class="n">_qhigh</span> <span class="o">-</span> <span class="n">_qlow</span><span class="p">)</span>
+                <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span>
+                    <span class="mi">1</span><span class="p">,</span> <span class="n">generator</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_generator</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_generator</span><span class="o">.</span><span class="n">device</span>
+                <span class="p">)</span>
+                <span class="o">+</span> <span class="n">_qlow</span>
                 <span class="k">if</span> <span class="n">dq</span> <span class="ow">and</span> <span class="p">(</span><span class="n">_qlow</span> <span class="o">&lt;</span> <span class="n">q</span> <span class="ow">or</span> <span class="n">_qhigh</span> <span class="o">&gt;</span> <span class="n">q</span><span class="p">)</span>
                 <span class="k">else</span> <span class="n">q</span>
             <span class="p">)</span>
