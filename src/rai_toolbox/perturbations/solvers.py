@@ -75,13 +75,15 @@ def gradient_ascent(
     optimizer : Optimizer | Type[Optimizer] | Partial[Optimizer]
         The optimizer to use for updating the perturbation model.
 
-        If `optimizer` is uninstantiated, it will be instantiated as `optimizer(perturbation_model.parameters(), **optim_kwargs)`
+        If `optimizer` is uninstantiated, it will be instantiated as
+        `optimizer(perturbation_model.parameters(), **optim_kwargs)`
 
     steps : int
         Number of projected gradient steps.
 
     perturbation_model : PerturbationModel | Type[PerturbationModel], optional (default=AdditivePerturbation)
-        A `torch.nn.Module` whose parameters are updated by the solver. Its forward-pass applies the perturbation to the data. Default is
+        A `torch.nn.Module` whose parameters are updated by the solver. Its forward-pass
+        applies the perturbation to the data. Default is
         `AdditivePerturbation`, which simply adds the perturbation to the data.
 
         The perturbation model should not modify the data in-place.
@@ -126,7 +128,8 @@ def gradient_ascent(
 
     Notes
     -----
-    `model` is automatically set to eval-mode and its parameters are set to `requires_grad=False` within the context of this function.
+    `model` is automatically set to eval-mode and its parameters are set to
+    `requires_grad=False` within the context of this function.
 
     Examples
     --------
@@ -178,7 +181,8 @@ def gradient_ascent(
     **Accessing the perturbations**
 
     To gain direct access to the solved perturbations, we can provide our own
-    perturbation model to the solver. Let's solve the same optimization problem, but provide our own instance of `AdditivePerturbation`
+    perturbation model to the solver. Let's solve the same optimization problem, but
+    provide our own instance of `AdditivePerturbation`
 
     >>> from rai_toolbox.perturbations import AdditivePerturbation
     >>> pert_model = AdditivePerturbation(data_or_shape=(2,))

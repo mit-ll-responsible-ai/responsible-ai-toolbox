@@ -74,7 +74,7 @@ autosummary_generate = False
 # https://www.sphinx-doc.org/en/master/usage/extensions/extlinks.html
 # A dictionary of external sites
 #   alias ->  (base-URL, prefix)
-_repo = "https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox"
+_repo = "https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox/"
 extlinks = {
     "commit": (_repo + "commit/%s", "commit "),
     "gh-file": (_repo + "blob/master/%s", ""),
