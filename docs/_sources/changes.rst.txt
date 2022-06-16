@@ -8,6 +8,16 @@ Changelog
 This is a record of all past rAI-toolbox releases and what went into them, in reverse 
 chronological order. All previous releases should still be available on pip.
 
+.. _v0.2.1:
+
+------------------
+0.2.1 - 2022-06-16
+------------------
+
+This patch fixes the following bugs:
+- ``TopQGradient`` device mismatch with user-specified RNG (see :pull:`64`)
+- `MultiRunMetricsWorkflow.to_xarray` raises `ValueError` when `target_job_dirs` points to job that performed a multirun over sequence-type values (see :pull:`68`)
+
 .. _v0.2.0:
 
 ------------------

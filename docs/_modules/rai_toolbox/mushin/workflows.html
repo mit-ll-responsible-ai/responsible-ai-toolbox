@@ -1056,6 +1056,21 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span></div>
 
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_sanitize_coordinate_for_xarray</span><span class="p">(</span>
+        <span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">LoadedValue</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">LoadedValue</span><span class="p">]]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]]]:</span>
+        <span class="sd">&quot;&quot;&quot;Nested sequences are not permitted for xarray coordinates. This</span>
+<span class="sd">        Returns a list of scalars when `value` is a multi-run or a scalar.</span>
+
+<span class="sd">        Inner sequences are converted to strings&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">_non_str_sequence</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">multirun</span><span class="p">):</span>
+                <span class="n">_seq</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">LoadedValue</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+                <span class="k">return</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">_v</span><span class="p">)</span> <span class="k">if</span> <span class="n">_non_str_sequence</span><span class="p">(</span><span class="n">_v</span><span class="p">)</span> <span class="k">else</span> <span class="n">_v</span> <span class="k">for</span> <span class="n">_v</span> <span class="ow">in</span> <span class="n">_seq</span><span class="p">]</span>
+            <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">value</span>  <span class="c1"># type: ignore</span>
+
 <div class="viewcode-block" id="MultiRunMetricsWorkflow.to_xarray"><a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.MultiRunMetricsWorkflow.html#rai_toolbox.mushin.MultiRunMetricsWorkflow.to_xarray">[docs]</a>    <span class="k">def</span> <span class="nf">to_xarray</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">include_working_subdirs_as_data_var</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -1102,15 +1117,14 @@
 
         <span class="c1"># all overrides containing non-multirun lists must be converted to</span>
         <span class="c1"># strings so that xarray treats that list value as a &quot;scalar&quot;</span>
-        <span class="n">cast_overrides</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">multirun_task_overrides</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">_non_str_sequence</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
-                <span class="n">value</span> <span class="o">=</span> <span class="p">(</span>
-                    <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">_v</span><span class="p">)</span> <span class="k">if</span> <span class="n">_non_str_sequence</span><span class="p">(</span><span class="n">_v</span><span class="p">)</span> <span class="k">else</span> <span class="n">_v</span> <span class="k">for</span> <span class="n">_v</span> <span class="ow">in</span> <span class="n">value</span><span class="p">]</span>
-                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">multirun</span><span class="p">)</span>
-                    <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-                <span class="p">)</span>
-            <span class="n">cast_overrides</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="c1">#</span>
+        <span class="c1"># stores: override-name -&gt; value</span>
+        <span class="c1"># where value is either a scalar (i.e. int|float|bool|str) or a list of scalars</span>
+        <span class="c1"># A list of scalars indicates a multirun</span>
+        <span class="n">cast_overrides</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">k</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sanitize_coordinate_for_xarray</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">multirun_task_overrides</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">}</span>
 
         <span class="n">orig_coords</span> <span class="o">=</span> <span class="p">{</span>
             <span class="n">k</span><span class="p">:</span> <span class="p">(</span><span class="n">v</span> <span class="k">if</span> <span class="n">_non_str_sequence</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">else</span> <span class="p">[</span><span class="n">v</span><span class="p">])</span>
@@ -1182,9 +1196,15 @@
             <span class="n">coords</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_dir_multirun_overrides</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">exp_dir</span><span class="p">):</span>
-                    <span class="n">uv</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">v</span><span class="p">)))</span>
-                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">uv</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">non_multirun_params_as_singleton_dims</span><span class="p">:</span>
-                        <span class="n">coords</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_JOBDIR_NAME</span><span class="p">],</span> <span class="n">v</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="p">(</span>
+                        <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">v</span><span class="p">)))</span> <span class="o">&gt;</span> <span class="mi">1</span>
+                        <span class="ow">or</span> <span class="n">non_multirun_params_as_singleton_dims</span>
+                    <span class="p">):</span>
+
+                        <span class="n">coords</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_JOBDIR_NAME</span><span class="p">],</span>
+                            <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_sanitize_coordinate_for_xarray</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">v</span><span class="p">],</span>
+                        <span class="p">)</span>
             <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span></div></div>
 
