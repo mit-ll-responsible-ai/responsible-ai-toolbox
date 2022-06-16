@@ -15,6 +15,7 @@ chronological order. All previous releases should still be available on pip.
 ------------------
 
 This patch fixes the following bugs:
+
 - ``TopQGradient`` device mismatch with user-specified RNG (see :pull:`64`)
 - `MultiRunMetricsWorkflow.to_xarray` raises `ValueError` when `target_job_dirs` points to job that performed a multirun over sequence-type values (see :pull:`68`)
 
