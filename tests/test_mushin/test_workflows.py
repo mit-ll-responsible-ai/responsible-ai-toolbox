@@ -658,3 +658,29 @@ def test_custom_metric_load_fn():
     wf.run(a=multirun([1, 2, 3]), b=False)
     wf.load_metrics("metrics.pkl")
     assert wf.metrics == dict(a=[[1] * 2, [2] * 2, [3] * 2], b=[False] * 3)
+
+
+@pytest.mark.usefixtures("cleandir")
+def test_regression_68():
+    # https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox/pull/68
+    class Blank(MultiRunMetricsWorkflow):
+        @staticmethod
+        def task():
+            pass
+
+    wf1 = Blank()
+    wf1.run(
+        list_vals=multirun([[0, 1], [2, 3]]),  # note: multi-run over list-values
+        working_dir="first",
+    )
+
+    wf2 = Blank()
+    wf2.run(
+        target_job_dirs=wf1.multirun_working_dirs,
+        val=multirun([1, 2]),
+        working_dir="second",
+    )
+
+    xr1_coords = wf1.to_xarray().list_vals.data
+    xr2_coords = wf2.to_xarray().list_vals.data
+    assert np.all(xr1_coords == xr2_coords)
