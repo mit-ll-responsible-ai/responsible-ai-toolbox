@@ -881,6 +881,21 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
 
         return self.metrics
 
+    @staticmethod
+    def _sanitize_coordinate_for_xarray(
+        value: Union[LoadedValue, Sequence[LoadedValue]]
+    ) -> Union[str, int, float, bool, List[Union[str, int, float, bool]]]:
+        """Nested sequences are not permitted for xarray coordinates. This
+        Returns a list of scalars when `value` is a multi-run or a scalar.
+
+        Inner sequences are converted to strings"""
+        if _non_str_sequence(value):
+            if isinstance(value, multirun):
+                _seq: Sequence[LoadedValue] = value
+                return [str(_v) if _non_str_sequence(_v) else _v for _v in _seq]
+            return str(value)
+        return value  # type: ignore
+
     def to_xarray(
         self,
         include_working_subdirs_as_data_var: bool = False,
@@ -927,15 +942,14 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
 
         # all overrides containing non-multirun lists must be converted to
         # strings so that xarray treats that list value as a "scalar"
-        cast_overrides = {}
-        for k, value in self.multirun_task_overrides.items():
-            if _non_str_sequence(value):
-                value = (
-                    [str(_v) if _non_str_sequence(_v) else _v for _v in value]
-                    if isinstance(value, multirun)
-                    else str(value)
-                )
-            cast_overrides[k] = value
+        #
+        # stores: override-name -> value
+        # where value is either a scalar (i.e. int|float|bool|str) or a list of scalars
+        # A list of scalars indicates a multirun
+        cast_overrides = {
+            k: self._sanitize_coordinate_for_xarray(value)
+            for k, value in self.multirun_task_overrides.items()
+        }
 
         orig_coords = {
             k: (v if _non_str_sequence(v) else [v])
@@ -1007,9 +1021,15 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
             coords = {}
             for k, v in self.target_dir_multirun_overrides.items():
                 if len(v) == len(exp_dir):
-                    uv = list(set(np.unique(v)))
-                    if len(uv) > 1 or non_multirun_params_as_singleton_dims:
-                        coords[k] = ([self._JOBDIR_NAME], v)
+                    if (
+                        len(set(np.unique(v))) > 1
+                        or non_multirun_params_as_singleton_dims
+                    ):
+
+                        coords[k] = (
+                            [self._JOBDIR_NAME],
+                            [self._sanitize_coordinate_for_xarray(item) for item in v],
+                        )
             out = out.assign_coords(coords)
         return out
 

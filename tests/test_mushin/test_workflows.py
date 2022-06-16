@@ -387,7 +387,12 @@ def test_multirun_over_jobdir(load_from_working_dir):
     # a multirun over the resulting folders, loading in
     # their metrics and re-returning them
     wf = FirstMultiRun()
-    wf.run(epsilon=multirun([1.0, 2.0, 3.0]), acc=multirun([1, 2]), working_dir="first")
+    wf.run(
+        epsilon=multirun([1.0, 2.0, 3.0]),
+        acc=multirun([1, 2]),
+        list_vals=multirun([[0, 1]]),  # ensure that multiruns over lists work
+        working_dir="first",
+    )
 
     snd_wf = ScndMultiRun()
     # runs over a total of epsilon-3 x acc-2 -> 6 job-dirs and 2 val
@@ -404,6 +409,7 @@ def test_multirun_over_jobdir(load_from_working_dir):
     assert snd_wf.target_dir_multirun_overrides == {
         "acc": [1, 1, 1, 2, 2, 2],
         "epsilon": [1.0, 2.0, 3.0, 1.0, 2.0, 3.0],
+        "list_vals": [[0, 1]] * 6,
     }
     xr1 = wf.to_xarray()
     xr2 = snd_wf.to_xarray()
@@ -411,16 +417,22 @@ def test_multirun_over_jobdir(load_from_working_dir):
     assert xr1.dims == {"acc": 2, "epsilon": 3, "images_dim0": 4, "images_dim1": 1}
     assert xr2.dims == {"val": 2, "job_dir": 6, "images_dim0": 4, "images_dim1": 1}
 
-    xr2 = xr2.set_index(job_dir=["epsilon", "acc"]).unstack("job_dir")
-    xr2 = xr2.transpose("val", "acc", "epsilon", "images_dim0", "images_dim1")
+    xr2 = xr2.set_index(job_dir=["epsilon", "acc", "list_vals"]).unstack("job_dir")
+    xr2 = xr2.transpose(
+        "list_vals", "val", "acc", "epsilon", "images_dim0", "images_dim1"
+    )
 
     assert_identical(xr1.epsilon, xr2.epsilon)
     assert_identical(xr1.acc, xr2.acc)
 
-    assert_duckarray_equal(xr1.images, xr2.images.sel(val=1))
-    assert_duckarray_equal(2 * xr1.images, xr2.images.sel(val=2))
-    assert_duckarray_equal(xr1.accuracies, xr2.accuracies.sel(val=1))
-    assert_duckarray_equal(2 * xr1.accuracies, xr2.accuracies.sel(val=2))
+    assert_duckarray_equal(xr1.images, xr2.images.sel(val=1, list_vals="[0, 1]"))
+    assert_duckarray_equal(2 * xr1.images, xr2.images.sel(val=2, list_vals="[0, 1]"))
+    assert_duckarray_equal(
+        xr1.accuracies, xr2.accuracies.sel(val=1, list_vals="[0, 1]")
+    )
+    assert_duckarray_equal(
+        2 * xr1.accuracies, xr2.accuracies.sel(val=2, list_vals="[0, 1]")
+    )
 
 
 class NoMetrics(MultiRunMetricsWorkflow):
@@ -646,3 +658,29 @@ def test_custom_metric_load_fn():
     wf.run(a=multirun([1, 2, 3]), b=False)
     wf.load_metrics("metrics.pkl")
     assert wf.metrics == dict(a=[[1] * 2, [2] * 2, [3] * 2], b=[False] * 3)
+
+
+@pytest.mark.usefixtures("cleandir")
+def test_regression_68():
+    # https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox/pull/68
+    class Blank(MultiRunMetricsWorkflow):
+        @staticmethod
+        def task():
+            pass
+
+    wf1 = Blank()
+    wf1.run(
+        list_vals=multirun([[0, 1], [2, 3]]),  # note: multi-run over list-values
+        working_dir="first",
+    )
+
+    wf2 = Blank()
+    wf2.run(
+        target_job_dirs=wf1.multirun_working_dirs,
+        val=multirun([1, 2]),
+        working_dir="second",
+    )
+
+    xr1_coords = wf1.to_xarray().list_vals.data
+    xr2_coords = wf2.to_xarray().list_vals.data
+    assert np.all(xr1_coords == xr2_coords)
