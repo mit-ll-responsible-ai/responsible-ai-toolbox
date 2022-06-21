@@ -23,6 +23,8 @@ def load_model(
         "mitll_imagenet_l2_3_0.pt",
     ]
 ):
+    # TODO: Add docs
+
     # TODO: which architecture is correct for mitll_restricted_imagenet_l2_3_0?
 
     import torch
@@ -47,6 +49,9 @@ def load_model(
         ckpt=_pre_trained_manager.fetch(name),
         weights_key="state_dict",
     )
+
+    # TODO: is this normalization appropriate only for cifar10?
+
     # Transform to normalize the data samples by the mean and standard deviation
     normalizer = torchvision.transforms.transforms.Normalize(
         mean=[0.4914, 0.4822, 0.4465],
