@@ -46,10 +46,10 @@ def load_model(
     -----
     Descriptions of models:
 
-       - `mitll_cifar_nat.pt`: This is a ResNet-50 model trained on CIFAR 10 using standard training with no adversarial perturbations in the loop (i.e., :math:`\epsilon=0`)
-       - `mitll_cifar_l2_1_0.pt`: A ResNet-50 model trained on CIFAR 10 with perturbations generated via PGD using perturbations constrained to :math:`L^2`-ball of radius :math:`\epsilon=1.0`
-       -  `mitll_imagenet_l2_3_0`: This is a ResNet-50 model trained on ImageNet with PGD using :math:`\epsilon=3.0`
-       -  `mitll_restricted_imagenet_l2_3_0`: This is a ResNet-50 model trained on restricted ImageNet [2]_ with PGD using :math:`\epsilon=3.0`
+    - `mitll_cifar_nat.pt`: This is a ResNet-50 model trained on CIFAR 10 using standard training with no adversarial perturbations in the loop (i.e., :math:`\epsilon=0`)
+    - `mitll_cifar_l2_1_0.pt`: A ResNet-50 model trained on CIFAR 10 with perturbations generated via PGD using perturbations constrained to :math:`L^2`-ball of radius :math:`\epsilon=1.0`
+    -  `mitll_imagenet_l2_3_0`: This is a ResNet-50 model trained on ImageNet with PGD using :math:`\epsilon=3.0`
+    -  `mitll_restricted_imagenet_l2_3_0`: This is a ResNet-50 model trained on restricted ImageNet [2]_ with PGD using :math:`\epsilon=3.0`
 
     References
     ----------
