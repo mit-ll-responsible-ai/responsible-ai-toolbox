@@ -59,6 +59,7 @@ def load_model(
 
     import torch
     from torchvision import transforms
+    from torchvision.models import resnet50 as torchvision_resnet50
 
     from rai_toolbox.mushin._utils import load_from_checkpoint
 
@@ -74,6 +75,7 @@ def load_model(
     elif model_name in {
         "mitll_imagenet_l2_3_0.pt",
         "mitll_restricted_imagenet_l2_3_0.pt",
+        "imagenet_nat.pt",
     }:
 
         model = partial(resnet50, num_classes=9 if "restricted" in model_name else 1000)
@@ -86,11 +88,14 @@ def load_model(
             f"Unknown model name: {model_name}\nAvailable models: {', '.join(_pre_trained_manager.registry_files)}"
         )
 
-    base_model = load_from_checkpoint(
-        model=model(),
-        ckpt=_pre_trained_manager.fetch(model_name),
-        weights_key="state_dict",
-    )
+    if model_name == "imagenet_nat.pt":
+        base_model = torchvision_resnet50(pretrained=True)
+    else:
+        base_model = load_from_checkpoint(
+            model=model(),
+            ckpt=_pre_trained_manager.fetch(model_name),
+            weights_key="state_dict",
+        )
 
     model = torch.nn.Sequential(norm, base_model)
     return model
