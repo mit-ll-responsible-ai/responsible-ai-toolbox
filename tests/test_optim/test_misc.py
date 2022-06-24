@@ -1,10 +1,11 @@
 # Copyright 2022, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
-
+from functools import partial
 from typing import Optional
 
 import hypothesis.strategies as st
+import pytest
 import torch as tr
 from hypothesis import assume, given, note
 from torch.testing import assert_allclose
@@ -14,6 +15,11 @@ from rai_toolbox.optim import (
     ClampedParameterOptimizer,
     TopQGradientOptimizer,
 )
+
+avail_devices = ["cpu"]
+
+if tr.cuda.is_available():
+    avail_devices.append("cuda:0")
 
 
 @given(
@@ -82,3 +88,35 @@ def test_top_q_grad(q):
     note(f"x.grad: {x.grad}")
     note(f"expected: {expected}")
     assert_allclose(x.grad, expected)
+
+
+@pytest.mark.parametrize("generator_device", avail_devices)
+def test_top_q_grad_generator(generator_device):
+
+    seed = 15873642
+    Optim = partial(
+        TopQGradientOptimizer,
+        q=0.5,
+        dq=1.0,
+        lr=1.0,
+        param_ndim=None,
+    )
+
+    def get_grad(seed=None) -> tr.Tensor:
+        generator = tr.Generator(device=generator_device)
+        if seed is not None:
+            generator.manual_seed(seed)
+
+        x = tr.ones((2000,), requires_grad=True)
+        optim = Optim(params=[x], generator=generator)
+        (x * 1).sum().backward()
+        optim.step()
+        assert isinstance(x.grad, tr.Tensor)
+        return x.grad
+
+    seeded_grad0 = get_grad(seed=seed)
+    seeded_grad1 = get_grad(seed=seed)
+    unseeded_grad = get_grad(seed=0)
+
+    assert_allclose(seeded_grad0, seeded_grad1)
+    assert tr.any(~tr.isclose(seeded_grad0, unseeded_grad))
