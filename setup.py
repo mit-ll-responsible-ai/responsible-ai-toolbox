@@ -79,7 +79,6 @@ setup(
             "hydra-zen >= 0.7.0",
             "xarray >= 0.19.0",
             "matplotlib >= 3.3",
-            "pooch >= 1.6.0",
             "protobuf <= 3.20.1",  # strict TODO: Remove after tensorboard gets compatible https://github.com/tensorflow/tensorboard/issues/5708
         ],
     },
