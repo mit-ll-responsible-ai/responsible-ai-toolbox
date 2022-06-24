@@ -14,6 +14,7 @@ INSTALL_REQUIRES = [
 
 setup(
     name="rai_experiments",
+    version="0.1.0",  # Make sure this matches `rai_experiments.__version__`!
     install_requires=INSTALL_REQUIRES,
     python_requires=">=3.7",
     packages=find_packages(where="src", exclude=["tests", "tests.*"]),
