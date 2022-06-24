@@ -23,7 +23,7 @@ def show_image_row(
     xlist: Tensor,
     ylist: Optional[List[str]] = None,
     fontsize: int = 12,
-    size: Tuple[int, int] = (2.5, 2.5),
+    size: Tuple[float, float] = (2.5, 2.5),
     tlist: Optional[List[str]] = None,
     filename: Optional[str] = None,
 ):
