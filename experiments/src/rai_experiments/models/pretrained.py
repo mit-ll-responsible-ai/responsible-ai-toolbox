@@ -92,7 +92,7 @@ def load_model(
         )
     else:
         raise ValueError(
-            f"Unknown model name: {model_name}\nAvailable models: {', '.join(_pre_trained_manager.registry_files)}"
+            f"Unknown model name: {model_name}\nAvailable models: {', '.join(_pre_trained_manager.registry_files + ['imagenet_nat.pt'])}"
         )
 
     if model_name == "imagenet_nat.pt":
