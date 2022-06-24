@@ -24,6 +24,7 @@ def load_model(
         "mitll_cifar_nat.pt",
         "mitll_imagenet_l2_3_0.pt",
         "mitll_restricted_imagenet_l2_3_0.pt",
+        "imagenet_nat.pt",
     ]
 ):
     r"""
@@ -35,7 +36,13 @@ def load_model(
 
     Parameters
     ----------
-    model_name: Literal["mitll_cifar_l2_1_0.pt", "mitll_cifar_nat.pt", "mitll_imagenet_l2_3_0.pt", "mitll_restricted_imagenet_l2_3_0.pt"]
+    model_name: str
+        Supported models
+           - mitll_cifar_l2_1_0.pt
+           - mitll_cifar_nat.pt
+           - mitll_imagenet_l2_3_0.pt
+           - mitll_restricted_imagenet_l2_3_0.pt
+           - imagenet_nat.p
 
     Returns
     -------
