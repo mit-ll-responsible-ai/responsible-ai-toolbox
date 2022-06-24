@@ -208,9 +208,7 @@ class MNISTC(VisionDataset):
         """
         img, target = self.data[index], self.targets[index]
 
-        # doing this so that it is consistent with all other datasets
-        # to return a PIL Image -- need to drop last dimension to
-        # properly import using PIL
+        # returns a PIL image by default unless transform specifies
         img = Image.fromarray(img[:, :, 0])
 
         if self.transform is not None:
