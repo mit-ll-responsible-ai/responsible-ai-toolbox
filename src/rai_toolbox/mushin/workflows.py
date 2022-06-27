@@ -305,7 +305,7 @@ class BaseWorkflow:
     ):
         """Run the experiment.
 
-        Individual workflows can expclitly define `workflow_overrides` to improve
+        Individual workflows can explicitly define `workflow_overrides` to improve
         readability and undstanding of what parameters are expected for a particular
         workflow.
 
