@@ -1,23 +1,41 @@
+# rai-experiments
+
 This directory contains experiments and analyses that leverage the capabilities of the rai-toolbox.
 
 Each entry in `experiments/` is an independent "project" that reproduces certain research results, or
 that demonstrates particular features of the toolbox in an applied setting.
 
-Before running any of these experiments, you need to install the `rai-experiments` package, which contains
-various bespoke utilities that are required by the experiments. To install this, navigate to the `experiments/`
-directory and run:
 
-```shell
-pip install .
+## Installing rai-experiments utilities
+
+`rai-experiments` is also a pip-installable package that includes utilities that are leveraged by `rai-toolbox`'s tutorials and docs.
+Install these via:
+
+```console
+$ pip install rai-experiments
 ```
 
-Now you will be able to import from `rai_experiments` in your Python environment. You only need to perform
-this one time for any given Python environment.
+## Running experiment notebooks
+
+Follow the above installation instructions, then clone this repo and navigate to the navigate to the `experiments/` directory.
 
 Some of the experiments contain Jupyter notebooks (`.ipynb` files). In order to open and run these, you must [install
 either jupyterlab or the "classic" jupyter notebook](https://jupyter.org/install).
 
-## Disclaimer
+
+# For Maintainers
+
+To publish a new version of `rai-experiments` do the following:
+
+1. Update `__version__` in `experiments/src/rai_experiments/__init__.py`
+2. Open a PR into the branch `rai-exps-publish`
+3. Review and merge.
+
+It is recommended that you first do this complete this process for a release candidate. E.g. 
+
+This will automatically trigger GitHub Actions, which will publish this new version to PyPI.
+
+# Disclaimer
 
 DISTRIBUTION STATEMENT A. Approved for public release. Distribution is unlimited.
 
