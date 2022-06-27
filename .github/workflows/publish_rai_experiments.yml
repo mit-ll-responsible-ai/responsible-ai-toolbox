@@ -1,0 +1,29 @@
+name: Upload rai-experiments to PyPI
+
+on:
+  push:
+    branches:
+      - rai-exps-publish
+jobs:
+  deploy:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: '3.x'
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install setuptools wheel twine
+    - name: Build and publish
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.RAI_EXPS_PYPI_TOKEN }}
+      run: |
+        cd experiments/
+        python setup.py sdist bdist_wheel
+        twine upload dist/*

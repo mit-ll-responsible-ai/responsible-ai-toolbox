@@ -27,9 +27,8 @@ on in production. Use at your own risk!
 
 **Installation**
 
-```console
-$ pip install rai-experiments"
-```
+pip install rai-experiments
+
 """
 
 AUTHOR = "Olivia Brown, Justin Goodwin, Ryan Soklaski, Michael Yee"
