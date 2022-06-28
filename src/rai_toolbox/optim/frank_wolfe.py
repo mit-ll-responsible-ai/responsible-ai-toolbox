@@ -387,16 +387,15 @@ class L2FrankWolfe(L2NormedGradientOptim):
     r"""A Frank-Wolfe [1]_ optimizer that constrains each updated parameter to fall
     within an :math:`\epsilon`-sized ball in :math:`L^2` space, centered on the origin.
 
+
+    This parameter-transforming optimizer is useful for producing error counter
+    factuals and performing visual concept probing [2]_.
+
     Notes
     -----
     The method `L2NormedGradientOptim._pre_step_transform_` is responsible for
     computing the *negative* linear minimization oracle for a parameter and storing it
     on `param.grad`.
-
-    Notes
-    -----
-    This parameter-transforming optimizer is useful for producing error counter
-    factuals and performing visual concept probing [2]_.
 
     See Also
     --------
