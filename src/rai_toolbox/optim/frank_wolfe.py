@@ -147,9 +147,7 @@ class L1qFrankWolfe(L1qNormedGradientOptim):
     References
     ----------
     .. [1] https://en.wikipedia.org/wiki/Frank%E2%80%93Wolfe_algorithm#Algorithm
-    .. [2] Roberts, Jay, and Theodoros Tsiligkaridis. "Controllably Sparse
-       Perturbations of Robust Classifiers for Explaining Predictions and Probing
-       Learned Concepts." (2021).
+    .. [2] Roberts, Jay, and Theodoros Tsiligkaridis. Controllably Sparse Perturbations of Robust Classifiers for Explaining Predictions and Probing Learned Concepts. (2021).
     """
 
     def __init__(
@@ -410,9 +408,7 @@ class L2FrankWolfe(L2NormedGradientOptim):
     References
     ----------
     .. [1] https://en.wikipedia.org/wiki/Frank%E2%80%93Wolfe_algorithm#Algorithm
-    .. [2] Roberts, Jay, and Theodoros Tsiligkaridis. "Controllably Sparse
-       Perturbations of Robust Classifiers for Explaining Predictions and Probing
-       Learned Concepts." (2021).
+    .. [2] Roberts, Jay, and Theodoros Tsiligkaridis. Controllably Sparse Perturbations of Robust Classifiers for Explaining Predictions and Probing Learned Concepts. (2021).
     """
 
     def __init__(
