@@ -332,7 +332,7 @@ composed augmentations, where the composition depth is determined by <code class
 <li><p>m ~ Beta</p></li>
 <li><p>[w1, …, wN] ~ Dirichlet</p></li>
 </ul>
-<p>Random values are drawn via NumPy’s global random number generator. Thus <a class="reference external" href="https://numpy.org/doc/stable/reference/random/generated/numpy.random.seed.html#numpy.random.seed" title="(in NumPy v1.22)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy.random.seed</span></code></a>
+<p>Random values are drawn via NumPy’s global random number generator. Thus <a class="reference external" href="https://numpy.org/doc/stable/reference/random/generated/numpy.random.seed.html#numpy.random.seed" title="(in NumPy v1.23)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy.random.seed</span></code></a>
 must be set in order to obtain reproducible results. Note that, until
 PyTorch 1.9.0, there was an issue with using NumPy’s global RNG in conjunction with
 DataLoaders that used multiple workers, where identical seeds were being used

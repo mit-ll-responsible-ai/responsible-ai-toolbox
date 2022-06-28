@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 <meta content="Using the responsible AI toolbox to probe concepts for a PyTorch model." name="description" />
 
-    <title>Concept Probing &#8212; rai-toolbox  documentation</title>
+    <title>Concept Probing Using Sparse Perturbations &#8212; rai-toolbox  documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -166,7 +166,7 @@
  </li>
  <li class="toctree-l1 current active">
   <a class="current reference internal" href="#">
-   Concept Probing
+   Concept Probing Using Sparse Perturbations
   </a>
  </li>
  <li class="toctree-l1">
@@ -487,33 +487,31 @@ div.rendered_html tbody tr:hover {
 <div class="line">SPDX-License-Identifier: MIT</div>
 </div>
 </div></blockquote>
-<section id="Concept-Probing">
-<h1>Concept Probing<a class="headerlink" href="#Concept-Probing" title="Permalink to this headline">#</a></h1>
-<p>This notebook demonstrates how the <a class="reference external" href="https://mit-ll-responsible-ai.github.io/responsible-ai-toolbox/generated/rai_toolbox.perturbations.gradient_ascent.html#rai_toolbox.perturbations.gradient_ascent">gradient_ascent</a> function from the previous tutorial can be repurposed with a different optimizer (<a class="reference external" href="https://mit-ll-responsible-ai.github.io/responsible-ai-toolbox/generated/rai_toolbox.optim.L1qFrankWolfe.html">L1qFrankWolfe</a>) to execute a task called concept probing.</p>
+<section id="Concept-Probing-Using-Sparse-Perturbations">
+<h1>Concept Probing Using Sparse Perturbations<a class="headerlink" href="#Concept-Probing-Using-Sparse-Perturbations" title="Permalink to this headline">#</a></h1>
+<p>This notebook demonstrates how the <a class="reference external" href="https://mit-ll-responsible-ai.github.io/responsible-ai-toolbox/generated/rai_toolbox.perturbations.gradient_ascent.html#rai_toolbox.perturbations.gradient_ascent">gradient_ascent</a> function from the previous tutorial can be repurposed with a different optimizer (<a class="reference external" href="https://mit-ll-responsible-ai.github.io/responsible-ai-toolbox/generated/rai_toolbox.optim.L1qFrankWolfe.html">L1qFrankWolfe</a>) to execute a task called concept probing. This method of concept
+probing was first reported in the paper <a class="reference external" href="https://diglib.eg.org/bitstream/handle/10.2312/mlvis20211072/001-005.pdf?sequence=1&amp;isAllowed=y">Controllably Sparse Perturbations of Robust Classifiers for Explaining Predictions and Probing Learned Concepts</a>.</p>
 <p>If you haven’t already, follow the steps at the beginning of the previous tutorial to install the rAI-toolbox and create a Jupyter notebook called <code class="docutils literal notranslate"><span class="pre">ImageNet-Concept-Probing.ipynb</span></code>. You can then follow along with this tutorial by copying, pasting, and running the code blocks below in the cells of your notebook.</p>
 <section id="Boilerplate-setup">
 <h2>Boilerplate setup<a class="headerlink" href="#Boilerplate-setup" title="Permalink to this headline">#</a></h2>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">torchvision</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
-<span class="kn">from</span> <span class="nn">rai_toolbox.mushin</span> <span class="kn">import</span> <span class="n">load_from_checkpoint</span>
 <span class="kn">from</span> <span class="nn">rai_toolbox.optim</span> <span class="kn">import</span> <span class="n">L1qFrankWolfe</span>
 <span class="kn">from</span> <span class="nn">rai_toolbox.perturbations</span> <span class="kn">import</span> <span class="n">gradient_ascent</span>
 
-<span class="kn">from</span> <span class="nn">rai_experiments.models</span> <span class="kn">import</span> <span class="n">resnet</span>
 <span class="kn">from</span> <span class="nn">rai_experiments.utils.imagenet_labels</span> <span class="kn">import</span> <span class="n">IMAGENET_LABELS</span>
 </pre></div>
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># CPU or GPU</span>
@@ -538,34 +536,19 @@ cuda:0
 <li><p><code class="docutils literal notranslate"><span class="pre">mitll_imagenet_l2_3_0.pt</span></code>: ResNet-50 model trained with perturbations generated via PGD using the <span class="math notranslate nohighlight">\(L^2\)</span>-norm with <span class="math notranslate nohighlight">\(\epsilon=3.0\)</span></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">imagenet_nat.pt</span></code>: ResNet-50 model trained using standard training, i.e., <span class="math notranslate nohighlight">\(\epsilon=0\)</span></p></li>
 </ul>
+<p><code class="docutils literal notranslate"><span class="pre">rai_experiments.models.pretrained.load_model</span></code> will automatically download and cache pre-trained weights for these models.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Transform to normalize the data samples by the mean and standard deviation</span>
-<span class="n">normalizer</span> <span class="o">=</span> <span class="n">torchvision</span><span class="o">.</span><span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span>
-    <span class="n">mean</span><span class="o">=</span><span class="p">[</span><span class="mf">0.485</span><span class="p">,</span> <span class="mf">0.456</span><span class="p">,</span> <span class="mf">0.406</span><span class="p">],</span>
-    <span class="n">std</span><span class="o">=</span><span class="p">[</span><span class="mf">0.229</span><span class="p">,</span> <span class="mf">0.224</span><span class="p">,</span> <span class="mf">0.225</span><span class="p">]</span>
-<span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rai_experiments.models.pretrained</span> <span class="kn">import</span> <span class="n">load_model</span>
 
 <span class="c1"># Load the robust model</span>
-<span class="n">checkpoint_robust</span> <span class="o">=</span> <span class="s2">&quot;mitll_imagenet_l2_3_0.pt&quot;</span>
-<span class="n">resnet_model_robust</span> <span class="o">=</span> <span class="n">load_from_checkpoint</span><span class="p">(</span>
-    <span class="n">model</span><span class="o">=</span><span class="n">resnet</span><span class="o">.</span><span class="n">resnet50</span><span class="p">(</span><span class="n">num_classes</span><span class="o">=</span><span class="mi">1000</span><span class="p">),</span>
-    <span class="n">ckpt</span><span class="o">=</span><span class="n">checkpoint_robust</span><span class="p">,</span>
-    <span class="n">weights_key</span><span class="o">=</span><span class="s2">&quot;state_dict&quot;</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="n">model_robust</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span><span class="n">normalizer</span><span class="p">,</span> <span class="n">resnet_model_robust</span><span class="p">)</span>
+<span class="n">model_robust</span> <span class="o">=</span> <span class="n">load_model</span><span class="p">(</span><span class="s2">&quot;mitll_imagenet_l2_3_0.pt&quot;</span><span class="p">)</span>
 <span class="n">model_robust</span><span class="o">.</span><span class="n">eval</span><span class="p">();</span>
 
 <span class="c1"># Load the standard model</span>
-<span class="n">checkpoint_standard</span> <span class="o">=</span> <span class="s2">&quot;imagenet_nat.pt&quot;</span>
-<span class="n">resnet_model_standard</span> <span class="o">=</span> <span class="n">load_from_checkpoint</span><span class="p">(</span>
-    <span class="n">model</span><span class="o">=</span><span class="n">resnet</span><span class="o">.</span><span class="n">resnet50</span><span class="p">(</span><span class="n">num_classes</span><span class="o">=</span><span class="mi">1000</span><span class="p">),</span>
-    <span class="n">ckpt</span><span class="o">=</span><span class="n">checkpoint_standard</span><span class="p">,</span>
-    <span class="n">weights_key</span><span class="o">=</span><span class="s2">&quot;model&quot;</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="n">model_standard</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span><span class="n">normalizer</span><span class="p">,</span> <span class="n">resnet_model_standard</span><span class="p">)</span>
+<span class="n">model_standard</span> <span class="o">=</span> <span class="n">load_model</span><span class="p">(</span><span class="s2">&quot;imagenet_nat.pt&quot;</span><span class="p">)</span>
 <span class="n">model_standard</span><span class="o">.</span><span class="n">eval</span><span class="p">();</span>
 </pre></div>
 </div>
@@ -577,7 +560,7 @@ cuda:0
 <p>Following the approach proposed by the authors of <a class="reference external" href="https://diglib.eg.org/bitstream/handle/10.2312/mlvis20211072/001-005.pdf?sequence=1&amp;isAllowed=y">this paper</a>, we utilize the <span class="math notranslate nohighlight">\(L^{1-q}\)</span> Frank-Wolfe optimizer to solve for sparse perturbations that are more interpretable by humans.</p>
 <p>We will use <code class="docutils literal notranslate"><span class="pre">functools.partial</span></code> to set default values for <code class="docutils literal notranslate"><span class="pre">gradient_ascent</span></code>, so that they can be used consistently across our two models. Note that <a class="reference external" href="https://mit-ll-responsible-ai.github.io/responsible-ai-toolbox/generated/rai_toolbox.perturbations.AdditivePerturbation.html#rai_toolbox.perturbations.AdditivePerturbation">AdditivePerturbation</a> is the default <code class="docutils literal notranslate"><span class="pre">perturbation_model</span></code> for <code class="docutils literal notranslate"><span class="pre">gradient_ascent</span></code>, so we don’t need to define it explicitly.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define solver for concept probing example:</span>
@@ -599,7 +582,7 @@ cuda:0
 </div>
 <p>Define three concepts to be probed (e.g., target classes), a random noise image to start with, and a function for probing those three concepts for a given model:</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Concepts to be probed</span>
@@ -635,7 +618,7 @@ cuda:0
 </div>
 <p>Run for standard and robust models and plot (first row is initial noise image, second row is the probed concept):</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Standard</span>
@@ -651,7 +634,7 @@ cuda:0
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Robust</span>
