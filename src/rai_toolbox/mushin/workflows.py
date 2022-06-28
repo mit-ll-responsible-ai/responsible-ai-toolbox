@@ -826,7 +826,7 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
             If `None`, the metrics stored in `self.metrics` is used.
 
         Returns
-        ------
+        -------
         metrics : Dict[str, List[Any]]
 
         Examples
