@@ -1,9 +1,22 @@
 from functools import partial
 
 import pooch
-from typing_extensions import Literal
+from typing_extensions import Literal, TypeAlias
 
-__all__ = ["load_model"]
+try:
+    import tqdm
+except ImportError:
+    tqdm = None
+
+__all__ = ["load_model", "get_path_to_checkpoint"]
+
+_MODEL_NAMES: TypeAlias = Literal[
+    "mitll_cifar_l2_1_0.pt",
+    "mitll_cifar_nat.pt",
+    "mitll_imagenet_l2_3_0.pt",
+    "mitll_restricted_imagenet_l2_3_0.pt",
+    "imagenet_nat.pt",
+]
 
 
 _pre_trained_manager = pooch.create(
@@ -18,15 +31,47 @@ _pre_trained_manager = pooch.create(
 )
 
 
-def load_model(
-    model_name: Literal[
-        "mitll_cifar_l2_1_0.pt",
-        "mitll_cifar_nat.pt",
-        "mitll_imagenet_l2_3_0.pt",
-        "mitll_restricted_imagenet_l2_3_0.pt",
-        "imagenet_nat.pt",
-    ]
-):
+def get_path_to_checkpoint(model_name: _MODEL_NAMES) -> str:
+    r"""
+    Returns path to pre-trained model weights. This function takes care of downloading
+    and caching weights.
+
+    All model weights were provided by Madry Lab [1]_. We converted these weights to a
+    format that does not require extraneous dependencies, such as `dill`, to load.
+
+    Parameters
+    ----------
+    model_name: str
+        Supported models
+           - mitll_cifar_l2_1_0.pt
+           - mitll_cifar_nat.pt
+           - mitll_imagenet_l2_3_0.pt
+           - mitll_restricted_imagenet_l2_3_0.pt
+           - imagenet_nat.p
+
+    Returns
+    -------
+    str
+
+    Notes
+    -----
+    Descriptions of models:
+
+    - `mitll_cifar_nat.pt`: This is a ResNet-50 model trained on CIFAR 10 using standard training with no adversarial perturbations in the loop (i.e., :math:`\epsilon=0`)
+    - `mitll_cifar_l2_1_0.pt`: A ResNet-50 model trained on CIFAR 10 with perturbations generated via PGD using perturbations constrained to :math:`L^2`-ball of radius :math:`\epsilon=1.0`
+    -  `mitll_imagenet_l2_3_0`: This is a ResNet-50 model trained on ImageNet with PGD using :math:`\epsilon=3.0`
+    -  `mitll_restricted_imagenet_l2_3_0`: This is a ResNet-50 model trained on restricted ImageNet [2]_ with PGD using :math:`\epsilon=3.0`
+
+    References
+    ----------
+    .. [1] https://github.com/MadryLab/robustness
+    .. [2] https://github.com/MadryLab/robust_representations
+    """
+
+    return _pre_trained_manager.fetch(model_name, progressbar=(tqdm is not None))
+
+
+def load_model(model_name: _MODEL_NAMES):
     r"""
     Loads pre-trained model weights. This function takes care of downloading and caching
     weights.
@@ -100,7 +145,7 @@ def load_model(
     else:
         base_model = load_from_checkpoint(
             model=model(),
-            ckpt=_pre_trained_manager.fetch(model_name),
+            ckpt=get_path_to_checkpoint(model_name),
             weights_key="state_dict",
         )
 
