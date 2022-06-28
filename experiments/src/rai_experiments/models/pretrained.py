@@ -27,6 +27,7 @@ _pre_trained_manager = pooch.create(
         "mitll_cifar_nat.pt": "md5:34e15ff183735933e13f41ad27f755b4",
         "mitll_restricted_imagenet_l2_3_0.pt": "md5:db37145acfd8bdf7ef7c05f4d261c0d9",
         "mitll_imagenet_l2_3_0.pt": "md5:37728e5c9c47684c0edd373e9d80ac9b",
+        "imagenet_nat.pt": "md5:0e98d33b24eafc63a1f9e4ae65ad1695",
     },
 )
 
@@ -111,7 +112,6 @@ def load_model(model_name: _MODEL_NAMES):
 
     import torch
     from torchvision import transforms
-    from torchvision.models import resnet50 as torchvision_resnet50
 
     from rai_toolbox.mushin._utils import load_from_checkpoint
 
@@ -140,14 +140,11 @@ def load_model(model_name: _MODEL_NAMES):
             f"Unknown model name: {model_name}\nAvailable models: {', '.join(_pre_trained_manager.registry_files + ['imagenet_nat.pt'])}"
         )
 
-    if model_name == "imagenet_nat.pt":
-        base_model = torchvision_resnet50(pretrained=True)
-    else:
-        base_model = load_from_checkpoint(
-            model=model(),
-            ckpt=get_path_to_checkpoint(model_name),
-            weights_key="state_dict",
-        )
+    base_model = load_from_checkpoint(
+        model=model(),
+        ckpt=get_path_to_checkpoint(model_name),
+        weights_key="state_dict" if model_name != "imagenet_nat.pt" else "model",
+    )
 
     model = torch.nn.Sequential(norm, base_model)
     return model
