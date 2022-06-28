@@ -133,6 +133,10 @@ class L1qFrankWolfe(L1qNormedGradientOptim):
     gradient's elements. The transformation is applied to the gradient in accordance
     with `param_ndim`.
 
+    Notes
+    -----
+    This parameter-transforming optimizer is useful for visual concept probing [2]_.
+
     See Also
     --------
     FrankWolfe
@@ -143,6 +147,9 @@ class L1qFrankWolfe(L1qNormedGradientOptim):
     References
     ----------
     .. [1] https://en.wikipedia.org/wiki/Frank%E2%80%93Wolfe_algorithm#Algorithm
+    .. [2] Roberts, Jay, and Theodoros Tsiligkaridis. "Controllably Sparse
+       Perturbations of Robust Classifiers for Explaining Predictions and Probing
+       Learned Concepts." (2021).
     """
 
     def __init__(
@@ -388,6 +395,11 @@ class L2FrankWolfe(L2NormedGradientOptim):
     computing the *negative* linear minimization oracle for a parameter and storing it
     on `param.grad`.
 
+    Notes
+    -----
+    This parameter-transforming optimizer is useful for producing error counter
+    factuals and performing visual concept probing [2]_.
+
     See Also
     --------
     FrankWolfe
@@ -398,6 +410,9 @@ class L2FrankWolfe(L2NormedGradientOptim):
     References
     ----------
     .. [1] https://en.wikipedia.org/wiki/Frank%E2%80%93Wolfe_algorithm#Algorithm
+    .. [2] Roberts, Jay, and Theodoros Tsiligkaridis. "Controllably Sparse
+       Perturbations of Robust Classifiers for Explaining Predictions and Probing
+       Learned Concepts." (2021).
     """
 
     def __init__(
