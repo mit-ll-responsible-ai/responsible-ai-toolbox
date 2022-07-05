@@ -1,0 +1,8 @@
+# ignore data folder created from downloaded datasets
+data
+
+# tensorboard artifacts from MNISTC dataset
+model_*
+
+# tensorboard
+runs
