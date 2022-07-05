@@ -65,10 +65,10 @@ def gradient_ascent(
         If `model` is a `torch.nn.Module`, then its weights will be frozen and it will
         be set to eval mode during the perturbation-solve phase.
 
-    data : Tensor, shape-(N, ...)
+    data : ArrayLike, shape-(N, ...)
         The input data to perturb.
 
-    target : Tensor, shape-(N, ...)
+    target : ArrayLike, shape-(N, ...)
         If `targeted==False` (default), then this is the target to perturb away from.
         If `targeted==True`, then this is the target to perturb toward.
 

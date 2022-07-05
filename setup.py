@@ -31,7 +31,7 @@ INSTALL_REQUIRES = [
 ]
 TESTS_REQUIRE = [
     "pytest >= 3.8",
-    "hypothesis >= 6.41.0",
+    "hypothesis >= 6.41.0, < 6.49.0",
     "mygrad >= 2.0.0",
     "omegaconf >= 2.1.1",
     "netCDF4 >= 1.5.8",
