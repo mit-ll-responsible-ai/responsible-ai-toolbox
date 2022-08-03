@@ -189,7 +189,7 @@ class CIFAR10C(_CIFAR10Base):
         if not isinstance(severity, (int, Integral)) and 1 <= severity <= 5:
             raise ValueError(f"`severity` must be an integer in [1, 5]. Got {severity}")
 
-        severity -= 1  # type: ignore
+        severity -= 1  # ignore
 
         mmap = np.load(self._root / (corruption + ".npy"), mmap_mode="r")
         size = len(mmap) // 5
