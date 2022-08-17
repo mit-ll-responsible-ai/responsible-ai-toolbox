@@ -1,7 +1,3 @@
-# Copyright 2022, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
-# Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
-# SPDX-License-Identifier: MIT
-
 import hashlib
 from pathlib import Path
 from typing import Any, Callable, Optional, Tuple, Union
@@ -47,7 +43,7 @@ class MNISTC(VisionDataset):
     files_md5: str = "d2bff22ed798fda041f7a54c096a1a2b"
     base_folder: str = "MNISTC"
 
-    all_corruptions = (
+    all_corruptions = [
         "brightness",
         "canny_edges",
         "dotted_line",
@@ -64,14 +60,14 @@ class MNISTC(VisionDataset):
         "stripe",
         "translate",
         "zigzag",
-    )
+    ]
 
     all_groupings = ("train", "test", "combined")
 
     def __init__(
         self,
         root: PathLike,
-        corruption: Corruptions,
+        corruptions: Corruptions,
         grouping: Groupings,
         transform: Optional[Callable[[Image.Image], Any]] = None,
         target_transform: Optional[Callable[[int], Any]] = None,
@@ -84,8 +80,8 @@ class MNISTC(VisionDataset):
             Root directory of dataset where directory
             ``MNISTC`` exists or will be saved to if download is set to True.
 
-        corruption : str
-            The type of corruption, e.g., "fog". See `MNISTC.all_corruptions()` for a full list of corruptions.
+        corruptions : str or list
+            The list of corruption types, e.g., "fog". See `MNISTC.all_corruptions()` for a full list of corruptions.
 
         grouping : str
             The type of grouping for the dataset: "train", "test", or "combined".
@@ -107,10 +103,16 @@ class MNISTC(VisionDataset):
 
         # TODO: check to see how using _root below in downloader affects torchvision root in base class
         self._root = (Path(self.root) / self.base_folder).resolve()
-        assert (
-            corruption in self.all_corruptions
-        ), f"The corruption '{corruption}' is invalid"
-        self.corruption = corruption
+        if isinstance(corruptions, str):
+            if corruptions == "all":
+                corruptions = self.all_corruptions
+            else:
+                corruptions = [corruptions]
+        for corruption in corruptions:
+            assert (
+                corruption in self.all_corruptions
+            ), f"The corruption '{corruption}' is invalid"
+        self.corruptions = corruptions
 
         assert grouping in self.all_groupings, (
             f"The grouping '{grouping}' is invalid: valid choices"
@@ -127,36 +129,64 @@ class MNISTC(VisionDataset):
                 + " You can use download=True to download it"
             )
 
+        # Collect paths to data and load data
+        self.test_images_paths = []
+        self.train_images_paths = []
+        self.test_labels_paths = []
+        self.train_labels_paths = []
+        self.test_images = None
+        self.test_labels = None
+        self.train_images = None
+        self.train_labels = None
+
         if self.grouping == "test" or self.grouping == "combined":
-            test_images_path = Path.joinpath(
-                self._root, "mnist_c", corruption, "test_images.npy"
-            )
-            test_labels_path = Path.joinpath(
-                self._root, "mnist_c", corruption, "test_labels.npy"
-            )
-            mmap_test = np.load(test_images_path, mmap_mode="r")
-            test_target = np.load(test_labels_path)
+            test_images = []
+            test_labels = []
+            for corruption in corruptions:
+                im_path = Path.joinpath(
+                    self._root, "mnist_c", corruption, "test_images.npy"
+                )
+                label_path = Path.joinpath(
+                    self._root, "mnist_c", corruption, "test_labels.npy"
+                )
+                self.test_images_paths.append(im_path)
+                self.test_labels_paths.append(label_path)
+                test_images.append(np.load(im_path))
+                test_labels.append(np.load(label_path))
+
+            # Concatenate image and target data
+            self.test_images = np.vstack(test_images)
+            self.test_labels = np.hstack(test_labels)
 
         if self.grouping == "train" or self.grouping == "combined":
-            train_images_path = Path.joinpath(
-                self._root, "mnist_c", corruption, "train_images.npy"
-            )
-            train_labels_path = Path.joinpath(
-                self._root, "mnist_c", corruption, "train_labels.npy"
-            )
-            mmap_train = np.load(train_images_path, mmap_mode="r")
-            train_target = np.load(train_labels_path)
+            train_images = []
+            train_labels = []
+            for corruption in corruptions:
+                im_path = Path.joinpath(
+                    self._root, "mnist_c", corruption, "train_images.npy"
+                )
+                label_path = Path.joinpath(
+                    self._root, "mnist_c", corruption, "train_labels.npy"
+                )
+                self.train_images_paths.append(im_path)
+                self.train_labels_paths.append(label_path)
+                train_images.append(np.load(im_path))
+                train_labels.append(np.load(label_path))
+
+            # Concatenate image and target data
+            self.train_images = np.vstack(train_images)
+            self.train_labels = np.hstack(train_labels)
 
         # shape-(N, H, W, C)
         if self.grouping == "train":
-            self.data = mmap_train
-            self.targets = train_target
+            self.data = self.train_images
+            self.targets = self.train_labels
         elif self.grouping == "test":
-            self.data = mmap_test
-            self.targets = test_target
+            self.data = self.test_images
+            self.targets = self.test_labels
         elif self.grouping == "combined":
-            self.data = np.concatenate((mmap_test, mmap_train))
-            self.targets = np.concatenate((test_target, train_target))
+            self.data = np.vstack([self.test_images, self.train_images])
+            self.targets = np.hstack([self.test_labels, self.train_labels])
         else:
             raise RuntimeError(f"Unknown grouping: {self.grouping}")
 
