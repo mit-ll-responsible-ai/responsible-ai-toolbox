@@ -9,6 +9,7 @@ import torch as tr
 from torch import Tensor
 from torch.nn import CrossEntropyLoss, Module
 from torch.optim import Optimizer as _TorchOptim
+from torch.optim.lr_scheduler import _LRScheduler
 
 from rai_toolbox import negate
 from rai_toolbox._typing import (
@@ -38,6 +39,9 @@ def gradient_ascent(
     use_best: bool = False,
     criterion: Optional[Callable[[Tensor, Tensor], Tensor]] = None,
     reduction_fn: Callable[[Tensor], Tensor] = tr.sum,
+    lr_scheduler: Optional[
+        Union[Callable[[Optimizer], _LRScheduler], _LRScheduler]
+    ] = None,
     **optim_kwargs: Any,
 ) -> Tuple[Tensor, Tensor]:
     """Solve for a set of perturbations for a given set of data and a model,
@@ -113,6 +117,12 @@ def gradient_ascent(
     reduction_fn : Callable[[Tensor], Tensor], optional (default=torch.sum)
         Used to reduce the shape-(N,) per-datum loss to a scalar. This should be
         set to `torch.mean` when solving for a "universal" perturbation.
+
+    lr_scheduler: Optional[Type[LRScheduler] | LRScheduler]
+        A learning rate scheduler, whose step is applied after each gradient-based update.
+
+        If `lr_scheduler` is uninstantiated, it will be instantiated as
+        `lr_scheduler(optimizer)`
 
     **optim_kwargs : Any
        Keyword arguments passed to `optimizer` when it is instatiated.
@@ -226,6 +236,7 @@ def gradient_ascent(
         criterion = negate(criterion)
 
     if instantiates_to(perturbation_model, PerturbationModel):
+        # TODO: open issue with pyright for false positive
         pmodel = perturbation_model(data)
     else:
         if not isinstance(perturbation_model, PerturbationModel):
@@ -257,6 +268,12 @@ def gradient_ascent(
 
         optim = optimizer
 
+    if lr_scheduler is not None and callable(lr_scheduler):
+        lr_scheduler = lr_scheduler(optim)
+
+    if lr_scheduler is not None and not isinstance(lr_scheduler, _LRScheduler):
+        value_check("lr_scheduler", lr_scheduler, type_=_LRScheduler, optional=True)
+
     to_freeze: List[Any] = [data, target]
 
     if isinstance(model, Module):
@@ -278,6 +295,8 @@ def gradient_ascent(
             optim.zero_grad(set_to_none=True)
             loss.backward()
             optim.step()
+            if lr_scheduler is not None:
+                lr_scheduler.step()
 
             if use_best:
                 if (
