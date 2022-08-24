@@ -20,6 +20,7 @@ from .lp_space import (
 from .misc import (
     ClampedGradientOptimizer,
     ClampedParameterOptimizer,
+    ClampedShrinkingThresholdOptim,
     TopQGradientOptimizer,
 )
 from .optimizer import ChainedParamTransformingOptimizer, ParamTransformingOptimizer
@@ -41,4 +42,5 @@ __all__ = [
     "ClampedGradientOptimizer",
     "ClampedParameterOptimizer",
     "ChainedParamTransformingOptimizer",
+    "ClampedShrinkingThresholdOptim",
 ]
