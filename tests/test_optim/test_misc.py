@@ -132,7 +132,7 @@ def test_shrinkage(shrink_size: float, clamp_min, clamp_max):
     params = tr.tensor([-10.0, 2.0, 6.0], requires_grad=True)
 
     expected = params.clone()
-    expected -= 0.1  # SGD step
+    expected -= 0.1  # SGD step (setting grad=1)
     # shrinkage
     expected += tr.tensor([shrink_size, 0.0, -shrink_size])
     expected[1] *= 0
