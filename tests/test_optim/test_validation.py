@@ -14,6 +14,7 @@ from torch.optim import SGD
 from rai_toolbox.optim import (
     ChainedParamTransformingOptimizer,
     ClampedGradientOptimizer,
+    ClampedShrinkingThresholdOptim,
     FrankWolfe,
     L2NormedGradientOptim,
     ParamTransformingOptimizer,
@@ -139,3 +140,11 @@ def test_fw_lr_validation_when_lr_sched_is_disabled(lr):
 
     with pytest.raises(ValueError):
         FrankWolfe([x], lr=lr, use_default_lr_schedule=False)
+
+
+@given(threshold=st.floats(max_value=0))
+def test_shrink_optim_bad_threshold(threshold):
+    x = tr.tensor([1.0], requires_grad=True)
+
+    with pytest.raises(ValueError):
+        ClampedShrinkingThresholdOptim([x], lr=1.0, shrink_size=threshold)

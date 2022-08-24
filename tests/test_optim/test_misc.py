@@ -13,6 +13,7 @@ from torch.testing import assert_allclose
 from rai_toolbox.optim import (
     ClampedGradientOptimizer,
     ClampedParameterOptimizer,
+    ClampedShrinkingThresholdOptim,
     TopQGradientOptimizer,
 )
 
@@ -120,3 +121,30 @@ def test_top_q_grad_generator(generator_device):
 
     assert_allclose(seeded_grad0, seeded_grad1)
     assert tr.any(~tr.isclose(seeded_grad0, unseeded_grad))
+
+
+@given(
+    shrink_size=st.floats(2.1, 5.9),
+    clamp_min=st.none() | st.floats(-10, 2),
+    clamp_max=st.floats(3, 10),
+)
+def test_shrinkage(shrink_size: float, clamp_min, clamp_max):
+    params = tr.tensor([-10.0, 2.0, 6.0], requires_grad=True)
+
+    expected = params.clone()
+    expected -= 0.1  # SGD step
+    # shrinkage
+    expected += tr.tensor([shrink_size, 0.0, -shrink_size])
+    expected[1] *= 0
+    tr.clamp_(expected, clamp_min, clamp_max)
+
+    params.backward(tr.tensor([1.0, 1.0, 1.0]))
+    optim = ClampedShrinkingThresholdOptim(
+        [params],
+        shrink_size=shrink_size,
+        lr=0.1,
+        clamp_min=clamp_min,
+        clamp_max=clamp_max,
+    )
+    optim.step()
+    assert tr.allclose(params, expected)
