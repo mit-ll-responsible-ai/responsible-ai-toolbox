@@ -465,13 +465,14 @@ class ClampedShrinkingThresholdOptim(ParamTransformingOptimizer):
     def _post_step_transform_(
         self, param: Tensor, optim_group: ClampedShrinkParamGroup
     ) -> None:
-        gt_b = param > optim_group["shrink_size"]
-        lt_minus_b = param < -optim_group["shrink_size"]
+        B = optim_group["shrink_size"]
+        gt_b = param > B
+        lt_minus_b = param < -B
         within_b = torch.logical_or(gt_b, lt_minus_b)
         within_b = torch.logical_not(within_b, out=within_b)
         param[within_b] *= 0
-        param[gt_b] -= optim_group["shrink_size"]
-        param[lt_minus_b] += optim_group["shrink_size"]
+        param[gt_b] -= B
+        param[lt_minus_b] += B
 
         if optim_group["clamp_min"] is not None or optim_group["clamp_max"] is not None:
             param.clamp_(min=optim_group["clamp_min"], max=optim_group["clamp_max"])
