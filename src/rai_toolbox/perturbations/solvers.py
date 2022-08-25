@@ -407,13 +407,13 @@ def elastic_net_attack(
         If `targeted==True` (default), then the target to perturbed toward.
         If `targeted==False`, then this is the target to perturbed away from.
 
-    pert_clamp_min : Optional[Union[float, Tensor]] = None
-        If provided, sets a lower-bound on the domain of the additive perturbation.
-        Set to `-data` to enforce `0 <= data + δ`.
+    pert_clamp_min : Optional[Union[float, Tensor]]
+        If specified, sets a lower-bound on the domain of the additive perturbation.
+        Set to `a - data` to enforce `a <= data + δ`.
 
-    pert_clamp_max : Optional[Union[float, Tensor]] = None
-        If provided, sets an upper-bound on the domain of the additive perturbation.
-        Set to `1 - data` to enforce `data + δ <= 1`.
+    pert_clamp_max : Optional[Union[float, Tensor]]
+        If specified, sets an upper-bound on the domain of the additive perturbation.
+        Set to `b - data` to enforce `data + δ <= b`.
 
     lr_schedule : Optional[Partial[_LRScheduler]] = None
         Specifies the learning rate schedule for the optimizer. Will be instantiated
