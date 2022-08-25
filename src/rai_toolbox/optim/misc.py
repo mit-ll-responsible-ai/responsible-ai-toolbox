@@ -402,10 +402,10 @@ class ClampedShrinkingThresholdOptim(ParamTransformingOptimizer):
         InnerOpt: Union[Opt, Partial[Opt], OptimizerType] = SGD,
         *,
         shrink_size: float,
-        clamp_min: Optional[float] = None,
-        clamp_max: Optional[float] = None,
+        clamp_min: Optional[Union[Tensor, float]] = None,
+        clamp_max: Optional[Union[Tensor, float]] = None,
         defaults: Optional[Dict[str, Any]] = None,
-        param_ndim: Optional[int] = None,
+        param_ndim: Optional[int] = -1,
         **inner_opt_kwargs,
     ) -> None:
         """
@@ -453,13 +453,6 @@ class ClampedShrinkingThresholdOptim(ParamTransformingOptimizer):
         )
 
         for group in self.param_groups:
-            if group["clamp_min"] is not None and group["clamp_max"] is not None:
-                value_check(
-                    "clamp_min",
-                    group["clamp_min"],
-                    max_=group["clamp_max"],
-                    upper_name="max_clamp",
-                )
             value_check("shrink_size", group["shrink_size"], min_=0.0, incl_min=False)
 
     def _post_step_transform_(
@@ -475,4 +468,16 @@ class ClampedShrinkingThresholdOptim(ParamTransformingOptimizer):
         param[lt_minus_b] += B
 
         if optim_group["clamp_min"] is not None or optim_group["clamp_max"] is not None:
-            param.clamp_(min=optim_group["clamp_min"], max=optim_group["clamp_max"])
+            min_, max_ = optim_group["clamp_min"], optim_group["clamp_max"]
+
+            if min_ is not None:
+                mask = param < min_
+                if isinstance(min_, Tensor):
+                    min_ = min_[mask]
+                param[mask] = min_
+
+            if max_ is not None:
+                mask = max_ < param
+                if isinstance(max_, Tensor):
+                    max_ = max_[mask]
+                param[mask] = max_
