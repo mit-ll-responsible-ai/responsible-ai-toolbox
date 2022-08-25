@@ -433,6 +433,36 @@ def elastic_net_attack(
             If `successes[j]` is `False` then `best_loss[j]` will be `inf`.
 
         Here "best" indicates that the elastic net loss, `b |δ| + |δ|^2_2`, is minimized
+
+    Examples
+    --------
+    Here is a trivial scenario where we are merely perturbing the "logits" themselves so
+    that the specified targets will be optimized for. Let's see that the longer
+    we run the optimizer, the more the learned perturbation shrinks while still
+    amounting to a successful attack.
+
+    >>> from rai_toolbox.perturbations.solvers import elastic_net_attack
+    >>> logits = [[0.497, 0.503]]
+    >>> target = [0]
+
+    >>> for num_steps in [1, 10, 100]:
+    ...     _, x_adv, _ = elastic_net_attack(
+    ...         model=lambda x: x,
+    ...         data=logits,
+    ...         target=target,
+    ...         beta=1e-3,
+    ...         c=2,
+    ...         steps=num_steps,
+    ...         confidence=.01,
+    ...         lr=0.5,
+    ...     )
+    ...     print(f"num-steps: {num_steps}\n{x_adv}")
+    num-steps: 1
+    tensor([[ 1.4960, -0.4960]])
+    num-steps: 10
+    tensor([[0.5062, 0.4938]])
+    num-steps: 100
+    tensor([[0.5018, 0.4982]])
     """
     data = tr.as_tensor(data)
     target = tr.as_tensor(target)
