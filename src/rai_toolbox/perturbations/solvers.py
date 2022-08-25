@@ -284,7 +284,6 @@ def gradient_ascent(
     # don't pass non nn.Module to frozen/eval
     packed_model = (model,) if isinstance(model, Module) else ()
 
-    # Projected Gradient Descent
     with frozen(*to_freeze), evaluating(*packed_model), tr.enable_grad():
         for _ in range(steps):
             # Calculate the gradient of loss
@@ -420,6 +419,7 @@ def elastic_net_attack(
 
     pmodel = AdditivePerturbation(data)
 
+    # clamps perturbations so that 0 <= x + δ <= 1
     optim = ClampedShrinkingThresholdOptim(
         pmodel.parameters(),
         shrink_size=beta,
@@ -469,7 +469,6 @@ def elastic_net_attack(
 
     tracking_success = None
 
-    # Projected Gradient Descent
     with frozen(*to_freeze), evaluating(*packed_model), tr.enable_grad():
         for k in range(steps):
             # Calculate the gradient of loss
