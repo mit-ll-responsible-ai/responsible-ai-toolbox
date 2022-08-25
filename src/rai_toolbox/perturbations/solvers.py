@@ -390,11 +390,16 @@ def elastic_net_attack(
     beta : float
         The shrinkage threshold and L1 penalty weight
 
+    c : float
+        The weight of the adversarial attack lodd
+
     confidence : float
         Controls the separation between the target and the next most likely
         prediction among all classes other than the target class
 
     targeted : bool, optional (default=True)
+        If `targeted==True` (default), then the target to perturbed toward.
+        If `targeted==False`, then this is the target to perturbed away from.
 
     Returns
     -------
