@@ -10,7 +10,7 @@ import torch.nn.functional as F
 from torch import Tensor
 from torch.nn import CrossEntropyLoss, Module
 from torch.optim import Optimizer as _TorchOptim
-from torch.optim.lr_scheduler import _LRScheduler
+from torch.optim.lr_scheduler import LambdaLR, _LRScheduler
 
 from rai_toolbox import negate
 from rai_toolbox._typing import (
@@ -364,11 +364,42 @@ def elastic_net_attack(
     steps: int,
     beta: float,
     c: float,
-    loss_margin: float,
+    confidence: float,
     targeted: bool = True,
     **optim_kwargs,
 ) -> Tuple[Tensor, Tensor, Tensor]:
+    """
+    Parameters
+    ----------
+    model : Callable[[Tensor], Tensor]
+        Differentiable function that processes the (perturbed) data prior to computing
+        the loss.
 
+        If `model` is a `torch.nn.Module`, then its weights will be frozen and it will
+        be set to eval mode during the perturbation-solve phase.
+
+    data : ArrayLike, shape-(N, ...)
+        A batch of N pieces of input data to perturb.
+
+    target : ArrayLike, shape-(N,)
+        A batch of N of target/truth labels.
+
+        If `targeted==True` (default), then this is the target to perturb toward.
+        If `targeted==False`, then this is the target to perturb away from.
+
+    beta : float
+        The shrinkage threshold and L1 penalty weight
+
+    confidence : float
+        Controls the separation between the target and the next most likely
+        prediction among all classes other than the target class
+
+    targeted : bool, optional (default=True)
+
+    Returns
+    -------
+    best_pert_example, best_loss, success : Tuple[Tensor, Tensor, Tensor]
+    """
     data = tr.as_tensor(data)
     target = tr.as_tensor(target)
 
@@ -391,6 +422,9 @@ def elastic_net_attack(
         clamp_max=1 - data,
         **optim_kwargs,
     )
+
+    # sqrt lr-decay to 0
+    lr_scheduler = LambdaLR(optim, lambda k: (1 - min(k, steps) / steps) ** (0.5))
 
     to_freeze: List[Any] = [data, target]
 
@@ -449,7 +483,7 @@ def elastic_net_attack(
             logits = model(yadv)
 
             losses = (
-                c * _attack_loss(logits, target, margin=loss_margin, targeted=True)
+                c * _attack_loss(logits, target, margin=confidence, targeted=True)
                 + elastic_net_loss()
             )
 
@@ -459,7 +493,7 @@ def elastic_net_attack(
             optim.zero_grad(set_to_none=True)
             loss.backward()
             optim.step()
-            # lr_scheduler.step()
+            lr_scheduler.step()
 
         # free up memory
         optim.zero_grad(set_to_none=True)
