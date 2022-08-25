@@ -537,16 +537,18 @@ def elastic_net_attack(
             with tr.no_grad():
                 delta_stored = pmodel.delta.clone().detach()
                 if k > 0:
+                    # evaluates model(x + δx)
                     tracking_success, best_loss, best_x = get_best_loss_and_adv_example(
                         tracking_success, best_loss, best_x
                     )
 
+                    # computes δy = δx_new - (k/(k+3))(δx_new - δx_old)
                     pmodel.delta *= 1 + k / (k + 3)  # type: ignore
                     pmodel.delta -= (k / (k + 3)) * delta_old  # type: ignore
                 delta_old = delta_stored
 
-            yadv = pmodel(data)
-            logits = model(yadv)
+            # evaluates model(x + δy)
+            logits = model(pmodel(data))
 
             losses = (
                 c * _attack_loss(logits, target, margin=confidence, targeted=True)
@@ -558,6 +560,8 @@ def elastic_net_attack(
             # Update the perturbation
             optim.zero_grad(set_to_none=True)
             loss.backward()
+
+            # computes δx = Sb(δy - lr * grad(δy))
             optim.step()
             lr_sched.step()
 
