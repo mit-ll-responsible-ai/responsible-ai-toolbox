@@ -364,7 +364,11 @@ def elastic_net_attack(
     beta: float,
     c: float,
     confidence: float,
+    lr: float,
     targeted: bool = True,
+    pert_clamp_min: Optional[Union[float, Tensor]] = None,
+    pert_clamp_max: Optional[Union[float, Tensor]] = None,
+    lr_schedule: Optional[Partial[_LRScheduler]] = None,
     **optim_kwargs,
 ) -> Tuple[Tensor, Tensor, Tensor]:
     """
@@ -390,19 +394,45 @@ def elastic_net_attack(
         The shrinkage threshold and L1 penalty weight
 
     c : float
-        The weight of the adversarial attack lodd
+        The weight of the adversarial attack loss: c * adv_attack_loss + elastic_net_loss
 
     confidence : float
         Controls the separation between the target and the next most likely
         prediction among all classes other than the target class
 
+    lr : float
+        The learning rate
+
     targeted : bool, optional (default=True)
         If `targeted==True` (default), then the target to perturbed toward.
         If `targeted==False`, then this is the target to perturbed away from.
 
+    pert_clamp_min : Optional[Union[float, Tensor]] = None
+        If provided, sets a lower-bound on the domain of the additive perturbation.
+        Set to `-data` to enforce `0 <= data + δ`.
+
+    pert_clamp_max : Optional[Union[float, Tensor]] = None
+        If provided, sets an upper-bound on the domain of the additive perturbation.
+        Set to `1 - data` to enforce `data + δ <= 1`.
+
+    lr_schedule : Optional[Partial[_LRScheduler]] = None
+        Specifies the learning rate schedule for the optimizer. Will be instantiated
+        as `lr_schedule(optimizer)`. By default a square-root decay-to-0 lr schedule is
+        used. To disable the lr schedule, specify `partial(LambdaLR, lr_lambda=lambda k: 1)`
+
     Returns
     -------
-    best_pert_example, best_loss, success : Tuple[Tensor, Tensor, Tensor]
+    successes, best_xadv, best_loss : Tuple[Tensor, Tensor, Tensor]
+        - successes: shape-(N,) boolean-valued array indicating whether a solution
+            was found for each datum. I.e. "success" for datum-j means that
+            the model thinks that `x_j + δ_j` does (doesn't) resemble the
+            specified target (label).
+        - best_xadv: shape-(N, ...) tensor of the best perturbed examples.
+            If `successes[j]` is `False` then `best_xadv[j]` will be a tensor of nans.
+        - best_loss: shape-(N,) tensor of smallest elastic net losses.
+            If `successes[j]` is `False` then `best_loss[j]` will be `inf`.
+
+        Here "best" indicates that the elastic net loss, `b |δ| + |δ|^2_2`, is minimized
     """
     data = tr.as_tensor(data)
     target = tr.as_tensor(target)
@@ -423,13 +453,17 @@ def elastic_net_attack(
     optim = ClampedShrinkingThresholdOptim(
         pmodel.parameters(),
         shrink_size=beta,
-        clamp_min=-data,
-        clamp_max=1 - data,
+        clamp_min=pert_clamp_min,
+        clamp_max=pert_clamp_max,
+        lr=lr,
         **optim_kwargs,
     )
 
-    # sqrt lr-decay to 0
-    lr_scheduler = LambdaLR(optim, lambda k: (1 - min(k, steps) / steps) ** (0.5))
+    if lr_schedule is None:
+        # sqrt lr-decay to 0
+        lr_sched = LambdaLR(optim, lambda k: (1 - min(k, steps) / steps) ** (0.5))
+    else:
+        lr_sched = lr_schedule(optim)
 
     to_freeze: List[Any] = [data, target]
 
@@ -442,14 +476,12 @@ def elastic_net_attack(
     delta_old = pmodel.delta
 
     def elastic_net_loss():
-        return beta * tr.linalg.norm(pmodel.delta, dim=1, ord=1) + tr.linalg.norm(
-            pmodel.delta, dim=1, ord=2
-        )
+        l1 = tr.linalg.norm(pmodel.delta.view(len(pmodel.delta), -1), dim=1, ord=1)
+        l2_sqr = tr.einsum("n...,n...->n", pmodel.delta, pmodel.delta)
+        return beta * l1 + l2_sqr
 
     def get_best_loss_and_adv_example(tracking_success, best_loss, best_x):
         xadv = pmodel(data)
-        # print("------")
-        # print(xadv, pmodel.delta, pmodel.delta.grad)
         preds = tr.argmax(model(xadv), dim=1)
         success = target == preds if targeted else target != preds
         if tracking_success is None:
@@ -497,7 +529,7 @@ def elastic_net_attack(
             optim.zero_grad(set_to_none=True)
             loss.backward()
             optim.step()
-            lr_scheduler.step()
+            lr_sched.step()
 
         # free up memory
         optim.zero_grad(set_to_none=True)
@@ -508,7 +540,7 @@ def elastic_net_attack(
                 tracking_success, best_loss, best_x
             )
 
-    return best_x.detach(), best_loss.detach(), tracking_success.detach()
+    return tracking_success.detach(), best_x.detach(), best_loss.detach()
 
 
 def random_restart(
@@ -641,7 +673,9 @@ def _replace_best(
     min : bool (default: True)
         Whether best is minimum (True) or maximum (False)
 
-    success: Optional[Tensor]
+    success: Optional[Tensor], shape-(N,)
+        Indicates whether or not an attack was successful, and thus if
+        it can be used to replace the best data and loss.
 
     Returns
     -------
@@ -652,7 +686,7 @@ def _replace_best(
         best_loss = loss
         if success is not None:
             best_data[~success] = float("nan")
-            best_loss[~success] = float("inf")
+            best_loss[~success] = float("inf") if min else -float("inf")
     else:
         assert best_data is not None
         if min:
