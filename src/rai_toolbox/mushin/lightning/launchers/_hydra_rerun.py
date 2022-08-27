@@ -24,7 +24,7 @@ def _subprocess_call(pickled_config_fn: str, pickled_task_fn: str) -> Sequence[s
     assert HydraConfig.initialized()
 
     # when user is using hydra find the absolute path
-    command = [sys.executable, "-m", "rai_toolbox.mushin.lightning._pl_rerun_hydra"]
+    command = [sys.executable, "-m", "rai_toolbox.mushin._pl_rerun_hydra"]
 
     # extract the hydra configu
     hydra_cfg = HydraConfig.get()

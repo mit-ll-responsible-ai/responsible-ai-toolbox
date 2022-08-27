@@ -31,11 +31,11 @@ def _teardown() -> None:
     # Remove PL environments so next multirun starts fresh
     envs = (
         "LOCAL_RANK",
-        # "NODE_RANK",
-        # "WORLD_SIZE",
-        # "MASTER_ADDR",
-        # "MASTER_PORT",
-        # "PL_GLOBAL_SEED",
+        "NODE_RANK",
+        "WORLD_SIZE",
+        "MASTER_ADDR",
+        "MASTER_PORT",
+        "PL_GLOBAL_SEED",
     )
 
     for name in envs:

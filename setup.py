@@ -75,6 +75,7 @@ setup(
     extras_require={
         "tests": TESTS_REQUIRE,
         "mushin": [
+            "cloudpickle >= 2.0.0",
             "pytorch-lightning >= 1.5.0",
             "hydra-zen >= 0.7.0",
             "xarray >= 0.19.0",
