@@ -41,7 +41,8 @@ TrainerConfig = builds(
 @pytest.mark.filterwarnings("ignore::UserWarning")
 @pytest.mark.usefixtures("cleandir")
 @pytest.mark.parametrize("trainer_state", ["training", "testing", "predicting"])
-def test_hydra_rerun_ddp(trainer_state):
+@pytest.mark.parametrize("num_jobs", [1, 2])
+def test_hydra_rerun_ddp(trainer_state, num_jobs):
 
     task_fn_cfg = builds(
         _task_calls,
@@ -66,14 +67,22 @@ def test_hydra_rerun_ddp(trainer_state):
         _trainer_state=trainer_state,
     )
 
+    fake_param = "+foo=" + ",".join(str(i) for i in range(num_jobs))
+    multirun = True if num_jobs > 1 else False
+
     task_fn = instantiate(task_fn_cfg)
-    launch(Config, task_fn, overrides=["hydra/callbacks=pickle_job"])
+    launch(
+        Config,
+        task_fn,
+        overrides=["hydra/callbacks=pickle_job", fake_param],
+        multirun=multirun,
+    )
 
     pickles = sorted(Path.cwd().glob("**/.hydra/config.pickle"))
-    assert len(pickles) == 1
+    assert len(pickles) == num_jobs
 
     pickles = sorted(Path.cwd().glob("**/.hydra/task_fn.pickle"))
-    assert len(pickles) == 1
+    assert len(pickles) == num_jobs
 
 
 @pytest.mark.skipif(
@@ -82,7 +91,8 @@ def test_hydra_rerun_ddp(trainer_state):
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
 @pytest.mark.filterwarnings("ignore::UserWarning")
 @pytest.mark.usefixtures("cleandir")
-def test_hydra_rerun_ddp_all_states():
+@pytest.mark.parametrize("num_jobs", [1, 2])
+def test_hydra_rerun_ddp_all_states(num_jobs):
 
     task_fn_cfg = builds(
         _task_calls,
@@ -106,11 +116,19 @@ def test_hydra_rerun_ddp_all_states():
         devices=2,
     )
 
+    fake_param = "+foo=" + ",".join(str(i) for i in range(num_jobs))
+    multirun = True if num_jobs > 1 else False
+
     task_fn = instantiate(task_fn_cfg)
-    launch(Config, task_fn, overrides=["hydra/callbacks=pickle_job"])
+    launch(
+        Config,
+        task_fn,
+        overrides=["hydra/callbacks=pickle_job", fake_param],
+        multirun=multirun,
+    )
 
     pickles = sorted(Path.cwd().glob("**/.hydra/config.pickle"))
-    assert len(pickles) == 1
+    assert len(pickles) == num_jobs
 
     pickles = sorted(Path.cwd().glob("**/.hydra/task_fn.pickle"))
-    assert len(pickles) == 1
+    assert len(pickles) == num_jobs
