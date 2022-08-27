@@ -7,7 +7,7 @@ import subprocess
 import sys
 from pathlib import Path
 from time import sleep
-from typing import Any, Callable, TypeVar
+from typing import Any, Callable, Dict, Sequence, TypeVar
 
 import numpy as np
 from hydra.core.hydra_config import HydraConfig
@@ -17,7 +17,7 @@ from pytorch_lightning import Trainer
 from pytorch_lightning.trainer.states import TrainerFn
 from torch import distributed
 
-from .._compatibility import PL_VERSION, Version
+from rai_toolbox.mushin._compatibility import PL_VERSION, Version
 
 R = TypeVar("R")
 
@@ -31,26 +31,18 @@ def _teardown() -> None:
     # Remove PL environments so next multirun starts fresh
     envs = (
         "LOCAL_RANK",
-        "NODE_RANK",
-        "WORLD_SIZE",
-        "MASTER_ADDR",
-        "MASTER_PORT",
-        "PL_GLOBAL_SEED",
+        # "NODE_RANK",
+        # "WORLD_SIZE",
+        # "MASTER_ADDR",
+        # "MASTER_PORT",
+        # "PL_GLOBAL_SEED",
     )
 
     for name in envs:
         os.environ.pop(name, None)
 
 
-def _subprocess_call(local_rank: int, testing: bool, predicting: bool) -> None:
-    env_copy = os.environ.copy()
-    env_copy["LOCAL_RANK"] = f"{local_rank}"
-    # CWD is the Hydra working directory
-    cwd = os.getcwd()
-    os_cwd = (
-        f'"{cwd}"'  # this is needed to handle characters like `=` in the directory name
-    )
-
+def _subprocess_call(local_rank: int, testing: bool, predicting: bool) -> Sequence[str]:
     command = [
         sys.executable,
         "-m",
@@ -58,11 +50,9 @@ def _subprocess_call(local_rank: int, testing: bool, predicting: bool) -> None:
     ]
     hydra_cfg = HydraConfig.get()
 
-    hydra_output = (
-        os.path.join(cwd, hydra_cfg.output_subdir)
-        if hydra_cfg.output_subdir is not None
-        else cwd
-    )
+    hydra_output = hydra_cfg.runtime.output_dir
+    if hydra_cfg.output_subdir is not None:
+        hydra_output = os.path.join(hydra_output, hydra_cfg.output_subdir)
 
     # Validate that minimal configuration requirements
     config = Path(hydra_output) / "config.yaml"
@@ -86,11 +76,12 @@ def _subprocess_call(local_rank: int, testing: bool, predicting: bool) -> None:
     command += [f"++pl_local_rank={local_rank}"]
 
     command += [
-        f"hydra.run.dir={os_cwd}",
+        f"hydra.run.dir={hydra_cfg.runtime.output_dir}",
         f"hydra.output_subdir=.pl_hydra_rank_{local_rank}",
         f"hydra.job.name={hydra_cfg.job.name}",
     ]
-    subprocess.Popen(command, env=env_copy, cwd=cwd)
+
+    return command
 
 
 if PL_VERSION >= Version(1, 6, 0):
@@ -175,8 +166,11 @@ if PL_VERSION >= Version(1, 6, 0):
         >>> job = launch(Config, task_function)
         """
 
+        strategy_name = "hydra_ddp"
+
         def setup_environment(self) -> None:
             _setup_environment()
+            self.setup_distributed()
             super().setup_environment()
 
         def _configure_launcher(self) -> None:
@@ -188,6 +182,20 @@ if PL_VERSION >= Version(1, 6, 0):
                     self.cluster_environment, self.num_processes, self.num_nodes
                 )
                 self._rank_0_will_call_children_scripts = True
+
+        @classmethod
+        def register_strategies(cls, strategy_registry: Dict) -> None:
+            strategy_registry.register(
+                "hydra_ddp_find_unused_parameters_false",
+                cls,
+                description="DDP Strategy with `find_unused_parameters` as False",
+                find_unused_parameters=False,
+            )
+            strategy_registry.register(
+                cls.strategy_name,
+                cls,
+                description=f"{cls.__class__.__name__}",
+            )
 
         def teardown(self) -> None:
             """Performs additional teardown steps for PL to allow for Hydra multirun jobs."""
@@ -227,7 +235,7 @@ if PL_VERSION >= Version(1, 6, 0):
             -------
             ReturnType
             """
-            del trainer  # unused
+            # del trainer  # unused
             if (
                 not self.cluster_environment.creates_processes_externally
             ):  # pragma: no cover
@@ -251,7 +259,18 @@ if PL_VERSION >= Version(1, 6, 0):
             os.environ["WORLD_SIZE"] = f"{self.num_processes * self.num_nodes}"
 
             for local_rank in range(1, self.num_processes):
-                _subprocess_call(local_rank, testing, predicting)
+                env_copy = os.environ.copy()
+                env_copy["LOCAL_RANK"] = f"{local_rank}"
+
+                # remove env var if global seed not set
+                if (
+                    os.environ.get("PL_GLOBAL_SEED") is None
+                    and "PL_GLOBAL_SEED" in env_copy
+                ):
+                    del env_copy["PL_GLOBAL_SEED"]
+
+                command = _subprocess_call(local_rank, testing, predicting)
+                subprocess.Popen(command, env=env_copy)
 
                 # starting all processes at once can cause issues
                 # with dataloaders delay between 1-10 seconds

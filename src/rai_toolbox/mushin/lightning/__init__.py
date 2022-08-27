@@ -3,6 +3,6 @@
 # SPDX-License-Identifier: MIT
 
 from .callbacks import MetricsCallback
-from .launchers import HydraDDP
+from .launchers import HydraDDP, HydraRerunDDP
 
-__all__ = ["MetricsCallback", "HydraDDP"]
+__all__ = ["MetricsCallback", "HydraDDP", "HydraRerunDDP"]

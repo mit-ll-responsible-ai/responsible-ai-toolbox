@@ -79,7 +79,9 @@ def task_fn_raises(cfg: Any):
 def test_ddp_with_hydra_pl_main(testing, predicting):
     trainer = Trainer(max_epochs=1, fast_dev_run=True, callbacks=[MetricsCallback()])
     module = SimpleLightningModule()
-    pl_main_task(trainer, module, None, testing, predicting)
+    pl_main_task(
+        trainer=trainer, module=module, pl_testing=testing, pl_predicting=predicting
+    )
 
     if not testing and not predicting:
         # makes sure Trainer.fit ws executed

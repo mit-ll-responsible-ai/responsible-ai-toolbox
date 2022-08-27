@@ -1,8 +1,10 @@
 # Copyright 2022, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
+import logging
 from dataclasses import is_dataclass
 from inspect import Parameter, signature
+from pathlib import Path
 from typing import (
     Any,
     Callable,
@@ -16,6 +18,9 @@ from typing import (
     overload,
 )
 
+import cloudpickle
+from hydra.experimental.callback import Callback
+from hydra.types import TaskFunction
 from hydra_zen import instantiate
 from hydra_zen.errors import HydraZenValidationError
 from hydra_zen.typing._implementations import DataClass
@@ -183,3 +188,41 @@ def zen(
 
         return wrap
     return Zen(__func, pre_call=pre_call, post_call=post_call)
+
+
+class MushinPickleJobCallback(Callback):
+    output_dir: Path
+    config_filename = "config.pickle"
+    task_filename = "task_fn.pickle"
+
+    def __init__(self, task_fn: TaskFunction) -> None:
+        self.task_fn = task_fn
+        self.log = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
+
+    def on_job_start(self, config, **kwargs: Any) -> None:
+        self.output_dir = Path(config.hydra.runtime.output_dir) / Path(
+            config.hydra.output_subdir
+        )
+        self._save_pickle(obj=config, output_dir=self.output_dir)
+        self.log.info(f"Saving job configs in {self.output_dir / self.config_filename}")
+
+    def on_job_end(self, config, job_return, **kwargs: Any) -> None:
+        self.log.info("Cleaning up Lightning Environment")
+        import os
+
+        import torch.distributed
+
+        # the code below is needed for multirun only
+        if torch.distributed.is_initialized():
+            torch.distributed.destroy_process_group()
+
+        os.environ.pop("LOCAL_RANK", None)
+
+    def _save_pickle(self, obj: Any, output_dir: Path) -> None:
+        output_dir.mkdir(parents=True, exist_ok=True)
+        assert output_dir is not None
+        with open(str(output_dir / self.config_filename), "wb") as file:
+            cloudpickle.dump(obj, file)
+
+        with open(str(output_dir / self.task_filename), "wb") as file:
+            cloudpickle.dump(self.task_fn, file)
