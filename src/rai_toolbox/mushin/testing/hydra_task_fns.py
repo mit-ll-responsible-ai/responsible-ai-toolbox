@@ -1,5 +1,3 @@
-from typing import Literal
-
 from hydra_zen import instantiate
 from pytorch_lightning import (
     LightningDataModule,
@@ -7,8 +5,7 @@ from pytorch_lightning import (
     Trainer,
     seed_everything,
 )
-
-from rai_toolbox.mushin.workflows import _task_calls
+from typing_extensions import Literal
 
 
 def pl_pre_task(cfg):
@@ -85,10 +82,3 @@ def zen_pl_all_task_fn(trainer: Trainer, module: LightningModule):
     trainer.fit(module)
     trainer.test(module)
     trainer.predict(module)
-
-
-task_call = _task_calls(pre_task=zen_pl_pre_task, task=zen_pl_task_fn)
-
-task_call_with_datamodule = _task_calls(
-    pre_task=zen_pl_pre_task, task=zen_pl_task_fn_with_datamodule
-)
