@@ -551,7 +551,7 @@ def elastic_net_attack(
             logits = model(pmodel(data))
 
             losses = (
-                c * _attack_loss(logits, target, margin=confidence, targeted=True)
+                c * _attack_loss(logits, target, margin=confidence, targeted=targeted)
                 + elastic_net_loss()
             )
 
