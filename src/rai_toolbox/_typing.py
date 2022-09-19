@@ -22,6 +22,7 @@ from typing import (
 
 import numpy as np
 from torch import Tensor
+from torch.nn.parameter import Parameter
 from typing_extensions import Protocol, TypeAlias, TypeGuard
 
 T = TypeVar("T")
@@ -79,7 +80,7 @@ OptimizerType: TypeAlias = Callable[..., Optimizer]
 
 
 # type for Optim(params: <>)
-OptimParams = Union[Sequence[Tensor], Iterable[ParamGroup]]
+OptimParams = Union[Sequence[Tensor], Iterable[Parameter], Iterable[ParamGroup]]
 
 
 InstantiatesTo = Union[Type[T_co], Partial[T_co]]

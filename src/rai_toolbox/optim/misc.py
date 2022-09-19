@@ -15,12 +15,20 @@ from rai_toolbox._utils import check_param_group_value, value_check
 
 from .optimizer import REQUIRED, DatumParamGroup, ParamTransformingOptimizer
 
-__all__ = ["ClampedGradientOptimizer", "TopQGradientOptimizer"]
+__all__ = [
+    "ClampedGradientOptimizer",
+    "TopQGradientOptimizer",
+    "ClampedShrinkingThresholdOptim",
+]
 
 
 class ClampedParamGroup(DatumParamGroup):
     clamp_min: Optional[float]
     clamp_max: Optional[float]
+
+
+class ClampedShrinkParamGroup(ClampedParamGroup):
+    shrink_size: float
 
 
 class _ClampedOptim(ParamTransformingOptimizer):
@@ -383,3 +391,93 @@ class TopQGradientOptimizer(ParamTransformingOptimizer):
             s[batch_idx, corners_q] = g[batch_idx, corners_q]
 
         param.grad[...] = s.view(shp)  # type: ignore
+
+
+class ClampedShrinkingThresholdOptim(ParamTransformingOptimizer):
+    param_groups: List[ClampedShrinkParamGroup]
+
+    def __init__(
+        self,
+        params: Optional[OptimParams] = None,
+        InnerOpt: Union[Opt, Partial[Opt], OptimizerType] = SGD,
+        *,
+        shrink_size: float,
+        clamp_min: Optional[Union[Tensor, float]] = None,
+        clamp_max: Optional[Union[Tensor, float]] = None,
+        defaults: Optional[Dict[str, Any]] = None,
+        param_ndim: Optional[int] = -1,
+        **inner_opt_kwargs,
+    ) -> None:
+        """
+        https://arxiv.org/pdf/1709.04114.pdf
+
+        Parameters
+        ----------
+        params : Sequence[Tensor] | Iterable[Mapping[str, Any]]
+            Iterable of parameters or dicts defining parameter groups.
+
+        InnerOpt : Type[Optimizer] | Partial[Optimizer], optional (default=`torch.nn.optim.SGD`)
+            The optimizer that updates the parameters after their gradients have
+            been transformed.
+
+        epsilon : float
+            Specifies the size of the L2-space ball that all parameters will be
+            projected into, post optimization step.
+
+        clamp_min: Optional[float]
+            Lower-bound of the range to be clamped to.  Must be specified if `clamp_max` is `None`.
+
+        clamp_max: Optional[float]
+            Upper-bound of the range to be clamped to. Must be specified if `clamp_min`
+            is `None`.
+
+        param_ndim : Optional[int]
+            Controles how `_pre_step_transform_` and `_post_step_transform_`  are
+            broadcast onto a given parameter. This has no effect for
+            `ClampedGradientOptimizer` and `ClampedParameterOptimizer`.
+
+        **inner_opt_kwargs : Any
+            Named arguments used to initialize `InnerOpt`.
+        """
+        if defaults is None:
+            defaults = {}
+        defaults.setdefault("clamp_min", clamp_min)
+        defaults.setdefault("clamp_max", clamp_max)
+        defaults.setdefault("shrink_size", shrink_size)
+        super().__init__(
+            params,
+            InnerOpt,
+            defaults=defaults,
+            param_ndim=param_ndim,
+            **inner_opt_kwargs,
+        )
+
+        for group in self.param_groups:
+            value_check("shrink_size", group["shrink_size"], min_=0.0, incl_min=False)
+
+    def _post_step_transform_(
+        self, param: Tensor, optim_group: ClampedShrinkParamGroup
+    ) -> None:
+        B = optim_group["shrink_size"]
+        gt_b = param > B
+        lt_minus_b = param < -B
+        within_b = torch.logical_or(gt_b, lt_minus_b)
+        within_b = torch.logical_not(within_b, out=within_b)
+        param[within_b] *= 0
+        param[gt_b] -= B
+        param[lt_minus_b] += B
+
+        if optim_group["clamp_min"] is not None or optim_group["clamp_max"] is not None:
+            min_, max_ = optim_group["clamp_min"], optim_group["clamp_max"]
+
+            if min_ is not None:
+                mask = param < min_
+                if isinstance(min_, Tensor):
+                    min_ = min_[mask]
+                param[mask] = min_
+
+            if max_ is not None:
+                mask = max_ < param
+                if isinstance(max_, Tensor):
+                    max_ = max_[mask]
+                param[mask] = max_

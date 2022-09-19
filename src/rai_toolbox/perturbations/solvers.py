@@ -6,9 +6,11 @@ import functools
 from typing import Any, Callable, List, Optional, Tuple, Union
 
 import torch as tr
+import torch.nn.functional as F
 from torch import Tensor
 from torch.nn import CrossEntropyLoss, Module
 from torch.optim import Optimizer as _TorchOptim
+from torch.optim.lr_scheduler import LambdaLR, _LRScheduler
 
 from rai_toolbox import negate
 from rai_toolbox._typing import (
@@ -21,6 +23,7 @@ from rai_toolbox._typing import (
 )
 from rai_toolbox._utils import value_check
 from rai_toolbox._utils.stateful import evaluating, frozen
+from rai_toolbox.optim.misc import ClampedShrinkingThresholdOptim
 from rai_toolbox.perturbations import AdditivePerturbation, PerturbationModel
 
 
@@ -38,6 +41,9 @@ def gradient_ascent(
     use_best: bool = False,
     criterion: Optional[Callable[[Tensor, Tensor], Tensor]] = None,
     reduction_fn: Callable[[Tensor], Tensor] = tr.sum,
+    lr_scheduler: Optional[
+        Union[Callable[[Optimizer], _LRScheduler], _LRScheduler]
+    ] = None,
     **optim_kwargs: Any,
 ) -> Tuple[Tensor, Tensor]:
     """Solve for a set of perturbations for a given set of data and a model,
@@ -113,6 +119,12 @@ def gradient_ascent(
     reduction_fn : Callable[[Tensor], Tensor], optional (default=torch.sum)
         Used to reduce the shape-(N,) per-datum loss to a scalar. This should be
         set to `torch.mean` when solving for a "universal" perturbation.
+
+    lr_scheduler: Optional[Type[LRScheduler] | LRScheduler]
+        A learning rate scheduler, whose step is applied after each gradient-based update.
+
+        If `lr_scheduler` is uninstantiated, it will be instantiated as
+        `lr_scheduler(optimizer)`
 
     **optim_kwargs : Any
        Keyword arguments passed to `optimizer` when it is instatiated.
@@ -226,6 +238,7 @@ def gradient_ascent(
         criterion = negate(criterion)
 
     if instantiates_to(perturbation_model, PerturbationModel):
+        # TODO: open issue with pyright for false positive
         pmodel = perturbation_model(data)
     else:
         if not isinstance(perturbation_model, PerturbationModel):
@@ -257,6 +270,12 @@ def gradient_ascent(
 
         optim = optimizer
 
+    if lr_scheduler is not None and callable(lr_scheduler):
+        lr_scheduler = lr_scheduler(optim)
+
+    if lr_scheduler is not None and not isinstance(lr_scheduler, _LRScheduler):
+        value_check("lr_scheduler", lr_scheduler, type_=_LRScheduler, optional=True)
+
     to_freeze: List[Any] = [data, target]
 
     if isinstance(model, Module):
@@ -265,7 +284,6 @@ def gradient_ascent(
     # don't pass non nn.Module to frozen/eval
     packed_model = (model,) if isinstance(model, Module) else ()
 
-    # Projected Gradient Descent
     with frozen(*to_freeze), evaluating(*packed_model), tr.enable_grad():
         for _ in range(steps):
             # Calculate the gradient of loss
@@ -278,6 +296,8 @@ def gradient_ascent(
             optim.zero_grad(set_to_none=True)
             loss.backward()
             optim.step()
+            if lr_scheduler is not None:
+                lr_scheduler.step()
 
             if use_best:
                 if (
@@ -313,6 +333,248 @@ def gradient_ascent(
         # a high loss.
         losses = -1 * losses
     return xadv.detach(), losses.detach()
+
+
+def _attack_loss(
+    scores: Tensor,
+    labels: Tensor,
+    margin: Union[float, tr.Tensor],
+    targeted: bool = True,
+):
+    # scores: shape-(N, C)
+    # labels: shape-(N,)  values in [0, C)
+    margin = tr.as_tensor(margin)
+    mask = F.one_hot(labels, num_classes=scores.shape[1])
+    non_target_scores = tr.max(scores - (mask * 1e25), dim=1).values
+    del mask
+
+    target_scores = scores[(range(len(labels)), labels)]
+    if targeted:
+        return tr.maximum(non_target_scores - target_scores, -margin)
+    else:
+        return tr.maximum(target_scores - non_target_scores, -margin)
+
+
+def elastic_net_attack(
+    *,
+    model: Callable[[Tensor], Tensor],
+    data: ArrayLike,
+    target: ArrayLike,
+    steps: int,
+    beta: float,
+    c: float,
+    confidence: float,
+    lr: float,
+    targeted: bool = True,
+    pert_clamp_min: Optional[Union[float, Tensor]] = None,
+    pert_clamp_max: Optional[Union[float, Tensor]] = None,
+    lr_schedule: Optional[Partial[_LRScheduler]] = None,
+    **optim_kwargs,
+) -> Tuple[Tensor, Tensor, Tensor]:
+    """
+    Parameters
+    ----------
+    model : Callable[[Tensor], Tensor]
+        Differentiable function that processes the (perturbed) data prior to computing
+        the loss.
+
+        If `model` is a `torch.nn.Module`, then its weights will be frozen and it will
+        be set to eval mode during the perturbation-solve phase.
+
+    data : ArrayLike, shape-(N, ...)
+        A batch of N pieces of input data to perturb.
+
+    target : ArrayLike, shape-(N,)
+        A batch of N of target/truth labels.
+
+        If `targeted==True` (default), then this is the target to perturb toward.
+        If `targeted==False`, then this is the target to perturb away from.
+
+    beta : float
+        The shrinkage threshold and L1 penalty weight
+
+    c : float
+        The weight of the adversarial attack loss: c * adv_attack_loss + elastic_net_loss
+
+    confidence : float
+        Controls the separation between the target and the next most likely
+        prediction among all classes other than the target class
+
+    lr : float
+        The learning rate
+
+    targeted : bool, optional (default=True)
+        If `targeted==True` (default), then the target to perturbed toward.
+        If `targeted==False`, then this is the target to perturbed away from.
+
+    pert_clamp_min : Optional[Union[float, Tensor]]
+        If specified, sets a lower-bound on the domain of the additive perturbation.
+        Set to `a - data` to enforce `a <= data + δ`.
+
+    pert_clamp_max : Optional[Union[float, Tensor]]
+        If specified, sets an upper-bound on the domain of the additive perturbation.
+        Set to `b - data` to enforce `data + δ <= b`.
+
+    lr_schedule : Optional[Partial[_LRScheduler]] = None
+        Specifies the learning rate schedule for the optimizer. Will be instantiated
+        as `lr_schedule(optimizer)`. By default a square-root decay-to-0 lr schedule is
+        used. To disable the lr schedule, specify `partial(LambdaLR, lr_lambda=lambda k: 1)`
+
+    Returns
+    -------
+    successes, best_xadv, best_loss : Tuple[Tensor, Tensor, Tensor]
+        - successes: shape-(N,) boolean-valued array indicating whether a solution
+            was found for each datum. I.e. "success" for datum-j means that
+            the model thinks that `x_j + δ_j` does (doesn't) resemble the
+            specified target (label).
+        - best_xadv: shape-(N, ...) tensor of the best perturbed examples.
+            If `successes[j]` is `False` then `best_xadv[j]` will be a tensor of nans.
+        - best_loss: shape-(N,) tensor of smallest elastic net losses.
+            If `successes[j]` is `False` then `best_loss[j]` will be `inf`.
+
+        Here "best" indicates that the elastic net loss, `b |δ| + |δ|^2_2`, is minimized
+
+    Examples
+    --------
+    Here is a trivial scenario where we are merely perturbing the "logits" themselves so
+    that the specified targets will be optimized for. Let's see that the longer
+    we run the optimizer, the more the learned perturbation shrinks while still
+    amounting to a successful attack.
+
+    >>> from rai_toolbox.perturbations.solvers import elastic_net_attack
+    >>> logits = [[0.497, 0.503]]
+    >>> target = [0]
+
+    >>> for num_steps in [1, 10, 100]:
+    ...     _, x_adv, _ = elastic_net_attack(
+    ...         model=lambda x: x,
+    ...         data=logits,
+    ...         target=target,
+    ...         beta=1e-3,
+    ...         c=2,
+    ...         steps=num_steps,
+    ...         confidence=.01,
+    ...         lr=0.5,
+    ...     )
+    ...     print(f"num-steps: {num_steps}\n{x_adv}")
+    num-steps: 1
+    tensor([[ 1.4960, -0.4960]])
+    num-steps: 10
+    tensor([[0.5062, 0.4938]])
+    num-steps: 100
+    tensor([[0.5018, 0.4982]])
+    """
+    data = tr.as_tensor(data)
+    target = tr.as_tensor(target)
+
+    if not data.is_leaf:
+        data = data.detach()
+
+    if not target.is_leaf:
+        target = target.detach()
+
+    # Initialize
+    best_loss = None
+    best_x = None
+
+    pmodel = AdditivePerturbation(data)
+
+    # clamps perturbations so that 0 <= x + δ <= 1
+    optim = ClampedShrinkingThresholdOptim(
+        pmodel.parameters(),
+        shrink_size=beta,
+        clamp_min=pert_clamp_min,
+        clamp_max=pert_clamp_max,
+        lr=lr,
+        **optim_kwargs,
+    )
+
+    if lr_schedule is None:
+        # sqrt lr-decay to 0
+        lr_sched = LambdaLR(optim, lambda k: (1 - min(k, steps) / steps) ** (0.5))
+    else:
+        lr_sched = lr_schedule(optim)
+
+    to_freeze: List[Any] = [data, target]
+
+    if isinstance(model, Module):
+        to_freeze.append(model)
+
+    # don't pass non nn.Module to frozen/eval
+    packed_model = (model,) if isinstance(model, Module) else ()
+
+    delta_old = pmodel.delta
+
+    def elastic_net_loss():
+        l1 = tr.linalg.norm(pmodel.delta.view(len(pmodel.delta), -1), dim=1, ord=1)
+        l2_sqr = tr.einsum("n...,n...->n", pmodel.delta, pmodel.delta)
+        return beta * l1 + l2_sqr
+
+    def get_best_loss_and_adv_example(tracking_success, best_loss, best_x):
+        xadv = pmodel(data)
+        preds = tr.argmax(model(xadv), dim=1)
+        success = target == preds if targeted else target != preds
+        if tracking_success is None:
+            tracking_success = success
+
+        tracking_success |= success
+        best_loss, best_x = _replace_best(
+            elastic_net_loss(),
+            best_loss,
+            xadv,
+            best_x,
+            success=success,
+            min=True,
+        )
+
+        return tracking_success, best_loss, best_x
+
+    tracking_success = None
+
+    with frozen(*to_freeze), evaluating(*packed_model), tr.enable_grad():
+        for k in range(steps):
+            # Calculate the gradient of loss
+            with tr.no_grad():
+                delta_stored = pmodel.delta.clone().detach()  # δx_new
+                if k > 0:
+                    # evaluates model(x + δx)
+                    tracking_success, best_loss, best_x = get_best_loss_and_adv_example(
+                        tracking_success, best_loss, best_x
+                    )
+
+                    # computes δy = δx_new - (k/(k+3))(δx_new - δx_old)
+                    pmodel.delta *= 1 + k / (k + 3)  # type: ignore
+                    pmodel.delta -= (k / (k + 3)) * delta_old  # type: ignore
+                delta_old = delta_stored  # δx_old <- δx_new
+
+            # evaluates model(x + δy)
+            logits = model(pmodel(data))
+
+            losses = (
+                c * _attack_loss(logits, target, margin=confidence, targeted=targeted)
+                + elastic_net_loss()
+            )
+
+            loss = losses.sum()
+
+            # Update the perturbation
+            optim.zero_grad(set_to_none=True)
+            loss.backward()
+
+            # computes δx_new = Sb(δy - lr * grad(δy))  (stored in pmodel.delta)
+            optim.step()
+            lr_sched.step()
+
+        # free up memory
+        optim.zero_grad(set_to_none=True)
+
+        # Final evalulation
+        with tr.no_grad():
+            tracking_success, best_loss, best_x = get_best_loss_and_adv_example(
+                tracking_success, best_loss, best_x
+            )
+
+    return tracking_success.detach(), best_x.detach(), best_loss.detach()
 
 
 def random_restart(
@@ -424,6 +686,7 @@ def _replace_best(
     data: Tensor,
     best_data: Optional[Tensor],
     min: bool = True,
+    success: Optional[Tensor] = None,
 ) -> Tuple[Tensor, Tensor]:
     """Returns the data with the smallest (or largest) loss
 
@@ -444,6 +707,10 @@ def _replace_best(
     min : bool (default: True)
         Whether best is minimum (True) or maximum (False)
 
+    success: Optional[Tensor], shape-(N,)
+        Indicates whether or not an attack was successful, and thus if
+        it can be used to replace the best data and loss.
+
     Returns
     -------
     best_loss, best_data : Tuple[Tensor, Tensor]
@@ -451,12 +718,17 @@ def _replace_best(
     if best_loss is None:
         best_data = data
         best_loss = loss
+        if success is not None:
+            best_data[~success] = float("nan")
+            best_loss[~success] = float("inf") if min else -float("inf")
     else:
         assert best_data is not None
         if min:
             replace = loss < best_loss
         else:
             replace = loss > best_loss
+        if success is not None:
+            tr.logical_and(replace, success, out=replace)
 
         best_data[replace] = data[replace]
         best_loss[replace] = loss[replace]

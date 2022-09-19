@@ -20,6 +20,7 @@ from rai_toolbox import to_batch
 from rai_toolbox._typing import Partial
 from rai_toolbox.optim import (
     ClampedGradientOptimizer,
+    ClampedShrinkingThresholdOptim,
     FrankWolfe,
     L1FrankWolfe,
     L1NormedGradientOptim,
@@ -123,6 +124,9 @@ def test_closure_is_called_by_step(
         partial(LinfFrankWolfe, epsilon=1.0, lr=0.5),
         partial(ClampedGradientOptimizer, clamp_min=-1e6, lr=0.1),
         partial(TopQGradientOptimizer, q=0.0, lr=0.1),
+        partial(
+            ClampedShrinkingThresholdOptim, shrink_size=1e-50, lr=0.1
+        ),  # should be equivalent to bare SGD
     ],
 )
 @pytest.mark.parametrize("device", [tr.device("cpu"), tr.device("cuda", index=0)])
