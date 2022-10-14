@@ -43,7 +43,7 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
-test = [
+tests = [
     "pytest >= 3.8",
     "hypothesis >= 6.41.0, < 6.49.0",
     "mygrad >= 2.0.0",

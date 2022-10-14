@@ -7,7 +7,7 @@ import hypothesis.extra.numpy as hnp
 import hypothesis.strategies as st
 import torch as tr
 from hypothesis import given
-from torch.testing import assert_allclose
+from torch.testing import assert_close as assert_allclose  # type: ignore
 
 from rai_toolbox.optim import (
     ChainedParamTransformingOptimizer,

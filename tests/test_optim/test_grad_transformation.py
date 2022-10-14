@@ -9,12 +9,11 @@ from typing import Callable, Optional, Tuple, Type
 import numpy as np
 import pytest
 import torch as tr
-from hypothesis import assume, given, note, settings
-from hypothesis import strategies as st
+from hypothesis import assume, given, note, settings, strategies as st
 from hypothesis.extra import numpy as hnp
 from torch import Tensor
 from torch.optim import SGD, Adam
-from torch.testing import assert_allclose
+from torch.testing import assert_close as assert_allclose  # type: ignore
 
 from rai_toolbox import to_batch
 from rai_toolbox._typing import Partial
