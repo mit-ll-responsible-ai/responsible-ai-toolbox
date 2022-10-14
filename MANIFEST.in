@@ -1,3 +1,2 @@
 recursive-exclude tests *
 recursive-exclude project_tooling *
-global-exclude *.py[cod]
