@@ -1,0 +1,179 @@
+[build-system]
+requires = [ "setuptools >= 35.0.2", "wheel >= 0.29.0", "setuptools_scm[toml]==7.0.5"]
+build-backend = "setuptools.build_meta"
+
+
+
+[project]
+name = "rai_toolbox"
+dynamic = ["version"]
+description = "PyTorch-centric library for evaluating and enhancing the robustness of AI technologies"
+readme = "README.md"
+requires-python = ">=3.7"
+dependencies=[
+    "torchvision >= 0.10.0",
+    # pytorch 1.9.1 has bug for its view inplace-update checks
+    "torch >= 1.9.0, != 1.9.1",
+    "torchmetrics >= 0.6.0",
+    "typing-extensions >= 4.1.1",
+]
+license = {file = "LICENSE.txt"}
+keywords= [ "machine learning", "robustness", "pytorch", "responsible", "AI"]
+
+authors = [
+  {name = "Ryan Soklaski", email = "ryan.soklaski@ll.mit.edu" },
+  {name = "Justin Goodwin", email = "jgoodwin@ll.mit.edu" },
+  {name = "Olivia Brown"},
+  {name = "Michael Yee"}
+]
+maintainers = [
+  {name = "Ryan Soklaski", email = "ryan.soklaski@ll.mit.edu" },
+]
+
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Topic :: Scientific/Engineering",
+    "Programming Language :: Python :: 3 :: Only",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest >= 3.8",
+    "hypothesis >= 6.41.0, < 6.49.0",
+    "mygrad >= 2.0.0",
+    "omegaconf >= 2.1.1",
+    "netCDF4 >= 1.5.8",
+]
+
+mushin = ["pytorch-lightning >= 1.5.0",
+          "hydra-zen >= 0.7.0",
+          "xarray >= 0.19.0",
+          "matplotlib >= 3.3",
+          "protobuf <= 3.20.1",  # strict TODO: Remove after tensorboard gets compatible https://github.com/tensorflow/tensorboard/issues/5708
+        ]
+
+[project.urls]
+"Homepage" = "https://mit-ll-responsible-ai.github.io/responsible-ai-toolbox/"
+"Bug Reports" = "https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox/issues"
+"Source" = "https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox"
+
+
+
+[tool.setuptools_scm]
+write_to = "src/rai_toolbox/_version.py"
+version_scheme = "no-guess-dev"
+
+
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+exclude = ["tests*", "tests.*"]
+
+[tool.setuptools.package-data]
+rai_toolbox = ["py.typed"]
+
+
+
+[tool.isort]
+known_first_party = ["rai_toolbox", "tests", "rai_experiments"]
+profile = "black"
+combine_as_imports = true
+
+
+
+[tool.coverage.report]
+omit = ["src/rai_toolbox/_version.py"]
+
+
+
+[tool.pyright]
+include = ["src"]
+exclude = [
+       "**/node_modules",
+       "**/__pycache__",
+       "src/rai_toolbox/_version.py",
+       "**/third_party",
+       "**/project_tooling",
+       "./tests/test_augmentations/_old_implementation.py"
+]
+reportUnnecessaryTypeIgnoreComment = true
+reportUnnecessaryIsInstance = false
+
+
+
+[tool.tox]
+legacy_tox_ini = """
+[tox]
+isolated_build = True
+envlist = py37, py38, py39
+
+[gh-actions]
+python =
+  3.7: py37
+  3.8: py38
+  3.9: py39
+
+[testenv]
+extras = 
+    tests
+    mushin
+commands = pytest --hypothesis-profile ci tests
+
+[testenv:min-deps]  # test against minimum dependency versions
+deps = 
+    torch==1.9.0
+    torchmetrics==0.6.0
+    typing-extensions==4.1.1
+    hydra-zen==0.7.0
+    pytorch-lightning==1.5.0
+basepython = python3.7
+
+[testenv:no-mushin]
+extras = 
+    tests
+commands = pytest --hypothesis-profile ci tests
+
+
+[testenv:coverage]
+setenv = NUMBA_DISABLE_JIT=1
+usedevelop = true
+basepython = python3.8
+extras = 
+    tests
+    mushin
+deps = coverage
+       pytest-cov
+commands = pytest --cov-report term-missing --cov-config=setup.cfg --cov-branch --cov=rai_toolbox --hypothesis-profile ci tests
+
+
+[testenv:pre-release]  # test against pre-releases of dependencies
+pip_pre = true
+extras = 
+    tests
+    mushin
+basepython = python3.8
+
+
+# runs experiments that don't require additional dependencies
+[testenv:experiments-checks]
+basepython = python3.8
+extras = 
+    tests
+deps = 
+       experiments/
+commands = 
+   pytest experiments/tests
+   pytest experiments/adversarial_training/test_experiment.py
+   pytest experiments/madry/test_experiment.py
+   pytest experiments/universal_perturbation/test_experiment.py
+   pytest experiments/xai/test_experiment.py
+"""
