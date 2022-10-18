@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>rai_toolbox.optim.L1qFrankWolfe &#8212; rai-toolbox  documentation</title>
   <script>
@@ -38,7 +38,9 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/clipboard.min.js"></script>
     <script src="../_static/copybutton.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -50,7 +52,7 @@
     <link rel="next" title="Perturbations" href="../ref_perturbation.html" />
     <link rel="prev" title="rai_toolbox.optim.LinfFrankWolfe" href="rai_toolbox.optim.LinfFrankWolfe.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="docsearch:language" content="None">
+  <meta name="docsearch:language" content="en">
   </head>
   
   
@@ -366,7 +368,7 @@
             <article class="bd-article" role="main">
               
   <section id="rai-toolbox-optim-l1qfrankwolfe">
-<h1>rai_toolbox.optim.L1qFrankWolfe<a class="headerlink" href="#rai-toolbox-optim-l1qfrankwolfe" title="Permalink to this headline">#</a></h1>
+<h1>rai_toolbox.optim.L1qFrankWolfe<a class="headerlink" href="#rai-toolbox-optim-l1qfrankwolfe" title="Permalink to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="rai_toolbox.optim.L1qFrankWolfe">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rai_toolbox.optim.</span></span><span class="sig-name descname"><span class="pre">L1qFrankWolfe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dq=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr=2.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_default_lr_schedule=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_ndim=-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">div_by_zero_eps=1.1754943508222875e-38</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generator=&lt;torch._C.Generator</span> <span class="pre">object&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/optim/frank_wolfe.html#L1qFrankWolfe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.optim.L1qFrankWolfe" title="Permalink to this definition">#</a></dt>
@@ -388,19 +390,21 @@ with <code class="xref py py-obj docutils literal notranslate"><span class="pre"
 <p class="rubric">Notes</p>
 <p>This parameter-transforming optimizer is useful for visual concept probing <a class="reference internal" href="#rd25ad1f7d854-2" id="id2">[2]</a>.</p>
 <p class="rubric">References</p>
-<dl class="citation">
-<dt class="label" id="rd25ad1f7d854-1"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
-<dd><p><a class="reference external" href="https://en.wikipedia.org/wiki/Frank%E2%80%93Wolfe_algorithm#Algorithm">https://en.wikipedia.org/wiki/Frank%E2%80%93Wolfe_algorithm#Algorithm</a></p>
-</dd>
-<dt class="label" id="rd25ad1f7d854-2"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
-<dd><p>Roberts, Jay, and Theodoros Tsiligkaridis. Controllably Sparse Perturbations of Robust Classifiers for Explaining Predictions and Probing Learned Concepts. (2021).</p>
-</dd>
-</dl>
+<div role="list" class="citation-list">
+<div class="citation" id="rd25ad1f7d854-1" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://en.wikipedia.org/wiki/Frank%E2%80%93Wolfe_algorithm#Algorithm">https://en.wikipedia.org/wiki/Frank%E2%80%93Wolfe_algorithm#Algorithm</a></p>
+</div>
+<div class="citation" id="rd25ad1f7d854-2" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p>Roberts, Jay, and Theodoros Tsiligkaridis. Controllably Sparse Perturbations of Robust Classifiers for Explaining Predictions and Probing Learned Concepts. (2021).</p>
+</div>
+</div>
 <dl class="py method">
 <dt class="sig sig-object py" id="rai_toolbox.optim.L1qFrankWolfe.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dq=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr=2.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_default_lr_schedule=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_ndim=-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">div_by_zero_eps=1.1754943508222875e-38</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generator=&lt;torch._C.Generator</span> <span class="pre">object&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/optim/frank_wolfe.html#L1qFrankWolfe.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.optim.L1qFrankWolfe.__init__" title="Permalink to this definition">#</a></dt>
 <dd><dl class="field-list">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
 <dt><strong>params</strong><span class="classifier">Sequence[Tensor] | Iterable[Mapping[str, Any]]</span></dt><dd><p>Iterable of parameters or dicts defining parameter groups.</p>
 </dd>
@@ -483,14 +487,10 @@ sparsified, sign-only gradient. Note that the parameter falls within/on the
 
 <p class="rubric">Methods</p>
 <table class="autosummary longtable table autosummary">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#rai_toolbox.optim.L1qFrankWolfe.__init__" title="rai_toolbox.optim.L1qFrankWolfe.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(params, *, q, epsilon[, dq, lr, ...])</p></td>
 <td><p><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p></p></dd>
 </dl>
 </p></td>
@@ -532,6 +532,38 @@ sparsified, sign-only gradient. Note that the parameter falls within/on the
           
             <div class="bd-sidebar-secondary bd-toc">
               
+<div class="toc-item">
+  
+<div class="tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+</div>
+<nav id="bd-toc-nav" class="page-toc">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#rai_toolbox.optim.L1qFrankWolfe">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     L1qFrankWolfe
+    </span>
+   </code>
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#rai_toolbox.optim.L1qFrankWolfe.__init__">
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       L1qFrankWolfe.__init__()
+      </span>
+     </code>
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+</nav>
+</div>
+
 <div class="toc-item">
   
 <div id="searchbox"></div>
@@ -585,7 +617,7 @@ sparsified, sign-only gradient. Note that the parameter falls within/on the
   <div class="footer-item">
     
 <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.3.0.<br>
 </p>
 
   </div>

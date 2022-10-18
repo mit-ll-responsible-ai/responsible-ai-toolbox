@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>rai_toolbox.augmentations.augmix.Fork &#8212; rai-toolbox  documentation</title>
   <script>
@@ -38,7 +38,9 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/clipboard.min.js"></script>
     <script src="../_static/copybutton.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -48,7 +50,7 @@
     <link rel="next" title="rai_toolbox.augmentations.augmix.augment_and_mix" href="rai_toolbox.augmentations.augmix.augment_and_mix.html" />
     <link rel="prev" title="rai_toolbox.augmentations.augmix.AugMix" href="rai_toolbox.augmentations.augmix.AugMix.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="docsearch:language" content="None">
+  <meta name="docsearch:language" content="en">
   </head>
   
   
@@ -353,14 +355,14 @@
             <article class="bd-article" role="main">
               
   <section id="rai-toolbox-augmentations-augmix-fork">
-<h1>rai_toolbox.augmentations.augmix.Fork<a class="headerlink" href="#rai-toolbox-augmentations-augmix-fork" title="Permalink to this headline">#</a></h1>
+<h1>rai_toolbox.augmentations.augmix.Fork<a class="headerlink" href="#rai-toolbox-augmentations-augmix-fork" title="Permalink to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="rai_toolbox.augmentations.augmix.Fork">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rai_toolbox.augmentations.augmix.</span></span><span class="sig-name descname"><span class="pre">Fork</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">forked_transforms</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/augmentations/augmix/transforms.html#Fork"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.augmentations.augmix.Fork" title="Permalink to this definition">#</a></dt>
 <dd><p>Forks an input into an arbitrary number of transform-chains. This can
 be useful for doing consistency-loss workflows.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>*forked_transforms: Callable[[Any], Any]</strong></dt><dd><p>One transform for each fork to create.</p>
 </dd>
@@ -406,10 +408,6 @@ paper’s consistency loss. It anticipates a PIL image and produces a triplet.</
 
 <p class="rubric">Methods</p>
 <table class="autosummary longtable table autosummary">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#rai_toolbox.augmentations.augmix.Fork.__init__" title="rai_toolbox.augmentations.augmix.Fork.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(*forked_transforms)</p></td>
 <td><p>Initializes internal Module state, shared by both nn.Module and ScriptModule.</p></td>
@@ -451,6 +449,38 @@ paper’s consistency loss. It anticipates a PIL image and produces a triplet.</
           
             <div class="bd-sidebar-secondary bd-toc">
               
+<div class="toc-item">
+  
+<div class="tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+</div>
+<nav id="bd-toc-nav" class="page-toc">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#rai_toolbox.augmentations.augmix.Fork">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     Fork
+    </span>
+   </code>
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#rai_toolbox.augmentations.augmix.Fork.__init__">
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       Fork.__init__()
+      </span>
+     </code>
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+</nav>
+</div>
+
 <div class="toc-item">
   
 <div id="searchbox"></div>
@@ -504,7 +534,7 @@ paper’s consistency loss. It anticipates a PIL image and produces a triplet.</
   <div class="footer-item">
     
 <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.3.0.<br>
 </p>
 
   </div>

@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 <meta content="An explanation of the responsible AI approach to data optimization problems." name="description" />
 
     <title>On Data Perturbations &#8212; rai-toolbox  documentation</title>
@@ -39,7 +39,9 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/clipboard.min.js"></script>
     <script src="../_static/copybutton.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -51,7 +53,7 @@
     <link rel="next" title="Reference" href="../api_reference.html" />
     <link rel="prev" title="Explanation" href="../explanation.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="docsearch:language" content="None">
+  <meta name="docsearch:language" content="en">
   </head>
   
   
@@ -342,13 +344,13 @@
             <article class="bd-article" role="main">
               
   <section id="on-data-perturbations">
-<h1>On Data Perturbations<a class="headerlink" href="#on-data-perturbations" title="Permalink to this headline">#</a></h1>
+<h1>On Data Perturbations<a class="headerlink" href="#on-data-perturbations" title="Permalink to this heading">#</a></h1>
 <p>This article provides an overview of common data optimization problems, using model-dependent criteria, that are relevant for assessing and enhancing robustness in machine learning models.
 We present a broad picture of how we have designed the rAI-toolbox to solve these problems, and provide pseudo-code that illustrates how <a class="reference internal" href="../ref_optim.html#optim-reference"><span class="std std-ref">optimizations</span></a> over <a class="reference internal" href="../ref_perturbation.html#pert-reference"><span class="std std-ref">data perturbations</span></a> adhere strictly
 to core <a class="reference external" href="https://pytorch.org/">PyTorch</a> APIs; i.e.,
 a perturbation model is defined as a <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.nn.Module</span></code>, and its optimizer as <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.optim.Optimizer</span></code>.</p>
 <section id="model-optimization-vs-data-optimization">
-<h2>Model optimization vs. data optimization<a class="headerlink" href="#model-optimization-vs-data-optimization" title="Permalink to this headline">#</a></h2>
+<h2>Model optimization vs. data optimization<a class="headerlink" href="#model-optimization-vs-data-optimization" title="Permalink to this heading">#</a></h2>
 <p>Standard machine learning model-training frameworks are designed to refine
 the parameters of the machine learning model (i.e., its architecture and weights), while methods for studying
 the robustness and explainability of the model naturally involve analyses of and
@@ -378,7 +380,7 @@ community. One popular approach is to use iterative project gradient descent
 <span class="math notranslate nohighlight">\(\epsilon\)</span> and <span class="math notranslate nohighlight">\(p=1,2,\)</span> or <span class="math notranslate nohighlight">\(\infty\)</span> as the constraint set.</p>
 </section>
 <section id="solvers-for-data-perturbations">
-<h2>Solvers for data perturbations<a class="headerlink" href="#solvers-for-data-perturbations" title="Permalink to this headline">#</a></h2>
+<h2>Solvers for data perturbations<a class="headerlink" href="#solvers-for-data-perturbations" title="Permalink to this heading">#</a></h2>
 <p>A variety of other tools exist that implement large libraries of techniques
 proposed by the research community (such as PGD) in a framework-agnostic API.
 Their perturbation solvers are often written from scratch and look something like this:</p>
@@ -495,7 +497,7 @@ need to write an entirely new solver.</p>
 <p><a class="reference internal" href="../generated/rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer" title="rai_toolbox.optim.ParamTransformingOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParamTransformingOptimizer</span></code></a>, <a class="reference internal" href="../generated/rai_toolbox.perturbations.AdditivePerturbation.html#rai_toolbox.perturbations.AdditivePerturbation" title="rai_toolbox.perturbations.AdditivePerturbation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AdditivePerturbation</span></code></a>, and <a class="reference internal" href="../generated/rai_toolbox.perturbations.gradient_ascent.html#rai_toolbox.perturbations.gradient_ascent" title="rai_toolbox.perturbations.gradient_ascent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gradient_ascent</span></code></a> represent concrete implementations of this design; the reader is advised to consult their reference documentation for further insights into the rAI-toolbox’s approach to solving for data perturbations.</p>
 </section>
 <section id="common-data-related-workflows-supported-by-rai-toolbox">
-<h2>Common data-related workflows supported by rAI-toolbox<a class="headerlink" href="#common-data-related-workflows-supported-by-rai-toolbox" title="Permalink to this headline">#</a></h2>
+<h2>Common data-related workflows supported by rAI-toolbox<a class="headerlink" href="#common-data-related-workflows-supported-by-rai-toolbox" title="Permalink to this heading">#</a></h2>
 <p>A wide range of responsible AI techniques involve optimizing parameters of data
 perturbations (or more generally, <em>transforations</em>), often in addition to optimizations over model parameters:</p>
 <ul class="simple">
@@ -655,7 +657,7 @@ and <a class="reference internal" href="../ref_perturbation.html#pert-solvers"><
   <div class="footer-item">
     
 <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.3.0.<br>
 </p>
 
   </div>

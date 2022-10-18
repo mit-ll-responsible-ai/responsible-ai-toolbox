@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>rai_toolbox.optim.TopQGradientOptimizer &#8212; rai-toolbox  documentation</title>
   <script>
@@ -38,7 +38,9 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/clipboard.min.js"></script>
     <script src="../_static/copybutton.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -50,7 +52,7 @@
     <link rel="next" title="rai_toolbox.optim.ClampedGradientOptimizer" href="rai_toolbox.optim.ClampedGradientOptimizer.html" />
     <link rel="prev" title="rai_toolbox.optim.L1qNormedGradientOptim" href="rai_toolbox.optim.L1qNormedGradientOptim.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="docsearch:language" content="None">
+  <meta name="docsearch:language" content="en">
   </head>
   
   
@@ -366,7 +368,7 @@
             <article class="bd-article" role="main">
               
   <section id="rai-toolbox-optim-topqgradientoptimizer">
-<h1>rai_toolbox.optim.TopQGradientOptimizer<a class="headerlink" href="#rai-toolbox-optim-topqgradientoptimizer" title="Permalink to this headline">#</a></h1>
+<h1>rai_toolbox.optim.TopQGradientOptimizer<a class="headerlink" href="#rai-toolbox-optim-topqgradientoptimizer" title="Permalink to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="rai_toolbox.optim.TopQGradientOptimizer">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rai_toolbox.optim.</span></span><span class="sig-name descname"><span class="pre">TopQGradientOptimizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">InnerOpt=&lt;class</span> <span class="pre">'torch.optim.sgd.SGD'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q=&lt;required</span> <span class="pre">parameter&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dq=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_ndim=-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defaults=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generator=&lt;torch._C.Generator</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**inner_opt_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/optim/misc.html#TopQGradientOptimizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.optim.TopQGradientOptimizer" title="Permalink to this definition">#</a></dt>
@@ -384,7 +386,7 @@ update the corresponding parameter.</p>
 <dt class="sig sig-object py" id="rai_toolbox.optim.TopQGradientOptimizer.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">InnerOpt=&lt;class</span> <span class="pre">'torch.optim.sgd.SGD'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q=&lt;required</span> <span class="pre">parameter&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dq=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_ndim=-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defaults=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generator=&lt;torch._C.Generator</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**inner_opt_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/optim/misc.html#TopQGradientOptimizer.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.optim.TopQGradientOptimizer.__init__" title="Permalink to this definition">#</a></dt>
 <dd><dl class="field-list">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
 <dt><strong>params</strong><span class="classifier">Sequence[Tensor] | Iterable[Mapping[str, Any]]</span></dt><dd><p>Iterable of parameters or dicts defining parameter groups.</p>
 </dd>
@@ -517,14 +519,10 @@ over each 1D sub-tensor in our gradient).</p>
 
 <p class="rubric">Methods</p>
 <table class="autosummary longtable table autosummary">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#rai_toolbox.optim.TopQGradientOptimizer.__init__" title="rai_toolbox.optim.TopQGradientOptimizer.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(params[, InnerOpt, q, dq, ...])</p></td>
 <td><p><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p></p></dd>
 </dl>
 </p></td>
@@ -566,6 +564,38 @@ over each 1D sub-tensor in our gradient).</p>
           
             <div class="bd-sidebar-secondary bd-toc">
               
+<div class="toc-item">
+  
+<div class="tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+</div>
+<nav id="bd-toc-nav" class="page-toc">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#rai_toolbox.optim.TopQGradientOptimizer">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     TopQGradientOptimizer
+    </span>
+   </code>
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#rai_toolbox.optim.TopQGradientOptimizer.__init__">
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       TopQGradientOptimizer.__init__()
+      </span>
+     </code>
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+</nav>
+</div>
+
 <div class="toc-item">
   
 <div id="searchbox"></div>
@@ -619,7 +649,7 @@ over each 1D sub-tensor in our gradient).</p>
   <div class="footer-item">
     
 <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.3.0.<br>
 </p>
 
   </div>

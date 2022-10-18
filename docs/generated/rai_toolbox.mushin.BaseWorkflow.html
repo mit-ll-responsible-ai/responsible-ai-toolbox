@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>rai_toolbox.mushin.BaseWorkflow &#8212; rai-toolbox  documentation</title>
   <script>
@@ -38,7 +38,9 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/clipboard.min.js"></script>
     <script src="../_static/copybutton.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -48,7 +50,7 @@
     <link rel="next" title="rai_toolbox.mushin.MultiRunMetricsWorkflow" href="rai_toolbox.mushin.MultiRunMetricsWorkflow.html" />
     <link rel="prev" title="Mushin" href="../ref_mushin.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="docsearch:language" content="None">
+  <meta name="docsearch:language" content="en">
   </head>
   
   
@@ -352,14 +354,14 @@
             <article class="bd-article" role="main">
               
   <section id="rai-toolbox-mushin-baseworkflow">
-<h1>rai_toolbox.mushin.BaseWorkflow<a class="headerlink" href="#rai-toolbox-mushin-baseworkflow" title="Permalink to this headline">#</a></h1>
+<h1>rai_toolbox.mushin.BaseWorkflow<a class="headerlink" href="#rai-toolbox-mushin-baseworkflow" title="Permalink to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="rai_toolbox.mushin.BaseWorkflow">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rai_toolbox.mushin.</span></span><span class="sig-name descname"><span class="pre">BaseWorkflow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eval_task_cfg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/mushin/workflows.html#BaseWorkflow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.mushin.BaseWorkflow" title="Permalink to this definition">#</a></dt>
 <dd><p>Provides an interface for creating a reusable workflow: encapsulated
 “boilerplate” for running, aggregating, and analyzing one or more Hydra jobs.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Attributes</dt>
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>cfgs</strong><span class="classifier">List[Any]</span></dt><dd><p>List of configurations for each Hydra job.</p>
 </dd>
@@ -380,7 +382,7 @@
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eval_task_cfg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/mushin/workflows.html#BaseWorkflow.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.mushin.BaseWorkflow.__init__" title="Permalink to this definition">#</a></dt>
 <dd><p>Workflows and experiments using Hydra.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>eval_task_cfg: Mapping | None (default: None)</strong></dt><dd><p>The workflow configuration object.</p>
 </dd>
@@ -430,7 +432,7 @@ function. This behavior can be modified by <code class="xref py py-obj docutils 
 readability and undstanding of what parameters are expected for a particular
 workflow.</p>
 <dl class="field-list">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
 <dt><strong>task_fn_wrapper: Callable[[Callable[…, T1]], Callable[[Any], T1]] | None, optional (default=rai_toolbox.mushin.zen)</strong></dt><dd><p>A wrapper applied to <code class="xref py py-obj docutils literal notranslate"><span class="pre">self.task</span></code> prior to launching the task.
 The default wrapper is <code class="xref py py-obj docutils literal notranslate"><span class="pre">rai_toolbox.mushin.zen</span></code>. Specify <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> for no
@@ -477,10 +479,6 @@ pass the entire list as a single input.</p>
 
 <p class="rubric">Methods</p>
 <table class="autosummary longtable table autosummary">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#rai_toolbox.mushin.BaseWorkflow.__init__" title="rai_toolbox.mushin.BaseWorkflow.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>([eval_task_cfg])</p></td>
 <td><p>Workflows and experiments using Hydra.</p></td>
@@ -507,10 +505,6 @@ pass the entire list as a single input.</p>
 </table>
 <p class="rubric">Attributes</p>
 <table class="autosummary longtable table autosummary">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">cfgs</span></code></p></td>
 <td><p></p></td>
@@ -561,6 +555,65 @@ pass the entire list as a single input.</p>
           
             <div class="bd-sidebar-secondary bd-toc">
               
+<div class="toc-item">
+  
+<div class="tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+</div>
+<nav id="bd-toc-nav" class="page-toc">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#rai_toolbox.mushin.BaseWorkflow">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     BaseWorkflow
+    </span>
+   </code>
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#rai_toolbox.mushin.BaseWorkflow.__init__">
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       BaseWorkflow.__init__()
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#rai_toolbox.mushin.BaseWorkflow.task">
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       BaseWorkflow.task()
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#rai_toolbox.mushin.BaseWorkflow.jobs_post_process">
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       BaseWorkflow.jobs_post_process()
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#rai_toolbox.mushin.BaseWorkflow.run">
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       BaseWorkflow.run()
+      </span>
+     </code>
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+</nav>
+</div>
+
 <div class="toc-item">
   
 <div id="searchbox"></div>
@@ -614,7 +667,7 @@ pass the entire list as a single input.</p>
   <div class="footer-item">
     
 <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.3.0.<br>
 </p>
 
   </div>

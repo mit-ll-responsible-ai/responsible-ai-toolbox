@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 <meta content="A guide for using the rAI-toolbox to create a parameter-transforming PyTorch Optimizer" name="description" />
 
     <title>Create a Parameter-Transforming Optimizer &#8212; rai-toolbox  documentation</title>
@@ -39,7 +39,9 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/clipboard.min.js"></script>
     <script src="../_static/copybutton.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -51,7 +53,7 @@
     <link rel="next" title="Solve for a Universal Perturbation" href="univ_adv_pert.html" />
     <link rel="prev" title="How-To Guides" href="../how_tos.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="docsearch:language" content="None">
+  <meta name="docsearch:language" content="en">
   </head>
   
   
@@ -345,7 +347,7 @@
             <article class="bd-article" role="main">
               
   <section id="create-a-parameter-transforming-optimizer">
-<span id="how-to-optim"></span><h1>Create a Parameter-Transforming Optimizer<a class="headerlink" href="#create-a-parameter-transforming-optimizer" title="Permalink to this headline">#</a></h1>
+<span id="how-to-optim"></span><h1>Create a Parameter-Transforming Optimizer<a class="headerlink" href="#create-a-parameter-transforming-optimizer" title="Permalink to this heading">#</a></h1>
 <p>Popular techniques for creating adversarial or targeted perturbations often entail solving for the perturbations using gradients that have been normalized in a particular manner, as well as ensuring that the resulting perturbations are constrained within a particular domain. In the rAI-toolbox, PyTorch optimizers are used to solve for perturbations in this way.</p>
 <p>In this How-To, we will use the <a class="reference internal" href="../generated/rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer" title="rai_toolbox.optim.ParamTransformingOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParamTransformingOptimizer</span></code></a> to design an optimizer, which is particularly well-suited for optimizing perturbations, that has the following properties:</p>
 <ol class="arabic simple">
@@ -355,7 +357,7 @@
 </ol>
 <p>We will then see how we can control how this optimizer applies (or “broadcasts”) these parameter transformations via the optimizer’s <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim</span></code> value.</p>
 <section id="designing-the-optimizer">
-<h2>Designing the optimizer<a class="headerlink" href="#designing-the-optimizer" title="Permalink to this headline">#</a></h2>
+<h2>Designing the optimizer<a class="headerlink" href="#designing-the-optimizer" title="Permalink to this heading">#</a></h2>
 <p>By inheriting from <a class="reference internal" href="../generated/rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer" title="rai_toolbox.optim.ParamTransformingOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParamTransformingOptimizer</span></code></a> our main task is to implement two methods: <a class="reference internal" href="../generated/rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer._pre_step_transform_" title="rai_toolbox.optim.ParamTransformingOptimizer._pre_step_transform_"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_pre_step_transform_</span></code></a> and <a class="reference internal" href="../generated/rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer._post_step_transform_" title="rai_toolbox.optim.ParamTransformingOptimizer._post_step_transform_"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_post_step_transform_</span></code></a>.</p>
 <p>The <a class="reference internal" href="../generated/rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer.__init__" title="rai_toolbox.optim.ParamTransformingOptimizer.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a> method for our optimizer will accept <code class="xref py py-obj docutils literal notranslate"><span class="pre">clamp_min</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">clamp_max</span></code> as configurable options;
 these bounds need to be added to the <code class="xref py py-obj docutils literal notranslate"><span class="pre">defaults</span></code> that are passed to the to the base class so that all of the optimizer’s parameter groups have access to them.
@@ -483,7 +485,7 @@ Note that we do not need to worry about doing any parameter reshaping for this m
 </div>
 </section>
 <section id="using-the-optimizer">
-<h2>Using the optimizer<a class="headerlink" href="#using-the-optimizer" title="Permalink to this headline">#</a></h2>
+<h2>Using the optimizer<a class="headerlink" href="#using-the-optimizer" title="Permalink to this heading">#</a></h2>
 <p>First, we’ll study the effect of <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim</span></code> on our optimizer’s behavior.
 Let’s create a simple shape-<code class="xref py py-obj docutils literal notranslate"><span class="pre">(2,</span> <span class="pre">2)</span></code> tensor, which will be the sole parameter that our optimizer will update.
 We will clamp the parameter’s elements to fall within <span class="math notranslate nohighlight">\((-\infty, 18.75]\)</span>.
@@ -678,7 +680,7 @@ Controlling this behavior is important when our parameter represents a single da
   <div class="footer-item">
     
 <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.3.0.<br>
 </p>
 
   </div>

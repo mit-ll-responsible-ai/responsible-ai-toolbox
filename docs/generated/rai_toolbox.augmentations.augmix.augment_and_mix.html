@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>rai_toolbox.augmentations.augmix.augment_and_mix &#8212; rai-toolbox  documentation</title>
   <script>
@@ -38,7 +38,9 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/clipboard.min.js"></script>
     <script src="../_static/copybutton.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -48,7 +50,7 @@
     <link rel="next" title="Losses" href="../ref_losses.html" />
     <link rel="prev" title="rai_toolbox.augmentations.augmix.Fork" href="rai_toolbox.augmentations.augmix.Fork.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="docsearch:language" content="None">
+  <meta name="docsearch:language" content="en">
   </head>
   
   
@@ -353,14 +355,14 @@
             <article class="bd-article" role="main">
               
   <section id="rai-toolbox-augmentations-augmix-augment-and-mix">
-<h1>rai_toolbox.augmentations.augmix.augment_and_mix<a class="headerlink" href="#rai-toolbox-augmentations-augmix-augment-and-mix" title="Permalink to this headline">#</a></h1>
+<h1>rai_toolbox.augmentations.augmix.augment_and_mix<a class="headerlink" href="#rai-toolbox-augmentations-augmix-augment-and-mix" title="Permalink to this heading">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="rai_toolbox.augmentations.augmix.augment_and_mix">
 <span class="sig-prename descclassname"><span class="pre">rai_toolbox.augmentations.augmix.</span></span><span class="sig-name descname"><span class="pre">augment_and_mix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datum</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">process_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">augmentations</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_aug_chains</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aug_chain_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(1,</span> <span class="pre">4)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(1.0,</span> <span class="pre">1.0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dirichlet_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">augmentation_choice_probs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/augmentations/augmix/_implementation.html#augment_and_mix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.augmentations.augmix.augment_and_mix" title="Permalink to this definition">#</a></dt>
 <dd><p>Augments <code class="xref py py-obj docutils literal notranslate"><span class="pre">datum</span></code> using a mixture of randomly-composed augmentations via a method
 called “AugMix” <a class="reference internal" href="#r118abdb39488-1" id="id1">[1]</a>.</p>
 <dl class="field-list">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
 <dt><strong>datum</strong><span class="classifier">T1</span></dt><dd><p>The datum to be augmixed.</p>
 </dd>
@@ -399,7 +401,7 @@ If not specified, a uniform distribution over all entries of <code class="xref p
 </dd>
 </dl>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
 <dt>augmixed: T2</dt><dd><p>The augmixed datum.</p>
 </dd>
@@ -424,11 +426,12 @@ DataLoaders that used multiple workers, where identical seeds were being used
 across workers and the same seed was being set at the outset of each epoch.</p>
 <p><a class="github reference external" href="https://github.com/pytorch/pytorch/pull/56488">pytorch/pytorch#56488</a></p>
 <p class="rubric">References</p>
-<dl class="citation">
-<dt class="label" id="r118abdb39488-1"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
-<dd><p>Hendrycks, Dan, et al. “Augmix: A simple data processing method to improve robustness and uncertainty.” arXiv preprint arXiv:1912.02781 (2019).</p>
-</dd>
-</dl>
+<div role="list" class="citation-list">
+<div class="citation" id="r118abdb39488-1" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>Hendrycks, Dan, et al. “Augmix: A simple data processing method to improve robustness and uncertainty.” arXiv preprint arXiv:1912.02781 (2019).</p>
+</div>
+</div>
 </dd></dl>
 
 </section>
@@ -464,6 +467,27 @@ across workers and the same seed was being set at the outset of each epoch.</p>
           
             <div class="bd-sidebar-secondary bd-toc">
               
+<div class="toc-item">
+  
+<div class="tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+</div>
+<nav id="bd-toc-nav" class="page-toc">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#rai_toolbox.augmentations.augmix.augment_and_mix">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     augment_and_mix()
+    </span>
+   </code>
+  </a>
+ </li>
+</ul>
+
+</nav>
+</div>
+
 <div class="toc-item">
   
 <div id="searchbox"></div>
@@ -517,7 +541,7 @@ across workers and the same seed was being set at the outset of each epoch.</p>
   <div class="footer-item">
     
 <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.3.0.<br>
 </p>
 
   </div>

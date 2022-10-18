@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>rai_toolbox.perturbations.uniform_like_l1_n_ball_ &#8212; rai-toolbox  documentation</title>
   <script>
@@ -38,7 +38,9 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/clipboard.min.js"></script>
     <script src="../_static/copybutton.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -50,7 +52,7 @@
     <link rel="next" title="rai_toolbox.perturbations.uniform_like_l2_n_ball_" href="rai_toolbox.perturbations.uniform_like_l2_n_ball_.html" />
     <link rel="prev" title="rai_toolbox.perturbations.random_restart" href="rai_toolbox.perturbations.random_restart.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="docsearch:language" content="None">
+  <meta name="docsearch:language" content="en">
   </head>
   
   
@@ -356,13 +358,13 @@
             <article class="bd-article" role="main">
               
   <section id="rai-toolbox-perturbations-uniform-like-l1-n-ball">
-<h1>rai_toolbox.perturbations.uniform_like_l1_n_ball_<a class="headerlink" href="#rai-toolbox-perturbations-uniform-like-l1-n-ball" title="Permalink to this headline">#</a></h1>
+<h1>rai_toolbox.perturbations.uniform_like_l1_n_ball_<a class="headerlink" href="#rai-toolbox-perturbations-uniform-like-l1-n-ball" title="Permalink to this heading">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="rai_toolbox.perturbations.uniform_like_l1_n_ball_">
 <span class="sig-prename descclassname"><span class="pre">rai_toolbox.perturbations.</span></span><span class="sig-name descname"><span class="pre">uniform_like_l1_n_ball_</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon=1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_ndim=-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generator=&lt;torch._C.Generator</span> <span class="pre">object&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/perturbations/init.html#uniform_like_l1_n_ball_"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.perturbations.uniform_like_l1_n_ball_" title="Permalink to this definition">#</a></dt>
 <dd><p>Uniform sampling of an <span class="math notranslate nohighlight">\(\epsilon\)</span>-sized <code class="xref py py-obj docutils literal notranslate"><span class="pre">n</span></code>-ball for <span class="math notranslate nohighlight">\(L^1\)</span>-norm, where <code class="xref py py-obj docutils literal notranslate"><span class="pre">n</span></code> is controlled by <code class="xref py py-obj docutils literal notranslate"><span class="pre">x.shape</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">param_ndim</span></code>. The result overwrites <code class="xref py py-obj docutils literal notranslate"><span class="pre">x</span></code> in-place.</p>
 <dl class="field-list">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
 <dt><strong>x: Tensor, shape-(N, D, …)</strong></dt><dd><p>The tensor from which to generate a new random tensor, i.e., returns a tensor of
 similar shape and on the same device.</p>
@@ -381,7 +383,7 @@ function.</p>
 </dd>
 </dl>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
 <dt><strong>x</strong><span class="classifier">Tensor, shape-(N, D, …)</span></dt><dd><p>The input tensor, which has been modified in-place.</p>
 </dd>
@@ -389,14 +391,16 @@ function.</p>
 </dd>
 </dl>
 <p class="rubric">References</p>
-<dl class="citation">
-<dt class="label" id="rae46f4d0f9b4-1"><span class="brackets">1</span></dt>
-<dd><p>Rauber et al., 2020, Foolbox Native: Fast adversarial attacks to benchmark the robustness of machine learning models in PyTorch, TensorFlow, and JAX <a class="reference external" href="https://doi.org/10.21105/joss.02607">https://doi.org/10.21105/joss.02607</a></p>
-</dd>
-<dt class="label" id="rae46f4d0f9b4-2"><span class="brackets">2</span></dt>
-<dd><p><a class="reference external" href="https://mathoverflow.net/a/9188">https://mathoverflow.net/a/9188</a></p>
-</dd>
-</dl>
+<div role="list" class="citation-list">
+<div class="citation" id="rae46f4d0f9b4-1" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
+<p>Rauber et al., 2020, Foolbox Native: Fast adversarial attacks to benchmark the robustness of machine learning models in PyTorch, TensorFlow, and JAX <a class="reference external" href="https://doi.org/10.21105/joss.02607">https://doi.org/10.21105/joss.02607</a></p>
+</div>
+<div class="citation" id="rae46f4d0f9b4-2" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://mathoverflow.net/a/9188">https://mathoverflow.net/a/9188</a></p>
+</div>
+</div>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">torch</span> <span class="k">as</span> <span class="nn">tr</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">rai_toolbox.perturbations.init</span> <span class="kn">import</span> <span class="n">uniform_like_l1_n_ball_</span>
@@ -461,6 +465,27 @@ storing it in <code class="xref py py-obj docutils literal notranslate"><span cl
               
 <div class="toc-item">
   
+<div class="tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+</div>
+<nav id="bd-toc-nav" class="page-toc">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#rai_toolbox.perturbations.uniform_like_l1_n_ball_">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     uniform_like_l1_n_ball_()
+    </span>
+   </code>
+  </a>
+ </li>
+</ul>
+
+</nav>
+</div>
+
+<div class="toc-item">
+  
 <div id="searchbox"></div>
 </div>
 
@@ -512,7 +537,7 @@ storing it in <code class="xref py py-obj docutils literal notranslate"><span cl
   <div class="footer-item">
     
 <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.3.0.<br>
 </p>
 
   </div>

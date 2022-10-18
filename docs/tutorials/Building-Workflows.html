@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 <meta content="Using the responsible AI toolbox to build workflows." name="description" />
 
     <title>Building Workflows for Cross Validation Training and Adversarial Robustness Analysis &#8212; rai-toolbox  documentation</title>
@@ -39,7 +39,9 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/clipboard.min.js"></script>
     <script src="../_static/copybutton.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -51,7 +53,7 @@
     <link rel="next" title="How-To Guides" href="../how_tos.html" />
     <link rel="prev" title="Concept Probing Using Sparse Perturbations" href="ImageNet-Concept-Probing.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="docsearch:language" content="None">
+  <meta name="docsearch:language" content="en">
   </head>
   
   
@@ -598,7 +600,7 @@ div.rendered_html tbody tr:hover {
 </div>
 </div></blockquote>
 <section id="Building-Workflows-for-Cross-Validation-Training-and-Adversarial-Robustness-Analysis">
-<h1>Building Workflows for Cross Validation Training and Adversarial Robustness Analysis<a class="headerlink" href="#Building-Workflows-for-Cross-Validation-Training-and-Adversarial-Robustness-Analysis" title="Permalink to this headline">#</a></h1>
+<h1>Building Workflows for Cross Validation Training and Adversarial Robustness Analysis<a class="headerlink" href="#Building-Workflows-for-Cross-Validation-Training-and-Adversarial-Robustness-Analysis" title="Permalink to this heading">#</a></h1>
 <p>This notebook demonstrates how the to build experiment workflows for configurable, repeatable, and scalable (CRS) experimentation. Two basic workflows will be demonstrated in this tutorial:</p>
 <ul class="simple">
 <li><p>Cross-Validation Workflow: Performs cross-validation training that logs accuracy and loss across data folds</p></li>
@@ -607,10 +609,10 @@ div.rendered_html tbody tr:hover {
 <p>Here, “workflow” has a precise meaning. In the parlance of <a class="reference external" href="https://mit-ll-responsible-ai.github.io/responsible-ai-toolbox/ref_mushin.html">mushin</a> a workflow is an API for describing how we configure, launch, and post-process one or more tasks. These workflows leverage <a class="reference external" href="https://hydra.cc/">Hydra</a> and <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen">hydra-zen</a> so that they are highly configurable and so that each job launched by a workflow is self-documenting and reproducible. In
 this tutorial, we also make use of <a class="reference external" href="https://www.pytorchlightning.ai/">PyTorch Lightning</a> to eliminate boilerplate code associated with training and testing a PyTorch model.</p>
 <section id="Getting-Started">
-<h2>Getting Started<a class="headerlink" href="#Getting-Started" title="Permalink to this headline">#</a></h2>
+<h2>Getting Started<a class="headerlink" href="#Getting-Started" title="Permalink to this heading">#</a></h2>
 <p>We will install the rAI-toolbox and then we will create a Jupyter notebook in which we will complete this tutorial.</p>
 <section id="Installing-rai_toolbox">
-<h3>Installing <code class="docutils literal notranslate"><span class="pre">rai_toolbox</span></code><a class="headerlink" href="#Installing-rai_toolbox" title="Permalink to this headline">#</a></h3>
+<h3>Installing <code class="docutils literal notranslate"><span class="pre">rai_toolbox</span></code><a class="headerlink" href="#Installing-rai_toolbox" title="Permalink to this heading">#</a></h3>
 <p>To install the toolbox (along with its <code class="docutils literal notranslate"><span class="pre">mushin</span></code> capabilities) in your Python environment, run the following command in your terminal:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pip install rai-toolbox<span class="o">[</span>mushin<span class="o">]</span>
 </pre></div>
@@ -623,7 +625,7 @@ this tutorial, we also make use of <a class="reference external" href="https://w
 </section>
 </section>
 <section id="Opening-a-Jupyter-notebook">
-<h2>Opening a Jupyter notebook<a class="headerlink" href="#Opening-a-Jupyter-notebook" title="Permalink to this headline">#</a></h2>
+<h2>Opening a Jupyter notebook<a class="headerlink" href="#Opening-a-Jupyter-notebook" title="Permalink to this heading">#</a></h2>
 <p>If you do not have Jupyter Notebook or Jupyter Lab installed in your Python environment, please follow <a class="reference external" href="https://jupyter.org/install">these instructions</a>. Now open a terminal on your computer and <a class="reference external" href="http://www.pythonlikeyoumeanit.com/Module1_GettingStartedWithPython/Jupyter_Notebooks.html">start a notebook/lab session</a>. A file-viewer will open in an internet browser; pick a directory where you are okay with saving some PyTorch model weights. Create a notebook called
 <code class="docutils literal notranslate"><span class="pre">Building-Workflows.ipynb</span></code>. You can then follow along with this tutorial by copying, pasting, and running the code blocks below in the cells of your notebook.</p>
 <p>Note: you may also need to install the <code class="docutils literal notranslate"><span class="pre">ipywidgets</span></code> package in your Python environment to configure the notebook to display ipywidgets:</p>
@@ -632,7 +634,7 @@ this tutorial, we also make use of <a class="reference external" href="https://w
 </div>
 </section>
 <section id="Imports">
-<h2>Imports<a class="headerlink" href="#Imports" title="Permalink to this headline">#</a></h2>
+<h2>Imports<a class="headerlink" href="#Imports" title="Permalink to this heading">#</a></h2>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
@@ -682,7 +684,7 @@ this tutorial, we also make use of <a class="reference external" href="https://w
 </div>
 </section>
 <section id="Experiment-Functions-and-Classes">
-<h2>Experiment Functions and Classes<a class="headerlink" href="#Experiment-Functions-and-Classes" title="Permalink to this headline">#</a></h2>
+<h2>Experiment Functions and Classes<a class="headerlink" href="#Experiment-Functions-and-Classes" title="Permalink to this heading">#</a></h2>
 <p>Here we define two Neural Network models, a fully linear neural network and a convolutional neural network.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
@@ -858,7 +860,7 @@ this tutorial, we also make use of <a class="reference external" href="https://w
 </div>
 </section>
 <section id="Configuring-our-experiments-with-hydra-zen">
-<h2>Configuring our experiments with hydra-zen<a class="headerlink" href="#Configuring-our-experiments-with-hydra-zen" title="Permalink to this headline">#</a></h2>
+<h2>Configuring our experiments with hydra-zen<a class="headerlink" href="#Configuring-our-experiments-with-hydra-zen" title="Permalink to this heading">#</a></h2>
 <p>Now we use <code class="docutils literal notranslate"><span class="pre">hydra-zen</span></code> to create “configs” for all of the components of our experiments. Each config describes an interface and/or object in our experiment that we want to be able to modify from run to run. They will also serve to make our work self-documenting and reproducible.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
@@ -956,7 +958,7 @@ this tutorial, we also make use of <a class="reference external" href="https://w
 </div>
 </section>
 <section id="Cross-Validation-Workflow">
-<h2>Cross Validation Workflow<a class="headerlink" href="#Cross-Validation-Workflow" title="Permalink to this headline">#</a></h2>
+<h2>Cross Validation Workflow<a class="headerlink" href="#Cross-Validation-Workflow" title="Permalink to this heading">#</a></h2>
 <p>With all the configurations in place we can now define our first experiment workflow: train multiple models on <code class="docutils literal notranslate"><span class="pre">MNIST</span></code> data using cross-validation. First define the main experiment configuration:</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
@@ -1566,7 +1568,7 @@ Text(0.5, 1.0, &#39;Cross Validation Performance&#39;)
 </div>
 </section>
 <section id="Robustness-Curve">
-<h2>Robustness Curve<a class="headerlink" href="#Robustness-Curve" title="Permalink to this headline">#</a></h2>
+<h2>Robustness Curve<a class="headerlink" href="#Robustness-Curve" title="Permalink to this heading">#</a></h2>
 <p>Now that we have trained some models let’s evalulate robustness of each model to adversarial perturbations. To create a configuration and workflow we need to provide the following for our task:</p>
 <ul class="simple">
 <li><p>The experiment directory containing the experiment parameters and model checkpoint for training</p></li>
@@ -2787,7 +2789,7 @@ Data variables:
   <div class="footer-item">
     
 <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.3.0.<br>
 </p>
 
   </div>

@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>rai_toolbox.perturbations.uniform_like_linf_n_ball_ &#8212; rai-toolbox  documentation</title>
   <script>
@@ -38,7 +38,9 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/clipboard.min.js"></script>
     <script src="../_static/copybutton.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -50,7 +52,7 @@
     <link rel="next" title="Datasets" href="../ref_datasets.html" />
     <link rel="prev" title="rai_toolbox.perturbations.uniform_like_l2_n_ball_" href="rai_toolbox.perturbations.uniform_like_l2_n_ball_.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="docsearch:language" content="None">
+  <meta name="docsearch:language" content="en">
   </head>
   
   
@@ -356,14 +358,14 @@
             <article class="bd-article" role="main">
               
   <section id="rai-toolbox-perturbations-uniform-like-linf-n-ball">
-<h1>rai_toolbox.perturbations.uniform_like_linf_n_ball_<a class="headerlink" href="#rai-toolbox-perturbations-uniform-like-linf-n-ball" title="Permalink to this headline">#</a></h1>
+<h1>rai_toolbox.perturbations.uniform_like_linf_n_ball_<a class="headerlink" href="#rai-toolbox-perturbations-uniform-like-linf-n-ball" title="Permalink to this heading">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="rai_toolbox.perturbations.uniform_like_linf_n_ball_">
 <span class="sig-prename descclassname"><span class="pre">rai_toolbox.perturbations.</span></span><span class="sig-name descname"><span class="pre">uniform_like_linf_n_ball_</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon=1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_ndim=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generator=&lt;torch._C.Generator</span> <span class="pre">object&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/perturbations/init.html#uniform_like_linf_n_ball_"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.perturbations.uniform_like_linf_n_ball_" title="Permalink to this definition">#</a></dt>
 <dd><p>Uniform sampling within an <span class="math notranslate nohighlight">\(\epsilon\)</span>-sized <code class="xref py py-obj docutils literal notranslate"><span class="pre">n</span></code>-ball for <span class="math notranslate nohighlight">\(L^{\infty}\)</span>-norm.
 The result overwrites <code class="xref py py-obj docutils literal notranslate"><span class="pre">x</span></code> in-place.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>x: Tensor, shape-(N, D, …)</strong></dt><dd><p>The tensor to generate a new random tensor from, i.e., returns a tensor of
 similar shape and on the same device.</p>
@@ -376,7 +378,7 @@ similar shape and on the same device.</p>
 </dd>
 </dl>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
 <dt><strong>x</strong><span class="classifier">Tensor, shape-(N, D, …)</span></dt><dd><p>The input tensor, which has been modified in-place.</p>
 </dd>
@@ -433,6 +435,27 @@ similar shape and on the same device.</p>
               
 <div class="toc-item">
   
+<div class="tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+</div>
+<nav id="bd-toc-nav" class="page-toc">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#rai_toolbox.perturbations.uniform_like_linf_n_ball_">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     uniform_like_linf_n_ball_()
+    </span>
+   </code>
+  </a>
+ </li>
+</ul>
+
+</nav>
+</div>
+
+<div class="toc-item">
+  
 <div id="searchbox"></div>
 </div>
 
@@ -484,7 +507,7 @@ similar shape and on the same device.</p>
   <div class="footer-item">
     
 <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.3.0.<br>
 </p>
 
   </div>

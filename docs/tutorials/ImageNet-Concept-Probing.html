@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 <meta content="Using the responsible AI toolbox to probe concepts for a PyTorch model." name="description" />
 
     <title>Concept Probing Using Sparse Perturbations &#8212; rai-toolbox  documentation</title>
@@ -39,7 +39,9 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/clipboard.min.js"></script>
     <script src="../_static/copybutton.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -51,7 +53,7 @@
     <link rel="next" title="Building Workflows for Cross Validation Training and Adversarial Robustness Analysis" href="Building-Workflows.html" />
     <link rel="prev" title="Generating Adversarial Perturbations" href="CIFAR10-Adversarial-Perturbations.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="docsearch:language" content="None">
+  <meta name="docsearch:language" content="en">
   </head>
   
   
@@ -598,12 +600,12 @@ div.rendered_html tbody tr:hover {
 </div>
 </div></blockquote>
 <section id="Concept-Probing-Using-Sparse-Perturbations">
-<h1>Concept Probing Using Sparse Perturbations<a class="headerlink" href="#Concept-Probing-Using-Sparse-Perturbations" title="Permalink to this headline">#</a></h1>
+<h1>Concept Probing Using Sparse Perturbations<a class="headerlink" href="#Concept-Probing-Using-Sparse-Perturbations" title="Permalink to this heading">#</a></h1>
 <p>This notebook demonstrates how the <a class="reference external" href="https://mit-ll-responsible-ai.github.io/responsible-ai-toolbox/generated/rai_toolbox.perturbations.gradient_ascent.html#rai_toolbox.perturbations.gradient_ascent">gradient_ascent</a> function from the previous tutorial can be repurposed with a different optimizer (<a class="reference external" href="https://mit-ll-responsible-ai.github.io/responsible-ai-toolbox/generated/rai_toolbox.optim.L1qFrankWolfe.html">L1qFrankWolfe</a>) to execute a task called concept probing. This method of concept
 probing was first reported in the paper <a class="reference external" href="https://diglib.eg.org/bitstream/handle/10.2312/mlvis20211072/001-005.pdf?sequence=1&amp;isAllowed=y">Controllably Sparse Perturbations of Robust Classifiers for Explaining Predictions and Probing Learned Concepts</a>.</p>
 <p>If you haven’t already, follow the steps at the beginning of the previous tutorial to install the rAI-toolbox and create a Jupyter notebook called <code class="docutils literal notranslate"><span class="pre">ImageNet-Concept-Probing.ipynb</span></code>. You can then follow along with this tutorial by copying, pasting, and running the code blocks below in the cells of your notebook.</p>
 <section id="Boilerplate-setup">
-<h2>Boilerplate setup<a class="headerlink" href="#Boilerplate-setup" title="Permalink to this headline">#</a></h2>
+<h2>Boilerplate setup<a class="headerlink" href="#Boilerplate-setup" title="Permalink to this heading">#</a></h2>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
@@ -640,7 +642,7 @@ cuda:0
 </div>
 </section>
 <section id="Load-pre-trained-ImageNet-models">
-<h2>Load pre-trained ImageNet models<a class="headerlink" href="#Load-pre-trained-ImageNet-models" title="Permalink to this headline">#</a></h2>
+<h2>Load pre-trained ImageNet models<a class="headerlink" href="#Load-pre-trained-ImageNet-models" title="Permalink to this heading">#</a></h2>
 <p>The pre-trained models used in this example are simplified data structures of the pre-trained models available via Madrylab’s robustness library <a class="reference external" href="https://github.com/MadryLab/robustness/blob/master/README.rst">README</a> for the <a class="reference external" href="https://www.image-net.org/">ImageNet</a> dataset, and include:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">mitll_imagenet_l2_3_0.pt</span></code>: ResNet-50 model trained with perturbations generated via PGD using the <span class="math notranslate nohighlight">\(L^2\)</span>-norm with <span class="math notranslate nohighlight">\(\epsilon=3.0\)</span></p></li>
@@ -665,7 +667,7 @@ cuda:0
 </div>
 </section>
 <section id="Concept-probing">
-<h2>Concept probing<a class="headerlink" href="#Concept-probing" title="Permalink to this headline">#</a></h2>
+<h2>Concept probing<a class="headerlink" href="#Concept-probing" title="Permalink to this heading">#</a></h2>
 <p>We will now demonstrate how the optimizer input to <code class="docutils literal notranslate"><span class="pre">gradient_ascent</span></code> can be switched out to complete a different task, called Concept Probing. Now instead of starting with a real image from the test set and optimizing its perturbation away from its true class as we did in the previous tutorial, in this example, we’ll be starting with a random noise image and optimizing its perturbation towards a class of interest, in an attempt to visualize what the model has learned for that class.</p>
 <p>Following the approach proposed by the authors of <a class="reference external" href="https://diglib.eg.org/bitstream/handle/10.2312/mlvis20211072/001-005.pdf?sequence=1&amp;isAllowed=y">this paper</a>, we utilize the <span class="math notranslate nohighlight">\(L^{1-q}\)</span> Frank-Wolfe optimizer to solve for sparse perturbations that are more interpretable by humans.</p>
 <p>We will use <code class="docutils literal notranslate"><span class="pre">functools.partial</span></code> to set default values for <code class="docutils literal notranslate"><span class="pre">gradient_ascent</span></code>, so that they can be used consistently across our two models. Note that <a class="reference external" href="https://mit-ll-responsible-ai.github.io/responsible-ai-toolbox/generated/rai_toolbox.perturbations.AdditivePerturbation.html#rai_toolbox.perturbations.AdditivePerturbation">AdditivePerturbation</a> is the default <code class="docutils literal notranslate"><span class="pre">perturbation_model</span></code> for <code class="docutils literal notranslate"><span class="pre">gradient_ascent</span></code>, so we don’t need to define it explicitly.</p>
@@ -874,7 +876,7 @@ cuda:0
   <div class="footer-item">
     
 <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.3.0.<br>
 </p>
 
   </div>

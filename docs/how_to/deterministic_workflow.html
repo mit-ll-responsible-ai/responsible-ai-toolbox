@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 <meta content="A guide for using the rAI-toolbox to design a deterministic workflow" name="description" />
 
     <title>Design a Deterministic Workflow &#8212; rai-toolbox  documentation</title>
@@ -39,7 +39,9 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/clipboard.min.js"></script>
     <script src="../_static/copybutton.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -49,7 +51,7 @@
     <link rel="next" title="Explanation" href="../explanation.html" />
     <link rel="prev" title="Run PyTorch Lightning DDP in Hydra" href="hydraddp.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="docsearch:language" content="None">
+  <meta name="docsearch:language" content="en">
   </head>
   
   
@@ -343,7 +345,7 @@
             <article class="bd-article" role="main">
               
   <section id="design-a-deterministic-workflow">
-<span id="how-to-deterministic"></span><h1>Design a Deterministic Workflow<a class="headerlink" href="#design-a-deterministic-workflow" title="Permalink to this headline">#</a></h1>
+<span id="how-to-deterministic"></span><h1>Design a Deterministic Workflow<a class="headerlink" href="#design-a-deterministic-workflow" title="Permalink to this heading">#</a></h1>
 <p>This How-To steps us through the process of designing a simple <code class="xref py py-obj docutils literal notranslate"><span class="pre">MultiRunMetricsWorkflow</span></code>-based workflow whose task depends on randomly-generated numbers, such that the task can be run in a deterministic manner.</p>
 <p>We will:</p>
 <ol class="arabic simple">
@@ -352,7 +354,7 @@
 <li><p>Run our workflow multiple times for various seeds to demonstrate that its behavior is indeed deterministic</p></li>
 </ol>
 <section id="creating-a-non-deterministic-workflow">
-<h2>Creating a non-deterministic workflow<a class="headerlink" href="#creating-a-non-deterministic-workflow" title="Permalink to this headline">#</a></h2>
+<h2>Creating a non-deterministic workflow<a class="headerlink" href="#creating-a-non-deterministic-workflow" title="Permalink to this heading">#</a></h2>
 <p>Our workflow will represent a simplified scenario in which our task accepts an instantiated PyTorch model and processes some data.</p>
 <div class="literal-block-wrapper docutils container" id="id1">
 <div class="code-block-caption"><span class="caption-text">Our basic workflow</span><a class="headerlink" href="#id1" title="Permalink to this code">#</a></div>
@@ -409,7 +411,7 @@ Now we will create a config that describes how to instantiate our module and dat
 Each task execution calls <code class="docutils literal notranslate"><span class="pre">instantiate(builds(Linear,</span> <span class="pre">10,</span> <span class="pre">1))</span></code> prior to populating the <code class="docutils literal notranslate"><span class="pre">module</span></code> argument of our task function, thus we see three randomly-varying outputs across all trials.</p>
 </section>
 <section id="making-our-workflow-deterministic">
-<h2>Making our workflow deterministic<a class="headerlink" href="#making-our-workflow-deterministic" title="Permalink to this headline">#</a></h2>
+<h2>Making our workflow deterministic<a class="headerlink" href="#making-our-workflow-deterministic" title="Permalink to this heading">#</a></h2>
 <p>Adding a <code class="docutils literal notranslate"><span class="pre">pre_task</span></code> method to our workflow enables us to seed PyTorch’s global random number generator before the linear layer is instantiated and passed to the task function.</p>
 <div class="literal-block-wrapper docutils container" id="id5">
 <div class="code-block-caption"><span class="caption-text">A deterministic version of the workflow</span><a class="headerlink" href="#id5" title="Permalink to this code">#</a></div>
@@ -580,7 +582,7 @@ refer to <a class="reference external" href="https://albertcthomas.github.io/goo
   <div class="footer-item">
     
 <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.3.0.<br>
 </p>
 
   </div>

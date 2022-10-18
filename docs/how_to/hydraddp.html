@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 <meta content="A description of how-to run PyTorch Lightning's DDP strategy with Hydra using rAI-toolbox." name="description" />
 
     <title>Run PyTorch Lightning DDP in Hydra &#8212; rai-toolbox  documentation</title>
@@ -39,7 +39,9 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/clipboard.min.js"></script>
     <script src="../_static/copybutton.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -49,7 +51,7 @@
     <link rel="next" title="Design a Deterministic Workflow" href="deterministic_workflow.html" />
     <link rel="prev" title="Solve for a Universal Perturbation" href="univ_adv_pert.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="docsearch:language" content="None">
+  <meta name="docsearch:language" content="en">
   </head>
   
   
@@ -375,7 +377,7 @@ or <a class="reference external" href="https://mit-ll-responsible-ai.github.io/h
 becomes compatible with interactive environments such as Jupyter Notebooks!</p>
 </div>
 <section id="run-pytorch-lightning-ddp-in-hydra">
-<span id="hydraddp"></span><h1>Run PyTorch Lightning DDP in Hydra<a class="headerlink" href="#run-pytorch-lightning-ddp-in-hydra" title="Permalink to this headline">#</a></h1>
+<span id="hydraddp"></span><h1>Run PyTorch Lightning DDP in Hydra<a class="headerlink" href="#run-pytorch-lightning-ddp-in-hydra" title="Permalink to this heading">#</a></h1>
 <p>Using Hydra to run <a class="reference external" href="https://pytorch-lightning.readthedocs.io/en/latest/accelerators/gpu_expert.html#what-is-a-strategy/">PyTorch Lightning’s Distributed Data Parallel (DDP) Strategy</a>
 often <a class="reference external" href="https://github.com/PyTorchLightning/pytorch-lightning/issues/11300">has issues</a>
 , in part because the strategy launches subprocesses where the command is derived from
@@ -481,7 +483,7 @@ a single epoch and in “fast dev run” mode.</p>
 </div>
 <p>Here you can see that the first line in the logged output indicates that the subprocess was launched for the second (Rank 1) GPU as expected.</p>
 <section id="bonus-adding-some-bells-whistles-to-our-hydra-application">
-<h2>Bonus: Adding Some Bells &amp; Whistles to Our Hydra Application<a class="headerlink" href="#bonus-adding-some-bells-whistles-to-our-hydra-application" title="Permalink to this headline">#</a></h2>
+<h2>Bonus: Adding Some Bells &amp; Whistles to Our Hydra Application<a class="headerlink" href="#bonus-adding-some-bells-whistles-to-our-hydra-application" title="Permalink to this heading">#</a></h2>
 <p>There are a couple of enhancements that we can add to our Hydra-based application,
 which are beyond the scope of this How-To; it is simple to <a class="reference external" href="https://mit-ll-responsible-ai.github.io/hydra-zen/tutorials/add_cli.html">add a command line interface to our code</a> and to make the <a class="reference internal" href="../generated/rai_toolbox.mushin.HydraDDP.html#rai_toolbox.mushin.HydraDDP" title="rai_toolbox.mushin.HydraDDP"><code class="xref py py-func docutils literal notranslate"><span class="pre">HydraDDP()</span></code></a> strategy available
 as <a class="reference external" href="https://mit-ll-responsible-ai.github.io/hydra-zen/tutorials/config_groups.html">a swappable configuration group</a>. We refer the reader to the linked tutorials for
@@ -632,7 +634,7 @@ further explanation and instruction.</p>
   <div class="footer-item">
     
 <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.3.0.<br>
 </p>
 
   </div>

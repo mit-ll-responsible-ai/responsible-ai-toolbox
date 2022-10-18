@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 <meta content="Reference documentation responsible AI toolbox PyTorch augmentations" name="description" />
 
     <title>Augmentations &#8212; rai-toolbox  documentation</title>
@@ -39,7 +39,9 @@
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/clipboard.min.js"></script>
     <script src="_static/copybutton.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -49,7 +51,7 @@
     <link rel="next" title="rai_toolbox.augmentations.fourier.FourierBasis" href="generated/rai_toolbox.augmentations.fourier.FourierBasis.html" />
     <link rel="prev" title="rai_toolbox.datasets.RestrictedImageNet" href="generated/rai_toolbox.datasets.RestrictedImageNet.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="docsearch:language" content="None">
+  <meta name="docsearch:language" content="en">
   </head>
   
   
@@ -354,18 +356,14 @@
             <article class="bd-article" role="main">
               
   <section id="augmentations">
-<span id="aug-reference"></span><h1>Augmentations<a class="headerlink" href="#augmentations" title="Permalink to this headline">#</a></h1>
+<span id="aug-reference"></span><h1>Augmentations<a class="headerlink" href="#augmentations" title="Permalink to this heading">#</a></h1>
 <p>The rAI-toolbox provides methods and utilities for generating diverse data
 augmentations that are not readily available via other existing libraries
 (e.g., <code class="xref py py-obj docutils literal notranslate"><span class="pre">torchvision.tranforms</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">kornia</span></code>).</p>
 <section id="fourier-basis-augmentations-and-utilities">
-<h2>Fourier-Basis Augmentations and Utilities<a class="headerlink" href="#fourier-basis-augmentations-and-utilities" title="Permalink to this headline">#</a></h2>
+<h2>Fourier-Basis Augmentations and Utilities<a class="headerlink" href="#fourier-basis-augmentations-and-utilities" title="Permalink to this heading">#</a></h2>
 <p>Utilities derived from <a class="reference external" href="https://arxiv.org/abs/2202.12412">Fourier-Based Augmentations for Improved Robustness and Uncertainty Calibration</a>.</p>
 <table class="autosummary longtable table autosummary">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/rai_toolbox.augmentations.fourier.FourierBasis.html#rai_toolbox.augmentations.fourier.FourierBasis" title="rai_toolbox.augmentations.fourier.FourierBasis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FourierBasis</span></code></a>(basis, position, sym_position, ...)</p></td>
 <td><p>Describes a 2D planewave generated via:</p></td>
@@ -380,13 +378,9 @@ augmentations that are not readily available via other existing libraries
 </table>
 </section>
 <section id="augmix-augmentations-and-utilities">
-<h2>AugMix Augmentations and Utilities<a class="headerlink" href="#augmix-augmentations-and-utilities" title="Permalink to this headline">#</a></h2>
+<h2>AugMix Augmentations and Utilities<a class="headerlink" href="#augmix-augmentations-and-utilities" title="Permalink to this heading">#</a></h2>
 <p>Utilities derived from <a class="reference external" href="https://arxiv.org/abs/1912.02781">AugMix: A Simple Data Processing Method to Improve Robustness and Uncertainty</a>.</p>
 <table class="autosummary longtable table autosummary">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/rai_toolbox.augmentations.augmix.AugMix.html#rai_toolbox.augmentations.augmix.AugMix" title="rai_toolbox.augmentations.augmix.AugMix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AugMix</span></code></a>(process_fn, augmentations, *[, ...])</p></td>
 <td><p>Augments <code class="xref py py-obj docutils literal notranslate"><span class="pre">datum</span></code> using a mixture of randomly-composed augmentations via a method called &quot;AugMix&quot; <a class="reference internal" href="generated/rai_toolbox.augmentations.augmix.AugMix.html#rd2eef4740ea0-1" id="id1"><span>[Rd2eef4740ea0-1]</span></a>.</p></td>
@@ -508,7 +502,7 @@ augmentations that are not readily available via other existing libraries
   <div class="footer-item">
     
 <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.3.0.<br>
 </p>
 
   </div>
