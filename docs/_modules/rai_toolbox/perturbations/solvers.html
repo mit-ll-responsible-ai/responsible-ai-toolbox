@@ -240,10 +240,10 @@
 <span class="sd">        If `model` is a `torch.nn.Module`, then its weights will be frozen and it will</span>
 <span class="sd">        be set to eval mode during the perturbation-solve phase.</span>
 
-<span class="sd">    data : Tensor, shape-(N, ...)</span>
+<span class="sd">    data : ArrayLike, shape-(N, ...)</span>
 <span class="sd">        The input data to perturb.</span>
 
-<span class="sd">    target : Tensor, shape-(N, ...)</span>
+<span class="sd">    target : ArrayLike, shape-(N, ...)</span>
 <span class="sd">        If `targeted==False` (default), then this is the target to perturb away from.</span>
 <span class="sd">        If `targeted==True`, then this is the target to perturb toward.</span>
 
