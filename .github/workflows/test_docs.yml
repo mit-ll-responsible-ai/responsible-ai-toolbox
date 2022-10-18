@@ -1,0 +1,35 @@
+name: test docs build
+
+on:
+  pull_request:
+    branches:
+      - docs
+
+jobs:
+  deploy:
+    runs-on: ubuntu-18.04
+    defaults:
+      run:
+        shell: bash -l {0}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          python-version: 3.9
+          channels: conda-forge
+          channel-priority: strict
+          activate-environment: sphinx-docs
+          environment-file: ./docs/conda_env.yml
+          use-only-tar-bz2: true
+      - run: |
+          conda activate sphinx-docs
+          which pip
+
+      - name: Install package
+        run: python3 -m pip install .[mushin]
+
+      - name: Install docs dependencies
+        run: pip install -r ./docs/requirements.txt
+
+      - name: Run sphinx
+        run: (cd ./docs/ && make html)
