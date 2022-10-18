@@ -41,7 +41,6 @@ extensions = [
     "sphinx.ext.autosummary",
     "numpydoc",
     "sphinx_copybutton",
-    "sphinx_tabs.tabs",
     "nbsphinx",
 ]
 
