@@ -1,7 +1,7 @@
-name: github pages
+name: test docs build
 
 on:
-  push:
+  pull_request:
     branches:
       - docs
 
@@ -33,10 +33,3 @@ jobs:
 
       - name: Run sphinx
         run: (cd ./docs/ && make html)
-
-      - name: Deploy
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          destination_dir: ./docs
-          publish_dir: ./docs/build/html

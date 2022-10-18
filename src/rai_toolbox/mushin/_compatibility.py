@@ -28,4 +28,4 @@ def _get_version(ver_str: str) -> Version:
     return Version(major=major, minor=minor, patch=int(patch_str))
 
 
-PL_VERSION: Final = _get_version(pytorch_lightning.__version__)
+PL_VERSION: Final = _get_version(pytorch_lightning.__version__)  # type: ignore

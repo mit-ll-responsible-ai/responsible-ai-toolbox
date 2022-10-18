@@ -31,7 +31,6 @@ To publish a new version of `rai-experiments` do the following:
 2. Open a PR into the branch `rai-exps-publish`
 3. Review and merge.
 
-It is recommended that you first do this complete this process for a release candidate. E.g. 
 
 This will automatically trigger GitHub Actions, which will publish this new version to PyPI.
 

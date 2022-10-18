@@ -58,10 +58,14 @@ class Optimizer(Protocol):  # pragma: no cover
     def load_state_dict(self, state_dict: Any) -> None:
         ...
 
-    def zero_grad(self, set_to_none: Optional[bool] = ...) -> None:
+    def zero_grad(self, set_to_none: Any = ...) -> None:
+        # In order to maintain compatibility across torch versions we
+        # annotate `set_to_none: Any`
+        # - torch 1.12 annotates `set_to_none: bool`
+        # - torch <1.12 annotates `set_to_none: Optional[bool]`
         ...
 
-    def step(self, closure: Optional[Callable[[], Any]] = ...) -> Optional[Any]:
+    def step(self, closure: Optional[Callable[[], Any]] = None) -> Optional[Any]:
         ...
 
     def add_param_group(self, param_group: Any) -> None:
