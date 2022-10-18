@@ -7,10 +7,10 @@ To deploy the docs to our website, you must push to the `docs` branch. In GitHub
 
 
 ## Building the docs locally
-Navigate your console to the `responsible-ai-toolbox/docs/` directory. In a conda environment install the following:
+Navigate your console to the `responsible-ai-toolbox/docs/` directory. In your conda environment, presumed to be named `my_env` here, run the following to install doc dependencies:
 
 ```console
-$ conda install nbsphinx=0.8.8 pandoc=2.18 ipykernel=6.13.0 -c conda-forge
+$ conda env update -n my_env --file conda_env.yml
 ```
 
 In the same conda environment [install the toolbox](https://mit-ll-responsible-ai.github.io/responsible-ai-toolbox/#installation) 
