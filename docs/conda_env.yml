@@ -2,8 +2,8 @@ name: sphinx-docs
 channels:
   - conda-forge
 dependencies:
-  - nbsphinx=0.8.8
+  - nbsphinx=0.8.9
   - pandoc=2.18
-  - ipykernel=6.13.0
+  - ipykernel=6.16.0
   - pip
   - setuptools
