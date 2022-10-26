@@ -297,7 +297,7 @@ def gradient_ascent(
         # free up memory
         optim.zero_grad(set_to_none=True)
 
-        # Final evalulation
+        # Final evaluation
         with tr.no_grad():
             xadv = pmodel(data)
             logits = model(xadv)
