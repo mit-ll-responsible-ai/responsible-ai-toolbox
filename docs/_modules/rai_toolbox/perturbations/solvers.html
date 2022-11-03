@@ -621,7 +621,7 @@
         <span class="c1"># free up memory</span>
         <span class="n">optim</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">(</span><span class="n">set_to_none</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-        <span class="c1"># Final evalulation</span>
+        <span class="c1"># Final evaluation</span>
         <span class="k">with</span> <span class="n">tr</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
             <span class="n">xadv</span> <span class="o">=</span> <span class="n">pmodel</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
             <span class="n">logits</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">xadv</span><span class="p">)</span>

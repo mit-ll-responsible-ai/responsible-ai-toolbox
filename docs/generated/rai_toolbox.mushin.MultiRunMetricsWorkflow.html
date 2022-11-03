@@ -464,7 +464,7 @@ function. This behavior can be modified by <code class="xref py py-obj docutils 
 <dl class="py method">
 <dt class="sig sig-object py" id="rai_toolbox.mushin.MultiRunMetricsWorkflow.task">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">task</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/mushin/workflows.html#MultiRunMetricsWorkflow.task"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.mushin.MultiRunMetricsWorkflow.task" title="Permalink to this definition">#</a></dt>
-<dd><p>Abstract <a class="reference external" href="https://docs.python.org/3/library/functions.html#staticmethod" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">staticmethod</span></code></a> for users to define the task that is configured and
+<dd><p>Abstract <a class="reference external" href="https://docs.python.org/3/library/functions.html#staticmethod" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">staticmethod</span></code></a> for users to define the task that is configured and
 launched by the workflow</p>
 </dd></dl>
 
@@ -479,7 +479,7 @@ workflow.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
 <dt><strong>task_fn_wrapper: Callable[[Callable[…, T1]], Callable[[Any], T1]] | None, optional (default=rai_toolbox.mushin.zen)</strong></dt><dd><p>A wrapper applied to <code class="xref py py-obj docutils literal notranslate"><span class="pre">self.task</span></code> prior to launching the task.
-The default wrapper is <code class="xref py py-obj docutils literal notranslate"><span class="pre">rai_toolbox.mushin.zen</span></code>. Specify <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> for no
+The default wrapper is <code class="xref py py-obj docutils literal notranslate"><span class="pre">rai_toolbox.mushin.zen</span></code>. Specify <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> for no
 wrapper to be applied.</p>
 </dd>
 <dt><strong>working_dir: str (default: None, the Hydra default will be used)</strong></dt><dd><p>The directory to run the experiment in.  This value is used for
@@ -497,7 +497,7 @@ This is helpful for filtering out parameters stored in
 </dd>
 <dt><strong>version_base</strong><span class="classifier">Optional[str], optional (default=1.1)</span></dt><dd><p>Available starting with Hydra 1.2.0.
 - If the <code class="xref py py-obj docutils literal notranslate"><span class="pre">version_base</span> <span class="pre">parameter</span></code> is not specified, Hydra 1.x will use defaults compatible with version 1.1. Also in this case, a warning is issued to indicate an explicit version_base is preferred.
-- If the <code class="xref py py-obj docutils literal notranslate"><span class="pre">version_base</span> <span class="pre">parameter</span></code> is <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, then the defaults are chosen for the current minor Hydra version. For example for Hydra 1.2, then would imply <code class="xref py py-obj docutils literal notranslate"><span class="pre">config_path=None</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra.job.chdir=False</span></code>.
+- If the <code class="xref py py-obj docutils literal notranslate"><span class="pre">version_base</span> <span class="pre">parameter</span></code> is <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, then the defaults are chosen for the current minor Hydra version. For example for Hydra 1.2, then would imply <code class="xref py py-obj docutils literal notranslate"><span class="pre">config_path=None</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra.job.chdir=False</span></code>.
 - If the <code class="xref py py-obj docutils literal notranslate"><span class="pre">version_base</span></code> parameter is an explicit version string like “1.1”, then the defaults appropriate to that version are used.</p>
 </dd>
 <dt><strong>to_dictconfig: bool (default: False)</strong></dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code>, convert a <code class="docutils literal notranslate"><span class="pre">dataclasses.dataclass</span></code> to a <code class="docutils literal notranslate"><span class="pre">omegaconf.DictConfig</span></code>. Note, this
@@ -534,7 +534,7 @@ that subdirectories within this working directory will contain
 individual Hydra jobs data (yaml configurations) and saved metrics files.</p>
 </dd>
 <dt><strong>metrics_filename: str | Sequence[str] | None</strong></dt><dd><p>The filename(s) or glob-pattern(s) uses to load the metrics.
-If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, the metrics stored in <code class="xref py py-obj docutils literal notranslate"><span class="pre">self.metrics</span></code> is used.</p>
+If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, the metrics stored in <code class="xref py py-obj docutils literal notranslate"><span class="pre">self.metrics</span></code> is used.</p>
 </dd>
 </dl>
 </dd>
@@ -556,7 +556,7 @@ the metrics in <code class="xref py py-obj docutils literal notranslate"><span c
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>metrics_filename</strong><span class="classifier">str | Sequence[str]</span></dt><dd><p>The filename(s) or glob-pattern(s) uses to load the metrics.
-If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, the metrics stored in <code class="xref py py-obj docutils literal notranslate"><span class="pre">self.metrics</span></code> is used.</p>
+If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, the metrics stored in <code class="xref py py-obj docutils literal notranslate"><span class="pre">self.metrics</span></code> is used.</p>
 </dd>
 </dl>
 </dd>
@@ -614,7 +614,7 @@ mappings.</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<p>Designing a workflow that uses the <a class="reference external" href="https://docs.python.org/3/library/pickle.html#module-pickle" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pickle</span></code></a> module to save and load
+<p>Designing a workflow that uses the <a class="reference external" href="https://docs.python.org/3/library/pickle.html#module-pickle" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pickle</span></code></a> module to save and load
 metrics</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">rai_toolbox.mushin</span> <span class="kn">import</span> <span class="n">MultiRunMetricsWorkflow</span><span class="p">,</span> <span class="n">multirun</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pickle</span>
@@ -646,20 +646,20 @@ metrics</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>include_working_subdirs_as_data_var</strong><span class="classifier">bool, optional (default=False)</span></dt><dd><p>If <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> then the data-variable “working_subdir” will be included in the
+<dt><strong>include_working_subdirs_as_data_var</strong><span class="classifier">bool, optional (default=False)</span></dt><dd><p>If <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> then the data-variable “working_subdir” will be included in the
 xarray. This data variable is used to lookup the working sub-dir path
 (a string) by multirun coordinate.</p>
 </dd>
-<dt><strong>coord_from_metrics</strong><span class="classifier">str | None (default: None)</span></dt><dd><p>If not <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> defines the metric key to use as a coordinate
+<dt><strong>coord_from_metrics</strong><span class="classifier">str | None (default: None)</span></dt><dd><p>If not <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> defines the metric key to use as a coordinate
 in the <code class="xref py py-obj docutils literal notranslate"><span class="pre">Dataset</span></code>.  This function assumes that this coordinate
 represents the leading dimension for all data-variables.</p>
 </dd>
-<dt><strong>non_multirun_params_as_singleton_dims</strong><span class="classifier">bool, optional (default=False)</span></dt><dd><p>If <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> then non-multirun entries from <code class="xref py py-obj docutils literal notranslate"><span class="pre">workflow_overrides</span></code> will be
+<dt><strong>non_multirun_params_as_singleton_dims</strong><span class="classifier">bool, optional (default=False)</span></dt><dd><p>If <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> then non-multirun entries from <code class="xref py py-obj docutils literal notranslate"><span class="pre">workflow_overrides</span></code> will be
 included as length-1 dimensions in the xarray. Useful for merging/
 concatenation with other Datasets</p>
 </dd>
 <dt><strong>metrics_filename: Optional[str]</strong></dt><dd><p>The filename or glob-pattern uses to load the metrics.
-If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, the metrics stored in <code class="xref py py-obj docutils literal notranslate"><span class="pre">self.metrics</span></code> is used.</p>
+If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, the metrics stored in <code class="xref py py-obj docutils literal notranslate"><span class="pre">self.metrics</span></code> is used.</p>
 </dd>
 </dl>
 </dd>
@@ -729,7 +729,7 @@ the flattened overrides for that previous run.</p>
 <td><p>Called prior to <a class="reference internal" href="#rai_toolbox.mushin.MultiRunMetricsWorkflow.task" title="rai_toolbox.mushin.MultiRunMetricsWorkflow.task"><code class="xref py py-obj docutils literal notranslate"><span class="pre">task</span></code></a></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#rai_toolbox.mushin.MultiRunMetricsWorkflow.task" title="rai_toolbox.mushin.MultiRunMetricsWorkflow.task"><code class="xref py py-obj docutils literal notranslate"><span class="pre">task</span></code></a>(*args, **kwargs)</p></td>
-<td><p>Abstract <a class="reference external" href="https://docs.python.org/3/library/functions.html#staticmethod" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">staticmethod</span></code></a> for users to define the task that is configured and launched by the workflow</p></td>
+<td><p>Abstract <a class="reference external" href="https://docs.python.org/3/library/functions.html#staticmethod" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">staticmethod</span></code></a> for users to define the task that is configured and launched by the workflow</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#rai_toolbox.mushin.MultiRunMetricsWorkflow.run" title="rai_toolbox.mushin.MultiRunMetricsWorkflow.run"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run</span></code></a>(*[, task_fn_wrapper, working_dir, ...])</p></td>
 <td><p>Run the experiment.</p></td>

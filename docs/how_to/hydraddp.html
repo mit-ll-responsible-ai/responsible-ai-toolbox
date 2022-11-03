@@ -381,7 +381,7 @@ becomes compatible with interactive environments such as Jupyter Notebooks!</p>
 <p>Using Hydra to run <a class="reference external" href="https://pytorch-lightning.readthedocs.io/en/latest/accelerators/gpu_expert.html#what-is-a-strategy/">PyTorch Lightning’s Distributed Data Parallel (DDP) Strategy</a>
 often <a class="reference external" href="https://github.com/PyTorchLightning/pytorch-lightning/issues/11300">has issues</a>
 , in part because the strategy launches subprocesses where the command is derived from
-values in <a class="reference external" href="https://docs.python.org/3/library/sys.html#sys.argv" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sys.argv</span></code></a>.</p>
+values in <a class="reference external" href="https://docs.python.org/3/library/sys.html#sys.argv" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sys.argv</span></code></a>.</p>
 <p>The rAI-toolbox comes with a custom strategy, <a class="reference internal" href="../generated/rai_toolbox.mushin.HydraDDP.html#rai_toolbox.mushin.HydraDDP" title="rai_toolbox.mushin.HydraDDP"><code class="xref py py-func docutils literal notranslate"><span class="pre">HydraDDP()</span></code></a>,
 that addresses the challenge of running Hydra and Lightning together using DDP.</p>
 <p>In this How-To we will:</p>

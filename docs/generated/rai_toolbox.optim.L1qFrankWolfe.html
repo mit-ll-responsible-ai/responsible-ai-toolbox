@@ -425,7 +425,7 @@ update. See <code class="xref py py-obj docutils literal notranslate"><span clas
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">use_default_lr_schedule=False</span></code> then <code class="xref py py-obj docutils literal notranslate"><span class="pre">lr</span></code> must be be in the
 domain <code class="xref py py-obj docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">1]</span></code>.</p>
 </dd>
-<dt><strong>use_default_lr_schedule</strong><span class="classifier">bool, optional (default=True)</span></dt><dd><p>If <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a>, then the per-parameter “learning rate” is scaled
+<dt><strong>use_default_lr_schedule</strong><span class="classifier">bool, optional (default=True)</span></dt><dd><p>If <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a>, then the per-parameter “learning rate” is scaled
 by <span class="math notranslate nohighlight">\(\hat{l_r} = l_r / (l_r + k)\)</span> where k is the update index
 for that parameter, which starts at 0.</p>
 </dd>
@@ -436,7 +436,7 @@ in a batch-like style. This can be specified per param-group</p>
 <ul class="simple">
 <li><p>A positive number determines the dimensionality of the tensor that the transformation will act on.</p></li>
 <li><p>A negative number indicates the ‘offset’ from the dimensionality of the tensor (see “Notes” for examples).</p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> means that the transformation will be applied directly to the tensor without any broadcasting.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> means that the transformation will be applied directly to the tensor without any broadcasting.</p></li>
 </ul>
 <p>See <a class="reference internal" href="rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer" title="rai_toolbox.optim.ParamTransformingOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParamTransformingOptimizer</span></code></a> for more details and examples.</p>
 </dd>

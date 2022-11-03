@@ -411,7 +411,7 @@ in a batch-like style.</p>
 <ul class="simple">
 <li><p>A positive number determines the dimensionality of the tensor that the transformation will act on.</p></li>
 <li><p>A negative number indicates the ‘offset’ from the dimensionality of the tensor (see “Notes” for examples).</p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> means that the transformation will be applied directly to the tensor without any broadcasting.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> means that the transformation will be applied directly to the tensor without any broadcasting.</p></li>
 </ul>
 <p>See <a class="reference internal" href="rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer" title="rai_toolbox.optim.ParamTransformingOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParamTransformingOptimizer</span></code></a> for more details and examples.</p>
 </dd>
@@ -451,7 +451,7 @@ optimizer will be used, with <code class="xref py py-obj docutils literal notran
 transformed gradients.</p>
 <p>We specify <a class="reference internal" href="rai_toolbox.optim.TopQGradientOptimizer.html#rai_toolbox.optim.TopQGradientOptimizer" title="rai_toolbox.optim.TopQGradientOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TopQGradientOptimizer</span></code></a> and then <a class="reference internal" href="rai_toolbox.optim.ClampedGradientOptimizer.html#rai_toolbox.optim.ClampedGradientOptimizer" title="rai_toolbox.optim.ClampedGradientOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ClampedGradientOptimizer</span></code></a>; the
 transformations are applied in order from left to right. Providing per-optimizer
-defaults is achieved most naturally using <a class="reference external" href="https://docs.python.org/3/library/functools.html#functools.partial" title="(in Python v3.10)"><code class="xref py py-func docutils literal notranslate"><span class="pre">functools.partial()</span></code></a>.</p>
+defaults is achieved most naturally using <a class="reference external" href="https://docs.python.org/3/library/functools.html#functools.partial" title="(in Python v3.11)"><code class="xref py py-func docutils literal notranslate"><span class="pre">functools.partial()</span></code></a>.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">optim</span> <span class="o">=</span> <span class="n">ChainedParamTransformingOptimizer</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="n">partial</span><span class="p">(</span><span class="n">TopQGradientOptimizer</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="mf">0.33</span><span class="p">),</span>
 <span class="gp">... </span>    <span class="n">partial</span><span class="p">(</span><span class="n">ClampedGradientOptimizer</span><span class="p">,</span> <span class="n">clamp_max</span><span class="o">=</span><span class="mf">2.8</span><span class="p">),</span>
