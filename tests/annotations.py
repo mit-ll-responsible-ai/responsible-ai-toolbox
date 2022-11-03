@@ -37,7 +37,7 @@ def check_optim_interface():
     SignedGradientOptim([{"params": x}], InnerOpt=partial(SGD))
 
     # x needs to be sequence
-    SignedGradientOptim(x, InnerOpt=SGD)  # type: ignore
+    SignedGradientOptim(x, InnerOpt=SGD)
 
 
 def check_optim_compatibilities():
