@@ -336,9 +336,14 @@
 <span class="kn">from</span> <span class="nn">torch.optim</span> <span class="kn">import</span> <span class="n">SGD</span><span class="p">,</span> <span class="n">Optimizer</span>
 <span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">TypedDict</span>
 
-<span class="kn">from</span> <span class="nn">rai_toolbox._typing</span> <span class="kn">import</span> <span class="n">InstantiatesTo</span>
-<span class="kn">from</span> <span class="nn">rai_toolbox._typing</span> <span class="kn">import</span> <span class="n">Optimizer</span> <span class="k">as</span> <span class="n">Opt</span>
-<span class="kn">from</span> <span class="nn">rai_toolbox._typing</span> <span class="kn">import</span> <span class="n">OptimizerType</span><span class="p">,</span> <span class="n">OptimParams</span><span class="p">,</span> <span class="n">Partial</span><span class="p">,</span> <span class="n">instantiates_to</span>
+<span class="kn">from</span> <span class="nn">rai_toolbox._typing</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">InstantiatesTo</span><span class="p">,</span>
+    <span class="n">Optimizer</span> <span class="k">as</span> <span class="n">Opt</span><span class="p">,</span>
+    <span class="n">OptimizerType</span><span class="p">,</span>
+    <span class="n">OptimParams</span><span class="p">,</span>
+    <span class="n">Partial</span><span class="p">,</span>
+    <span class="n">instantiates_to</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">rai_toolbox._utils</span> <span class="kn">import</span> <span class="n">validate_param_ndim</span> <span class="k">as</span> <span class="n">_validate_param_ndim</span>
 
 <span class="n">_T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;_T&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">float</span><span class="p">]])</span>
@@ -477,7 +482,7 @@
 <span class="sd">    `param_groups`, `defaults`, and `state` are always in sync.</span>
 
 <span class="sd">    `ParamTransformingOptimizer` is designed to be combined with other,</span>
-<span class="sd">    standard gradient-based optimizers (e.g., Adam) via encapsulation, rather than</span>
+<span class="sd">    standard gradient-based optimizers (e.g., Adam) via composition, rather than</span>
 <span class="sd">    through inheritance. I.e., `ParamTransformingOptimizer(InnerOpt=&lt;...&gt;)` will apply</span>
 <span class="sd">    `_pre_step_transform_` on a parameter, and then use `InnerOpt.step(...)` to update</span>
 <span class="sd">    said parameter, and finally will apply `_post_step_transform_` to the parameter.</span>
