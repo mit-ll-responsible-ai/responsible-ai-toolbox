@@ -1166,7 +1166,7 @@ class RobustnessCurve(MultiRunMetricsWorkflow):
     def plot(
         self,
         metric: str,
-        ax=None,
+        ax: Any = None,
         group: Optional[str] = None,
         save_filename: Optional[str] = None,
         non_multirun_params_as_singleton_dims: bool = False,
