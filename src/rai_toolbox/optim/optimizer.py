@@ -12,9 +12,14 @@ from torch import Tensor
 from torch.optim import SGD, Optimizer
 from typing_extensions import TypedDict
 
-from rai_toolbox._typing import InstantiatesTo
-from rai_toolbox._typing import Optimizer as Opt
-from rai_toolbox._typing import OptimizerType, OptimParams, Partial, instantiates_to
+from rai_toolbox._typing import (
+    InstantiatesTo,
+    Optimizer as Opt,
+    OptimizerType,
+    OptimParams,
+    Partial,
+    instantiates_to,
+)
 from rai_toolbox._utils import validate_param_ndim as _validate_param_ndim
 
 _T = TypeVar("_T", bound=Optional[Union[Tensor, float]])
@@ -153,7 +158,7 @@ class ParamTransformingOptimizer(Optimizer, metaclass=ABCMeta):
     `param_groups`, `defaults`, and `state` are always in sync.
 
     `ParamTransformingOptimizer` is designed to be combined with other,
-    standard gradient-based optimizers (e.g., Adam) via encapsulation, rather than
+    standard gradient-based optimizers (e.g., Adam) via composition, rather than
     through inheritance. I.e., `ParamTransformingOptimizer(InnerOpt=<...>)` will apply
     `_pre_step_transform_` on a parameter, and then use `InnerOpt.step(...)` to update
     said parameter, and finally will apply `_post_step_transform_` to the parameter.

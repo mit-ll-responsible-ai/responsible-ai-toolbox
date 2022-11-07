@@ -7,8 +7,8 @@
 Optimizers
 ##########
 
-Our optimizers are designed to enhance off-the-shelf `torch.optim.Optimizer` implementations by adding the ability to modify parameters – and their gradients – before and after the optimizer's step process.
-This is facilitated by `~rai_toolbox.optim.ParamTransformingOptimizer`, which is able to encapsulate any optimizer (referred to as `InnerOpt` throughout the reference docs) and add parameter/gradient-transforming capabilities to it.
+Our optimizers are designed to compose with off-the-shelf `torch.optim.Optimizer` implementations by adding the ability to modify parameters – and their gradients – before and after the optimizer's step process.
+This is facilitated by `~rai_toolbox.optim.ParamTransformingOptimizer`, which is able to compose with any PyTorch optimizer (referred to as `InnerOpt` throughout the reference docs) and add parameter/gradient-transforming capabilities to it.
 
 
 The capabilities and implementations provided here are particularly useful for :ref:`solving for data perturbations <pert-reference>`.
