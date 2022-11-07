@@ -1208,7 +1208,7 @@ class RobustnessCurve(MultiRunMetricsWorkflow):
             non_multirun_params_as_singleton_dims=non_multirun_params_as_singleton_dims
         )
         if group is None:
-            plots = xdata[metric].plot.line(x="epsilon", ax=ax, **kwargs)
+            plots = xdata[metric].plot.line(x="epsilon", ax=ax, **kwargs)  # type: ignore
 
         else:
             # TODO: xarray.groupby doesn't support multidimensional grouping
