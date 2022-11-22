@@ -18,8 +18,11 @@ cs.store(name="madry_config", node=configs.Config)
 
 class MadryLabRobustness(RobustnessCurve):
     @staticmethod
-    def task(seed: int, trainer: pl.Trainer, module: pl.LightningModule) -> dict:
+    def pre_task(seed: int):
         pl.seed_everything(seed)
+
+    @staticmethod
+    def task(trainer: pl.Trainer, module: pl.LightningModule) -> dict:
         trainer.test(module)
 
         assert Path("test_metrics.pt").exists()
