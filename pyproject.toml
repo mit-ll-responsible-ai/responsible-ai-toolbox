@@ -144,7 +144,7 @@ basepython = python3.7
 [testenv:no-mushin]
 extras = 
     tests
-commands = pytest --hypothesis-profile ci tests
+commands = pytest -n auto --hypothesis-profile ci tests
 
 
 [testenv:coverage]
@@ -154,9 +154,10 @@ basepython = python3.8
 extras = 
     tests
     mushin
-deps = coverage
+deps = {[testenv]deps}
+       coverage
        pytest-cov
-commands = pytest --cov-report term-missing --cov-config=pyproject.toml --cov-branch --cov=rai_toolbox --hypothesis-profile ci tests
+commands = pytest -n auto --cov-report term-missing --cov-config=pyproject.toml --cov-branch --cov=rai_toolbox --hypothesis-profile ci tests
 
 
 [testenv:pre-release]  # test against pre-releases of dependencies
