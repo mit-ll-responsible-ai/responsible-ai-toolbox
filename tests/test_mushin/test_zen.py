@@ -4,8 +4,7 @@
 import pytest
 from hydra_zen import builds, make_config
 from hydra_zen.errors import HydraZenValidationError
-from hypothesis import given
-from hypothesis import strategies as st
+from hypothesis import given, strategies as st
 
 from rai_toolbox.mushin.hydra import zen
 

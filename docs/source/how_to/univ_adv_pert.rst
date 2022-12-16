@@ -7,7 +7,7 @@
 Solve for a Universal Perturbation
 ==================================
 
-A universal adversarial perturbation (UAP) is a *single* perturbation that can be applied *uniformly to any data* in order to substantially reduce the quality of a machine learning model's predicitons on that data.
+A universal adversarial perturbation (UAP) is a *single* perturbation that can be applied *uniformly to any data* in order to substantially reduce the quality of a machine learning model's predictionsf on that data.
 In the case of an additive perturbation (i.e., :math:`x \rightarrow x + \delta`), the single perturbation, :math:`\delta`, is optimized over a data distribution:
 
 .. math::
@@ -16,7 +16,7 @@ In the case of an additive perturbation (i.e., :math:`x \rightarrow x + \delta`)
 
 The paper `Universal Adversarial Training <https://arxiv.org/pdf/1811.11304.pdf>`_ by Shafahi et al propose a simple and efficient gradient-based optimization method for solving for such a UAP.
 
-In this How-To, we demonstrate how the rAI-toolbox's perturbation models, optimizers, and solvers naturally accomodate this approach to solving for UAPs.
+In this How-To, we demonstrate how the rAI-toolbox's perturbation models, optimizers, and solvers naturally accommodate this approach to solving for UAPs.
 Specifically, we will
 
 1. Create some toy-data and a trivial model.
@@ -78,7 +78,7 @@ Rather than specifying the precise shape of the perturbation, we can simply indi
             [0., 0., 0., 0.]]], requires_grad=True)
 
 
-Now we will initialize an optimizer that will update our perturbation. `~rai_toolbox.optim.L2ProjectedOptim` is designed to normalize a gradient by its :math:`L^2` norm prior to perfoming the parameter updated (using a `SGD` step by default). The updated perturbation is then projected into a :math:`\epsilon`-sized :math:`L^2` ball.
+Now we will initialize an optimizer that will update our perturbation. `~rai_toolbox.optim.L2ProjectedOptim` is designed to normalize a gradient by its :math:`L^2` norm prior to performing the parameter updated (using a `SGD` step by default). The updated perturbation is then projected into a :math:`\epsilon`-sized :math:`L^2` ball.
 We will use an `SGD` step with `lr=0.1` and a momentum of 0.9; we pick :math:`\epsilon=2`. In order to ensure that these gradient and parameter-transforming operations apply appropriately to our UAP, we specify `param_ndim=None` (see :ref:`these docs <param-ndim-add>` for more details).
 
 
@@ -168,7 +168,7 @@ Let's check that the loss of the clean batch of data is less than the loss of th
    >>> cross_entropy(model(pert_data), truth)
    tensor(2.4227, grad_fn=<NllLossBackward0>)
 
-Great! Our UAP for this toy problem reduces the average perfomance of our model on uniformally-perturbed data.
+Great! Our UAP for this toy problem reduces the average performance of our model on uniformally-perturbed data.
 
 .. note:: 
 

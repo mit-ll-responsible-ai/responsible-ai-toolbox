@@ -56,14 +56,10 @@ _VERSION_BASE_DEFAULT = _NotSet if HYDRA_VERSION < (1, 2, 0) else "1.1"
 class multirun(UserList):
     """Signals that a sequence is to be iterated over in a multirun"""
 
-    pass
-
 
 class hydra_list(UserList):
     """Signals that a sequence is provided as a single configured value (i.e. it is not
     to be iterated over during a multirun)"""
-
-    pass
 
 
 def _sort_x_by_k(x: T, k: Iterable[Any]) -> T:
@@ -243,9 +239,8 @@ class BaseWorkflow:
         -----
         This function is automatically wrapped by `zen`, which is responsible
         for parsing the function's signature and then extracting and instantiating
-        the correspending fields from a Hydra config object – passing them to the
+        the corresponding fields from a Hydra config object – passing them to the
         function. This behavior can be modified by `self.run(pre_task_fn_wrapper=...)`"""
-        pass
 
     @staticmethod
     def task(*args: Any, **kwargs: Any) -> Any:
@@ -271,13 +266,13 @@ class BaseWorkflow:
         -----
         This function is automatically wrapped by `zen`, which is responsible
         for parsing the function's signature and then extracting and instantiating
-        the correspending fields from a Hydra config object – passing them to the
+        the corresponding fields from a Hydra config object – passing them to the
         function. This behavior can be modified by `self.run(task_fn_wrapper=...)`
         """
         raise NotImplementedError()
 
     def validate(self, include_pre_task: bool = True):
-        """Valide the configuration will execute with the user defined evaluation task"""
+        """Validates that the configuration will execute with the user-defined evaluation task"""
         if include_pre_task:
             zen(self.pre_task).validate(self.eval_task_cfg)
 
@@ -458,7 +453,7 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
     """Abstract class for workflows that record metrics using Hydra multirun.
 
     This workflow creates subdirectories of multirun experiments using Hydra.  These directories
-    contain the Hydra YAML configuration and any saved metrics file (defined by the evaulation task)::
+    contain the Hydra YAML configuration and any saved metrics file (defined by the evaluationf task)::
 
         ├── working_dir
         │    ├── <experiment directory name: 0>
@@ -1096,7 +1091,7 @@ class RobustnessCurve(MultiRunMetricsWorkflow):
             These parameters represent the values for configurations to use for the
             experiment.
 
-            These values will be appeneded to the `overrides` for the Hydra job.
+            These values will be appended to the `overrides` for the Hydra job.
         """
 
         if not isinstance(epsilon, str):

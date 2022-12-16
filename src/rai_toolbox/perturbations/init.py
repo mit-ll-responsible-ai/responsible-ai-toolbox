@@ -7,9 +7,11 @@ from typing import Optional, Union
 import torch
 from torch import Generator, Tensor, default_generator
 
-from rai_toolbox._utils import to_batch as _to_batch
-from rai_toolbox._utils import validate_param_ndim as _validate_param_ndim
-from rai_toolbox._utils import value_check
+from rai_toolbox._utils import (
+    to_batch as _to_batch,
+    validate_param_ndim as _validate_param_ndim,
+    value_check,
+)
 
 
 @torch.no_grad()
@@ -28,13 +30,13 @@ def uniform_like_l1_n_ball_(
         similar shape and on the same device.
 
         By default, each of the `N` shape-`(D, ...)` subtensors are initialized
-        independently. See `param_ndim` to contol this behavior.
+        independently. See `param_ndim` to control this behavior.
 
     epsilon : float, optional (default=1)
         Determines the radius of the ball.
 
     param_ndim : int | None, optional (default=-1)
-        Determines the dimenionality of the subtensors that are sampled by this
+        Determines the dimensionality of the subtensors that are sampled by this
         function.
 
         - A positive number determines the dimensionality of each subtensor to be drawn and packed into the shape-`(N, D, ...)` resulting tensor.
@@ -123,13 +125,13 @@ def uniform_like_l2_n_ball_(
         similar shape and on the same device.
 
         By default, each of the `N` shape-`(D, ...)` subtensors are initialized
-        independently. See `param_ndim` to contol this behavior.
+        independently. See `param_ndim` to control this behavior.
 
     epsilon : float, optional (default=1)
         Determines the radius of the ball.
 
     param_ndim : int | None, optional (default=-1)
-        Determines the dimenionality of the subtensors that are sampled by this
+        Determines the dimensionality of the subtensors that are sampled by this
         function.
 
         - A positive number determines the dimensionality of each subtensor to be drawn and packed into the shape-`(N, D, ...)` resulting tensor.

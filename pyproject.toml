@@ -94,6 +94,9 @@ combine_as_imports = true
 omit = ["src/rai_toolbox/_version.py"]
 
 
+[tool.codespell]
+skip = '*.js,*.html,*ipynb,*.svg,*.css,docs/build'
+
 
 [tool.pyright]
 include = ["src"]
@@ -162,6 +165,30 @@ extras =
     mushin
 basepython = python3.8
 
+[testenv:auto-format]
+skip_install=true
+deps =
+    autoflake
+    black
+    isort
+commands =
+    autoflake --recursive --in-place --remove-duplicate-keys --remove-unused-variables src/ tests/
+    isort src/ tests/
+    black src/ tests/
+
+[testenv:enforce-format]
+skip_install=true
+basepython=python3.9
+deps=black
+     isort
+     flake8
+     codespell
+commands=
+    black src/ tests/ --diff --check
+    isort src/ tests/ --diff --check
+    flake8 src/ tests/
+    codespell src/ docs/
+
 
 # runs experiments that don't require additional dependencies
 [testenv:experiments-checks]
@@ -177,3 +204,4 @@ commands =
    pytest experiments/universal_perturbation/test_experiment.py
    pytest experiments/xai/test_experiment.py
 """
+

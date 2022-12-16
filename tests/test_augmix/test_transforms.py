@@ -1,17 +1,15 @@
 # Copyright 2022, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
-import pytest
-
 from typing import Tuple, Union
 
 import hypothesis.strategies as st
-from hypothesis import settings
 import numpy as np
-from hypothesis import given
+import pytest
+from hypothesis import given, settings
 from numpy.testing import assert_allclose
 
-from rai_toolbox.augmentations.augmix import augment_and_mix, AugMix, Fork
+from rai_toolbox.augmentations.augmix import AugMix, Fork, augment_and_mix
 
 
 @given(
@@ -88,6 +86,7 @@ def identity1(x):
 def identity2(x):
     return x
 
+
 @settings(max_examples=10)
 @given(
     augmentations=st.lists(
@@ -97,12 +96,14 @@ def identity2(x):
 def test_augmix_reprs(augmentations):
     assert isinstance(repr(AugMix(identity1, augmentations=augmentations)), str)
 
+
 @settings(max_examples=10)
 @given(
     functions=st.lists(st.sampled_from([identity1, identity2]), min_size=1, max_size=7)
 )
 def test_fork_repr(functions):
     assert isinstance(repr(Fork(*functions)), str)
+
 
 @settings(max_examples=10)
 @given(bad_input=st.sampled_from([[], [1], [identity1, False], [True, identity1]]))

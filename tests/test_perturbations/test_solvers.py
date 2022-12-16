@@ -8,12 +8,10 @@ import numpy as np
 import pytest
 import torch
 import torch as tr
-from hypothesis import given, settings
-from hypothesis import strategies as st
+from hypothesis import given, settings, strategies as st
 from hypothesis.extra import numpy as hnp
 from torch import Tensor
-from torch.nn import Module
-from torch.nn import functional as F
+from torch.nn import Module, functional as F
 from torch.optim import SGD
 
 from rai_toolbox.optim import L2ProjectedOptim, LinfProjectedOptim

@@ -5,12 +5,10 @@
 import hypothesis.strategies as st
 import torch as tr
 from hypothesis import given, settings
+from torch.nn import Module
 
 from rai_toolbox._utils import get_device
 from rai_toolbox._utils.tqdm import _dummy_tqdm
-
-
-from torch.nn import Module
 
 devices = [tr.device("cpu")]
 
@@ -21,6 +19,7 @@ if tr.cuda.is_available():
 class EmptyModule(Module):
     def parameters(self, recurse: bool = True):
         return []
+
 
 @settings(deadline=None)
 @given(
@@ -33,6 +32,7 @@ def test_get_device(device, obj):
 
 def test_get_device_for_empty_module():
     assert get_device(EmptyModule()) == tr.device("cpu")
+
 
 @given(st.integers(0, 10))
 def test_tqdm(n: int):
