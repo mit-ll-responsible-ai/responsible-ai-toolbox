@@ -126,10 +126,10 @@ python =
   3.9: py39
 
 [testenv]
+deps = pytest-xdist
 extras = 
     tests
     mushin
-    pytest-xdist
 commands = pytest -n auto --hypothesis-profile ci tests
 
 [testenv:min-deps]  # test against minimum dependency versions
