@@ -134,6 +134,7 @@ commands = pytest -n auto --hypothesis-profile ci tests
 
 [testenv:min-deps]  # test against minimum dependency versions
 deps = 
+    {[testenv]deps}
     torch==1.9.0
     torchmetrics==0.6.0
     typing-extensions==4.1.1
