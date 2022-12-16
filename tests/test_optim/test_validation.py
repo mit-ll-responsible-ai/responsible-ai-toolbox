@@ -1,6 +1,6 @@
 # Copyright 2022, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
-# SPDX-License-Identifier: MIT_params = [tr.tensor(1.0, requires_grad=True)]
+# SPDX-License-Identifier: MIT
 from functools import partial
 
 import hypothesis.strategies as st

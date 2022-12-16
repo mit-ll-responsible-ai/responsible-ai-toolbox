@@ -129,7 +129,8 @@ python =
 extras = 
     tests
     mushin
-commands = pytest --hypothesis-profile ci tests
+    pytest-xdist
+commands = pytest -n auto --hypothesis-profile ci tests
 
 [testenv:min-deps]  # test against minimum dependency versions
 deps = 
@@ -183,11 +184,13 @@ deps=black
      isort
      flake8
      codespell
+     pytest
 commands=
     black src/ tests/ --diff --check
     isort src/ tests/ --diff --check
     flake8 src/ tests/
     codespell src/ docs/
+    pytest project_tooling/test_headers.py
 
 
 # runs experiments that don't require additional dependencies
