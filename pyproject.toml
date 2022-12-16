@@ -126,13 +126,15 @@ python =
   3.9: py39
 
 [testenv]
+deps = pytest-xdist
 extras = 
     tests
     mushin
-commands = pytest --hypothesis-profile ci tests
+commands = pytest -n auto --hypothesis-profile ci tests
 
 [testenv:min-deps]  # test against minimum dependency versions
 deps = 
+    {[testenv]deps}
     torch==1.9.0
     torchmetrics==0.6.0
     typing-extensions==4.1.1
@@ -143,7 +145,7 @@ basepython = python3.7
 [testenv:no-mushin]
 extras = 
     tests
-commands = pytest --hypothesis-profile ci tests
+commands = pytest -n auto --hypothesis-profile ci tests
 
 
 [testenv:coverage]
@@ -153,9 +155,10 @@ basepython = python3.8
 extras = 
     tests
     mushin
-deps = coverage
+deps = {[testenv]deps}
+       coverage
        pytest-cov
-commands = pytest --cov-report term-missing --cov-config=pyproject.toml --cov-branch --cov=rai_toolbox --hypothesis-profile ci tests
+commands = pytest -n auto --cov-report term-missing --cov-config=pyproject.toml --cov-branch --cov=rai_toolbox --hypothesis-profile ci tests
 
 
 [testenv:pre-release]  # test against pre-releases of dependencies
@@ -183,11 +186,13 @@ deps=black
      isort
      flake8
      codespell
+     pytest
 commands=
     black src/ tests/ --diff --check
     isort src/ tests/ --diff --check
     flake8 src/ tests/
     codespell src/ docs/
+    pytest project_tooling/test_headers.py
 
 
 # runs experiments that don't require additional dependencies
