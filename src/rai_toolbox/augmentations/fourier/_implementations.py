@@ -139,7 +139,7 @@ def create_heatmaps(
     factor_2pi_phase_shift: float = 0,
 ) -> Dict[str, List[HeatMapEntry]]:
     from rai_toolbox._utils.tqdm import tqdm
-    
+
     _outer_total = (
         None if row_col_coords is not None else int(np.prod(image_height_width)) // 2
     )

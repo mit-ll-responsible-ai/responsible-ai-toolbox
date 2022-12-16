@@ -2,12 +2,11 @@
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 
-import pytest
 import hypothesis.strategies as st
-from hypothesis import settings
 import numpy as np
+import pytest
 import torch as tr
-from hypothesis import given
+from hypothesis import given, settings
 from hypothesis.extra.numpy import array_shapes, arrays
 from mygrad import no_autodiff
 from mygrad.nnet.activations import softmax

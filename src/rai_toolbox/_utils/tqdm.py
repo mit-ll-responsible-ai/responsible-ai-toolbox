@@ -8,6 +8,7 @@ _T = TypeVar("_T", bound=Iterable)
 
 __all__ = ["tqdm"]
 
+
 def _dummy_tqdm(
     iterable: _T,
     desc: Optional[str] = None,
@@ -31,9 +32,9 @@ def _dummy_tqdm(
     unit_divisor=1000,
 ) -> _T:
     return iterable
-        
+
+
 try:
     from tqdm.auto import tqdm
 except ImportError:  # pragma: no cover
     tqdm = _dummy_tqdm
-

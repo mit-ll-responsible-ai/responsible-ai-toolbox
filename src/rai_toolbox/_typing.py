@@ -95,7 +95,7 @@ def _is_protocol(cls: Any) -> bool:
 def instantiates_to(x: Any, co_var_type: Type[T]) -> TypeGuard[InstantiatesTo[T]]:
     """Checks if `x(...)` will return type `co_var_type`.
 
-    Accomodates structural subtyping via protocols.
+    Accommodates structural subtyping via protocols.
 
     Parameters
     ----------

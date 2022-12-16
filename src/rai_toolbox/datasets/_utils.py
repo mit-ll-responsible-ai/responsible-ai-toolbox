@@ -10,7 +10,7 @@ PathLike = Union[str, Path]
 __all__ = ["md5_check"]
 
 
-def md5_check(fname: PathLike, chunksize: int = 1024 ** 2) -> str:
+def md5_check(fname: PathLike, chunksize: int = 1024**2) -> str:
     """Reads in data from disk and returns md5 hash"""
     import hashlib
 
