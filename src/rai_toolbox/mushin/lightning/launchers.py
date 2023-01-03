@@ -1,4 +1,4 @@
-# Copyright 2022, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
+# Copyright 2023, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 
@@ -259,7 +259,7 @@ if PL_VERSION >= Version(1, 6, 0):
                 sleep(delay)
 
 else:  # pragma: no cover
-    from pytorch_lightning.plugins.training_type.ddp import DDPPlugin
+    from pytorch_lightning.plugins.training_type.ddp import DDPPlugin  # type: ignore
 
     class HydraDDP(DDPPlugin):
         """DDP Strategy that supports Hydra run and multirun jobs.
@@ -352,11 +352,11 @@ else:  # pragma: no cover
                 raise TypeError("HydraDDP.cluster_environment is None")
 
             # bookkeeping of spawned processes
-            self._check_can_spawn_children()  # type: ignore
+            self._check_can_spawn_children()
 
             # DDP Environment variables
-            os.environ["MASTER_ADDR"] = self.cluster_environment.master_address()  # type: ignore
-            os.environ["MASTER_PORT"] = str(self.cluster_environment.master_port())  # type: ignore
+            os.environ["MASTER_ADDR"] = self.cluster_environment.master_address()
+            os.environ["MASTER_PORT"] = str(self.cluster_environment.master_port())
 
             # allow the user to pass the node rank
             os.environ["NODE_RANK"] = str(self.cluster_environment.node_rank())

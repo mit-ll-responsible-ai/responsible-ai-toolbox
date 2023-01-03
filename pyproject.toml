@@ -1,0 +1,225 @@
+[build-system]
+requires = [
+    "setuptools >= 35.0.2",
+    "wheel >= 0.29.0",
+    "setuptools_scm[toml]==7.0.5",
+]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "rai_toolbox"
+dynamic = ["version"]
+description = "PyTorch-centric library for evaluating and enhancing the robustness of AI technologies"
+readme = "README.md"
+requires-python = ">=3.7"
+dependencies = [
+    "torch >= 1.10.0",
+    "torchmetrics >= 0.6.0",
+    "typing-extensions >= 4.1.1",
+]
+license = { file = "LICENSE.txt" }
+keywords = ["machine learning", "robustness", "pytorch", "responsible", "AI"]
+
+authors = [
+    { name = "Ryan Soklaski", email = "ryan.soklaski@ll.mit.edu" },
+    { name = "Justin Goodwin", email = "jgoodwin@ll.mit.edu" },
+    { name = "Olivia Brown" },
+    { name = "Michael Yee" },
+]
+maintainers = [{ name = "Ryan Soklaski", email = "ryan.soklaski@ll.mit.edu" }]
+
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Topic :: Scientific/Engineering",
+    "Programming Language :: Python :: 3 :: Only",
+]
+
+[project.optional-dependencies]
+tests = [
+    "pytest >= 3.8",
+    "hypothesis >= 6.41.0, < 6.49.0",
+    "mygrad >= 2.0.0",
+    "omegaconf >= 2.1.1",
+    "netCDF4 >= 1.5.8",
+]
+
+mushin = [
+    "pytorch-lightning >= 1.5.0",
+    "hydra-zen >= 0.9.0",
+    "xarray >= 0.19.0",
+    "matplotlib >= 3.3",
+    "protobuf <= 3.20.1",         # strict TODO: Remove after tensorboard gets compatible https://github.com/tensorflow/tensorboard/issues/5708
+]
+
+datasets = ["torchvision >= 0.10.0"]
+
+[project.urls]
+"Homepage" = "https://mit-ll-responsible-ai.github.io/responsible-ai-toolbox/"
+"Bug Reports" = "https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox/issues"
+"Source" = "https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox"
+
+
+[tool.setuptools_scm]
+write_to = "src/rai_toolbox/_version.py"
+version_scheme = "no-guess-dev"
+
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+exclude = ["tests*", "tests.*"]
+
+[tool.setuptools.package-data]
+rai_toolbox = ["py.typed"]
+
+
+[tool.isort]
+known_first_party = ["rai_toolbox", "tests", "rai_experiments"]
+profile = "black"
+combine_as_imports = true
+
+
+[tool.coverage.report]
+omit = ["src/rai_toolbox/_version.py"]
+
+
+[tool.codespell]
+skip = '*.js,*.html,*ipynb,*.svg,*.css,docs/build'
+
+
+[tool.pyright]
+include = ["src"]
+exclude = [
+    "**/node_modules",
+    "**/__pycache__",
+    "src/rai_toolbox/_version.py",
+    "**/third_party",
+    "**/project_tooling",
+    "./tests/test_augmentations/_old_implementation.py",
+]
+reportUnnecessaryTypeIgnoreComment = true
+reportUnnecessaryIsInstance = false
+reportPrivateImportUsage = false
+
+
+[tool.pytest.ini_options]
+xfail_strict=true
+filterwarnings = [
+   "ignore:The --rsyncdir command line argument and rsyncdirs config variable are deprecated.:DeprecationWarning",
+   "ignore:Future Hydra versions will no longer change working directory at job runtime by default.",
+   "ignore:distutils Version classes are deprecated",
+   "ignore:numpy.ndarray size changed, may indicate binary incompatibility",
+ ]
+
+
+[tool.tox]
+legacy_tox_ini = """
+[tox]
+isolated_build = True
+envlist = py37, py38, py39, py310
+
+[gh-actions]
+python =
+  3.7: py37
+  3.8: py38
+  3.9: py39
+  3.10: py310
+
+[testenv]
+deps = pytest-xdist
+extras = 
+    tests
+    mushin
+commands = pytest -n auto --hypothesis-profile ci tests
+
+[testenv:min-deps]  # test against minimum dependency versions
+deps = 
+    {[testenv]deps}
+    setuptools==59.5.0
+    torch==1.10.0
+    torchmetrics==0.6.0
+    typing-extensions==4.1.1
+    hydra-zen==0.7.0
+    pytorch-lightning==1.5.0
+basepython = python3.7
+
+[testenv:no-mushin]
+extras = 
+    tests
+commands = pytest -n auto --hypothesis-profile ci tests
+
+
+[testenv:coverage]
+setenv = NUMBA_DISABLE_JIT=1
+usedevelop = true
+basepython = python3.9
+extras = 
+    tests
+    mushin
+    datasets
+deps = {[testenv]deps}
+       coverage
+       pytest-cov
+commands = pytest -n auto --cov-report term-missing --cov-config=pyproject.toml --cov-branch --cov=rai_toolbox --hypothesis-profile ci tests
+
+
+[testenv:pre-release]  # test against pre-releases of dependencies
+pip_pre = true
+extras = 
+    tests
+    mushin
+    datasets
+basepython = python3.9
+
+[testenv:auto-format]
+skip_install=true
+deps =
+    autoflake
+    black
+    isort
+commands =
+    autoflake --recursive --in-place --remove-duplicate-keys --remove-unused-variables src/ tests/
+    isort src/ tests/
+    black src/ tests/
+
+[testenv:enforce-format]
+skip_install=true
+basepython=python3.9
+deps=black
+     isort
+     flake8
+     codespell
+     pytest
+commands=
+    black src/ tests/ --diff --check
+    isort src/ tests/ --diff --check
+    flake8 src/ tests/
+    codespell src/ docs/
+    pytest project_tooling/test_headers.py
+
+
+# runs experiments that don't require additional dependencies
+[testenv:experiments-checks]
+basepython = python3.9
+extras = 
+    tests
+    datasets
+deps = 
+       experiments/
+commands = 
+   pytest experiments/tests
+   pytest experiments/adversarial_training/test_experiment.py
+   pytest experiments/madry/test_experiment.py
+   pytest experiments/universal_perturbation/test_experiment.py
+   pytest experiments/xai/test_experiment.py
+"""

@@ -1,4 +1,4 @@
-# Copyright 2022, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
+# Copyright 2023, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 
@@ -75,7 +75,7 @@ def load_from_checkpoint(
 
     if model_attr is None:
         # The weights can be loaded in directly
-        model.load_state_dict(ckpt_data)  # type: ignore
+        model.load_state_dict(ckpt_data)
 
     else:
         assert hasattr(model, model_attr)

@@ -1,4 +1,4 @@
-# Copyright 2022, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
+# Copyright 2023, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 
@@ -23,6 +23,11 @@ collect_ignore_glob = []
 
 if not MUSHIN_EXTRAS & _installed:
     collect_ignore_glob.append("test_mushin/*.py")
+
+if "torchvision" not in _installed:
+    collect_ignore_glob.append("*test_augmix*")
+    collect_ignore_glob.append("*test_augmentations*")
+    collect_ignore_glob.append("*test_datasets*")
 
 
 @pytest.fixture()

@@ -17,7 +17,7 @@
 # -- Project information -----------------------------------------------------
 
 project = "rai-toolbox"
-copyright = "2022 Massachusetts Institute of Technology"
+copyright = "2023 Massachusetts Institute of Technology"
 author = "Ryan Soklaski, Justin Goodwin, Olivia Brown, Michael Yee"
 
 # The short X.Y version
@@ -41,7 +41,6 @@ extensions = [
     "sphinx.ext.autosummary",
     "numpydoc",
     "sphinx_copybutton",
-    "sphinx_tabs.tabs",
     "nbsphinx",
 ]
 
@@ -76,14 +75,15 @@ autosummary_generate = False
 #   alias ->  (base-URL, prefix)
 _repo = "https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox/"
 extlinks = {
-    "commit": (_repo + "commit/%s", "commit "),
-    "gh-file": (_repo + "blob/master/%s", ""),
-    "gh-link": (_repo + "%s", ""),
-    "issue": (_repo + "issues/%s", "issue #"),
-    "pull": (_repo + "pull/%s", "pull request #"),
-    "plymi": ("https://www.pythonlikeyoumeanit.com/%s", ""),
-    "hydra": ("https://hydra.cc/docs/%s", ""),
+    "commit": (_repo + "commit/%s", "commit %s"),
+    "gh-file": (_repo + "blob/master/%s", "%s"),
+    "gh-link": (_repo + "%s", "%s"),
+    "issue": (_repo + "issues/%s", "issue #%s"),
+    "pull": (_repo + "pull/%s", "pull request #%s"),
+    "plymi": ("https://www.pythonlikeyoumeanit.com/%s", "%s"),
+    "hydra": ("https://hydra.cc/docs/%s", "%s"),
 }
+
 
 # -- Options for HTML output -------------------------------------------------
 

@@ -1,2 +1,2 @@
-include versioneer.py
-include src/rai_toolbox/_version.py
+recursive-exclude tests *
+recursive-exclude project_tooling *

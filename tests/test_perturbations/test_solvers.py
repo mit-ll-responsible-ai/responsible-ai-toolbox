@@ -1,4 +1,4 @@
-# Copyright 2022, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
+# Copyright 2023, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 from functools import partial
@@ -8,12 +8,10 @@ import numpy as np
 import pytest
 import torch
 import torch as tr
-from hypothesis import given, settings
-from hypothesis import strategies as st
+from hypothesis import given, settings, strategies as st
 from hypothesis.extra import numpy as hnp
 from torch import Tensor
-from torch.nn import Module
-from torch.nn import functional as F
+from torch.nn import Module, functional as F
 from torch.optim import SGD
 
 from rai_toolbox.optim import L2ProjectedOptim, LinfProjectedOptim
@@ -307,6 +305,7 @@ def test_pert_model_validation(pert_model):
     "optim",
     [SGD, partial(SGD), "instance"],
 )
+@settings(deadline=None)
 @given(x=st.floats(-10.0, 10.0))
 def test_various_forms_of_pert_model(pert_model, optim, x: float):
     # pert_model can be Type[PertModel], Partial[PertModel], or PertModel

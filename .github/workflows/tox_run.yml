@@ -17,16 +17,16 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
-      max-parallel: 4
+      max-parallel: 5
       matrix:
-        python-version: [3.7, 3.8, 3.9]
+        python-version: [3.7, 3.8, 3.9, "3.10"]
       fail-fast: false
 
     steps:
     - uses: actions/checkout@v3
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
 
@@ -43,7 +43,7 @@ jobs:
       uses: actions/cache@v3
       with:
         path: .tox
-        key: tox-td${{ env.TIME_PERIOD }}-py${{ matrix.python-version }}-${{ hashFiles('setup.cfg') }}-${{ hashFiles('setup.py') }}-${{ hashFiles('.github/workflows/tox.yml') }}
+        key: tox-td${{ env.TIME_PERIOD }}-py${{ matrix.python-version }}-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('.github/workflows/tox.yml') }}
 
     - name: Test with tox
       run: tox -e py
@@ -53,10 +53,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Set up Python 3.8
-      uses: actions/setup-python@v3
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v4
       with:
-        python-version: 3.8
+        python-version: "3.10"
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
@@ -70,10 +70,10 @@ jobs:
       uses: actions/cache@v3
       with:
         path: .tox
-        key: tox-windows-td${{ env.TIME_PERIOD }}-${{ hashFiles('setup.cfg') }}-${{ hashFiles('setup.py') }}-${{ hashFiles('tests/conftest.py') }}-${{ hashFiles('.github/workflows/tox.yml') }}
+        key: tox-windows-td${{ env.TIME_PERIOD }}-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('tests/conftest.py') }}-${{ hashFiles('.github/workflows/tox.yml') }}
 
     - name: Test with tox
-      run: tox -e py38
+      run: tox -e py310
 
   coverage:
     runs-on: ubuntu-latest
@@ -81,9 +81,9 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v4
       with:
-        python-version: 3.8
+        python-version: 3.9
     
     - name: Install dependencies
       run: |
@@ -99,7 +99,7 @@ jobs:
       with:
         path: .tox
 
-        key: tox-coverage-td${{ env.TIME_PERIOD }}-${{ hashFiles('setup.cfg') }}-${{ hashFiles('setup.py') }}-${{ hashFiles('.github/workflows/tox.yml') }}
+        key: tox-coverage-td${{ env.TIME_PERIOD }}-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('.github/workflows/tox.yml') }}
 
     - name: Measure coverage
       run: tox -e coverage
@@ -110,9 +110,9 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v4
       with:
-        python-version: 3.8
+        python-version: 3.9
     
     - name: Install dependencies
       run: |
@@ -124,9 +124,9 @@ jobs:
       uses: actions/cache@v3
       with:
         path: .tox
-        # setup.cfg and pyproject.toml have versioning info that would
+        # pyproject.toml and pyproject.toml have versioning info that would
         # impact the tox environment.
-        key: tox-experiments-${{ hashFiles('setup.cfg') }}-${{ hashFiles('setup.py') }}-${{ hashFiles('tests/conftest.py') }}-${{ hashFiles('.github/workflows/tox.yml') }}
+        key: tox-experiments-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('tests/conftest.py') }}-${{ hashFiles('.github/workflows/tox.yml') }}
 
     - name: Run experiments checks
       run: tox -e experiments-checks
@@ -137,9 +137,9 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v4
       with:
-        python-version: 3.8
+        python-version: 3.9
     
     - name: Install dependencies
       run: |
@@ -151,7 +151,7 @@ jobs:
       uses: actions/cache@v3
       with:
         path: .tox
-        key: tox-no-mushin-${{ hashFiles('setup.cfg') }}-${{ hashFiles('setup.py') }}-${{ hashFiles('tests/conftest.py') }}-${{ hashFiles('.github/workflows/tox.yml') }}
+        key: tox-no-mushin-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('tests/conftest.py') }}-${{ hashFiles('.github/workflows/tox.yml') }}
 
     - name: Run experiments checks
       run: tox -e no-mushin
@@ -162,7 +162,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v4
       with:
         python-version: 3.7
     - name: Install dependencies
@@ -174,7 +174,7 @@ jobs:
       uses: actions/cache@v3
       with:
         path: .tox
-        key: tox-min-deps-${{ hashFiles('setup.cfg') }}-${{ hashFiles('setup.py') }}-${{ hashFiles('tests/conftest.py') }}-${{ hashFiles('.github/workflows/tox.yml') }}
+        key: tox-min-deps-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('tests/conftest.py') }}-${{ hashFiles('.github/workflows/tox.yml') }}
     - name: Test with tox
       run: tox -e min-deps
 
@@ -184,9 +184,9 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v4
       with:
-        python-version: 3.8
+        python-version: 3.9
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
@@ -196,17 +196,32 @@ jobs:
       uses: actions/cache@v3
       with:
         path: .tox
-        key: tox-pre-deps-${{ hashFiles('setup.cfg') }}-${{ hashFiles('setup.py') }}-${{ hashFiles('tests/conftest.py') }}-${{ hashFiles('.github/workflows/tox.yml') }}
+        key: tox-pre-deps-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('tests/conftest.py') }}-${{ hashFiles('.github/workflows/tox.yml') }}
     - name: Test with tox
       run: tox -e pre-release
+
+  check-repo-format:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.9
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install tox tox-gh-actions
+    - name: Test with tox
+      run: tox -e enforce-format
 
   run-pyright:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
-    - uses: actions/setup-node@v2-beta
+    - uses: actions/setup-node@v3.5.1
       with:
         node-version: ${{ env.NODE_VERSION }}
 
@@ -221,22 +236,22 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-node-
     - name: Install pyright
-      run: sudo npm install -g pyright@">1.1.232"
+      run: sudo npm install -g pyright@"=1.1.285"
     - uses: actions/checkout@v3
     - name: Set up Python
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v4
       with:
-        python-version: 3.8
+        python-version: 3.9
     - name: Reset caching
       run: python -c "import time; weeks = time.time() / 60 / 60 / 24 / 7; print(f'WEEK_PERIOD=d{int(weeks / 2) * 2}')" >> $GITHUB_ENV
     - uses: actions/cache@v3
       with:
         path: ${{ env.pythonLocation }}
-        key: pyright-td${{ env.WEEK_PERIOD }}-${{ env.pythonLocation }}-${{ hashFiles('setup.py') }}
+        key: pyright-td${{ env.WEEK_PERIOD }}-${{ env.pythonLocation }}
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install --upgrade --upgrade-strategy eager -e .[mushin,tests]
+        pip install --upgrade --upgrade-strategy eager -e .[mushin,tests,datasets]
         pip install matplotlib
     - name: Run pyright basic on src
       run: pyright --lib tests/ src/rai_toolbox/mushin/

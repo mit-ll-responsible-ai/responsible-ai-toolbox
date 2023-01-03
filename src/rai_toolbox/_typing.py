@@ -1,4 +1,4 @@
-# Copyright 2022, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
+# Copyright 2023, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 
@@ -22,6 +22,7 @@ from typing import (
 
 import numpy as np
 from torch import Tensor
+from torch.nn.parameter import Parameter
 from typing_extensions import Protocol, TypeAlias, TypeGuard
 
 T = TypeVar("T")
@@ -58,10 +59,14 @@ class Optimizer(Protocol):  # pragma: no cover
     def load_state_dict(self, state_dict: Any) -> None:
         ...
 
-    def zero_grad(self, set_to_none: Optional[bool] = ...) -> None:
+    def zero_grad(self, set_to_none: Any = ...) -> None:
+        # In order to maintain compatibility across torch versions we
+        # annotate `set_to_none: Any`
+        # - torch 1.12 annotates `set_to_none: bool`
+        # - torch <1.12 annotates `set_to_none: Optional[bool]`
         ...
 
-    def step(self, closure: Optional[Callable[[], Any]] = ...) -> Optional[Any]:
+    def step(self, closure: Optional[Callable[[], Any]] = None) -> Optional[Any]:
         ...
 
     def add_param_group(self, param_group: Any) -> None:
@@ -75,7 +80,7 @@ OptimizerType: TypeAlias = Callable[..., Optimizer]
 
 
 # type for Optim(params: <>)
-OptimParams = Union[Sequence[Tensor], Iterable[ParamGroup]]
+OptimParams = Union[Iterable[Tensor], Iterable[Parameter], Iterable[ParamGroup]]
 
 
 InstantiatesTo = Union[Type[T_co], Partial[T_co]]
@@ -90,7 +95,7 @@ def _is_protocol(cls: Any) -> bool:
 def instantiates_to(x: Any, co_var_type: Type[T]) -> TypeGuard[InstantiatesTo[T]]:
     """Checks if `x(...)` will return type `co_var_type`.
 
-    Accomodates structural subtyping via protocols.
+    Accommodates structural subtyping via protocols.
 
     Parameters
     ----------

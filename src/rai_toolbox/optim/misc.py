@@ -1,4 +1,4 @@
-# Copyright 2022, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
+# Copyright 2023, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 
@@ -9,8 +9,7 @@ import torch
 from torch import Generator, Tensor, default_generator
 from torch.optim import SGD
 
-from rai_toolbox._typing import Optimizer as Opt
-from rai_toolbox._typing import OptimizerType, OptimParams, Partial
+from rai_toolbox._typing import Optimizer as Opt, OptimizerType, OptimParams, Partial
 from rai_toolbox._utils import check_param_group_value, value_check
 
 from .optimizer import REQUIRED, DatumParamGroup, ParamTransformingOptimizer
@@ -70,7 +69,7 @@ class _ClampedOptim(ParamTransformingOptimizer):
             Specifies default parameters for all parameter groups.
 
         param_ndim : Optional[int]
-            Controles how `_pre_step_transform_` and `_post_step_transform_`  are
+            Controls how `_pre_step_transform_` and `_post_step_transform_`  are
             broadcast onto a given parameter. This has no effect for
             `ClampedGradientOptimizer` and `ClampedParameterOptimizer`.
 
@@ -167,7 +166,7 @@ class ClampedParameterOptimizer(_ClampedOptim):
 
 class TopQGradientOptimizer(ParamTransformingOptimizer):
     """A gradient-tranforming  optimizer that zeros the elements of a gradient whose
-    absolue magnitudes fall below the Qth percentile. `InnerOpt.step()` is then to
+    absolute magnitudes fall below the Qth percentile. `InnerOpt.step()` is then to
     update the corresponding parameter.
 
     See Also

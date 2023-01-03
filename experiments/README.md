@@ -31,7 +31,6 @@ To publish a new version of `rai-experiments` do the following:
 2. Open a PR into the branch `rai-exps-publish`
 3. Review and merge.
 
-It is recommended that you first do this complete this process for a release candidate. E.g. 
 
 This will automatically trigger GitHub Actions, which will publish this new version to PyPI.
 
@@ -43,7 +42,7 @@ This material is based upon work supported by the Under Secretary of Defense for
 
 A portion of this research was sponsored by the United States Air Force Research Laboratory and the United States Air Force Artificial Intelligence Accelerator and was accomplished under Cooperative Agreement Number FA8750-19-2-1000. The views and conclusions contained in this document are those of the authors and should not be interpreted as representing the official policies, either expressed or implied, of the United States Air Force or the U.S. Government. The U.S. Government is authorized to reproduce and distribute reprints for Government purposes notwithstanding any copyright notation herein.
 
-© 2022 Massachusetts Institute of Technology.
+© 2023 Massachusetts Institute of Technology.
 
 Subject to FAR52.227-11 Patent Rights - Ownership by the contractor (May 2014)
 

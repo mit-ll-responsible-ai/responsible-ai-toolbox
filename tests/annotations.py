@@ -1,4 +1,4 @@
-# Copyright 2022, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
+# Copyright 2023, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 
@@ -37,7 +37,7 @@ def check_optim_interface():
     SignedGradientOptim([{"params": x}], InnerOpt=partial(SGD))
 
     # x needs to be sequence
-    SignedGradientOptim(x, InnerOpt=SGD)  # type: ignore
+    SignedGradientOptim(x, InnerOpt=SGD)
 
 
 def check_optim_compatibilities():

@@ -1,4 +1,4 @@
-# Copyright 2022, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
+# Copyright 2023, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 import string
@@ -481,6 +481,8 @@ def test_working_subdirs(
         if k.startswith("hydra") and v is not None
     ]
 
+    # just to keep these from looking like they are unused
+    del hydra_sweep_dir, hydra_sweep_subdir
     wf = GridMetrics()
     wf.run(x=multirun([-1, 0, 1]), y=multirun([-10, 10]), overrides=overrides)
 

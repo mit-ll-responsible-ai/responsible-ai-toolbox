@@ -1,4 +1,4 @@
-# Copyright 2022, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
+# Copyright 2023, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 
@@ -147,9 +147,7 @@ class L1qFrankWolfe(L1qNormedGradientOptim):
     References
     ----------
     .. [1] https://en.wikipedia.org/wiki/Frank%E2%80%93Wolfe_algorithm#Algorithm
-    .. [2] Roberts, Jay, and Theodoros Tsiligkaridis. "Controllably Sparse
-       Perturbations of Robust Classifiers for Explaining Predictions and Probing
-       Learned Concepts." (2021).
+    .. [2] Roberts, Jay, and Theodoros Tsiligkaridis. Controllably Sparse Perturbations of Robust Classifiers for Explaining Predictions and Probing Learned Concepts. (2021).
     """
 
     def __init__(
@@ -389,16 +387,15 @@ class L2FrankWolfe(L2NormedGradientOptim):
     r"""A Frank-Wolfe [1]_ optimizer that constrains each updated parameter to fall
     within an :math:`\epsilon`-sized ball in :math:`L^2` space, centered on the origin.
 
+
+    This parameter-transforming optimizer is useful for producing error counter
+    factuals and performing visual concept probing [2]_.
+
     Notes
     -----
     The method `L2NormedGradientOptim._pre_step_transform_` is responsible for
     computing the *negative* linear minimization oracle for a parameter and storing it
     on `param.grad`.
-
-    Notes
-    -----
-    This parameter-transforming optimizer is useful for producing error counter
-    factuals and performing visual concept probing [2]_.
 
     See Also
     --------
@@ -410,9 +407,7 @@ class L2FrankWolfe(L2NormedGradientOptim):
     References
     ----------
     .. [1] https://en.wikipedia.org/wiki/Frank%E2%80%93Wolfe_algorithm#Algorithm
-    .. [2] Roberts, Jay, and Theodoros Tsiligkaridis. "Controllably Sparse
-       Perturbations of Robust Classifiers for Explaining Predictions and Probing
-       Learned Concepts." (2021).
+    .. [2] Roberts, Jay, and Theodoros Tsiligkaridis. Controllably Sparse Perturbations of Robust Classifiers for Explaining Predictions and Probing Learned Concepts. (2021).
     """
 
     def __init__(

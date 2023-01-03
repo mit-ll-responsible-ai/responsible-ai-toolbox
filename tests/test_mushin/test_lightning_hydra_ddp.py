@@ -1,4 +1,4 @@
-# Copyright 2022, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
+# Copyright 2023, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 
@@ -164,6 +164,9 @@ def test_ddp_with_hydra_subprocess_runs_correct_mode(testing, predicting):
 
 
 @pytest.mark.usefixtures("cleandir")
+@pytest.mark.filterwarnings("ignore:The dataloader")
+@pytest.mark.filterwarnings("ignore:It is recommended to use")
+@pytest.mark.filterwarnings("ignore:The number of training batches")
 def test_ddp_with_hydra_with_datamodule():
     module = builds(SimpleLightningModuleNoData)
     datamodule = builds(SimpleDataModule)

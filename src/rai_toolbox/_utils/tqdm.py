@@ -1,4 +1,4 @@
-# Copyright 2022, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
+# Copyright 2023, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 
@@ -7,6 +7,7 @@ from typing import Iterable, Optional, TypeVar
 _T = TypeVar("_T", bound=Iterable)
 
 __all__ = ["tqdm"]
+
 
 def _dummy_tqdm(
     iterable: _T,
@@ -31,9 +32,9 @@ def _dummy_tqdm(
     unit_divisor=1000,
 ) -> _T:
     return iterable
-        
+
+
 try:
     from tqdm.auto import tqdm
 except ImportError:  # pragma: no cover
     tqdm = _dummy_tqdm
-

@@ -11,7 +11,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v4
       with:
         python-version: 3.8
     - name: Install dependencies
@@ -32,7 +32,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - uses: actions/setup-node@v2-beta
+    - uses: actions/setup-node@v3.5.1
       with:
         node-version: ${{ env.NODE_VERSION }}
 
@@ -47,16 +47,16 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-node-
     - name: Install pyright
-      run: sudo npm install -g pyright@">1.1.246"
+      run: sudo npm install -g pyright@"=1.1.285"
     - uses: actions/checkout@v3
     - name: Set up Python
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v4
       with:
-        python-version: 3.8
+        python-version: 3.9
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install --upgrade --upgrade-strategy eager -e .[mushin,tests]
+        pip install --upgrade --upgrade-strategy eager -e .[mushin,tests,datasets]
         pip install matplotlib
     - name: Run pyright basic on src
       run: pyright --lib tests/ src/rai_toolbox/mushin/

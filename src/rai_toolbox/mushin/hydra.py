@@ -1,4 +1,4 @@
-# Copyright 2022, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
+# Copyright 2023, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 from dataclasses import is_dataclass
@@ -49,7 +49,7 @@ def _flat_call(x: Iterable[Callable[P, Any]]):
 
 # TODO: - zen's instantiation should be memoized so that subsequent access
 #         to an attribute returns the same instance
-#       - zen should interface with a singelton that "recognizes"
+#       - zen should interface with a singleton that "recognizes"
 #         the configs that it interacts with
 class Zen(Generic[P, T1]):
     def __init__(

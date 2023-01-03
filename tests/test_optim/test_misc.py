@@ -1,4 +1,4 @@
-# Copyright 2022, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
+# Copyright 2023, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 from functools import partial
@@ -8,7 +8,7 @@ import hypothesis.strategies as st
 import pytest
 import torch as tr
 from hypothesis import assume, given, note
-from torch.testing import assert_allclose
+from torch.testing import assert_close
 
 from rai_toolbox.optim import (
     ClampedGradientOptimizer,
@@ -43,7 +43,7 @@ def test_clamped_grad_optim(a: Optional[float], b: Optional[float]):
     x.backward(gradient=grad)
     optim.step()
 
-    assert_allclose(x.grad, tr.clamp(grad, kwargs["clamp_min"], kwargs["clamp_max"]))
+    assert_close(x.grad, tr.clamp(grad, kwargs["clamp_min"], kwargs["clamp_max"]))
 
 
 @given(
@@ -67,7 +67,7 @@ def test_clamped_param_optim(a: Optional[float], b: Optional[float]):
     x.backward(gradient=grad)
     optim.step()
 
-    assert_allclose(
+    assert_close(
         x,
         tr.clamp(tr.arange(-1000.0, 1000.0), kwargs["clamp_min"], kwargs["clamp_max"]),
     )
@@ -87,7 +87,7 @@ def test_top_q_grad(q):
 
     note(f"x.grad: {x.grad}")
     note(f"expected: {expected}")
-    assert_allclose(x.grad, expected)
+    assert_close(x.grad, expected)
 
 
 @pytest.mark.parametrize("generator_device", avail_devices)
@@ -118,5 +118,5 @@ def test_top_q_grad_generator(generator_device):
     seeded_grad1 = get_grad(seed=seed)
     unseeded_grad = get_grad(seed=0)
 
-    assert_allclose(seeded_grad0, seeded_grad1)
+    assert_close(seeded_grad0, seeded_grad1)
     assert tr.any(~tr.isclose(seeded_grad0, unseeded_grad))
