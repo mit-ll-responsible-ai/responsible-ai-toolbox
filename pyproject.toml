@@ -1,7 +1,10 @@
 [build-system]
-requires = [ "setuptools >= 35.0.2", "wheel >= 0.29.0", "setuptools_scm[toml]==7.0.5"]
+requires = [
+    "setuptools >= 35.0.2",
+    "wheel >= 0.29.0",
+    "setuptools_scm[toml]==7.0.5",
+]
 build-backend = "setuptools.build_meta"
-
 
 
 [project]
@@ -10,25 +13,21 @@ dynamic = ["version"]
 description = "PyTorch-centric library for evaluating and enhancing the robustness of AI technologies"
 readme = "README.md"
 requires-python = ">=3.7"
-dependencies=[
-    "torchvision >= 0.10.0",
-    # pytorch 1.9.1 has bug for its view inplace-update checks
-    "torch >= 1.9.0, != 1.9.1",
+dependencies = [
+    "torch >= 1.10.0",
     "torchmetrics >= 0.6.0",
     "typing-extensions >= 4.1.1",
 ]
-license = {file = "LICENSE.txt"}
-keywords= [ "machine learning", "robustness", "pytorch", "responsible", "AI"]
+license = { file = "LICENSE.txt" }
+keywords = ["machine learning", "robustness", "pytorch", "responsible", "AI"]
 
 authors = [
-  {name = "Ryan Soklaski", email = "ryan.soklaski@ll.mit.edu" },
-  {name = "Justin Goodwin", email = "jgoodwin@ll.mit.edu" },
-  {name = "Olivia Brown"},
-  {name = "Michael Yee"}
+    { name = "Ryan Soklaski", email = "ryan.soklaski@ll.mit.edu" },
+    { name = "Justin Goodwin", email = "jgoodwin@ll.mit.edu" },
+    { name = "Olivia Brown" },
+    { name = "Michael Yee" },
 ]
-maintainers = [
-  {name = "Ryan Soklaski", email = "ryan.soklaski@ll.mit.edu" },
-]
+maintainers = [{ name = "Ryan Soklaski", email = "ryan.soklaski@ll.mit.edu" }]
 
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -38,6 +37,7 @@ classifiers = [
     "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
     "Topic :: Scientific/Engineering",
     "Programming Language :: Python :: 3 :: Only",
 ]
@@ -51,12 +51,15 @@ tests = [
     "netCDF4 >= 1.5.8",
 ]
 
-mushin = ["pytorch-lightning >= 1.5.0",
-          "hydra-zen >= 0.7.0",
-          "xarray >= 0.19.0",
-          "matplotlib >= 3.3",
-          "protobuf <= 3.20.1",  # strict TODO: Remove after tensorboard gets compatible https://github.com/tensorflow/tensorboard/issues/5708
-        ]
+mushin = [
+    "pytorch-lightning >= 1.5.0",
+    "hydra-zen >= 0.9.0",
+    "xarray >= 0.19.0",
+    "matplotlib >= 3.3",
+    "protobuf <= 3.20.1",         # strict TODO: Remove after tensorboard gets compatible https://github.com/tensorflow/tensorboard/issues/5708
+]
+
+datasets = ["torchvision >= 0.10.0"]
 
 [project.urls]
 "Homepage" = "https://mit-ll-responsible-ai.github.io/responsible-ai-toolbox/"
@@ -64,15 +67,13 @@ mushin = ["pytorch-lightning >= 1.5.0",
 "Source" = "https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox"
 
 
-
 [tool.setuptools_scm]
 write_to = "src/rai_toolbox/_version.py"
 version_scheme = "no-guess-dev"
 
 
-
 [tool.setuptools]
-package-dir = {"" = "src"}
+package-dir = { "" = "src" }
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -82,12 +83,10 @@ exclude = ["tests*", "tests.*"]
 rai_toolbox = ["py.typed"]
 
 
-
 [tool.isort]
 known_first_party = ["rai_toolbox", "tests", "rai_experiments"]
 profile = "black"
 combine_as_imports = true
-
 
 
 [tool.coverage.report]
@@ -101,29 +100,40 @@ skip = '*.js,*.html,*ipynb,*.svg,*.css,docs/build'
 [tool.pyright]
 include = ["src"]
 exclude = [
-       "**/node_modules",
-       "**/__pycache__",
-       "src/rai_toolbox/_version.py",
-       "**/third_party",
-       "**/project_tooling",
-       "./tests/test_augmentations/_old_implementation.py"
+    "**/node_modules",
+    "**/__pycache__",
+    "src/rai_toolbox/_version.py",
+    "**/third_party",
+    "**/project_tooling",
+    "./tests/test_augmentations/_old_implementation.py",
 ]
 reportUnnecessaryTypeIgnoreComment = true
 reportUnnecessaryIsInstance = false
+reportPrivateImportUsage = false
 
+
+[tool.pytest.ini_options]
+xfail_strict=true
+filterwarnings = [
+   "ignore:The --rsyncdir command line argument and rsyncdirs config variable are deprecated.:DeprecationWarning",
+   "ignore:Future Hydra versions will no longer change working directory at job runtime by default.",
+   "ignore:distutils Version classes are deprecated",
+   "ignore:numpy.ndarray size changed, may indicate binary incompatibility",
+ ]
 
 
 [tool.tox]
 legacy_tox_ini = """
 [tox]
 isolated_build = True
-envlist = py37, py38, py39
+envlist = py37, py38, py39, py310
 
 [gh-actions]
 python =
   3.7: py37
   3.8: py38
   3.9: py39
+  3.10: py310
 
 [testenv]
 deps = pytest-xdist
@@ -135,7 +145,8 @@ commands = pytest -n auto --hypothesis-profile ci tests
 [testenv:min-deps]  # test against minimum dependency versions
 deps = 
     {[testenv]deps}
-    torch==1.9.0
+    setuptools==59.5.0
+    torch==1.10.0
     torchmetrics==0.6.0
     typing-extensions==4.1.1
     hydra-zen==0.7.0
@@ -151,10 +162,11 @@ commands = pytest -n auto --hypothesis-profile ci tests
 [testenv:coverage]
 setenv = NUMBA_DISABLE_JIT=1
 usedevelop = true
-basepython = python3.8
+basepython = python3.9
 extras = 
     tests
     mushin
+    datasets
 deps = {[testenv]deps}
        coverage
        pytest-cov
@@ -166,7 +178,8 @@ pip_pre = true
 extras = 
     tests
     mushin
-basepython = python3.8
+    datasets
+basepython = python3.9
 
 [testenv:auto-format]
 skip_install=true
@@ -197,9 +210,10 @@ commands=
 
 # runs experiments that don't require additional dependencies
 [testenv:experiments-checks]
-basepython = python3.8
+basepython = python3.9
 extras = 
     tests
+    datasets
 deps = 
        experiments/
 commands = 

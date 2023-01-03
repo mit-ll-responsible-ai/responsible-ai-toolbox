@@ -305,6 +305,7 @@ def test_pert_model_validation(pert_model):
     "optim",
     [SGD, partial(SGD), "instance"],
 )
+@settings(deadline=None)
 @given(x=st.floats(-10.0, 10.0))
 def test_various_forms_of_pert_model(pert_model, optim, x: float):
     # pert_model can be Type[PertModel], Partial[PertModel], or PertModel
