@@ -54,7 +54,7 @@ If you would like to contribute to this repo, please refer to our `CONTRIBUTING.
 
 DISTRIBUTION STATEMENT A. Approved for public release. Distribution is unlimited.
 
-© 2022 MASSACHUSETTS INSTITUTE OF TECHNOLOGY
+© 2023 MASSACHUSETTS INSTITUTE OF TECHNOLOGY
 
 - Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014)
 - SPDX-License-Identifier: MIT

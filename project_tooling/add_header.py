@@ -1,4 +1,4 @@
-# Copyright 2022, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
+# Copyright 2023, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 
@@ -19,10 +19,10 @@ import os.path as path
 from pathlib import Path
 from typing import Iterable, Union
 
-OLD_HEADER = """# Copyright (c) 2022 Massachusetts Institute of Technology
+OLD_HEADER = """# Copyright (c) 2023 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT\n"""
 
-NEW_HEADER = """# Copyright 2022, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
+NEW_HEADER = """# Copyright 2023, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT\n"""
 
