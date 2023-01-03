@@ -33,6 +33,11 @@ class A:
 method = A().f
 
 
+def test_zen_is_deprecated():
+    with pytest.warns(FutureWarning):
+        zen(lambda x: None)
+
+
 @pytest.mark.parametrize(
     "func",
     [
@@ -52,6 +57,7 @@ method = A().f
         make_config(y=2, z=4),
     ],
 )
+@pytest.mark.filterwarnings("ignore:rai_toolbox.mushin.zen will be removed")
 def test_zen_validation(cfg, func):
     with pytest.raises(HydraZenValidationError):
         zen(func).validate(cfg)
@@ -73,6 +79,7 @@ def test_zen_validation(cfg, func):
     kwargs=st.dictionaries(st.sampled_from(["z", "not_a_field"]), st.integers()),
     instantiate_cfg=st.booleans(),
 )
+@pytest.mark.filterwarnings("ignore:rai_toolbox.mushin.zen will be removed")
 def test_zen_call(x: int, y: int, kwargs: dict, instantiate_cfg, func):
 
     cfg = make_config(x=x, y=y, **kwargs)
@@ -107,10 +114,12 @@ zen_g = zen(g)
     ],
 )
 @given(x=st.integers(-10, 10))
+@pytest.mark.filterwarnings("ignore:rai_toolbox.mushin.zen will be removed")
 def test_instantiation(call, x):
     assert call(x) == x
 
 
+@pytest.mark.filterwarnings("ignore:rai_toolbox.mushin.zen will be removed")
 def test_zen_works_with_non_builds():
     bigger_cfg = make_config(super_conf=make_config(a=builds(int)))
     out = zen(lambda super_conf: super_conf)(bigger_cfg)
@@ -133,6 +142,7 @@ post_call_strat = st.just(lambda cfg, result: Post.record.append((cfg.y, result)
     pre_call=(pre_call_strat | st.lists(pre_call_strat)),
     post_call=(post_call_strat | st.lists(post_call_strat)),
 )
+@pytest.mark.filterwarnings("ignore:rai_toolbox.mushin.zen will be removed")
 def test_pre_and_post_call(pre_call, post_call):
     Pre.record.clear()
     Post.record.clear()

@@ -2,7 +2,6 @@
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 
-import warnings
 from collections import UserList, defaultdict
 from inspect import getattr_static
 from pathlib import Path
@@ -26,14 +25,12 @@ import numpy as np
 import torch as tr
 from hydra.core.override_parser.overrides_parser import OverridesParser
 from hydra.core.utils import JobReturn
-from hydra_zen import launch, load_from_yaml, make_config
+from hydra_zen import launch, load_from_yaml, make_config, zen
 from hydra_zen._compatibility import HYDRA_VERSION
 from hydra_zen._launch import _NotSet
 from typing_extensions import Self, TypeAlias, TypeGuard
 
 from rai_toolbox._utils import value_check
-
-from .hydra import zen
 
 LoadedValue: TypeAlias = Union[str, int, float, bool, List[Any], Dict[str, Any]]
 
@@ -134,17 +131,6 @@ class BaseWorkflow:
         self._multirun_task_overrides = {}
         self.jobs = []
         self._working_dir = None
-
-        if hasattr(self, "evaluation_task"):
-            warnings.warn(
-                "The static method `evaluation_task` is deprecated in favor of the "
-                "static method  `task`. Support for `evaluation_task` will be removed "
-                "in version 0.3.0 of rai-toolbox. To fix this, simply rename "
-                "`evaluation_task` method to `task`.",
-                FutureWarning,
-                stacklevel=2,
-            )
-            self.task = self.evaluation_task  # type: ignore
 
     @property
     def working_dir(self) -> Path:
