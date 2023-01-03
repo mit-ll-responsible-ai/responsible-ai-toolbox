@@ -24,6 +24,10 @@ collect_ignore_glob = []
 if not MUSHIN_EXTRAS & _installed:
     collect_ignore_glob.append("test_mushin/*.py")
 
+if "torchvision" not in _installed:
+    collect_ignore_glob.append("tests/test_augmentations/test_fourier.py")
+    collect_ignore_glob.append("tests/test_datasets/*.py")
+
 
 @pytest.fixture()
 def cleandir(tmp_path):

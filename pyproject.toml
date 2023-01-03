@@ -157,6 +157,7 @@ basepython = python3.9
 extras = 
     tests
     mushin
+    datasets
 deps = {[testenv]deps}
        coverage
        pytest-cov
@@ -168,6 +169,7 @@ pip_pre = true
 extras = 
     tests
     mushin
+    datasets
 basepython = python3.9
 
 [testenv:auto-format]
