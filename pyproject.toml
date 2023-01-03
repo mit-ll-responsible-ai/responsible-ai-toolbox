@@ -112,6 +112,13 @@ reportUnnecessaryTypeIgnoreComment = true
 reportUnnecessaryIsInstance = false
 
 
+[tool.pytest.ini_options]
+xfail_strict=true
+filterwarnings = [
+   "ignore:The --rsyncdir command line argument and rsyncdirs config variable are deprecated.:DeprecationWarning",
+ ]
+
+
 [tool.tox]
 legacy_tox_ini = """
 [tox]
@@ -135,6 +142,7 @@ commands = pytest -n auto --hypothesis-profile ci tests
 [testenv:min-deps]  # test against minimum dependency versions
 deps = 
     {[testenv]deps}
+    setuptools==59.5.0
     torch==1.10.0
     torchmetrics==0.6.0
     typing-extensions==4.1.1
