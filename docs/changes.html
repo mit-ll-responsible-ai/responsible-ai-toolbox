@@ -8,24 +8,24 @@
 <meta content="The changelog for rAI-toolbox, including what's new." name="description" />
 
     <title>Changelog &#8212; rai-toolbox  documentation</title>
-  <script>
+  
+  
+  
+  <script data-cfasync="false">
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="_static/styles/theme.css?digest=1e1de1a1873e13ef5536" rel="stylesheet">
-<link href="_static/styles/pydata-sphinx-theme.css?digest=1e1de1a1873e13ef5536" rel="stylesheet">
+  <link href="_static/styles/theme.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+<link href="_static/styles/bootstrap.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+<link href="_static/styles/pydata-sphinx-theme.css?digest=796348d33e8b1d947c94" rel="stylesheet">
 
   
-  <link rel="stylesheet"
-    href="_static/vendor/fontawesome/6.1.2/css/all.min.css">
-  <link rel="preload" as="font" type="font/woff2" crossorigin
-    href="_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2">
-  <link rel="preload" as="font" type="font/woff2" crossorigin
-    href="_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2">
-  <link rel="preload" as="font" type="font/woff2" crossorigin
-    href="_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2">
+  <link href="_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2">
 
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
@@ -34,7 +34,8 @@
     <link rel="apple-touch-icon" sizes="180x180" type="image/png" href="_static/apple-touch-icon.png" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=1e1de1a1873e13ef5536">
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=796348d33e8b1d947c94">
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=796348d33e8b1d947c94">
 
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
@@ -57,6 +58,10 @@
   
   
   <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="180" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
 
   
   <input type="checkbox" class="sidebar-toggle" name="__primary" id="__primary">
@@ -120,39 +125,39 @@
     </p>
     <ul id="navbar-main-elements" class="navbar-nav">
         
-                <li class="nav-item">
-                    <a class="nav-link" href="tutorials.html">
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="tutorials.html">
                         Tutorials
-                    </a>
-                </li>
+                      </a>
+                    </li>
                 
 
-                <li class="nav-item">
-                    <a class="nav-link" href="how_tos.html">
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="how_tos.html">
                         How-To Guides
-                    </a>
-                </li>
+                      </a>
+                    </li>
                 
 
-                <li class="nav-item">
-                    <a class="nav-link" href="explanation.html">
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="explanation.html">
                         Explanation
-                    </a>
-                </li>
+                      </a>
+                    </li>
                 
 
-                <li class="nav-item">
-                    <a class="nav-link" href="api_reference.html">
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="api_reference.html">
                         Reference
-                    </a>
-                </li>
+                      </a>
+                    </li>
                 
 
-                <li class="nav-item current active">
-                    <a class="nav-link" href="#">
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="#">
                         Changelog
-                    </a>
-                </li>
+                      </a>
+                    </li>
                 
     </ul>
 </nav>
@@ -161,19 +166,21 @@
     </div>
 
     <div id="navbar-end">
-      <div class="navbar-end-item navbar-end__search-button-container">
-        
-<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" data-toggle="tooltip">
+      
+        <div class="navbar-end-item navbar-persistent--container">
+          
+<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-toggle="tooltip">
   <i class="fa-solid fa-magnifying-glass"></i>
 </button>
-      </div>
+        </div>
+      
       
       <div class="navbar-end-item">
-        <span class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" data-toggle="tooltip">
-    <a class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></a>
-    <a class="theme-switch" data-mode="dark"><i class="fa-regular fa-moon"></i></a>
-    <a class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></a>
-</span>
+        <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+</button>
       </div>
       
       <div class="navbar-end-item">
@@ -197,11 +204,13 @@
 
 
   
-  <div class="search-button-container--mobile">
-<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" data-toggle="tooltip">
+  
+    <div class="navbar-persistent--mobile">
+<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-toggle="tooltip">
   <i class="fa-solid fa-magnifying-glass"></i>
 </button>
-  </div>
+    </div>
+  
 
   
   <label class="sidebar-toggle secondary-toggle" for="__secondary">
@@ -231,39 +240,39 @@
     </p>
     <ul id="navbar-main-elements" class="navbar-nav">
         
-                <li class="nav-item">
-                    <a class="nav-link" href="tutorials.html">
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="tutorials.html">
                         Tutorials
-                    </a>
-                </li>
+                      </a>
+                    </li>
                 
 
-                <li class="nav-item">
-                    <a class="nav-link" href="how_tos.html">
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="how_tos.html">
                         How-To Guides
-                    </a>
-                </li>
+                      </a>
+                    </li>
                 
 
-                <li class="nav-item">
-                    <a class="nav-link" href="explanation.html">
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="explanation.html">
                         Explanation
-                    </a>
-                </li>
+                      </a>
+                    </li>
                 
 
-                <li class="nav-item">
-                    <a class="nav-link" href="api_reference.html">
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="api_reference.html">
                         Reference
-                    </a>
-                </li>
+                      </a>
+                    </li>
                 
 
-                <li class="nav-item current active">
-                    <a class="nav-link" href="#">
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="#">
                         Changelog
-                    </a>
-                </li>
+                      </a>
+                    </li>
                 
     </ul>
 </nav>
@@ -277,11 +286,11 @@
     <div class="sidebar-header-items__end">
       
       <div class="navbar-end-item">
-        <span class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" data-toggle="tooltip">
-    <a class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></a>
-    <a class="theme-switch" data-mode="dark"><i class="fa-regular fa-moon"></i></a>
-    <a class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></a>
-</span>
+        <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+</button>
       </div>
       
       <div class="navbar-end-item">
@@ -312,8 +321,11 @@
     </div>
   </div>
 
+  
+  <div id="rtd-footer-container"></div>
+
       </div>
-      <main class="bd-main">
+      <main id="main-content" class="bd-main">
         
         
         <div class="bd-content">
@@ -346,7 +358,7 @@ chronological order. All previous releases should still be available on pip.</p>
 <ul class="simple">
 <li><p>A <code class="xref py py-obj docutils literal notranslate"><span class="pre">pre_task</span></code> step can be defined for a workflow; this is useful for seeding random number generators prior to the task’s instantiation phase. See <a class="reference internal" href="how_to/deterministic_workflow.html#how-to-deterministic"><span class="std std-ref">this how-to guide</span></a> for examples.</p></li>
 <li><p>Loaded workflow overrides now roundtrip appropriately. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox/pull/61">pull request #61</a>.</p></li>
-<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">metric_load_fn</span></code> can be overriden to customize how <code class="xref py py-obj docutils literal notranslate"><span class="pre">MultiRunMetricsWorkflow</span></code> loads metric files; the default behavior is to use <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.load</span></code>. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox/pull/63">pull request #63</a>.</p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">metric_load_fn</span></code> can be overridden to customize how <code class="xref py py-obj docutils literal notranslate"><span class="pre">MultiRunMetricsWorkflow</span></code> loads metric files; the default behavior is to use <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.load</span></code>. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox/pull/63">pull request #63</a>.</p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">working_subdir</span></code> can be included as a data-variable in a workflow’s xarray; this enables users to lookup subdirs by override values. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox/pull/52">pull request #52</a>.</p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_xarray</span></code> works on lists of array-likes, not just lists of numpy arrays</p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_metrics</span></code> can be called directly from <code class="xref py py-obj docutils literal notranslate"><span class="pre">MultiRunMetricsWorkflow</span></code>.</p></li>
@@ -377,7 +389,7 @@ chronological order. All previous releases should still be available on pip.</p>
 <p>This patch fixes two bugs in <code class="docutils literal notranslate"><span class="pre">rai_toolbox.perturbations.init</span></code>:</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="generated/rai_toolbox.perturbations.uniform_like_l1_n_ball_.html#rai_toolbox.perturbations.uniform_like_l1_n_ball_" title="rai_toolbox.perturbations.uniform_like_l1_n_ball_"><code class="xref py py-obj docutils literal notranslate"><span class="pre">uniform_like_l1_n_ball_</span></code></a> was not correctly symmeterized; the drawn values only had components in the direction of the positive hemisphere of the <span class="math notranslate nohighlight">\(L^1\)</span> ball.</p></li>
-<li><p>Passing an on-gpu tensor to the in-place init functions would cause a device mis-match error with the default random number generator, which is on CPU.</p></li>
+<li><p>Passing an on-gpu tensor to the in-place init functions would cause a device mismatch error with the default random number generator, which is on CPU.</p></li>
 </ul>
 </section>
 <section id="v0-1-0">
@@ -510,7 +522,8 @@ significant changes in future releases are documented as such.</p>
   
     
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="_static/scripts/pydata-sphinx-theme.js?digest=1e1de1a1873e13ef5536"></script>
+  <script src="_static/scripts/bootstrap.js?digest=796348d33e8b1d947c94"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=796348d33e8b1d947c94"></script>
 
   <footer class="bd-footer"><div class="bd-footer__inner container">
   
@@ -518,10 +531,20 @@ significant changes in future releases are documented as such.</p>
     
 <p class="copyright">
 
-    &copy; Copyright 2022 Massachusetts Institute of Technology.<br>
+    &copy; Copyright 2023 Massachusetts Institute of Technology.<br>
 
 </p>
 
+  </div>
+  
+  <div class="footer-item">
+    <p class="theme-version">
+    Built with the
+    <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">
+        PyData Sphinx Theme
+    </a>
+    0.12.0.
+</p>
   </div>
   
   <div class="footer-item">
