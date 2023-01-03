@@ -24,9 +24,9 @@ collect_ignore_glob = []
 if not MUSHIN_EXTRAS & _installed:
     collect_ignore_glob.append("test_mushin/*.py")
 
-if "torchvision" not in _installed:
-    collect_ignore_glob.append("**/test_augmentations/test_fourier.py")
-    collect_ignore_glob.append("**/test_datasets/*.py")
+if "torchviaasion" not in _installed:
+    collect_ignore_glob.append("*test_augmentations*")
+    collect_ignore_glob.append("*test_datasets*")
 
 
 @pytest.fixture()
