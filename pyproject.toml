@@ -38,7 +38,6 @@ classifiers = [
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
     "Topic :: Scientific/Engineering",
     "Programming Language :: Python :: 3 :: Only",
 ]
@@ -110,12 +109,16 @@ exclude = [
 ]
 reportUnnecessaryTypeIgnoreComment = true
 reportUnnecessaryIsInstance = false
+reportPrivateImportUsage = false
 
 
 [tool.pytest.ini_options]
 xfail_strict=true
 filterwarnings = [
    "ignore:The --rsyncdir command line argument and rsyncdirs config variable are deprecated.:DeprecationWarning",
+   "ignore:Future Hydra versions will no longer change working directory at job runtime by default.",
+   "ignore:distutils Version classes are deprecated",
+   "ignore:numpy.ndarray size changed, may indicate binary incompatibility",
  ]
 
 

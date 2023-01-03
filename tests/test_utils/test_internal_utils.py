@@ -1,6 +1,7 @@
 # Copyright 2023, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
+import platform
 from typing import Union
 
 import hypothesis.strategies as st
@@ -32,6 +33,10 @@ def test_type_catches_bad_type(name, target_type, value):
         value_check(name, value=value, type_=target_type)
 
 
+@pytest.mark.skipif(
+    platform.system == "Windows",
+    reason="Weird flakiness involving " "Hypothesis, Python 3.10 and `zoneinfo`",
+)
 @given(
     target_type=st.shared(any_types, key="target_type"),
     value=st.shared(any_types, key="target_type").flatmap(st.from_type),

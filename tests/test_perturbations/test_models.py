@@ -10,7 +10,7 @@ import torch as tr
 from hypothesis import given, settings, strategies as st
 from hypothesis.extra import numpy as hnp
 from omegaconf import ListConfig
-from torch.testing import assert_allclose
+from torch.testing import assert_close
 
 from rai_toolbox.perturbations.init import (
     uniform_like_l1_n_ball_,
@@ -53,7 +53,7 @@ def test_models_additive_pert(perturber, x):
     assert tr.all(params[0].abs() == 0)
 
     xpert = model(x)
-    tr.testing.assert_allclose(xpert, (x + params[0]))
+    tr.testing.assert_close(xpert, (x + params[0]))
 
 
 @pytest.mark.parametrize(
@@ -83,7 +83,7 @@ def test_init_fn_kwargs():
     pert2 = AdditivePerturbation((3,), uniform_like_l1_n_ball_, generator=gen2)
     pert3 = AdditivePerturbation((3,), uniform_like_l1_n_ball_, generator=gen3)
 
-    assert_allclose(pert1.delta, pert2.delta)
+    assert_close(pert1.delta, pert2.delta)
     assert tr.all(pert1.delta != pert3.delta)
 
 
