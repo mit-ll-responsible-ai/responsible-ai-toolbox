@@ -38,6 +38,8 @@ classifiers = [
     "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
     "Topic :: Scientific/Engineering",
     "Programming Language :: Python :: 3 :: Only",
 ]
@@ -52,7 +54,7 @@ tests = [
 ]
 
 mushin = ["pytorch-lightning >= 1.5.0",
-          "hydra-zen >= 0.7.0",
+          "hydra-zen >= 0.9.0",
           "xarray >= 0.19.0",
           "matplotlib >= 3.3",
           "protobuf <= 3.20.1",  # strict TODO: Remove after tensorboard gets compatible https://github.com/tensorflow/tensorboard/issues/5708
@@ -117,13 +119,15 @@ reportUnnecessaryIsInstance = false
 legacy_tox_ini = """
 [tox]
 isolated_build = True
-envlist = py37, py38, py39
+envlist = py37, py38, py39, py310, py311
 
 [gh-actions]
 python =
   3.7: py37
   3.8: py38
   3.9: py39
+  3.10: py310
+  3.11: py311
 
 [testenv]
 deps = pytest-xdist
@@ -151,7 +155,7 @@ commands = pytest -n auto --hypothesis-profile ci tests
 [testenv:coverage]
 setenv = NUMBA_DISABLE_JIT=1
 usedevelop = true
-basepython = python3.8
+basepython = python3.9
 extras = 
     tests
     mushin
@@ -166,7 +170,7 @@ pip_pre = true
 extras = 
     tests
     mushin
-basepython = python3.8
+basepython = python3.9
 
 [testenv:auto-format]
 skip_install=true
@@ -197,7 +201,7 @@ commands=
 
 # runs experiments that don't require additional dependencies
 [testenv:experiments-checks]
-basepython = python3.8
+basepython = python3.9
 extras = 
     tests
 deps = 
