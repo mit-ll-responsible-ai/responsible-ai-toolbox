@@ -119,6 +119,7 @@ filterwarnings = [
    "ignore:Future Hydra versions will no longer change working directory at job runtime by default.",
    "ignore:distutils Version classes are deprecated",
    "ignore:numpy.ndarray size changed, may indicate binary incompatibility",
+   "ignore:rai_toolbox.mushin.zen will be removed",
  ]
 
 

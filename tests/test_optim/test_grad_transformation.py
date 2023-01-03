@@ -691,11 +691,3 @@ def test_l1q_regression():
     p.backward(g)
     opt.step()
     assert_close(actual=p.grad, expected=tr.tensor([0.0, -0.5, 0.5, 0.0]))
-
-
-def test_project_is_deprecated():
-    x = tr.tensor(1.0, requires_grad=True)
-    optim = L2ProjectedOptim([x], lr=1.0, epsilon=2.0, param_ndim=None)
-
-    with pytest.warns(FutureWarning):
-        optim.project()
