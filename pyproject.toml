@@ -1,7 +1,10 @@
 [build-system]
-requires = [ "setuptools >= 35.0.2", "wheel >= 0.29.0", "setuptools_scm[toml]==7.0.5"]
+requires = [
+    "setuptools >= 35.0.2",
+    "wheel >= 0.29.0",
+    "setuptools_scm[toml]==7.0.5",
+]
 build-backend = "setuptools.build_meta"
-
 
 
 [project]
@@ -10,25 +13,22 @@ dynamic = ["version"]
 description = "PyTorch-centric library for evaluating and enhancing the robustness of AI technologies"
 readme = "README.md"
 requires-python = ">=3.7"
-dependencies=[
-    "torchvision >= 0.10.0",
+dependencies = [
     # pytorch 1.9.1 has bug for its view inplace-update checks
     "torch >= 1.9.0, != 1.9.1",
     "torchmetrics >= 0.6.0",
     "typing-extensions >= 4.1.1",
 ]
-license = {file = "LICENSE.txt"}
-keywords= [ "machine learning", "robustness", "pytorch", "responsible", "AI"]
+license = { file = "LICENSE.txt" }
+keywords = ["machine learning", "robustness", "pytorch", "responsible", "AI"]
 
 authors = [
-  {name = "Ryan Soklaski", email = "ryan.soklaski@ll.mit.edu" },
-  {name = "Justin Goodwin", email = "jgoodwin@ll.mit.edu" },
-  {name = "Olivia Brown"},
-  {name = "Michael Yee"}
+    { name = "Ryan Soklaski", email = "ryan.soklaski@ll.mit.edu" },
+    { name = "Justin Goodwin", email = "jgoodwin@ll.mit.edu" },
+    { name = "Olivia Brown" },
+    { name = "Michael Yee" },
 ]
-maintainers = [
-  {name = "Ryan Soklaski", email = "ryan.soklaski@ll.mit.edu" },
-]
+maintainers = [{ name = "Ryan Soklaski", email = "ryan.soklaski@ll.mit.edu" }]
 
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -53,12 +53,15 @@ tests = [
     "netCDF4 >= 1.5.8",
 ]
 
-mushin = ["pytorch-lightning >= 1.5.0",
-          "hydra-zen >= 0.9.0",
-          "xarray >= 0.19.0",
-          "matplotlib >= 3.3",
-          "protobuf <= 3.20.1",  # strict TODO: Remove after tensorboard gets compatible https://github.com/tensorflow/tensorboard/issues/5708
-        ]
+mushin = [
+    "pytorch-lightning >= 1.5.0",
+    "hydra-zen >= 0.9.0",
+    "xarray >= 0.19.0",
+    "matplotlib >= 3.3",
+    "protobuf <= 3.20.1",         # strict TODO: Remove after tensorboard gets compatible https://github.com/tensorflow/tensorboard/issues/5708
+]
+
+datasets = ["torchvision >= 0.10.0"]
 
 [project.urls]
 "Homepage" = "https://mit-ll-responsible-ai.github.io/responsible-ai-toolbox/"
@@ -66,15 +69,13 @@ mushin = ["pytorch-lightning >= 1.5.0",
 "Source" = "https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox"
 
 
-
 [tool.setuptools_scm]
 write_to = "src/rai_toolbox/_version.py"
 version_scheme = "no-guess-dev"
 
 
-
 [tool.setuptools]
-package-dir = {"" = "src"}
+package-dir = { "" = "src" }
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -84,12 +85,10 @@ exclude = ["tests*", "tests.*"]
 rai_toolbox = ["py.typed"]
 
 
-
 [tool.isort]
 known_first_party = ["rai_toolbox", "tests", "rai_experiments"]
 profile = "black"
 combine_as_imports = true
-
 
 
 [tool.coverage.report]
@@ -103,16 +102,15 @@ skip = '*.js,*.html,*ipynb,*.svg,*.css,docs/build'
 [tool.pyright]
 include = ["src"]
 exclude = [
-       "**/node_modules",
-       "**/__pycache__",
-       "src/rai_toolbox/_version.py",
-       "**/third_party",
-       "**/project_tooling",
-       "./tests/test_augmentations/_old_implementation.py"
+    "**/node_modules",
+    "**/__pycache__",
+    "src/rai_toolbox/_version.py",
+    "**/third_party",
+    "**/project_tooling",
+    "./tests/test_augmentations/_old_implementation.py",
 ]
 reportUnnecessaryTypeIgnoreComment = true
 reportUnnecessaryIsInstance = false
-
 
 
 [tool.tox]
@@ -204,6 +202,7 @@ commands=
 basepython = python3.9
 extras = 
     tests
+    datasets
 deps = 
        experiments/
 commands = 
