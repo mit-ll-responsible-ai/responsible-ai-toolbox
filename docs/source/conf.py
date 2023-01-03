@@ -17,7 +17,7 @@
 # -- Project information -----------------------------------------------------
 
 project = "rai-toolbox"
-copyright = "2022 Massachusetts Institute of Technology"
+copyright = "2023 Massachusetts Institute of Technology"
 author = "Ryan Soklaski, Justin Goodwin, Olivia Brown, Michael Yee"
 
 # The short X.Y version

@@ -19,7 +19,7 @@ import os.path as path
 from pathlib import Path
 from typing import Iterable, Union
 
-OLD_HEADER = """# Copyright (c) 2022 Massachusetts Institute of Technology
+OLD_HEADER = """# Copyright (c) 2023 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT\n"""
 
 NEW_HEADER = """# Copyright 2022, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
