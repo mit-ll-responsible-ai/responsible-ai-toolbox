@@ -11,8 +11,10 @@ chronological order. All previous releases should still be available on pip.
 .. _v0.3.0:
 
 ------------------
-0.3.0 - 2023-01-03
+0.3.0 - 2023-XX-XX
 ------------------
+
+.. note:: This is documentation for an unreleased version of the rai-toolbox.
 
 Improvements
 ------------
@@ -28,7 +30,7 @@ Compatibility-Breaking changes
 - Support for `MultiRunMetricsWorkflow.evaluation_task` was deprecated in v0.2.0 and is now removed.
 - `ParamTransformingOptimizer.project` was deprecated in v0.2.0 and is now removed.
 - The minimum supported version of PyTorch is now 1.10.0.
-- - The minimum supported version of `hydra-zen <https://github.com/mit-ll-responsible-ai/hydra-zen>`_ is now 0.9.0.
+- The minimum supported version of `hydra-zen <https://github.com/mit-ll-responsible-ai/hydra-zen>`_ is now 0.9.0.
 
 Deprecations
 ------------
