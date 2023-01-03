@@ -34,7 +34,7 @@ def test_type_catches_bad_type(name, target_type, value):
 
 
 @pytest.mark.skipif(
-    platform.system == "Windows",
+    platform.system() == "Windows",
     reason="Weird flakiness involving " "Hypothesis, Python 3.10 and `zoneinfo`",
 )
 @given(
