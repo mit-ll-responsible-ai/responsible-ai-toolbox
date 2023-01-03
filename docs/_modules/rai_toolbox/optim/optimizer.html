@@ -339,7 +339,6 @@
 <span class="c1"># SPDX-License-Identifier: MIT</span>
 
 <span class="kn">import</span> <span class="nn">inspect</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABCMeta</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span><span class="p">,</span> <span class="n">overload</span>
 
@@ -864,26 +863,6 @@
             <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">group</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">]:</span>
                 <span class="n">p</span> <span class="o">=</span> <span class="n">_to_batch</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">param_ndim</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_post_step_transform_</span><span class="p">(</span><span class="n">param</span><span class="o">=</span><span class="n">p</span><span class="p">,</span> <span class="n">optim_group</span><span class="o">=</span><span class="n">group</span><span class="p">)</span></div>
-
-    <span class="k">def</span> <span class="nf">project</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        .. deprecated:: 0.2.0</span>
-<span class="sd">          `project` will be removed in rai-toolbox 0.3.0, it is replaced by</span>
-<span class="sd">          `_apply_post_step_transform_`</span>
-
-<span class="sd">        Update each parameter in-place by calling `_post_step_transform_` on the</span>
-<span class="sd">        parameter.</span>
-
-<span class="sd">        This is called automatically by `.step()` after `InnerOpt.step()` has been</span>
-<span class="sd">        called.&quot;&quot;&quot;</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="ne">FutureWarning</span><span class="p">(</span>
-                <span class="s2">&quot;`project` will be removed in rai-toolbox 0.3.0, it is replaced by &quot;</span>
-                <span class="s2">&quot;`_apply_post_step_transform_`&quot;</span>
-            <span class="p">),</span>
-            <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_post_step_transform_</span><span class="p">()</span>
 
 <div class="viewcode-block" id="ParamTransformingOptimizer._apply_pre_step_transform_"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer._apply_pre_step_transform_">[docs]</a>    <span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
     <span class="k">def</span> <span class="nf">_apply_pre_step_transform_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

@@ -357,10 +357,10 @@
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;`</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">`` must be a non-negative integer. Got </span><span class="si">{</span><span class="n">item</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="AugMix"><a class="viewcode-back" href="../../../../generated/rai_toolbox.augmentations.augmix.AugMix.html#rai_toolbox.augmentations.augmix.AugMix">[docs]</a><span class="k">class</span> <span class="nc">AugMix</span><span class="p">(</span><span class="n">tr</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">AugMix</span><span class="p">(</span><span class="n">tr</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="vm">__doc__</span> <span class="o">=</span> <span class="n">augment_and_mix</span><span class="o">.</span><span class="vm">__doc__</span>
 
-<div class="viewcode-block" id="AugMix.__init__"><a class="viewcode-back" href="../../../../generated/rai_toolbox.augmentations.augmix.AugMix.html#rai_toolbox.augmentations.augmix.AugMix.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">process_fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">_T1</span><span class="p">],</span> <span class="n">_T2</span><span class="p">],</span>
         <span class="n">augmentations</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">_T1</span><span class="p">],</span> <span class="n">_T1</span><span class="p">]],</span>
@@ -397,7 +397,7 @@
         <span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">augmentations</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;`len(sample_probabilities)` (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">augmentation_choice_probs</span><span class="p">)</span><span class="si">}</span><span class="s2">) must match `len(augmentations)` (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">augmentations</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span>
-            <span class="p">)</span></div>
+            <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">datum</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">augment_and_mix</span><span class="p">(</span>
@@ -423,7 +423,7 @@
         <span class="n">format_string</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">dirichlet_params=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dirichlet_params</span><span class="si">}</span><span class="s2">,&quot;</span>
         <span class="n">format_string</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">)&quot;</span>
 
-        <span class="k">return</span> <span class="n">format_string</span></div>
+        <span class="k">return</span> <span class="n">format_string</span>
 
 
 <span class="k">def</span> <span class="nf">_flat_repr</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>

@@ -48,8 +48,6 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'generated/rai_toolbox.datasets.RestrictedImageNet';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Augmentations" href="../ref_augmentations.html" />
-    <link rel="prev" title="rai_toolbox.datasets.ImageNetM10" href="rai_toolbox.datasets.ImageNetM10.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="docsearch:language" content="en">
   </head>
@@ -144,7 +142,7 @@
                     </li>
                 
 
-                    <li class="nav-item current active">
+                    <li class="nav-item">
                       <a class="nav-link nav-internal" href="../api_reference.html">
                         Reference
                       </a>
@@ -223,7 +221,7 @@
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
       
-      <div class="bd-sidebar-primary bd-sidebar">
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
         
   
   <div class="sidebar-header-items sidebar-primary__section">
@@ -259,7 +257,7 @@
                     </li>
                 
 
-                    <li class="nav-item current active">
+                    <li class="nav-item">
                       <a class="nav-link nav-internal" href="../api_reference.html">
                         Reference
                       </a>
@@ -312,36 +310,6 @@
   </div>
 
   
-  <div class="sidebar-start-items sidebar-primary__section">
-    <div class="sidebar-start-items__item"><nav class="bd-links" id="bd-docs-nav" aria-label="Section navigation">
-  <p class="bd-links__title" role="heading" aria-level="1">
-    Section Navigation
-  </p>
-  <div class="bd-toc-item navbar-nav">
-    <p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../ref_optim.html">Optimizers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../ref_perturbation.html">Perturbations</a></li>
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="../ref_datasets.html">Datasets</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="rai_toolbox.datasets.CIFAR10C.html">rai_toolbox.datasets.CIFAR10C</a></li>
-<li class="toctree-l2"><a class="reference internal" href="rai_toolbox.datasets.CIFAR100C.html">rai_toolbox.datasets.CIFAR100C</a></li>
-<li class="toctree-l2"><a class="reference internal" href="rai_toolbox.datasets.CIFAR10P1.html">rai_toolbox.datasets.CIFAR10P1</a></li>
-<li class="toctree-l2"><a class="reference internal" href="rai_toolbox.datasets.ImageNet.html">rai_toolbox.datasets.ImageNet</a></li>
-<li class="toctree-l2"><a class="reference internal" href="rai_toolbox.datasets.ImageNetM10.html">rai_toolbox.datasets.ImageNetM10</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">rai_toolbox.datasets.RestrictedImageNet</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../ref_augmentations.html">Augmentations</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../ref_losses.html">Losses</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../ref_mushin.html">Mushin</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../ref_utils.html">General Utilities</a></li>
-</ul>
-
-  </div>
-</nav>
-    </div>
-  </div>
-  
 
   
   <div class="sidebar-end-items sidebar-primary__section">
@@ -368,46 +336,6 @@
               
   <section id="rai-toolbox-datasets-restrictedimagenet">
 <h1>rai_toolbox.datasets.RestrictedImageNet<a class="headerlink" href="#rai-toolbox-datasets-restrictedimagenet" title="Permalink to this heading">#</a></h1>
-<dl class="py class">
-<dt class="sig sig-object py" id="rai_toolbox.datasets.RestrictedImageNet">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rai_toolbox.datasets.</span></span><span class="sig-name descname"><span class="pre">RestrictedImageNet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_transform=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loader=&lt;function</span> <span class="pre">default_loader&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_valid_file=None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/datasets/_imagenet_base.html#RestrictedImageNet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.datasets.RestrictedImageNet" title="Permalink to this definition">#</a></dt>
-<dd><p>Restricted ImageNet, see <a class="reference external" href="https://arxiv.org/abs/1906.00945">https://arxiv.org/abs/1906.00945</a></p>
-<p><strong>WARNING</strong>: This dataset is imbalanced</p>
-<dl class="simple">
-<dt>Dog:</dt><dd><p>ImageNet Class Indices: 151-268</p>
-</dd>
-<dt>Cat:</dt><dd><p>ImageNet Class Indices: 281-285</p>
-</dd>
-<dt>Frog:</dt><dd><p>ImageNet Class Indices: 30-32</p>
-</dd>
-<dt>Turtle:</dt><dd><p>ImageNet Class Indices: 33-37</p>
-</dd>
-<dt>Bird:</dt><dd><p>ImageNet Class Indices: 80-100</p>
-</dd>
-<dt>Monkey:</dt><dd><p>ImageNet Class Indices: 365-382</p>
-</dd>
-<dt>Fish:</dt><dd><p>ImageNet Class Indices: 389-397</p>
-</dd>
-<dt>Crab:</dt><dd><p>ImageNet Class Indices: 118-121</p>
-</dd>
-<dt>Insect:</dt><dd><p>ImageNet Class Indices: 300-319</p>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="rai_toolbox.datasets.RestrictedImageNet.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_transform=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loader=&lt;function</span> <span class="pre">default_loader&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_valid_file=None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rai_toolbox.datasets.RestrictedImageNet.__init__" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
-
-<p class="rubric">Methods</p>
-<table class="autosummary longtable table autosummary">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#rai_toolbox.datasets.RestrictedImageNet.__init__" title="rai_toolbox.datasets.RestrictedImageNet.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(root[, transform, ...])</p></td>
-<td><p></p></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
 </section>
 
 
@@ -418,20 +346,6 @@
             <footer class="bd-footer-article">
                 <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-  <a class='left-prev' id="prev-link" href="rai_toolbox.datasets.ImageNetM10.html" title="previous page">
-      <i class="fa-solid fa-angle-left"></i>
-      <div class="prev-next-info">
-          <p class="prev-next-subtitle">previous</p>
-          <p class="prev-next-title">rai_toolbox.datasets.ImageNetM10</p>
-      </div>
-  </a>
-  <a class='right-next' id="next-link" href="../ref_augmentations.html" title="next page">
-  <div class="prev-next-info">
-      <p class="prev-next-subtitle">next</p>
-      <p class="prev-next-title">Augmentations</p>
-  </div>
-  <i class="fa-solid fa-angle-right"></i>
-  </a>
 </div>
             </footer>
             
@@ -441,38 +355,6 @@
           
             <div class="bd-sidebar-secondary bd-toc">
               
-<div class="toc-item">
-  
-<div class="tocsection onthispage">
-    <i class="fa-solid fa-list"></i> On this page
-</div>
-<nav id="bd-toc-nav" class="page-toc">
-    <ul class="visible nav section-nav flex-column">
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#rai_toolbox.datasets.RestrictedImageNet">
-   <code class="docutils literal notranslate">
-    <span class="pre">
-     RestrictedImageNet
-    </span>
-   </code>
-  </a>
-  <ul class="nav section-nav flex-column">
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#rai_toolbox.datasets.RestrictedImageNet.__init__">
-     <code class="docutils literal notranslate">
-      <span class="pre">
-       RestrictedImageNet.__init__()
-      </span>
-     </code>
-    </a>
-   </li>
-  </ul>
- </li>
-</ul>
-
-</nav>
-</div>
-
 <div class="toc-item">
   
 <div id="searchbox"></div>
