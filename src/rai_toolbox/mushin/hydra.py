@@ -1,6 +1,7 @@
 # Copyright 2023, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
+import warnings
 from dataclasses import is_dataclass
 from inspect import Parameter, signature
 from typing import (
@@ -175,7 +176,13 @@ def zen(
     pre_call: PreCall = None,
     post_call: PostCall[T1] = None,
 ) -> Union[Zen[P, T1], Callable[[Callable[P, T1]], Zen[P, T1]]]:
-
+    warnings.warn(
+        FutureWarning(
+            "rai_toolbox.mushin.zen will be removed in rai-toolbox 0.4.0. "
+            "Use `hydra_zen.zen` instead."
+        ),
+        stacklevel=2,
+    )
     if __func is None:
 
         def wrap(f: Callable[P, T1]) -> Zen[P, T1]:

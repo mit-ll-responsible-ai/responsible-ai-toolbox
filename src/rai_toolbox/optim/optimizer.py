@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: MIT
 
 import inspect
-import warnings
 from abc import ABCMeta
 from typing import Any, Callable, Dict, List, Optional, TypeVar, Union, cast, overload
 
@@ -528,26 +527,6 @@ class ParamTransformingOptimizer(Optimizer, metaclass=ABCMeta):
             for p in group["params"]:
                 p = _to_batch(p, param_ndim)
                 self._post_step_transform_(param=p, optim_group=group)
-
-    def project(self):
-        """
-        .. deprecated:: 0.2.0
-          `project` will be removed in rai-toolbox 0.3.0, it is replaced by
-          `_apply_post_step_transform_`
-
-        Update each parameter in-place by calling `_post_step_transform_` on the
-        parameter.
-
-        This is called automatically by `.step()` after `InnerOpt.step()` has been
-        called."""
-        warnings.warn(
-            FutureWarning(
-                "`project` will be removed in rai-toolbox 0.3.0, it is replaced by "
-                "`_apply_post_step_transform_`"
-            ),
-            stacklevel=2,
-        )
-        return self._apply_post_step_transform_()
 
     @torch.no_grad()
     def _apply_pre_step_transform_(self):
