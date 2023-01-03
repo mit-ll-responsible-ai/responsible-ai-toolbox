@@ -43,7 +43,7 @@ jobs:
       uses: actions/cache@v3
       with:
         path: .tox
-        key: tox-td${{ env.TIME_PERIOD }}-py${{ matrix.python-version }}-${{ hashFiles('setup.cfg') }}-${{ hashFiles('setup.py') }}-${{ hashFiles('.github/workflows/tox.yml') }}
+        key: tox-td${{ env.TIME_PERIOD }}-py${{ matrix.python-version }}-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('.github/workflows/tox.yml') }}
 
     - name: Test with tox
       run: tox -e py
@@ -70,7 +70,7 @@ jobs:
       uses: actions/cache@v3
       with:
         path: .tox
-        key: tox-windows-td${{ env.TIME_PERIOD }}-${{ hashFiles('setup.cfg') }}-${{ hashFiles('setup.py') }}-${{ hashFiles('tests/conftest.py') }}-${{ hashFiles('.github/workflows/tox.yml') }}
+        key: tox-windows-td${{ env.TIME_PERIOD }}-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('tests/conftest.py') }}-${{ hashFiles('.github/workflows/tox.yml') }}
 
     - name: Test with tox
       run: tox -e py38
@@ -99,7 +99,7 @@ jobs:
       with:
         path: .tox
 
-        key: tox-coverage-td${{ env.TIME_PERIOD }}-${{ hashFiles('setup.cfg') }}-${{ hashFiles('setup.py') }}-${{ hashFiles('.github/workflows/tox.yml') }}
+        key: tox-coverage-td${{ env.TIME_PERIOD }}-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('.github/workflows/tox.yml') }}
 
     - name: Measure coverage
       run: tox -e coverage
@@ -124,9 +124,9 @@ jobs:
       uses: actions/cache@v3
       with:
         path: .tox
-        # setup.cfg and pyproject.toml have versioning info that would
+        # pyproject.toml and pyproject.toml have versioning info that would
         # impact the tox environment.
-        key: tox-experiments-${{ hashFiles('setup.cfg') }}-${{ hashFiles('setup.py') }}-${{ hashFiles('tests/conftest.py') }}-${{ hashFiles('.github/workflows/tox.yml') }}
+        key: tox-experiments-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('tests/conftest.py') }}-${{ hashFiles('.github/workflows/tox.yml') }}
 
     - name: Run experiments checks
       run: tox -e experiments-checks
@@ -151,7 +151,7 @@ jobs:
       uses: actions/cache@v3
       with:
         path: .tox
-        key: tox-no-mushin-${{ hashFiles('setup.cfg') }}-${{ hashFiles('setup.py') }}-${{ hashFiles('tests/conftest.py') }}-${{ hashFiles('.github/workflows/tox.yml') }}
+        key: tox-no-mushin-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('tests/conftest.py') }}-${{ hashFiles('.github/workflows/tox.yml') }}
 
     - name: Run experiments checks
       run: tox -e no-mushin
@@ -174,7 +174,7 @@ jobs:
       uses: actions/cache@v3
       with:
         path: .tox
-        key: tox-min-deps-${{ hashFiles('setup.cfg') }}-${{ hashFiles('setup.py') }}-${{ hashFiles('tests/conftest.py') }}-${{ hashFiles('.github/workflows/tox.yml') }}
+        key: tox-min-deps-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('tests/conftest.py') }}-${{ hashFiles('.github/workflows/tox.yml') }}
     - name: Test with tox
       run: tox -e min-deps
 
@@ -196,7 +196,7 @@ jobs:
       uses: actions/cache@v3
       with:
         path: .tox
-        key: tox-pre-deps-${{ hashFiles('setup.cfg') }}-${{ hashFiles('setup.py') }}-${{ hashFiles('tests/conftest.py') }}-${{ hashFiles('.github/workflows/tox.yml') }}
+        key: tox-pre-deps-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('tests/conftest.py') }}-${{ hashFiles('.github/workflows/tox.yml') }}
     - name: Test with tox
       run: tox -e pre-release
 
@@ -247,7 +247,7 @@ jobs:
     - uses: actions/cache@v3
       with:
         path: ${{ env.pythonLocation }}
-        key: pyright-td${{ env.WEEK_PERIOD }}-${{ env.pythonLocation }}-${{ hashFiles('setup.py') }}
+        key: pyright-td${{ env.WEEK_PERIOD }}-${{ env.pythonLocation }}
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
