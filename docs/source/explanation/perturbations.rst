@@ -181,7 +181,7 @@ Common data-related workflows supported by rAI-toolbox
 ======================================================
 
 A wide range of responsible AI techniques involve optimizing parameters of data
-perturbations (or more generally, *transforations*), often in addition to optimizations over model parameters:
+perturbations (or more generally, *transformations*), often in addition to optimizations over model parameters:
 
 - Data augmentations / corruptions: :math:`g_\delta(x)`
     - Model-independent

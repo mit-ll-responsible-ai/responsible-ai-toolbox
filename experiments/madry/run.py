@@ -1,4 +1,4 @@
-# Copyright 2022, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
+# Copyright 2023, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 
@@ -18,8 +18,11 @@ cs.store(name="madry_config", node=configs.Config)
 
 class MadryLabRobustness(RobustnessCurve):
     @staticmethod
-    def task(seed: int, trainer: pl.Trainer, module: pl.LightningModule) -> dict:
+    def pre_task(seed: int):
         pl.seed_everything(seed)
+
+    @staticmethod
+    def task(trainer: pl.Trainer, module: pl.LightningModule) -> dict:
         trainer.test(module)
 
         assert Path("test_metrics.pt").exists()

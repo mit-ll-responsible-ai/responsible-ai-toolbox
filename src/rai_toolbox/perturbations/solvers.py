@@ -1,4 +1,4 @@
-# Copyright 2022, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
+# Copyright 2023, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 
@@ -53,7 +53,7 @@ def gradient_ascent(
 
     Note that, by default, this perturbs the data away from `target` (i.e., this performs
     gradient *ascent*), given a standard loss function that seeks to minimize the
-    diffence between the model's output and the target. See `targeted` to toggle this
+    difference between the model's output and the target. See `targeted` to toggle this
     behavior.
 
     Parameters
@@ -247,7 +247,7 @@ def gradient_ascent(
         if instantiates_to(perturbation_model, PerturbationModel):
             raise TypeError(
                 "An initialized optimizer can only be passed to the solver in "
-                "combination with an intialized perturbation model."
+                "combination with an initialized perturbation model."
             )
         if optim_kwargs:
             raise TypeError(
@@ -286,7 +286,7 @@ def gradient_ascent(
                     or losses.shape != data.shape[: losses.ndim]
                 ):
                     raise ValueError(
-                        f"`use_best=True` but `criterion` does not ouput a per-datum-loss. "
+                        f"`use_best=True` but `criterion` does not output a per-datum-loss. "
                         f"I.e. `criterion` returned a tensor of shape-{tuple(losses.shape)} for a "
                         f"batch of shape-{tuple(data.shape)}. Expected a tensor of "
                         f"shape-{(len(data),)} or greater."

@@ -1,4 +1,4 @@
-# Copyright 2022, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
+# Copyright 2023, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 
@@ -10,7 +10,7 @@ from numpy.typing import DTypeLike
 
 
 class FourierBasis(NamedTuple):
-    """
+    r"""
     Describes a 2D planewave generated via:
 
     A * cos(2pi * freq_vector @ x + phase_shift)
@@ -51,7 +51,7 @@ def generate_fourier_bases(
     factor_2pi_phase_shift: float = 0,
     row_col_coords: Optional[Iterable[Tuple[int, int]]] = None,
 ) -> Iterator[FourierBasis]:
-    """Yields each unique, real-valued 2D array with unit norm, such that its Fourier
+    r"""Yields each unique, real-valued 2D array with unit norm, such that its Fourier
     transform is supported at each (i, j) and its symmetric position on a shape-(nrows, ncols)
     grid in Fourier space, where the lowest frequency component resides at the center of
     the grid.

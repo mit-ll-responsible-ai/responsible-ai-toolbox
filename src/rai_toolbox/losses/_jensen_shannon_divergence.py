@@ -1,4 +1,4 @@
-# Copyright 2022, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
+# Copyright 2023, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 
@@ -13,7 +13,7 @@ from rai_toolbox._typing import ArrayLike
 def jensen_shannon_divergence(
     *probs: ArrayLike, weight: Optional[float] = None
 ) -> tr.Tensor:
-    """
+    r"""
     Computes the Jensen-Shannon divergence [1]_ between n distributions:
 
     :math:`JSD(P_1, P_2, ..., P_n)`

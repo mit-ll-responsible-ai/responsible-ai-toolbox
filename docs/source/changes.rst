@@ -31,7 +31,7 @@ Improvements to `MultiRunMetricsWorkflow`
 -----------------------------------------
 - A `pre_task` step can be defined for a workflow; this is useful for seeding random number generators prior to the task's instantiation phase. See :ref:`this how-to guide <how-to-deterministic>` for examples.
 - Loaded workflow overrides now roundtrip appropriately. See :pull:`61`.
-- `metric_load_fn` can be overriden to customize how `~MultiRunMetricsWorkflow` loads metric files; the default behavior is to use `torch.load`. See :pull:`63`.
+- `metric_load_fn` can be overridden to customize how `~MultiRunMetricsWorkflow` loads metric files; the default behavior is to use `torch.load`. See :pull:`63`.
 - `working_subdir` can be included as a data-variable in a workflow's xarray; this enables users to lookup subdirs by override values. See :pull:`52`.
 - `to_xarray` works on lists of array-likes, not just lists of numpy arrays
 - `load_metrics` can be called directly from `~MultiRunMetricsWorkflow`.
@@ -63,7 +63,7 @@ Deprecations
 This patch fixes two bugs in ``rai_toolbox.perturbations.init``:
 
 - `~rai_toolbox.perturbations.uniform_like_l1_n_ball_` was not correctly symmeterized; the drawn values only had components in the direction of the positive hemisphere of the :math:`L^1` ball.
-- Passing an on-gpu tensor to the in-place init functions would cause a device mis-match error with the default random number generator, which is on CPU.
+- Passing an on-gpu tensor to the in-place init functions would cause a device mismatch error with the default random number generator, which is on CPU.
 
 
 .. _v0.1.0:

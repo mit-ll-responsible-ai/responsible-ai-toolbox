@@ -1,4 +1,4 @@
-# Copyright 2022, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
+# Copyright 2023, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 from numbers import Real
@@ -94,7 +94,7 @@ def value_check(
         (min_ <= value if incl_min else min_ < value) if min_ is not None else True
     )
     max_satisfied = (
-        (value <= max_ if incl_min else value < max_) if max_ is not None else True
+        (value <= max_ if incl_max else value < max_) if max_ is not None else True
     )
 
     if not min_satisfied or not max_satisfied:
@@ -195,7 +195,7 @@ def to_batch(p: tr.Tensor, param_ndim: Optional[int]) -> tr.Tensor:
 
         - A positive number determines the dimensionality of the tensor that the transformation will act on.
         - A negative number indicates the 'offset' from the dimensionality of the tensor.
-        - `None` means that the transformation will be applied to the tensor without any broadcasting.
+        - `None` means that the transformation will be applied to the tensor without any broadcasting. This is equivalent to `param_ndim=p.ndim`
 
     Returns
     -------

@@ -1,4 +1,4 @@
-# Copyright 2022, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
+# Copyright 2023, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 from typing import Union
@@ -103,7 +103,7 @@ def test_min_max_ordering(kwargs):
         ),
         pytest.param(dict(value=1, min_=1, incl_min=True), id="lower:1 <= value:1"),
         pytest.param(
-            dict(value=1, max_=1, incl_min=False),
+            dict(value=1, max_=1, incl_max=False),
             marks=pytest.mark.xfail(raises=ValueError, strict=True),
             id="value:1 < upper:1",
         ),
