@@ -14,8 +14,7 @@ description = "PyTorch-centric library for evaluating and enhancing the robustne
 readme = "README.md"
 requires-python = ">=3.7"
 dependencies = [
-    # pytorch 1.9.1 has bug for its view inplace-update checks
-    "torch >= 1.9.0, != 1.9.1",
+    "torch >= 1.10.0",
     "torchmetrics >= 0.6.0",
     "typing-extensions >= 4.1.1",
 ]
@@ -117,7 +116,7 @@ reportUnnecessaryIsInstance = false
 legacy_tox_ini = """
 [tox]
 isolated_build = True
-envlist = py37, py38, py39, py310, py311
+envlist = py37, py38, py39, py310
 
 [gh-actions]
 python =
@@ -125,7 +124,6 @@ python =
   3.8: py38
   3.9: py39
   3.10: py310
-  3.11: py311
 
 [testenv]
 deps = pytest-xdist
@@ -137,7 +135,7 @@ commands = pytest -n auto --hypothesis-profile ci tests
 [testenv:min-deps]  # test against minimum dependency versions
 deps = 
     {[testenv]deps}
-    torch==1.9.0
+    torch==1.10.0
     torchmetrics==0.6.0
     typing-extensions==4.1.1
     hydra-zen==0.7.0
