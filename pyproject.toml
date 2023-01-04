@@ -192,7 +192,7 @@ extras =
     mushin
     datasets
 deps = 
-    --requirement deps/pyright.txt
+    --requirement deps/requirements-pyright.txt
 basepython = python3.9
 
 commands = pyright --lib tests/ src/
