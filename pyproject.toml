@@ -195,7 +195,7 @@ deps =
     --requirement deps/pyright.txt
 basepython = python3.9
 
-commands = pyright --lib tests/ src/rai_toolbox/mushin/
+commands = pyright --lib tests/ src/
 
 
 [testenv:auto-format]
