@@ -203,7 +203,7 @@ class FourierPerturbation(tr.nn.Module):
         self._sample_probs = np.concatenate([1 / _radii] * num_distinct_phases)
         self._sample_probs /= self._sample_probs.sum()
 
-    def forward(self, img: _T) -> _T:
+    def forward(self, img: _T) -> _T:  # type: ignore
         """
         Parameters
         ----------

@@ -22,12 +22,12 @@ license = { file = "LICENSE.txt" }
 keywords = ["machine learning", "robustness", "pytorch", "responsible", "AI"]
 
 authors = [
-    { name = "Ryan Soklaski", email = "ryan.soklaski@ll.mit.edu" },
+    { name = "Ryan Soklaski", email = "rsoklaski@gmail.com" },
     { name = "Justin Goodwin", email = "jgoodwin@ll.mit.edu" },
     { name = "Olivia Brown" },
     { name = "Michael Yee" },
 ]
-maintainers = [{ name = "Ryan Soklaski", email = "ryan.soklaski@ll.mit.edu" }]
+maintainers = [{ name = "Ryan Soklaski", email = "rsoklaski@gmail.com" }]
 
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -106,8 +106,6 @@ exclude = [
     "**/third_party",
     "**/project_tooling",
     "./tests/test_augmentations/_old_implementation.py",
-    "src/rai_toolbox/augmentations/augmix",
-    "src/rai_toolbox/augmentations/fourier",
 ]
 reportUnnecessaryTypeIgnoreComment = true
 reportUnnecessaryIsInstance = false
