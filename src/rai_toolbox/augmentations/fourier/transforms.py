@@ -57,10 +57,10 @@ class FourierPerturbation(tr.nn.Module):
 
         if isinstance(self._norm_bnds, tuple):
             norm = np.random.uniform(*self._norm_bnds, size=1).item()
-            return self.bases[index] * norm
+            return cast(Tensor, self.bases[index] * norm)
         else:
             # norm was already applied to all bases in __init__
-            return self.bases[index]
+            return cast(Tensor, self.bases[index])
 
     def __init__(
         self,
