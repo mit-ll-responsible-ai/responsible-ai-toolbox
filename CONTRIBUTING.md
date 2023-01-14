@@ -3,12 +3,11 @@ through the following resources before you begin working on any contributions to
 code base.
 
 
-- [Installing rAI toolkit for development](#installing-rai-toolkit-for-development)
-- [Pre-Commit Hooks (Required)](#pre-commit-hooks-required)
-  - [What does this do?](#what-does-this-do)
-- [Running Our Tests](#running-our-tests)
+- [Contributor Basics](#contributor-basics)
+  - [Installing rAI toolkit for development](#installing-rai-toolkit-for-development)
+  - [Pre-Commit Hooks (Required)](#pre-commit-hooks-required)
+    - [What does this do?](#what-does-this-do)
   - [Running Tests](#running-tests)
-  - [Additional Resources to Learn About Our Approach to Automated Testing](#additional-resources-to-learn-about-our-approach-to-automated-testing)
 - [Code Quality](#code-quality)
   - [PEP 8](#pep-8)
   - [Naming Conventions](#naming-conventions)
@@ -16,10 +15,14 @@ code base.
   - [Documentation Strings](#documentation-strings)
   - [Using Descriptive Data Structures](#using-descriptive-data-structures)
 - [Validating Type Correctness](#validating-type-correctness)
-- [Publishing a new version to PyPI](#publishing-a-new-version-to-pypi)
+- [Maintaining the rai-toolbox](#maintaining-the-rai-toolbox)
+  - [CI/CD Overview](#cicd-overview)
+  - [Project dependencies, metadata, and versioning](#project-dependencies-metadata-and-versioning)
+  - [Tooling configuration](#tooling-configuration)
+  - [Creating a new release and publishing to PyPI](#creating-a-new-release-and-publishing-to-pypi)
   
-
-## Installing rAI toolkit for development
+## Contributor Basics
+### Installing rAI toolkit for development
 
 Install the toolkit along with its test dependencies; checkout the repo, navigate to its top level and run
 
@@ -29,7 +32,7 @@ pip install -e .[tests]
 
 the `-e` option ensures that any changes that you make to the project's source code will be reflected in your local install – you need not reinstall the package in order for your modifications to take effect.
 
-## Pre-Commit Hooks (Required)
+### Pre-Commit Hooks (Required)
 
 We provide contributors with pre-commit hooks, which will apply auto-formatters and 
 linters to your code before your commit takes effect. You must install these in order to contribute to the repo.
@@ -49,7 +52,7 @@ pre-commit run
 
 Great! You can read more about pre-commit hooks in general here: https://pre-commit.com/
 
-### What does this do?
+#### What does this do?
 
 Our pre-commit hooks run the following auto-formatters on all commits:
 - [black](https://black.readthedocs.io/en/stable/)
@@ -58,9 +61,8 @@ Our pre-commit hooks run the following auto-formatters on all commits:
 It also runs [flake8](https://github.com/PyCQA/flake8) to enforce PEP8 standards.
 
 
-## Running Our Tests
-
 ### Running Tests
+
 The most basic use case of `pytest` is trivial: it will look for files with the word "test" in their name, and will look for functions that also have "test" in their name, and it will simply run those functions.
 
 Navigate to the top-level of `rai_toolbox` and run:
@@ -76,9 +78,7 @@ If you want to quickly run through the test suite, just to verify that it runs w
 pytest tests/ --hypothesis-profile fast
 ```
 
-### Additional Resources to Learn About Our Approach to Automated Testing
-
-See: https://github.com/rsokl/testing-tutorial
+Additional Resources to Learn About Our Approach to Automated Testing, see: https://github.com/rsokl/testing-tutorial
 
 ## Code Quality
 A more thorough discussion of the following items can be found in [module 5 of Python Like You Mean It](https://www.pythonlikeyoumeanit.com/Module5_OddsAndEnds/Writing_Good_Code.html).
@@ -265,12 +265,46 @@ Our CI runs the `pyright` type-checker in basic mode against hydra-zen's entire 
 
 If you use VSCode with Pylance, then make sure that `Type Checking Mode` is set to `basic` for your hydra-zen workspace. Your IDE will then mark any problematic code.Other IDEs can leverage the pyright language server to a similar effect. 
 
-While this is helpful for getting immediate feedback about your code, it is no substitute for running `pyright` from the commandline. To do so, [install pyright](https://github.com/microsoft/pyright#command-line) and, from the top-level of this repo, run:
+While this is helpful for getting immediate feedback about your code, it is no substitute for running `pyright` from the commandline. To do so, run the following tox job:
 
 ```console
-pyright --lib tests/annotations/ src/
+tox -e pyright
 ```
 
-## Publishing a new version to PyPI
+## Maintaining the rai-toolbox
+
+The following lays out the essentials for maintaining the rai-toolbox. It is recommended that you read the previous "Contributor Basics" before proceeding.
+
+### CI/CD Overview
+
+We use GitHub Actions for our CI/CD needs. It is responsible for:
+- Running our test suite against multiple platforms, Python versions, and dependency matrices
+- Scanning the project for consistent and up-to-date headers
+- Running a spell checker on our docs and code base
+- Running the pyright type checker on our code base, tests, and docs
+- Publishing new build artifacts to PyPI
+- Building and publishing our docs
+- Managing our pinned dependencies via dependabot
+
+As described above, We use `tox` to normalize the Python environment creation and command running for the majority of these tasks, so that they can be run locally as well.
+
+### Project dependencies, metadata, and versioning
+
+The project's build tooling (e.g. that we use setuptools to builds the installable artifacts), metadata (e.g. author list), and dependencies are all specified in the [pyproject.toml](https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox/blob/main/pyproject.toml) file.
+
+The `project > dependencies` section is where the project's minimum dependencies are specified.
+In the case that a new dependency is added, a minimum version must be specified. `project > optional-dependencies` includes the dependencies that are needed to run our test suite, dependencies for the `mushin` and `datasets` submodules.
+
+The project's version (e.g. `v0.3.0`) is managed by [setuptools_scm](https://github.com/pypa/setuptools_scm), meaning that the `rai_toolbox.__version__` attribute is not set manually, rather it is derived from the project's latest git-commit tag of the form `vX.Y.Z`. See [Creating a new release and publishing to PyPI](#creating-a-new-release-and-publishing-to-pypi) for more details.
+
+
+### Tooling configuration
+
+The repo's [pyproject.toml](https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox/blob/main/pyproject.toml) file is responsible for storing the configurations for the project's tools (e.g. isort, pyright, codespell) whenever possible. Some tools, such as flake8 and pre-commit, do not support this file format and have separate config files.
+
+
+Our pinned pyright dependency is managed by [dependabot](https://docs.github.com/en/code-security/dependabot/dependabot-version-updates) in 
+
+### Creating a new release and publishing to PyPI
 
 We use GitHub Actions to automate the process of publishing to the Python Package Index. To publish a new release, simply create a new tag to reflect the new version `v<major>.<minor>.<patch>[rc<iter>]` (e.g. `v1.0.2` or `v1.0.2rc3` -- for the 3rd release candidate of `v1.0.2`). Then, in the repo, create a new release using that tag. This will trigger the action for publishing to PyPI; within minutes users will be able to install the latest version using pip!
