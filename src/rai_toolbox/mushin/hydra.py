@@ -12,8 +12,8 @@ from ..errors import RAIToolboxDeprecationWarning
 def zen(*args, **kwargs):
     warnings.warn(
         RAIToolboxDeprecationWarning(
-            "`rai_toolbox.hydra.zen` will be deprecated,"
-            "please import from `hydra_zen.zen`."
+            "rai_toolbox.mushin.zen will be removed in rai-toolbox 0.4.0. "
+            "Use `hydra_zen.zen` instead."
         ),
         stacklevel=2,
     )
