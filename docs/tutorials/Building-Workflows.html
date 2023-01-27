@@ -810,9 +810,9 @@ this tutorial, we also make use of <a class="reference external" href="https://w
         <span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span> <span class="o">=</span> <span class="n">num_workers</span>
 
         <span class="c1"># Metrics</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">acc_metric</span> <span class="o">=</span> <span class="n">Accuracy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">acc_metric</span> <span class="o">=</span> <span class="n">Accuracy</span><span class="p">(</span><span class="n">task</span><span class="o">=</span><span class="s2">&quot;multiclass&quot;</span><span class="p">,</span> <span class="n">num_classes</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">perturber</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">clean_acc_metric</span> <span class="o">=</span> <span class="n">Accuracy</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">clean_acc_metric</span> <span class="o">=</span> <span class="n">Accuracy</span><span class="p">(</span><span class="n">task</span><span class="o">=</span><span class="s2">&quot;multiclass&quot;</span><span class="p">,</span> <span class="n">num_classes</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
@@ -852,9 +852,16 @@ this tutorial, we also make use of <a class="reference external" href="https://w
                 <span class="n">acc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">clean_acc_metric</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stage</span><span class="si">}</span><span class="s2">_clean_accuracy&quot;</span><span class="p">,</span> <span class="n">acc</span><span class="p">)</span>
 
-            <span class="n">data</span><span class="p">,</span> <span class="n">adv_loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">perturber</span><span class="p">(</span>
-                <span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data_orig</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">target</span>
-            <span class="p">)</span>
+            <span class="n">inference_tensors</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">is_inference_mode_enabled</span><span class="p">()</span>
+            <span class="k">with</span> <span class="n">tr</span><span class="o">.</span><span class="n">inference_mode</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span> <span class="n">tr</span><span class="o">.</span><span class="n">enable_grad</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">inference_tensors</span><span class="p">:</span>
+                    <span class="c1"># we need to clone in order to support grad mode</span>
+                    <span class="n">data_orig</span> <span class="o">=</span> <span class="n">data_orig</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
+                    <span class="n">target</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
+
+                <span class="n">data</span><span class="p">,</span> <span class="n">adv_loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">perturber</span><span class="p">(</span>
+                    <span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data_orig</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">target</span>
+                <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stage</span><span class="si">}</span><span class="s2">_adversarial_loss&quot;</span><span class="p">,</span> <span class="n">adv_loss</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
 
         <span class="k">else</span><span class="p">:</span>
@@ -947,7 +954,7 @@ this tutorial, we also make use of <a class="reference external" href="https://w
 </div>
 <p>We configure our trainer to use <code class="docutils literal notranslate"><span class="pre">MetricsCallback</span></code>, which will instruct PyTorch Lightning to automatically save our logged metrics as a dictionary in a file named “fit_metrics.pt” and “test_metrics.pt” for training and evaluation, respectively.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">TrainerCfg</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span>
@@ -965,7 +972,7 @@ this tutorial, we also make use of <a class="reference external" href="https://w
 </div>
 <p>Now we use Hydra’s <a class="reference external" href="https://hydra.cc/docs/tutorials/structured_config/config_store/">ConfigStore</a> API to create named configuration groups that can be specified/swapped when we run our workflow. Let’s make it easy to swap both models and optimizers by-name.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cs</span> <span class="o">=</span> <span class="n">ConfigStore</span><span class="o">.</span><span class="n">instance</span><span class="p">()</span>
@@ -981,7 +988,7 @@ this tutorial, we also make use of <a class="reference external" href="https://w
 <h2>Cross Validation Workflow<a class="headerlink" href="#Cross-Validation-Workflow" title="Permalink to this heading">#</a></h2>
 <p>With all the configurations in place we can now define our first experiment workflow: train multiple models on <code class="docutils literal notranslate"><span class="pre">MNIST</span></code> data using cross-validation. First define the main experiment configuration:</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">platform</span>
@@ -1005,7 +1012,7 @@ this tutorial, we also make use of <a class="reference external" href="https://w
 <p>Create <code class="docutils literal notranslate"><span class="pre">CrossValWorkflow</span></code> by inheriting from <a class="reference external" href="https://mit-ll-responsible-ai.github.io/responsible-ai-toolbox/generated/rai_toolbox.mushin.MultiRunMetricsWorkflow.html">MultiRunMetricsWorkflow</a> to train a given model for a given a cross validation dataset (fold). The task function simply runs PyTorch Lightning’s <a class="reference external" href="https://pytorch-lightning.readthedocs.io/en/latest/api/pytorch_lightning.trainer.trainer.Trainer.html#pytorch_lightning.trainer.trainer.Trainer">Trainer.fit</a> and returns the
 metrics saved from <a class="reference external" href="https://mit-ll-responsible-ai.github.io/responsible-ai-toolbox/generated/rai_toolbox.mushin.MetricsCallback.html">MetricsCallback</a>. To run this workflow simply define the number of cross validation splits to use via <code class="docutils literal notranslate"><span class="pre">n_splits</span></code>.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">CrossValWorkFlow</span><span class="p">(</span><span class="n">MultiRunMetricsWorkflow</span><span class="p">):</span>
@@ -1024,7 +1031,7 @@ metrics saved from <a class="reference external" href="https://mit-ll-responsibl
 </div>
 <p>Now run the workflow by defining the requried <code class="docutils literal notranslate"><span class="pre">n_splits</span></code> and the models (names defined in the <a class="reference external" href="https://hydra.cc/docs/tutorials/structured_config/config_store/">ConfigStore</a> above). Additionally we define the working directory of the experiment by setting <code class="docutils literal notranslate"><span class="pre">hydra.sweep.dir</span></code> configuration via <code class="docutils literal notranslate"><span class="pre">overrides</span></code>.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">kfold_task</span> <span class="o">=</span> <span class="n">CrossValWorkFlow</span><span class="p">(</span><span class="n">Config</span><span class="p">)</span>
@@ -1045,8 +1052,8 @@ metrics saved from <a class="reference external" href="https://mit-ll-responsibl
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-[2022-05-23 11:33:26,591][HYDRA] Launching 4 jobs locally
-[2022-05-23 11:33:26,592][HYDRA]        #0 : n_splits=2 fold=0 model=linear
+[2023-01-27 13:08:46,529][HYDRA] Launching 4 jobs locally
+[2023-01-27 13:08:46,529][HYDRA]        #0 : n_splits=2 fold=0 model=linear
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1054,12 +1061,20 @@ metrics saved from <a class="reference external" href="https://mit-ll-responsibl
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-GPU available: True, used: True
+/home/justin_goodwin/.conda/envs/rai_toolbox/lib/python3.10/site-packages/hydra/_internal/core_plugins/basic_launcher.py:74: UserWarning: Future Hydra versions will no longer change working directory at job runtime by default.
+See https://hydra.cc/docs/1.2/upgrades/1.1_to_1.2/changes_to_job_working_dir/ for more information.
+  ret = run_job(
+/home/justin_goodwin/.conda/envs/rai_toolbox/lib/python3.10/site-packages/lightning_fabric/plugins/environments/slurm.py:166: PossibleUserWarning: The `srun` command is available on your system but is not used. HINT: If your intention is to run Lightning on SLURM, prepend your python command with `srun` like so: srun python /home/justin_goodwin/.conda/envs/rai_toolbox/lib/pyt ...
+  rank_zero_warn(
+GPU available: True (cuda), used: True
 TPU available: False, using: 0 TPU cores
 IPU available: False, using: 0 IPUs
 HPU available: False, using: 0 HPUs
-Missing logger folder: C:\Users\Ryan Soklaski\responsible-ai-toolbox\docs\source\tutorials\outputs\cross_validation\2022-05-23\11-33-26\0\lightning_logs
-LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+/home/justin_goodwin/.conda/envs/rai_toolbox/lib/python3.10/site-packages/pytorch_lightning/trainer/connectors/logger_connector/logger_connector.py:67: UserWarning: Starting from v1.9.0, `tensorboardX` has been removed as a dependency of the `pytorch_lightning` package, due to potential conflicts with other packages in the ML ecosystem. For this reason, `logger=True` will use `CSVLogger` as the default logger, unless the `tensorboard` or `tensorboardX` packages are found. Please `pip install lightning[extra]` or one of them to enable TensorBoard support by default
+  warning_cache.warn(
+Missing logger folder: /home/justin_goodwin/projects/raiden/rai_toolbox/docs/source/tutorials/outputs/cross_validation/2023-01-27/13-08-46/0/lightning_logs
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0,1]
+`Trainer.fit` stopped: `max_epochs=10` reached.
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1067,7 +1082,7 @@ LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-[2022-05-23 11:36:03,695][HYDRA]        #1 : n_splits=2 fold=0 model=cnn
+[2023-01-27 13:09:20,658][HYDRA]        #1 : n_splits=2 fold=0 model=cnn
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1075,12 +1090,18 @@ LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-GPU available: True, used: True
+/home/justin_goodwin/.conda/envs/rai_toolbox/lib/python3.10/site-packages/hydra/_internal/core_plugins/basic_launcher.py:74: UserWarning: Future Hydra versions will no longer change working directory at job runtime by default.
+See https://hydra.cc/docs/1.2/upgrades/1.1_to_1.2/changes_to_job_working_dir/ for more information.
+  ret = run_job(
+/home/justin_goodwin/.conda/envs/rai_toolbox/lib/python3.10/site-packages/lightning_fabric/plugins/environments/slurm.py:166: PossibleUserWarning: The `srun` command is available on your system but is not used. HINT: If your intention is to run Lightning on SLURM, prepend your python command with `srun` like so: srun python /home/justin_goodwin/.conda/envs/rai_toolbox/lib/pyt ...
+  rank_zero_warn(
+GPU available: True (cuda), used: True
 TPU available: False, using: 0 TPU cores
 IPU available: False, using: 0 IPUs
 HPU available: False, using: 0 HPUs
-Missing logger folder: C:\Users\Ryan Soklaski\responsible-ai-toolbox\docs\source\tutorials\outputs\cross_validation\2022-05-23\11-33-26\1\lightning_logs
-LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+Missing logger folder: /home/justin_goodwin/projects/raiden/rai_toolbox/docs/source/tutorials/outputs/cross_validation/2023-01-27/13-08-46/1/lightning_logs
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0,1]
+`Trainer.fit` stopped: `max_epochs=10` reached.
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1088,7 +1109,7 @@ LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-[2022-05-23 11:38:43,273][HYDRA]        #2 : n_splits=2 fold=1 model=linear
+[2023-01-27 13:09:56,220][HYDRA]        #2 : n_splits=2 fold=1 model=linear
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1096,12 +1117,18 @@ LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-GPU available: True, used: True
+/home/justin_goodwin/.conda/envs/rai_toolbox/lib/python3.10/site-packages/hydra/_internal/core_plugins/basic_launcher.py:74: UserWarning: Future Hydra versions will no longer change working directory at job runtime by default.
+See https://hydra.cc/docs/1.2/upgrades/1.1_to_1.2/changes_to_job_working_dir/ for more information.
+  ret = run_job(
+/home/justin_goodwin/.conda/envs/rai_toolbox/lib/python3.10/site-packages/lightning_fabric/plugins/environments/slurm.py:166: PossibleUserWarning: The `srun` command is available on your system but is not used. HINT: If your intention is to run Lightning on SLURM, prepend your python command with `srun` like so: srun python /home/justin_goodwin/.conda/envs/rai_toolbox/lib/pyt ...
+  rank_zero_warn(
+GPU available: True (cuda), used: True
 TPU available: False, using: 0 TPU cores
 IPU available: False, using: 0 IPUs
 HPU available: False, using: 0 HPUs
-Missing logger folder: C:\Users\Ryan Soklaski\responsible-ai-toolbox\docs\source\tutorials\outputs\cross_validation\2022-05-23\11-33-26\2\lightning_logs
-LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+Missing logger folder: /home/justin_goodwin/projects/raiden/rai_toolbox/docs/source/tutorials/outputs/cross_validation/2023-01-27/13-08-46/2/lightning_logs
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0,1]
+`Trainer.fit` stopped: `max_epochs=10` reached.
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1109,7 +1136,7 @@ LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-[2022-05-23 11:41:17,726][HYDRA]        #3 : n_splits=2 fold=1 model=cnn
+[2023-01-27 13:10:28,555][HYDRA]        #3 : n_splits=2 fold=1 model=cnn
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -1117,16 +1144,22 @@ LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-GPU available: True, used: True
+/home/justin_goodwin/.conda/envs/rai_toolbox/lib/python3.10/site-packages/hydra/_internal/core_plugins/basic_launcher.py:74: UserWarning: Future Hydra versions will no longer change working directory at job runtime by default.
+See https://hydra.cc/docs/1.2/upgrades/1.1_to_1.2/changes_to_job_working_dir/ for more information.
+  ret = run_job(
+/home/justin_goodwin/.conda/envs/rai_toolbox/lib/python3.10/site-packages/lightning_fabric/plugins/environments/slurm.py:166: PossibleUserWarning: The `srun` command is available on your system but is not used. HINT: If your intention is to run Lightning on SLURM, prepend your python command with `srun` like so: srun python /home/justin_goodwin/.conda/envs/rai_toolbox/lib/pyt ...
+  rank_zero_warn(
+GPU available: True (cuda), used: True
 TPU available: False, using: 0 TPU cores
 IPU available: False, using: 0 IPUs
 HPU available: False, using: 0 HPUs
-Missing logger folder: C:\Users\Ryan Soklaski\responsible-ai-toolbox\docs\source\tutorials\outputs\cross_validation\2022-05-23\11-33-26\3\lightning_logs
-LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+Missing logger folder: /home/justin_goodwin/projects/raiden/rai_toolbox/docs/source/tutorials/outputs/cross_validation/2023-01-27/13-08-46/3/lightning_logs
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0,1]
+`Trainer.fit` stopped: `max_epochs=10` reached.
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">kfold_task</span><span class="o">.</span><span class="n">working_dir</span>
@@ -1134,17 +1167,17 @@ LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-WindowsPath(&#39;C:/Users/Ryan Soklaski/responsible-ai-toolbox/docs/source/tutorials/outputs/cross_validation/2022-05-23/11-33-26&#39;)
+PosixPath(&#39;/home/justin_goodwin/projects/raiden/rai_toolbox/docs/source/tutorials/outputs/cross_validation/2023-01-27/13-08-46&#39;)
 </pre></div></div>
 </div>
 <p>Once the task is finished we can load in the metrics to an <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html">xarray.Dataset</a> using the <code class="docutils literal notranslate"><span class="pre">to_xarray</span></code> method. This xarray dataset thus stores all of the metrics that were saved/returned by the tasks that we ran.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">xdata</span> <span class="o">=</span> <span class="n">kfold_task</span><span class="o">.</span><span class="n">to_xarray</span><span class="p">(</span><span class="n">coord_from_metrics</span><span class="o">=</span><span class="s2">&quot;epoch&quot;</span><span class="p">)</span>
@@ -1153,7 +1186,7 @@ WindowsPath(&#39;C:/Users/Ryan Soklaski/responsible-ai-toolbox/docs/source/tutor
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
 <div class="output_area rendered_html docutils container">
@@ -1188,6 +1221,7 @@ WindowsPath(&#39;C:/Users/Ryan Soklaski/responsible-ai-toolbox/docs/source/tutor
 }
 
 html[theme=dark],
+body[data-theme=dark],
 body.vscode-dark {
   --xr-font-color0: rgba(255, 255, 255, 1);
   --xr-font-color2: rgba(255, 255, 255, 0.54);
@@ -1417,6 +1451,11 @@ body.vscode-dark {
   grid-column: 4;
 }
 
+.xr-index-preview {
+  grid-column: 2 / 5;
+  color: var(--xr-font-color2);
+}
+
 .xr-var-name,
 .xr-var-dims,
 .xr-var-dtype,
@@ -1438,14 +1477,16 @@ body.vscode-dark {
 }
 
 .xr-var-attrs,
-.xr-var-data {
+.xr-var-data,
+.xr-index-data {
   display: none;
   background-color: var(--xr-background-color) !important;
   padding-bottom: 5px !important;
 }
 
 .xr-var-attrs-in:checked ~ .xr-var-attrs,
-.xr-var-data-in:checked ~ .xr-var-data {
+.xr-var-data-in:checked ~ .xr-var-data,
+.xr-index-data-in:checked ~ .xr-index-data {
   display: block;
 }
 
@@ -1455,13 +1496,16 @@ body.vscode-dark {
 
 .xr-var-name span,
 .xr-var-data,
+.xr-index-name div,
+.xr-index-data,
 .xr-attrs {
   padding-left: 25px !important;
 }
 
 .xr-attrs,
 .xr-var-attrs,
-.xr-var-data {
+.xr-var-data,
+.xr-index-data {
   grid-column: 1 / -1;
 }
 
@@ -1499,7 +1543,8 @@ dl.xr-attrs {
 }
 
 .xr-icon-database,
-.xr-icon-file-text2 {
+.xr-icon-file-text2,
+.xr-no-icon {
   display: inline-block;
   vertical-align: middle;
   width: 1em;
@@ -1511,52 +1556,52 @@ dl.xr-attrs {
 </style><pre class='xr-text-repr-fallback'>&lt;xarray.Dataset&gt;
 Dimensions:         (fold: 2, model: 2, epoch: 10)
 Coordinates:
-  * fold            (fold) int32 0 1
+  * fold            (fold) int64 0 1
   * model           (model) &lt;U6 &#x27;linear&#x27; &#x27;cnn&#x27;
-  * epoch           (epoch) int32 0 1 2 3 4 5 6 7 8 9
+  * epoch           (epoch) int64 0 1 2 3 4 5 6 7 8 9
 Data variables:
-    train_loss      (fold, model, epoch) float64 1.891 0.9639 ... 0.02849
-    train_accuracy  (fold, model, epoch) float64 0.36 0.66 0.81 ... 0.99 0.98
-    val_loss        (fold, model, epoch) float64 1.83 1.061 ... 0.1212 0.04668
-    val_accuracy    (fold, model, epoch) float64 0.3593 0.6281 ... 0.9612 0.9855
+    train_loss      (fold, model, epoch) float64 1.8 0.9345 ... 0.09954 0.01555
+    train_accuracy  (fold, model, epoch) float64 0.47 0.68 0.83 ... 1.0 0.97 1.0
+    val_loss        (fold, model, epoch) float64 1.894 1.108 ... 0.07693 0.04691
+    val_accuracy    (fold, model, epoch) float64 0.3434 0.6266 ... 0.9743 0.9844
 Attributes:
-    n_splits:  2</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-23ee08e7-2462-4616-b0ae-ed498b46baff' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-23ee08e7-2462-4616-b0ae-ed498b46baff' class='xr-section-summary'  title='Expand/collapse section'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span class='xr-has-index'>fold</span>: 2</li><li><span class='xr-has-index'>model</span>: 2</li><li><span class='xr-has-index'>epoch</span>: 10</li></ul></div><div class='xr-section-details'></div></li><li class='xr-section-item'><input id='section-c8df70a1-6fcf-4b13-949e-f7f656aad7bd' class='xr-section-summary-in' type='checkbox'  checked><label for='section-c8df70a1-6fcf-4b13-949e-f7f656aad7bd' class='xr-section-summary' >Coordinates: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>fold</span></div><div class='xr-var-dims'>(fold)</div><div class='xr-var-dtype'>int32</div><div class='xr-var-preview xr-preview'>0 1</div><input id='attrs-7319e79d-6f8e-49e1-b4c7-4dced733f7cb' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-7319e79d-6f8e-49e1-b4c7-4dced733f7cb' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-3a3cbe0a-27b8-400d-a28d-f7c36ef9ba1d' class='xr-var-data-in' type='checkbox'><label for='data-3a3cbe0a-27b8-400d-a28d-f7c36ef9ba1d' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>model</span></div><div class='xr-var-dims'>(model)</div><div class='xr-var-dtype'>&lt;U6</div><div class='xr-var-preview xr-preview'>&#x27;linear&#x27; &#x27;cnn&#x27;</div><input id='attrs-d0620d1c-f0a5-405c-93a7-0b2e097d3826' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-d0620d1c-f0a5-405c-93a7-0b2e097d3826' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-21b15892-ad43-4d3d-8118-a707fe4c184b' class='xr-var-data-in' type='checkbox'><label for='data-21b15892-ad43-4d3d-8118-a707fe4c184b' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([&#x27;linear&#x27;, &#x27;cnn&#x27;], dtype=&#x27;&lt;U6&#x27;)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>epoch</span></div><div class='xr-var-dims'>(epoch)</div><div class='xr-var-dtype'>int32</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 5 6 7 8 9</div><input id='attrs-99bbb2d1-56c3-40c4-94fb-f81447d488b6' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-99bbb2d1-56c3-40c4-94fb-f81447d488b6' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-b92b0dd0-1de8-451a-863c-ec7c341f7ba6' class='xr-var-data-in' type='checkbox'><label for='data-b92b0dd0-1de8-451a-863c-ec7c341f7ba6' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-1b8b5bb2-43a3-4186-bae3-f89a89c7cb39' class='xr-section-summary-in' type='checkbox'  checked><label for='section-1b8b5bb2-43a3-4186-bae3-f89a89c7cb39' class='xr-section-summary' >Data variables: <span>(4)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>train_loss</span></div><div class='xr-var-dims'>(fold, model, epoch)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>1.891 0.9639 ... 0.06841 0.02849</div><input id='attrs-69564bf2-c86e-461a-af8a-013dcaed37b9' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-69564bf2-c86e-461a-af8a-013dcaed37b9' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-512b247a-53d3-4918-bed1-ddde7f63bf06' class='xr-var-data-in' type='checkbox'><label for='data-512b247a-53d3-4918-bed1-ddde7f63bf06' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[[1.89077961, 0.96394485, 0.61276984, 0.35877392, 0.58689928,
-         0.24661432, 0.34626079, 0.2517738 , 0.2090987 , 0.15242624],
-        [0.08926605, 0.10808383, 0.02571749, 0.08712401, 0.11123369,
-         0.06250655, 0.01725711, 0.02093483, 0.04960108, 0.0069297 ]],
+    n_splits:  2</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-5e56be59-bd29-4e07-9740-71f39cb24904' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-5e56be59-bd29-4e07-9740-71f39cb24904' class='xr-section-summary'  title='Expand/collapse section'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span class='xr-has-index'>fold</span>: 2</li><li><span class='xr-has-index'>model</span>: 2</li><li><span class='xr-has-index'>epoch</span>: 10</li></ul></div><div class='xr-section-details'></div></li><li class='xr-section-item'><input id='section-b72cf99b-35bc-4fe1-823c-ae78d3044191' class='xr-section-summary-in' type='checkbox'  checked><label for='section-b72cf99b-35bc-4fe1-823c-ae78d3044191' class='xr-section-summary' >Coordinates: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>fold</span></div><div class='xr-var-dims'>(fold)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1</div><input id='attrs-dd904085-3dd9-4d46-8d4c-65e0c25b5416' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-dd904085-3dd9-4d46-8d4c-65e0c25b5416' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-f8798d6c-1924-49d6-af9a-70b1b1635ef1' class='xr-var-data-in' type='checkbox'><label for='data-f8798d6c-1924-49d6-af9a-70b1b1635ef1' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>model</span></div><div class='xr-var-dims'>(model)</div><div class='xr-var-dtype'>&lt;U6</div><div class='xr-var-preview xr-preview'>&#x27;linear&#x27; &#x27;cnn&#x27;</div><input id='attrs-60996033-8aea-4c9c-a9a7-6db5077be55f' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-60996033-8aea-4c9c-a9a7-6db5077be55f' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-909415ac-f8cf-433a-b48f-7c91cb07b70d' class='xr-var-data-in' type='checkbox'><label for='data-909415ac-f8cf-433a-b48f-7c91cb07b70d' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([&#x27;linear&#x27;, &#x27;cnn&#x27;], dtype=&#x27;&lt;U6&#x27;)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>epoch</span></div><div class='xr-var-dims'>(epoch)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 5 6 7 8 9</div><input id='attrs-28307a9f-aadb-4ac5-960c-d94c00eabde2' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-28307a9f-aadb-4ac5-960c-d94c00eabde2' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-17892281-9eff-45cb-b776-5ba5013e0cfc' class='xr-var-data-in' type='checkbox'><label for='data-17892281-9eff-45cb-b776-5ba5013e0cfc' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-c6450fe9-08d9-44c5-b679-0a5c629e85f0' class='xr-section-summary-in' type='checkbox'  checked><label for='section-c6450fe9-08d9-44c5-b679-0a5c629e85f0' class='xr-section-summary' >Data variables: <span>(4)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>train_loss</span></div><div class='xr-var-dims'>(fold, model, epoch)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>1.8 0.9345 ... 0.09954 0.01555</div><input id='attrs-45abeaa2-311e-411f-81a1-8d73e3317f1d' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-45abeaa2-311e-411f-81a1-8d73e3317f1d' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-f4f32389-d441-461b-951d-165a7a52076a' class='xr-var-data-in' type='checkbox'><label for='data-f4f32389-d441-461b-951d-165a7a52076a' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[[1.79951   , 0.93452781, 0.57486546, 0.54329646, 0.2067156 ,
+         0.27539489, 0.15544096, 0.14027588, 0.17616475, 0.20089331],
+        [0.17494555, 0.11561865, 0.07715302, 0.09166128, 0.08542629,
+         0.05901102, 0.04888228, 0.06659161, 0.02308378, 0.017231  ]],
 
-       [[1.86968136, 0.9181    , 0.57409596, 0.64834028, 0.32452586,
-         0.28390455, 0.45847282, 0.20395048, 0.22007602, 0.26738185],
-        [0.11343943, 0.05312678, 0.06988007, 0.05198158, 0.03963113,
-         0.09220515, 0.07206026, 0.1132156 , 0.06840769, 0.02849275]]])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>train_accuracy</span></div><div class='xr-var-dims'>(fold, model, epoch)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>0.36 0.66 0.81 ... 0.97 0.99 0.98</div><input id='attrs-abdab156-3a14-4a5e-9d23-118a4fa758e5' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-abdab156-3a14-4a5e-9d23-118a4fa758e5' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-d37d10f4-d6bc-4b3a-8fb3-ef6e62823188' class='xr-var-data-in' type='checkbox'><label for='data-d37d10f4-d6bc-4b3a-8fb3-ef6e62823188' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[[0.36000001, 0.66000003, 0.81      , 0.87      , 0.85000002,
-         0.95999998, 0.87      , 0.92000002, 0.91000003, 0.94      ],
-        [0.98000002, 0.95999998, 0.99000001, 0.97000003, 0.97000003,
-         0.99000001, 1.        , 0.99000001, 0.98000002, 1.        ]],
+       [[1.79451704, 0.75974238, 0.64639199, 0.50036258, 0.24058343,
+         0.26069173, 0.28814128, 0.2224139 , 0.27875006, 0.10043753],
+        [0.17304236, 0.08140782, 0.12449303, 0.05256687, 0.10422713,
+         0.04171692, 0.03007324, 0.01924299, 0.09954353, 0.01554767]]])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>train_accuracy</span></div><div class='xr-var-dims'>(fold, model, epoch)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>0.47 0.68 0.83 ... 1.0 0.97 1.0</div><input id='attrs-a3f45253-3f45-4f96-a56d-576f351c1275' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-a3f45253-3f45-4f96-a56d-576f351c1275' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-6a3a72fa-e865-4225-8b4c-66e5494f4e62' class='xr-var-data-in' type='checkbox'><label for='data-6a3a72fa-e865-4225-8b4c-66e5494f4e62' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[[0.47      , 0.68000001, 0.82999998, 0.81999999, 0.91000003,
+         0.94999999, 0.95999998, 0.94      , 0.94999999, 0.92000002],
+        [0.97000003, 0.99000001, 0.99000001, 0.97000003, 0.97000003,
+         0.95999998, 0.98000002, 0.98000002, 0.98000002, 1.        ]],
 
-       [[0.31      , 0.64999998, 0.81      , 0.75999999, 0.88      ,
-         0.92000002, 0.88      , 0.91000003, 0.92000002, 0.93000001],
-        [0.95999998, 0.99000001, 0.98000002, 0.98000002, 0.99000001,
-         0.97000003, 0.98000002, 0.97000003, 0.99000001, 0.98000002]]])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>val_loss</span></div><div class='xr-var-dims'>(fold, model, epoch)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>1.83 1.061 ... 0.1212 0.04668</div><input id='attrs-b02564e7-a56d-4e8d-97cc-7dbe0d2b44ab' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-b02564e7-a56d-4e8d-97cc-7dbe0d2b44ab' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-780fc2cc-bf1d-4a1c-92fb-18bfaf3732c5' class='xr-var-data-in' type='checkbox'><label for='data-780fc2cc-bf1d-4a1c-92fb-18bfaf3732c5' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[[1.83043897, 1.06094921, 0.64058143, 0.43002862, 0.34109908,
-         0.31199619, 0.24298802, 0.21758874, 0.21307263, 0.19901828],
-        [0.25782233, 0.10610785, 0.0784487 , 0.09417197, 0.0793643 ,
-         0.06127988, 0.05527427, 0.06376629, 0.06549259, 0.04416722]],
+       [[0.41      , 0.79000002, 0.76999998, 0.83999997, 0.94999999,
+         0.93000001, 0.91000003, 0.95999998, 0.93000001, 0.95999998],
+        [0.97000003, 0.97000003, 0.95999998, 0.98000002, 0.98000002,
+         0.99000001, 0.98000002, 1.        , 0.97000003, 1.        ]]])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>val_loss</span></div><div class='xr-var-dims'>(fold, model, epoch)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>1.894 1.108 ... 0.07693 0.04691</div><input id='attrs-4ff0ffe7-af24-45ed-868b-4d699d2b5813' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-4ff0ffe7-af24-45ed-868b-4d699d2b5813' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-b63a4934-0a39-4b1a-8cdf-fa54642dc333' class='xr-var-data-in' type='checkbox'><label for='data-b63a4934-0a39-4b1a-8cdf-fa54642dc333' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[[1.89350331, 1.10829556, 0.61778945, 0.48659813, 0.32210329,
+         0.27476683, 0.24099217, 0.21278532, 0.2067167 , 0.18611576],
+        [0.17209756, 0.1074324 , 0.09318855, 0.08749811, 0.07797404,
+         0.06971584, 0.0667539 , 0.05857411, 0.04461391, 0.05001244]],
 
-       [[1.86134064, 0.97008365, 0.53320324, 0.51321387, 0.3080599 ,
-         0.27088243, 0.23045407, 0.26763469, 0.22680357, 0.20453173],
-        [0.16045928, 0.10399894, 0.11487091, 0.10635144, 0.05884539,
-         0.11137096, 0.05779473, 0.05314729, 0.12119476, 0.04667559]]])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>val_accuracy</span></div><div class='xr-var-dims'>(fold, model, epoch)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>0.3593 0.6281 ... 0.9612 0.9855</div><input id='attrs-c101a37c-7d8a-4119-88c6-dc4569a72ffb' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-c101a37c-7d8a-4119-88c6-dc4569a72ffb' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-492ee802-f285-42f6-b0b1-3f2febd6c92a' class='xr-var-data-in' type='checkbox'><label for='data-492ee802-f285-42f6-b0b1-3f2febd6c92a' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[[0.35926667, 0.62806666, 0.80190003, 0.86909997, 0.89733332,
-         0.90603334, 0.92729998, 0.93436664, 0.93486667, 0.94      ],
-        [0.91890001, 0.96936667, 0.97633332, 0.97003335, 0.97626668,
-         0.98100001, 0.98263335, 0.98040003, 0.97936666, 0.98643333]],
+       [[1.78684103, 1.00957799, 0.5871228 , 0.39855707, 0.35516837,
+         0.28075773, 0.25527468, 0.23342025, 0.23109512, 0.18992679],
+        [0.15136372, 0.1046785 , 0.15660073, 0.11373832, 0.10207726,
+         0.07447258, 0.06167319, 0.06228647, 0.07692941, 0.04691046]]])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>val_accuracy</span></div><div class='xr-var-dims'>(fold, model, epoch)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>0.3434 0.6266 0.8 ... 0.9743 0.9844</div><input id='attrs-03611a4b-4db9-4b80-a3a6-c82df585e585' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-03611a4b-4db9-4b80-a3a6-c82df585e585' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-97d74363-8216-4217-be6a-854f73ec0b95' class='xr-var-data-in' type='checkbox'><label for='data-97d74363-8216-4217-be6a-854f73ec0b95' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[[0.34343332, 0.62656665, 0.80000001, 0.84616667, 0.90066665,
+         0.91533333, 0.92826664, 0.93629998, 0.93636668, 0.94400001],
+        [0.94843334, 0.96796668, 0.97266668, 0.97273332, 0.9763    ,
+         0.97939998, 0.97866666, 0.98283333, 0.98693335, 0.98406667]],
 
-       [[0.35403332, 0.66263336, 0.8351    , 0.83359998, 0.90893334,
-         0.91683334, 0.93173331, 0.91396666, 0.92886668, 0.93613333],
-        [0.95106667, 0.96883333, 0.96143335, 0.9677    , 0.98213333,
-         0.96340001, 0.98176664, 0.98303336, 0.96116668, 0.98553336]]])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-254460d0-84ef-4944-bd1d-7edf8c592f75' class='xr-section-summary-in' type='checkbox'  checked><label for='section-254460d0-84ef-4944-bd1d-7edf8c592f75' class='xr-section-summary' >Attributes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'><dt><span>n_splits :</span></dt><dd>2</dd></dl></div></li></ul></div></div></div>
+       [[0.38999999, 0.66503334, 0.8308    , 0.88006669, 0.88826668,
+         0.91573334, 0.92339998, 0.92906666, 0.9289    , 0.94136667],
+        [0.95546669, 0.96950001, 0.95020002, 0.96453333, 0.96666664,
+         0.97733331, 0.98070002, 0.98083335, 0.97433335, 0.98443335]]])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-6102c5aa-4448-4079-9bb9-823ef1e50ddf' class='xr-section-summary-in' type='checkbox'  ><label for='section-6102c5aa-4448-4079-9bb9-823ef1e50ddf' class='xr-section-summary' >Indexes: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>fold</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-9582b07d-779b-4c38-86ef-9c492c75f269' class='xr-index-data-in' type='checkbox'/><label for='index-9582b07d-779b-4c38-86ef-9c492c75f269' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Int64Index([0, 1], dtype=&#x27;int64&#x27;, name=&#x27;fold&#x27;))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>model</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-f0cf9469-90d1-43d6-8f7a-4888ffbbb2c4' class='xr-index-data-in' type='checkbox'/><label for='index-f0cf9469-90d1-43d6-8f7a-4888ffbbb2c4' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([&#x27;linear&#x27;, &#x27;cnn&#x27;], dtype=&#x27;object&#x27;, name=&#x27;model&#x27;))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>epoch</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-ca1ba51e-c9df-496a-ba03-b076cb315ba9' class='xr-index-data-in' type='checkbox'/><label for='index-ca1ba51e-c9df-496a-ba03-b076cb315ba9' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Int64Index([0, 1, 2, 3, 4, 5, 6, 7, 8, 9], dtype=&#x27;int64&#x27;, name=&#x27;epoch&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-6420a50d-dd8a-49c0-a401-abc03729fea0' class='xr-section-summary-in' type='checkbox'  checked><label for='section-6420a50d-dd8a-49c0-a401-abc03729fea0' class='xr-section-summary' >Attributes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'><dt><span>n_splits :</span></dt><dd>2</dd></dl></div></li></ul></div></div></div>
 </div>
 <p>We can use xarray to plot the validation accuracy over training epochs for each fold or aggregrate the mean across all folds.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
@@ -1571,7 +1616,7 @@ Attributes:
 </div>
 </div>
 <div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -1596,7 +1641,7 @@ Text(0.5, 1.0, &#39;Cross Validation Performance&#39;)
 </ul>
 <p>Below we define a function that extracts the configuration of the model defined by in the experiment YAML file while the checkpoint is found within the training experiment directory. This makes sure we load the correct model configuration and checkpoint for testing.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">load_model_from_experiment</span><span class="p">(</span><span class="n">job_dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
@@ -1625,7 +1670,7 @@ Text(0.5, 1.0, &#39;Cross Validation Performance&#39;)
 </div>
 <p>Now we can define our experiment configuration file.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">TestConfig</span> <span class="o">=</span> <span class="n">make_config</span><span class="p">(</span>
@@ -1653,7 +1698,7 @@ Text(0.5, 1.0, &#39;Cross Validation Performance&#39;)
 <li><p>Update the <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html">xarray.Dataset</a> with the training experiment parameters</p></li>
 </ul>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">ExperimentRobustnessCurve</span><span class="p">(</span><span class="n">RobustnessCurve</span><span class="p">):</span>
@@ -1668,7 +1713,7 @@ Text(0.5, 1.0, &#39;Cross Validation Performance&#39;)
 </div>
 <p>Run the experiment by first defining the main experiment directory for each cross-validation experiment and providing the <code class="docutils literal notranslate"><span class="pre">epsilon</span></code> values for the calculating the <span class="math notranslate nohighlight">\(\ell_2\)</span> adverarial perturbations.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">robustness_curve_task</span> <span class="o">=</span> <span class="n">ExperimentRobustnessCurve</span><span class="p">(</span><span class="n">TestConfig</span><span class="p">)</span>
@@ -1690,8 +1735,8 @@ Text(0.5, 1.0, &#39;Cross Validation Performance&#39;)
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-[2022-05-23 11:58:38,842][HYDRA] Launching 12 jobs locally
-[2022-05-23 11:58:38,842][HYDRA]        #0 : epsilon=0 job_dir=C\:\\Users\\Ryan\ Soklaski\\responsible-ai-toolbox\\docs\\source\\tutorials\\outputs\\cross_validation\\2022-05-23\\11-33-26\\0
+[2023-01-27 13:11:05,446][HYDRA] Launching 12 jobs locally
+[2023-01-27 13:11:05,447][HYDRA]        #0 : epsilon=0 job_dir=/home/justin_goodwin/projects/raiden/rai_toolbox/docs/source/tutorials/outputs/cross_validation/2023-01-27/13-08-46/0
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1699,7 +1744,12 @@ Text(0.5, 1.0, &#39;Cross Validation Performance&#39;)
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-GPU available: True, used: True
+/home/justin_goodwin/.conda/envs/rai_toolbox/lib/python3.10/site-packages/hydra/_internal/core_plugins/basic_launcher.py:74: UserWarning: Future Hydra versions will no longer change working directory at job runtime by default.
+See https://hydra.cc/docs/1.2/upgrades/1.1_to_1.2/changes_to_job_working_dir/ for more information.
+  ret = run_job(
+/home/justin_goodwin/.conda/envs/rai_toolbox/lib/python3.10/site-packages/lightning_fabric/plugins/environments/slurm.py:166: PossibleUserWarning: The `srun` command is available on your system but is not used. HINT: If your intention is to run Lightning on SLURM, prepend your python command with `srun` like so: srun python /home/justin_goodwin/.conda/envs/rai_toolbox/lib/pyt ...
+  rank_zero_warn(
+GPU available: True (cuda), used: True
 TPU available: False, using: 0 TPU cores
 IPU available: False, using: 0 IPUs
 HPU available: False, using: 0 HPUs
@@ -1710,7 +1760,7 @@ HPU available: False, using: 0 HPUs
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-[2022-05-23 11:58:39,109][rai_toolbox.mushin._utils][INFO] - Loading model checkpoint from C:\Users\Ryan Soklaski\responsible-ai-toolbox\docs\source\tutorials\outputs\cross_validation\2022-05-23\11-33-26\0\lightning_logs\version_0\checkpoints\epoch=9-step=3000.ckpt
+[2023-01-27 13:11:05,602][rai_toolbox.mushin._utils][INFO] - Loading model checkpoint from /home/justin_goodwin/projects/raiden/rai_toolbox/docs/source/tutorials/outputs/cross_validation/2023-01-27/13-08-46/0/lightning_logs/version_0/checkpoints/epoch=9-step=3000.ckpt
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1718,8 +1768,8 @@ HPU available: False, using: 0 HPUs
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-Missing logger folder: C:\Users\Ryan Soklaski\responsible-ai-toolbox\docs\source\tutorials\outputs\robustness_curves\2022-05-23\11-58-37\0\lightning_logs
-LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+Missing logger folder: /home/justin_goodwin/projects/raiden/rai_toolbox/docs/source/tutorials/outputs/robustness_curves/2023-01-27/13-11-04/0/lightning_logs
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0,1]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1730,12 +1780,12 @@ LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
        Test metric             DataLoader 0
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-      test_accuracy         0.9567999839782715
-  test_adversarial_loss     0.14566604793071747
-   test_clean_accuracy      0.9567999839782715
-        test_loss           0.14566606283187866
+      test_accuracy         0.9595000147819519
+  test_adversarial_loss     0.12619434297084808
+   test_clean_accuracy      0.9595000147819519
+        test_loss           0.12619434297084808
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-[2022-05-23 11:58:42,864][HYDRA]        #1 : epsilon=0 job_dir=C\:\\Users\\Ryan\ Soklaski\\responsible-ai-toolbox\\docs\\source\\tutorials\\outputs\\cross_validation\\2022-05-23\\11-33-26\\1
+[2023-01-27 13:11:07,343][HYDRA]        #1 : epsilon=0 job_dir=/home/justin_goodwin/projects/raiden/rai_toolbox/docs/source/tutorials/outputs/cross_validation/2023-01-27/13-08-46/1
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1743,7 +1793,7 @@ LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-GPU available: True, used: True
+GPU available: True (cuda), used: True
 TPU available: False, using: 0 TPU cores
 IPU available: False, using: 0 IPUs
 HPU available: False, using: 0 HPUs
@@ -1754,7 +1804,7 @@ HPU available: False, using: 0 HPUs
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-[2022-05-23 11:58:43,032][rai_toolbox.mushin._utils][INFO] - Loading model checkpoint from C:\Users\Ryan Soklaski\responsible-ai-toolbox\docs\source\tutorials\outputs\cross_validation\2022-05-23\11-33-26\1\lightning_logs\version_0\checkpoints\epoch=9-step=3000.ckpt
+[2023-01-27 13:11:07,500][rai_toolbox.mushin._utils][INFO] - Loading model checkpoint from /home/justin_goodwin/projects/raiden/rai_toolbox/docs/source/tutorials/outputs/cross_validation/2023-01-27/13-08-46/1/lightning_logs/version_0/checkpoints/epoch=9-step=3000.ckpt
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1762,8 +1812,96 @@ HPU available: False, using: 0 HPUs
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-Missing logger folder: C:\Users\Ryan Soklaski\responsible-ai-toolbox\docs\source\tutorials\outputs\robustness_curves\2022-05-23\11-58-37\1\lightning_logs
-LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+Missing logger folder: /home/justin_goodwin/projects/raiden/rai_toolbox/docs/source/tutorials/outputs/robustness_curves/2023-01-27/13-11-04/1/lightning_logs
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0,1]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+       Test metric             DataLoader 0
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+      test_accuracy         0.9868999719619751
+  test_adversarial_loss    0.037374187260866165
+   test_clean_accuracy      0.9868999719619751
+        test_loss          0.037374187260866165
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+[2023-01-27 13:11:09,931][HYDRA]        #2 : epsilon=0 job_dir=/home/justin_goodwin/projects/raiden/rai_toolbox/docs/source/tutorials/outputs/cross_validation/2023-01-27/13-08-46/2
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[2023-01-27 13:11:10,091][rai_toolbox.mushin._utils][INFO] - Loading model checkpoint from /home/justin_goodwin/projects/raiden/rai_toolbox/docs/source/tutorials/outputs/cross_validation/2023-01-27/13-08-46/2/lightning_logs/version_0/checkpoints/epoch=9-step=3000.ckpt
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Missing logger folder: /home/justin_goodwin/projects/raiden/rai_toolbox/docs/source/tutorials/outputs/robustness_curves/2023-01-27/13-11-04/2/lightning_logs
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0,1]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+       Test metric             DataLoader 0
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+      test_accuracy         0.9621999859809875
+  test_adversarial_loss     0.12058829516172409
+   test_clean_accuracy      0.9621999859809875
+        test_loss           0.12058829516172409
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+[2023-01-27 13:11:11,825][HYDRA]        #3 : epsilon=0 job_dir=/home/justin_goodwin/projects/raiden/rai_toolbox/docs/source/tutorials/outputs/cross_validation/2023-01-27/13-08-46/3
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[2023-01-27 13:11:11,981][rai_toolbox.mushin._utils][INFO] - Loading model checkpoint from /home/justin_goodwin/projects/raiden/rai_toolbox/docs/source/tutorials/outputs/cross_validation/2023-01-27/13-08-46/3/lightning_logs/version_0/checkpoints/epoch=9-step=3000.ckpt
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Missing logger folder: /home/justin_goodwin/projects/raiden/rai_toolbox/docs/source/tutorials/outputs/robustness_curves/2023-01-27/13-11-04/3/lightning_logs
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0,1]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1775,11 +1913,11 @@ LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
        Test metric             DataLoader 0
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
       test_accuracy         0.9898999929428101
-  test_adversarial_loss     0.02779332548379898
+  test_adversarial_loss     0.02972579002380371
    test_clean_accuracy      0.9898999929428101
-        test_loss           0.02779332548379898
+        test_loss           0.02972579002380371
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-[2022-05-23 11:58:48,605][HYDRA]        #2 : epsilon=0 job_dir=C\:\\Users\\Ryan\ Soklaski\\responsible-ai-toolbox\\docs\\source\\tutorials\\outputs\\cross_validation\\2022-05-23\\11-33-26\\2
+[2023-01-27 13:11:14,394][HYDRA]        #4 : epsilon=1 job_dir=/home/justin_goodwin/projects/raiden/rai_toolbox/docs/source/tutorials/outputs/cross_validation/2023-01-27/13-08-46/0
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1787,7 +1925,7 @@ LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-GPU available: True, used: True
+GPU available: True (cuda), used: True
 TPU available: False, using: 0 TPU cores
 IPU available: False, using: 0 IPUs
 HPU available: False, using: 0 HPUs
@@ -1798,7 +1936,7 @@ HPU available: False, using: 0 HPUs
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-[2022-05-23 11:58:48,770][rai_toolbox.mushin._utils][INFO] - Loading model checkpoint from C:\Users\Ryan Soklaski\responsible-ai-toolbox\docs\source\tutorials\outputs\cross_validation\2022-05-23\11-33-26\2\lightning_logs\version_0\checkpoints\epoch=9-step=3000.ckpt
+[2023-01-27 13:11:14,549][rai_toolbox.mushin._utils][INFO] - Loading model checkpoint from /home/justin_goodwin/projects/raiden/rai_toolbox/docs/source/tutorials/outputs/cross_validation/2023-01-27/13-08-46/0/lightning_logs/version_0/checkpoints/epoch=9-step=3000.ckpt
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1806,8 +1944,8 @@ HPU available: False, using: 0 HPUs
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-Missing logger folder: C:\Users\Ryan Soklaski\responsible-ai-toolbox\docs\source\tutorials\outputs\robustness_curves\2022-05-23\11-58-37\2\lightning_logs
-LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+Missing logger folder: /home/justin_goodwin/projects/raiden/rai_toolbox/docs/source/tutorials/outputs/robustness_curves/2023-01-27/13-11-04/4/lightning_logs
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0,1]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1818,12 +1956,12 @@ LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
        Test metric             DataLoader 0
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-      test_accuracy         0.9538000226020813
-  test_adversarial_loss     0.14155754446983337
-   test_clean_accuracy      0.9538000226020813
-        test_loss           0.14155754446983337
+      test_accuracy         0.22789999842643738
+  test_adversarial_loss      3.348794937133789
+   test_clean_accuracy      0.9595000147819519
+        test_loss            3.348794937133789
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-[2022-05-23 11:58:52,528][HYDRA]        #3 : epsilon=0 job_dir=C\:\\Users\\Ryan\ Soklaski\\responsible-ai-toolbox\\docs\\source\\tutorials\\outputs\\cross_validation\\2022-05-23\\11-33-26\\3
+[2023-01-27 13:11:16,295][HYDRA]        #5 : epsilon=1 job_dir=/home/justin_goodwin/projects/raiden/rai_toolbox/docs/source/tutorials/outputs/cross_validation/2023-01-27/13-08-46/1
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1831,7 +1969,7 @@ LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-GPU available: True, used: True
+GPU available: True (cuda), used: True
 TPU available: False, using: 0 TPU cores
 IPU available: False, using: 0 IPUs
 HPU available: False, using: 0 HPUs
@@ -1842,7 +1980,7 @@ HPU available: False, using: 0 HPUs
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-[2022-05-23 11:58:52,703][rai_toolbox.mushin._utils][INFO] - Loading model checkpoint from C:\Users\Ryan Soklaski\responsible-ai-toolbox\docs\source\tutorials\outputs\cross_validation\2022-05-23\11-33-26\3\lightning_logs\version_0\checkpoints\epoch=9-step=3000.ckpt
+[2023-01-27 13:11:16,452][rai_toolbox.mushin._utils][INFO] - Loading model checkpoint from /home/justin_goodwin/projects/raiden/rai_toolbox/docs/source/tutorials/outputs/cross_validation/2023-01-27/13-08-46/1/lightning_logs/version_0/checkpoints/epoch=9-step=3000.ckpt
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1850,8 +1988,8 @@ HPU available: False, using: 0 HPUs
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-Missing logger folder: C:\Users\Ryan Soklaski\responsible-ai-toolbox\docs\source\tutorials\outputs\robustness_curves\2022-05-23\11-58-37\3\lightning_logs
-LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+Missing logger folder: /home/justin_goodwin/projects/raiden/rai_toolbox/docs/source/tutorials/outputs/robustness_curves/2023-01-27/13-11-04/5/lightning_logs
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0,1]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1862,12 +2000,12 @@ LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
        Test metric             DataLoader 0
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-      test_accuracy         0.9879000186920166
-  test_adversarial_loss     0.03512534126639366
-   test_clean_accuracy      0.9879000186920166
-        test_loss           0.03512534499168396
+      test_accuracy         0.09929999709129333
+  test_adversarial_loss      4.624772548675537
+   test_clean_accuracy      0.9868999719619751
+        test_loss            4.624772071838379
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-[2022-05-23 11:58:58,342][HYDRA]        #4 : epsilon=1 job_dir=C\:\\Users\\Ryan\ Soklaski\\responsible-ai-toolbox\\docs\\source\\tutorials\\outputs\\cross_validation\\2022-05-23\\11-33-26\\0
+[2023-01-27 13:11:18,874][HYDRA]        #6 : epsilon=1 job_dir=/home/justin_goodwin/projects/raiden/rai_toolbox/docs/source/tutorials/outputs/cross_validation/2023-01-27/13-08-46/2
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1875,7 +2013,7 @@ LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-GPU available: True, used: True
+GPU available: True (cuda), used: True
 TPU available: False, using: 0 TPU cores
 IPU available: False, using: 0 IPUs
 HPU available: False, using: 0 HPUs
@@ -1886,7 +2024,7 @@ HPU available: False, using: 0 HPUs
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-[2022-05-23 11:58:58,504][rai_toolbox.mushin._utils][INFO] - Loading model checkpoint from C:\Users\Ryan Soklaski\responsible-ai-toolbox\docs\source\tutorials\outputs\cross_validation\2022-05-23\11-33-26\0\lightning_logs\version_0\checkpoints\epoch=9-step=3000.ckpt
+[2023-01-27 13:11:19,029][rai_toolbox.mushin._utils][INFO] - Loading model checkpoint from /home/justin_goodwin/projects/raiden/rai_toolbox/docs/source/tutorials/outputs/cross_validation/2023-01-27/13-08-46/2/lightning_logs/version_0/checkpoints/epoch=9-step=3000.ckpt
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1894,8 +2032,8 @@ HPU available: False, using: 0 HPUs
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-Missing logger folder: C:\Users\Ryan Soklaski\responsible-ai-toolbox\docs\source\tutorials\outputs\robustness_curves\2022-05-23\11-58-37\4\lightning_logs
-LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+Missing logger folder: /home/justin_goodwin/projects/raiden/rai_toolbox/docs/source/tutorials/outputs/robustness_curves/2023-01-27/13-11-04/6/lightning_logs
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0,1]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1906,12 +2044,12 @@ LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
        Test metric             DataLoader 0
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-      test_accuracy         0.22030000388622284
-  test_adversarial_loss     3.3281285762786865
-   test_clean_accuracy      0.9567999839782715
-        test_loss           3.3281285762786865
+      test_accuracy         0.2484000027179718
+  test_adversarial_loss     3.2621147632598877
+   test_clean_accuracy      0.9621999859809875
+        test_loss           3.2621147632598877
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-[2022-05-23 11:59:02,387][HYDRA]        #5 : epsilon=1 job_dir=C\:\\Users\\Ryan\ Soklaski\\responsible-ai-toolbox\\docs\\source\\tutorials\\outputs\\cross_validation\\2022-05-23\\11-33-26\\1
+[2023-01-27 13:11:20,770][HYDRA]        #7 : epsilon=1 job_dir=/home/justin_goodwin/projects/raiden/rai_toolbox/docs/source/tutorials/outputs/cross_validation/2023-01-27/13-08-46/3
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1919,7 +2057,7 @@ LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-GPU available: True, used: True
+GPU available: True (cuda), used: True
 TPU available: False, using: 0 TPU cores
 IPU available: False, using: 0 IPUs
 HPU available: False, using: 0 HPUs
@@ -1930,7 +2068,7 @@ HPU available: False, using: 0 HPUs
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-[2022-05-23 11:59:02,549][rai_toolbox.mushin._utils][INFO] - Loading model checkpoint from C:\Users\Ryan Soklaski\responsible-ai-toolbox\docs\source\tutorials\outputs\cross_validation\2022-05-23\11-33-26\1\lightning_logs\version_0\checkpoints\epoch=9-step=3000.ckpt
+[2023-01-27 13:11:20,926][rai_toolbox.mushin._utils][INFO] - Loading model checkpoint from /home/justin_goodwin/projects/raiden/rai_toolbox/docs/source/tutorials/outputs/cross_validation/2023-01-27/13-08-46/3/lightning_logs/version_0/checkpoints/epoch=9-step=3000.ckpt
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1938,8 +2076,8 @@ HPU available: False, using: 0 HPUs
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-Missing logger folder: C:\Users\Ryan Soklaski\responsible-ai-toolbox\docs\source\tutorials\outputs\robustness_curves\2022-05-23\11-58-37\5\lightning_logs
-LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+Missing logger folder: /home/justin_goodwin/projects/raiden/rai_toolbox/docs/source/tutorials/outputs/robustness_curves/2023-01-27/13-11-04/7/lightning_logs
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0,1]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1950,12 +2088,12 @@ LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
        Test metric             DataLoader 0
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-      test_accuracy         0.12359999865293503
-  test_adversarial_loss      4.366969585418701
+      test_accuracy         0.19189999997615814
+  test_adversarial_loss     3.5013301372528076
    test_clean_accuracy      0.9898999929428101
-        test_loss            4.366969585418701
+        test_loss           3.5013301372528076
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-[2022-05-23 11:59:08,042][HYDRA]        #6 : epsilon=1 job_dir=C\:\\Users\\Ryan\ Soklaski\\responsible-ai-toolbox\\docs\\source\\tutorials\\outputs\\cross_validation\\2022-05-23\\11-33-26\\2
+[2023-01-27 13:11:23,246][HYDRA]        #8 : epsilon=2 job_dir=/home/justin_goodwin/projects/raiden/rai_toolbox/docs/source/tutorials/outputs/cross_validation/2023-01-27/13-08-46/0
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1963,7 +2101,7 @@ LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-GPU available: True, used: True
+GPU available: True (cuda), used: True
 TPU available: False, using: 0 TPU cores
 IPU available: False, using: 0 IPUs
 HPU available: False, using: 0 HPUs
@@ -1974,7 +2112,7 @@ HPU available: False, using: 0 HPUs
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-[2022-05-23 11:59:08,199][rai_toolbox.mushin._utils][INFO] - Loading model checkpoint from C:\Users\Ryan Soklaski\responsible-ai-toolbox\docs\source\tutorials\outputs\cross_validation\2022-05-23\11-33-26\2\lightning_logs\version_0\checkpoints\epoch=9-step=3000.ckpt
+[2023-01-27 13:11:23,413][rai_toolbox.mushin._utils][INFO] - Loading model checkpoint from /home/justin_goodwin/projects/raiden/rai_toolbox/docs/source/tutorials/outputs/cross_validation/2023-01-27/13-08-46/0/lightning_logs/version_0/checkpoints/epoch=9-step=3000.ckpt
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1982,8 +2120,8 @@ HPU available: False, using: 0 HPUs
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-Missing logger folder: C:\Users\Ryan Soklaski\responsible-ai-toolbox\docs\source\tutorials\outputs\robustness_curves\2022-05-23\11-58-37\6\lightning_logs
-LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+Missing logger folder: /home/justin_goodwin/projects/raiden/rai_toolbox/docs/source/tutorials/outputs/robustness_curves/2023-01-27/13-11-04/8/lightning_logs
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0,1]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1994,12 +2132,12 @@ LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
        Test metric             DataLoader 0
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-      test_accuracy         0.2320999950170517
-  test_adversarial_loss     3.3719112873077393
-   test_clean_accuracy      0.9538000226020813
-        test_loss            3.37191104888916
+      test_accuracy        0.004999999888241291
+  test_adversarial_loss     10.608979225158691
+   test_clean_accuracy      0.9595000147819519
+        test_loss           10.608978271484375
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-[2022-05-23 11:59:11,957][HYDRA]        #7 : epsilon=1 job_dir=C\:\\Users\\Ryan\ Soklaski\\responsible-ai-toolbox\\docs\\source\\tutorials\\outputs\\cross_validation\\2022-05-23\\11-33-26\\3
+[2023-01-27 13:11:25,194][HYDRA]        #9 : epsilon=2 job_dir=/home/justin_goodwin/projects/raiden/rai_toolbox/docs/source/tutorials/outputs/cross_validation/2023-01-27/13-08-46/1
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -2007,7 +2145,7 @@ LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-GPU available: True, used: True
+GPU available: True (cuda), used: True
 TPU available: False, using: 0 TPU cores
 IPU available: False, using: 0 IPUs
 HPU available: False, using: 0 HPUs
@@ -2018,7 +2156,7 @@ HPU available: False, using: 0 HPUs
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-[2022-05-23 11:59:12,126][rai_toolbox.mushin._utils][INFO] - Loading model checkpoint from C:\Users\Ryan Soklaski\responsible-ai-toolbox\docs\source\tutorials\outputs\cross_validation\2022-05-23\11-33-26\3\lightning_logs\version_0\checkpoints\epoch=9-step=3000.ckpt
+[2023-01-27 13:11:25,350][rai_toolbox.mushin._utils][INFO] - Loading model checkpoint from /home/justin_goodwin/projects/raiden/rai_toolbox/docs/source/tutorials/outputs/cross_validation/2023-01-27/13-08-46/1/lightning_logs/version_0/checkpoints/epoch=9-step=3000.ckpt
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -2026,96 +2164,8 @@ HPU available: False, using: 0 HPUs
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-Missing logger folder: C:\Users\Ryan Soklaski\responsible-ai-toolbox\docs\source\tutorials\outputs\robustness_curves\2022-05-23\11-58-37\7\lightning_logs
-LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-       Test metric             DataLoader 0
-────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-      test_accuracy         0.20319999754428864
-  test_adversarial_loss     3.4973063468933105
-   test_clean_accuracy      0.9879000186920166
-        test_loss           3.4973063468933105
-────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-[2022-05-23 11:59:17,705][HYDRA]        #8 : epsilon=2 job_dir=C\:\\Users\\Ryan\ Soklaski\\responsible-ai-toolbox\\docs\\source\\tutorials\\outputs\\cross_validation\\2022-05-23\\11-33-26\\0
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-GPU available: True, used: True
-TPU available: False, using: 0 TPU cores
-IPU available: False, using: 0 IPUs
-HPU available: False, using: 0 HPUs
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-[2022-05-23 11:59:17,859][rai_toolbox.mushin._utils][INFO] - Loading model checkpoint from C:\Users\Ryan Soklaski\responsible-ai-toolbox\docs\source\tutorials\outputs\cross_validation\2022-05-23\11-33-26\0\lightning_logs\version_0\checkpoints\epoch=9-step=3000.ckpt
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-Missing logger folder: C:\Users\Ryan Soklaski\responsible-ai-toolbox\docs\source\tutorials\outputs\robustness_curves\2022-05-23\11-58-37\8\lightning_logs
-LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-       Test metric             DataLoader 0
-────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-      test_accuracy        0.0008999999845400453
-  test_adversarial_loss      10.54411792755127
-   test_clean_accuracy      0.9567999839782715
-        test_loss           10.544118881225586
-────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-[2022-05-23 11:59:21,548][HYDRA]        #9 : epsilon=2 job_dir=C\:\\Users\\Ryan\ Soklaski\\responsible-ai-toolbox\\docs\\source\\tutorials\\outputs\\cross_validation\\2022-05-23\\11-33-26\\1
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-GPU available: True, used: True
-TPU available: False, using: 0 TPU cores
-IPU available: False, using: 0 IPUs
-HPU available: False, using: 0 HPUs
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-[2022-05-23 11:59:21,703][rai_toolbox.mushin._utils][INFO] - Loading model checkpoint from C:\Users\Ryan Soklaski\responsible-ai-toolbox\docs\source\tutorials\outputs\cross_validation\2022-05-23\11-33-26\1\lightning_logs\version_0\checkpoints\epoch=9-step=3000.ckpt
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-Missing logger folder: C:\Users\Ryan Soklaski\responsible-ai-toolbox\docs\source\tutorials\outputs\robustness_curves\2022-05-23\11-58-37\9\lightning_logs
-LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+Missing logger folder: /home/justin_goodwin/projects/raiden/rai_toolbox/docs/source/tutorials/outputs/robustness_curves/2023-01-27/13-11-04/9/lightning_logs
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0,1]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -2127,11 +2177,11 @@ LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
        Test metric             DataLoader 0
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
       test_accuracy                 0.0
-  test_adversarial_loss     16.473522186279297
-   test_clean_accuracy      0.9898999929428101
-        test_loss            16.47352409362793
+  test_adversarial_loss     16.613271713256836
+   test_clean_accuracy      0.9868999719619751
+        test_loss            16.6132755279541
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-[2022-05-23 11:59:27,232][HYDRA]        #10 : epsilon=2 job_dir=C\:\\Users\\Ryan\ Soklaski\\responsible-ai-toolbox\\docs\\source\\tutorials\\outputs\\cross_validation\\2022-05-23\\11-33-26\\2
+[2023-01-27 13:11:27,776][HYDRA]        #10 : epsilon=2 job_dir=/home/justin_goodwin/projects/raiden/rai_toolbox/docs/source/tutorials/outputs/cross_validation/2023-01-27/13-08-46/2
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -2139,7 +2189,7 @@ LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-GPU available: True, used: True
+GPU available: True (cuda), used: True
 TPU available: False, using: 0 TPU cores
 IPU available: False, using: 0 IPUs
 HPU available: False, using: 0 HPUs
@@ -2150,7 +2200,7 @@ HPU available: False, using: 0 HPUs
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-[2022-05-23 11:59:27,401][rai_toolbox.mushin._utils][INFO] - Loading model checkpoint from C:\Users\Ryan Soklaski\responsible-ai-toolbox\docs\source\tutorials\outputs\cross_validation\2022-05-23\11-33-26\2\lightning_logs\version_0\checkpoints\epoch=9-step=3000.ckpt
+[2023-01-27 13:11:27,933][rai_toolbox.mushin._utils][INFO] - Loading model checkpoint from /home/justin_goodwin/projects/raiden/rai_toolbox/docs/source/tutorials/outputs/cross_validation/2023-01-27/13-08-46/2/lightning_logs/version_0/checkpoints/epoch=9-step=3000.ckpt
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -2158,8 +2208,8 @@ HPU available: False, using: 0 HPUs
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-Missing logger folder: C:\Users\Ryan Soklaski\responsible-ai-toolbox\docs\source\tutorials\outputs\robustness_curves\2022-05-23\11-58-37\10\lightning_logs
-LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+Missing logger folder: /home/justin_goodwin/projects/raiden/rai_toolbox/docs/source/tutorials/outputs/robustness_curves/2023-01-27/13-11-04/10/lightning_logs
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0,1]
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -2170,12 +2220,12 @@ LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
        Test metric             DataLoader 0
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-      test_accuracy        0.004399999976158142
-  test_adversarial_loss     10.504456520080566
-   test_clean_accuracy      0.9538000226020813
-        test_loss           10.504456520080566
+      test_accuracy         0.00559999980032444
+  test_adversarial_loss     10.573102951049805
+   test_clean_accuracy      0.9621999859809875
+        test_loss           10.573102951049805
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-[2022-05-23 11:59:31,170][HYDRA]        #11 : epsilon=2 job_dir=C\:\\Users\\Ryan\ Soklaski\\responsible-ai-toolbox\\docs\\source\\tutorials\\outputs\\cross_validation\\2022-05-23\\11-33-26\\3
+[2023-01-27 13:11:29,668][HYDRA]        #11 : epsilon=2 job_dir=/home/justin_goodwin/projects/raiden/rai_toolbox/docs/source/tutorials/outputs/cross_validation/2023-01-27/13-08-46/3
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -2183,7 +2233,7 @@ LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-GPU available: True, used: True
+GPU available: True (cuda), used: True
 TPU available: False, using: 0 TPU cores
 IPU available: False, using: 0 IPUs
 HPU available: False, using: 0 HPUs
@@ -2194,7 +2244,7 @@ HPU available: False, using: 0 HPUs
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-[2022-05-23 11:59:31,328][rai_toolbox.mushin._utils][INFO] - Loading model checkpoint from C:\Users\Ryan Soklaski\responsible-ai-toolbox\docs\source\tutorials\outputs\cross_validation\2022-05-23\11-33-26\3\lightning_logs\version_0\checkpoints\epoch=9-step=3000.ckpt
+[2023-01-27 13:11:29,853][rai_toolbox.mushin._utils][INFO] - Loading model checkpoint from /home/justin_goodwin/projects/raiden/rai_toolbox/docs/source/tutorials/outputs/cross_validation/2023-01-27/13-08-46/3/lightning_logs/version_0/checkpoints/epoch=9-step=3000.ckpt
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -2202,8 +2252,8 @@ HPU available: False, using: 0 HPUs
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-Missing logger folder: C:\Users\Ryan Soklaski\responsible-ai-toolbox\docs\source\tutorials\outputs\robustness_curves\2022-05-23\11-58-37\11\lightning_logs
-LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+Missing logger folder: /home/justin_goodwin/projects/raiden/rai_toolbox/docs/source/tutorials/outputs/robustness_curves/2023-01-27/13-11-04/11/lightning_logs
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0,1]
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -2215,14 +2265,14 @@ LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
        Test metric             DataLoader 0
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
       test_accuracy                 0.0
-  test_adversarial_loss      14.78298282623291
-   test_clean_accuracy      0.9879000186920166
-        test_loss           14.782984733581543
+  test_adversarial_loss     14.753412246704102
+   test_clean_accuracy      0.9898999929428101
+        test_loss           14.753414154052734
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">robustness_curve_task</span><span class="o">.</span><span class="n">working_dir</span>
@@ -2230,17 +2280,17 @@ LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-WindowsPath(&#39;C:/Users/Ryan Soklaski/responsible-ai-toolbox/docs/source/tutorials/outputs/robustness_curves/2022-05-23/11-58-37&#39;)
+PosixPath(&#39;/home/justin_goodwin/projects/raiden/rai_toolbox/docs/source/tutorials/outputs/robustness_curves/2023-01-27/13-11-04&#39;)
 </pre></div></div>
 </div>
 <p>Extract the <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html">xarray.Dataset</a>.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rdata</span> <span class="o">=</span> <span class="n">robustness_curve_task</span><span class="o">.</span><span class="n">to_xarray</span><span class="p">()</span>
@@ -2249,7 +2299,7 @@ WindowsPath(&#39;C:/Users/Ryan Soklaski/responsible-ai-toolbox/docs/source/tutor
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
 </pre></div>
 </div>
 <div class="output_area rendered_html docutils container">
@@ -2284,6 +2334,7 @@ WindowsPath(&#39;C:/Users/Ryan Soklaski/responsible-ai-toolbox/docs/source/tutor
 }
 
 html[theme=dark],
+body[data-theme=dark],
 body.vscode-dark {
   --xr-font-color0: rgba(255, 255, 255, 1);
   --xr-font-color2: rgba(255, 255, 255, 0.54);
@@ -2513,6 +2564,11 @@ body.vscode-dark {
   grid-column: 4;
 }
 
+.xr-index-preview {
+  grid-column: 2 / 5;
+  color: var(--xr-font-color2);
+}
+
 .xr-var-name,
 .xr-var-dims,
 .xr-var-dtype,
@@ -2534,14 +2590,16 @@ body.vscode-dark {
 }
 
 .xr-var-attrs,
-.xr-var-data {
+.xr-var-data,
+.xr-index-data {
   display: none;
   background-color: var(--xr-background-color) !important;
   padding-bottom: 5px !important;
 }
 
 .xr-var-attrs-in:checked ~ .xr-var-attrs,
-.xr-var-data-in:checked ~ .xr-var-data {
+.xr-var-data-in:checked ~ .xr-var-data,
+.xr-index-data-in:checked ~ .xr-index-data {
   display: block;
 }
 
@@ -2551,13 +2609,16 @@ body.vscode-dark {
 
 .xr-var-name span,
 .xr-var-data,
+.xr-index-name div,
+.xr-index-data,
 .xr-attrs {
   padding-left: 25px !important;
 }
 
 .xr-attrs,
 .xr-var-attrs,
-.xr-var-data {
+.xr-var-data,
+.xr-index-data {
   grid-column: 1 / -1;
 }
 
@@ -2595,7 +2656,8 @@ dl.xr-attrs {
 }
 
 .xr-icon-database,
-.xr-icon-file-text2 {
+.xr-icon-file-text2,
+.xr-no-icon {
   display: inline-block;
   vertical-align: middle;
   width: 1em;
@@ -2607,31 +2669,35 @@ dl.xr-attrs {
 </style><pre class='xr-text-repr-fallback'>&lt;xarray.Dataset&gt;
 Dimensions:                (epsilon: 3, job_dir: 4)
 Coordinates:
-  * epsilon                (epsilon) int32 0 1 2
-  * job_dir                (job_dir) &lt;U127 &#x27;C\\:\\\\Users\\\\Ryan\\ Soklaski\...
-    fold                   (job_dir) int32 0 0 1 1
+  * epsilon                (epsilon) int64 0 1 2
+  * job_dir                (job_dir) &lt;U117 &#x27;/home/justin_goodwin/projects/rai...
+    fold                   (job_dir) int64 0 0 1 1
     model                  (job_dir) &lt;U6 &#x27;linear&#x27; &#x27;cnn&#x27; &#x27;linear&#x27; &#x27;cnn&#x27;
 Data variables:
-    test_clean_accuracy    (epsilon, job_dir) float64 0.9568 0.9899 ... 0.9879
-    test_adversarial_loss  (epsilon, job_dir) float64 0.1457 0.02779 ... 14.78
-    test_loss              (epsilon, job_dir) float64 0.1457 0.02779 ... 14.78
-    test_accuracy          (epsilon, job_dir) float64 0.9568 0.9899 ... 0.0</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-99573793-f4c4-46d8-af39-2b9b25c8c1c8' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-99573793-f4c4-46d8-af39-2b9b25c8c1c8' class='xr-section-summary'  title='Expand/collapse section'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span class='xr-has-index'>epsilon</span>: 3</li><li><span class='xr-has-index'>job_dir</span>: 4</li></ul></div><div class='xr-section-details'></div></li><li class='xr-section-item'><input id='section-2ca84213-c80c-455f-8f05-529f415e1c4f' class='xr-section-summary-in' type='checkbox'  checked><label for='section-2ca84213-c80c-455f-8f05-529f415e1c4f' class='xr-section-summary' >Coordinates: <span>(4)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>epsilon</span></div><div class='xr-var-dims'>(epsilon)</div><div class='xr-var-dtype'>int32</div><div class='xr-var-preview xr-preview'>0 1 2</div><input id='attrs-b26e64b0-4566-449a-a507-3f1df98d38a5' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-b26e64b0-4566-449a-a507-3f1df98d38a5' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-f467eb52-b3b1-4631-8ca1-b667ff0be703' class='xr-var-data-in' type='checkbox'><label for='data-f467eb52-b3b1-4631-8ca1-b667ff0be703' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 1, 2])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>job_dir</span></div><div class='xr-var-dims'>(job_dir)</div><div class='xr-var-dtype'>&lt;U127</div><div class='xr-var-preview xr-preview'>&#x27;C\\:\\\\Users\\\\Ryan\\ Soklask...</div><input id='attrs-bfdf6e07-0453-4165-ae9c-79e5acad2679' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-bfdf6e07-0453-4165-ae9c-79e5acad2679' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-6296cc3e-464e-4032-bb07-b2967501929a' class='xr-var-data-in' type='checkbox'><label for='data-6296cc3e-464e-4032-bb07-b2967501929a' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([&#x27;C\\:\\\\Users\\\\Ryan\\ Soklaski\\\\responsible-ai-toolbox\\\\docs\\\\source\\\\tutorials\\\\outputs\\\\cross_validation\\\\2022-05-23\\\\11-33-26\\\\0&#x27;,
-       &#x27;C\\:\\\\Users\\\\Ryan\\ Soklaski\\\\responsible-ai-toolbox\\\\docs\\\\source\\\\tutorials\\\\outputs\\\\cross_validation\\\\2022-05-23\\\\11-33-26\\\\1&#x27;,
-       &#x27;C\\:\\\\Users\\\\Ryan\\ Soklaski\\\\responsible-ai-toolbox\\\\docs\\\\source\\\\tutorials\\\\outputs\\\\cross_validation\\\\2022-05-23\\\\11-33-26\\\\2&#x27;,
-       &#x27;C\\:\\\\Users\\\\Ryan\\ Soklaski\\\\responsible-ai-toolbox\\\\docs\\\\source\\\\tutorials\\\\outputs\\\\cross_validation\\\\2022-05-23\\\\11-33-26\\\\3&#x27;],
-      dtype=&#x27;&lt;U127&#x27;)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>fold</span></div><div class='xr-var-dims'>(job_dir)</div><div class='xr-var-dtype'>int32</div><div class='xr-var-preview xr-preview'>0 0 1 1</div><input id='attrs-02054e8d-aec0-49a8-a56a-c22a11b461df' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-02054e8d-aec0-49a8-a56a-c22a11b461df' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-5d1b63d9-ba66-4d3c-bc25-0c4c2e8a2d62' class='xr-var-data-in' type='checkbox'><label for='data-5d1b63d9-ba66-4d3c-bc25-0c4c2e8a2d62' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 0, 1, 1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>model</span></div><div class='xr-var-dims'>(job_dir)</div><div class='xr-var-dtype'>&lt;U6</div><div class='xr-var-preview xr-preview'>&#x27;linear&#x27; &#x27;cnn&#x27; &#x27;linear&#x27; &#x27;cnn&#x27;</div><input id='attrs-78294181-8f5e-4375-b914-255c0b709431' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-78294181-8f5e-4375-b914-255c0b709431' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-57421e58-4b87-4355-9e55-a582fc42b415' class='xr-var-data-in' type='checkbox'><label for='data-57421e58-4b87-4355-9e55-a582fc42b415' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([&#x27;linear&#x27;, &#x27;cnn&#x27;, &#x27;linear&#x27;, &#x27;cnn&#x27;], dtype=&#x27;&lt;U6&#x27;)</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-ff323414-f19a-4f75-8ef9-f859a9d69e31' class='xr-section-summary-in' type='checkbox'  checked><label for='section-ff323414-f19a-4f75-8ef9-f859a9d69e31' class='xr-section-summary' >Data variables: <span>(4)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>test_clean_accuracy</span></div><div class='xr-var-dims'>(epsilon, job_dir)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>0.9568 0.9899 ... 0.9538 0.9879</div><input id='attrs-35a80139-d351-45b5-afe4-c48fdff3fa2d' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-35a80139-d351-45b5-afe4-c48fdff3fa2d' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-6434739d-8e9e-4c5e-9466-54c7a622c563' class='xr-var-data-in' type='checkbox'><label for='data-6434739d-8e9e-4c5e-9466-54c7a622c563' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[0.95679998, 0.98989999, 0.95380002, 0.98790002],
-       [0.95679998, 0.98989999, 0.95380002, 0.98790002],
-       [0.95679998, 0.98989999, 0.95380002, 0.98790002]])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>test_adversarial_loss</span></div><div class='xr-var-dims'>(epsilon, job_dir)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>0.1457 0.02779 ... 10.5 14.78</div><input id='attrs-0b84c0a6-8401-4a6a-b4d0-db33e818a3a4' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-0b84c0a6-8401-4a6a-b4d0-db33e818a3a4' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-d97a0612-bc09-45cd-b374-b0227b2b5566' class='xr-var-data-in' type='checkbox'><label for='data-d97a0612-bc09-45cd-b374-b0227b2b5566' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[ 0.14566605,  0.02779333,  0.14155754,  0.03512534],
-       [ 3.32812858,  4.36696959,  3.37191129,  3.49730635],
-       [10.54411793, 16.47352219, 10.50445652, 14.78298283]])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>test_loss</span></div><div class='xr-var-dims'>(epsilon, job_dir)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>0.1457 0.02779 ... 10.5 14.78</div><input id='attrs-9edcf365-58f8-4139-93d1-ba06d92574cc' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-9edcf365-58f8-4139-93d1-ba06d92574cc' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-11def564-ba8c-469b-b170-ad53e6551451' class='xr-var-data-in' type='checkbox'><label for='data-11def564-ba8c-469b-b170-ad53e6551451' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[ 0.14566606,  0.02779333,  0.14155754,  0.03512534],
-       [ 3.32812858,  4.36696959,  3.37191105,  3.49730635],
-       [10.54411888, 16.47352409, 10.50445652, 14.78298473]])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>test_accuracy</span></div><div class='xr-var-dims'>(epsilon, job_dir)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>0.9568 0.9899 0.9538 ... 0.0044 0.0</div><input id='attrs-8b4a4d4e-c7fd-4ad1-9b8c-218591080646' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-8b4a4d4e-c7fd-4ad1-9b8c-218591080646' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-52bdc9c1-53be-4706-b7d6-4f99c9041131' class='xr-var-data-in' type='checkbox'><label for='data-52bdc9c1-53be-4706-b7d6-4f99c9041131' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[9.56799984e-01, 9.89899993e-01, 9.53800023e-01, 9.87900019e-01],
-       [2.20300004e-01, 1.23599999e-01, 2.32099995e-01, 2.03199998e-01],
-       [8.99999985e-04, 0.00000000e+00, 4.39999998e-03, 0.00000000e+00]])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-148aeae1-9697-4da5-b689-98f5abe2ff95' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-148aeae1-9697-4da5-b689-98f5abe2ff95' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div></div>
+    test_clean_accuracy    (epsilon, job_dir) float64 0.9595 0.9869 ... 0.9899
+    test_adversarial_loss  (epsilon, job_dir) float64 0.1262 0.03737 ... 14.75
+    test_loss              (epsilon, job_dir) float64 0.1262 0.03737 ... 14.75
+    test_accuracy          (epsilon, job_dir) float64 0.9595 0.9869 ... 0.0</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-abdcc44b-429d-4673-983a-ccb7f1874258' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-abdcc44b-429d-4673-983a-ccb7f1874258' class='xr-section-summary'  title='Expand/collapse section'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span class='xr-has-index'>epsilon</span>: 3</li><li><span class='xr-has-index'>job_dir</span>: 4</li></ul></div><div class='xr-section-details'></div></li><li class='xr-section-item'><input id='section-b2877ee9-3073-4756-8d9b-6681d38d5d21' class='xr-section-summary-in' type='checkbox'  checked><label for='section-b2877ee9-3073-4756-8d9b-6681d38d5d21' class='xr-section-summary' >Coordinates: <span>(4)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>epsilon</span></div><div class='xr-var-dims'>(epsilon)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2</div><input id='attrs-ca7d2587-0c1b-4f0b-a144-f50f0a0b7f22' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-ca7d2587-0c1b-4f0b-a144-f50f0a0b7f22' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-809e4212-c34d-41fd-ade7-359326b94247' class='xr-var-data-in' type='checkbox'><label for='data-809e4212-c34d-41fd-ade7-359326b94247' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 1, 2])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>job_dir</span></div><div class='xr-var-dims'>(job_dir)</div><div class='xr-var-dtype'>&lt;U117</div><div class='xr-var-preview xr-preview'>&#x27;/home/justin_goodwin/projects/r...</div><input id='attrs-63b5a570-7173-49db-83f6-d13c98eac6a7' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-63b5a570-7173-49db-83f6-d13c98eac6a7' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-1c6ea15d-5be1-4439-bc98-d81b67dba42a' class='xr-var-data-in' type='checkbox'><label for='data-1c6ea15d-5be1-4439-bc98-d81b67dba42a' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([&#x27;/home/justin_goodwin/projects/raiden/rai_toolbox/docs/source/tutorials/outputs/cross_validation/2023-01-27/13-08-46/0&#x27;,
+       &#x27;/home/justin_goodwin/projects/raiden/rai_toolbox/docs/source/tutorials/outputs/cross_validation/2023-01-27/13-08-46/1&#x27;,
+       &#x27;/home/justin_goodwin/projects/raiden/rai_toolbox/docs/source/tutorials/outputs/cross_validation/2023-01-27/13-08-46/2&#x27;,
+       &#x27;/home/justin_goodwin/projects/raiden/rai_toolbox/docs/source/tutorials/outputs/cross_validation/2023-01-27/13-08-46/3&#x27;],
+      dtype=&#x27;&lt;U117&#x27;)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>fold</span></div><div class='xr-var-dims'>(job_dir)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 0 1 1</div><input id='attrs-ebe294a4-69c8-4ffe-8fc8-c1f7d84a483a' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-ebe294a4-69c8-4ffe-8fc8-c1f7d84a483a' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-7a1ed7ac-893a-488d-a34b-d5451dffda15' class='xr-var-data-in' type='checkbox'><label for='data-7a1ed7ac-893a-488d-a34b-d5451dffda15' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 0, 1, 1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>model</span></div><div class='xr-var-dims'>(job_dir)</div><div class='xr-var-dtype'>&lt;U6</div><div class='xr-var-preview xr-preview'>&#x27;linear&#x27; &#x27;cnn&#x27; &#x27;linear&#x27; &#x27;cnn&#x27;</div><input id='attrs-673bcf28-7323-4901-a408-4f9de509827c' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-673bcf28-7323-4901-a408-4f9de509827c' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-7f6795ee-5a84-4185-845f-858e2e900b9a' class='xr-var-data-in' type='checkbox'><label for='data-7f6795ee-5a84-4185-845f-858e2e900b9a' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([&#x27;linear&#x27;, &#x27;cnn&#x27;, &#x27;linear&#x27;, &#x27;cnn&#x27;], dtype=&#x27;&lt;U6&#x27;)</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-86cd44ad-f14b-4793-a07b-9ccff99517fc' class='xr-section-summary-in' type='checkbox'  checked><label for='section-86cd44ad-f14b-4793-a07b-9ccff99517fc' class='xr-section-summary' >Data variables: <span>(4)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>test_clean_accuracy</span></div><div class='xr-var-dims'>(epsilon, job_dir)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>0.9595 0.9869 ... 0.9622 0.9899</div><input id='attrs-8eee4d2a-41b0-4538-bdc7-b6279931b6e2' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-8eee4d2a-41b0-4538-bdc7-b6279931b6e2' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-21bd99a3-56fc-475a-a53a-695b6cd7415c' class='xr-var-data-in' type='checkbox'><label for='data-21bd99a3-56fc-475a-a53a-695b6cd7415c' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[0.95950001, 0.98689997, 0.96219999, 0.98989999],
+       [0.95950001, 0.98689997, 0.96219999, 0.98989999],
+       [0.95950001, 0.98689997, 0.96219999, 0.98989999]])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>test_adversarial_loss</span></div><div class='xr-var-dims'>(epsilon, job_dir)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>0.1262 0.03737 ... 10.57 14.75</div><input id='attrs-2b6787f4-b8a1-43a2-a4b9-3b29b7fbce47' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-2b6787f4-b8a1-43a2-a4b9-3b29b7fbce47' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-ccccfa90-da6a-49eb-aeb1-e510b74b1006' class='xr-var-data-in' type='checkbox'><label for='data-ccccfa90-da6a-49eb-aeb1-e510b74b1006' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[ 0.12619434,  0.03737419,  0.1205883 ,  0.02972579],
+       [ 3.34879494,  4.62477255,  3.26211476,  3.50133014],
+       [10.60897923, 16.61327171, 10.57310295, 14.75341225]])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>test_loss</span></div><div class='xr-var-dims'>(epsilon, job_dir)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>0.1262 0.03737 ... 10.57 14.75</div><input id='attrs-416a0fa2-8556-442d-9883-9a9f9f32b420' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-416a0fa2-8556-442d-9883-9a9f9f32b420' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-07368d61-d142-449e-bd05-a8c4ca9ec854' class='xr-var-data-in' type='checkbox'><label for='data-07368d61-d142-449e-bd05-a8c4ca9ec854' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[ 0.12619434,  0.03737419,  0.1205883 ,  0.02972579],
+       [ 3.34879494,  4.62477207,  3.26211476,  3.50133014],
+       [10.60897827, 16.61327553, 10.57310295, 14.75341415]])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>test_accuracy</span></div><div class='xr-var-dims'>(epsilon, job_dir)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>0.9595 0.9869 0.9622 ... 0.0056 0.0</div><input id='attrs-a284ecc4-5159-4740-abc3-020e04834e22' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-a284ecc4-5159-4740-abc3-020e04834e22' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-73d53b96-cc28-4424-b5fa-0f6a571f25ab' class='xr-var-data-in' type='checkbox'><label for='data-73d53b96-cc28-4424-b5fa-0f6a571f25ab' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([[0.95950001, 0.98689997, 0.96219999, 0.98989999],
+       [0.2279    , 0.0993    , 0.2484    , 0.1919    ],
+       [0.005     , 0.        , 0.0056    , 0.        ]])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-8011356d-5ce2-4f9b-89a0-5029a132fb0e' class='xr-section-summary-in' type='checkbox'  ><label for='section-8011356d-5ce2-4f9b-89a0-5029a132fb0e' class='xr-section-summary' >Indexes: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>epsilon</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-4cd43461-3608-4022-a6a5-5950316c5028' class='xr-index-data-in' type='checkbox'/><label for='index-4cd43461-3608-4022-a6a5-5950316c5028' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Int64Index([0, 1, 2], dtype=&#x27;int64&#x27;, name=&#x27;epsilon&#x27;))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>job_dir</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-a67e0125-0fca-441f-9b72-4e3e2c983a1d' class='xr-index-data-in' type='checkbox'/><label for='index-a67e0125-0fca-441f-9b72-4e3e2c983a1d' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([&#x27;/home/justin_goodwin/projects/raiden/rai_toolbox/docs/source/tutorials/outputs/cross_validation/2023-01-27/13-08-46/0&#x27;,
+       &#x27;/home/justin_goodwin/projects/raiden/rai_toolbox/docs/source/tutorials/outputs/cross_validation/2023-01-27/13-08-46/1&#x27;,
+       &#x27;/home/justin_goodwin/projects/raiden/rai_toolbox/docs/source/tutorials/outputs/cross_validation/2023-01-27/13-08-46/2&#x27;,
+       &#x27;/home/justin_goodwin/projects/raiden/rai_toolbox/docs/source/tutorials/outputs/cross_validation/2023-01-27/13-08-46/3&#x27;],
+      dtype=&#x27;object&#x27;, name=&#x27;job_dir&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-8d70440a-01ac-46e0-89f3-3eb46e11284d' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-8d70440a-01ac-46e0-89f3-3eb46e11284d' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div></div>
 </div>
 <p>And lastly plot the curves for each cross-validation experiment along with the mean curve for each model.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
@@ -2647,12 +2713,12 @@ Data variables:
 </div>
 </div>
 <div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;matplotlib.legend.Legend at 0x17a2300d3d0&gt;
+&lt;matplotlib.legend.Legend at 0x7f1da1e5a6b0&gt;
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
