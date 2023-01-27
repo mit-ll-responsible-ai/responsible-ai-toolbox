@@ -1,4 +1,4 @@
-# Copyright 2022, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
+# Copyright 2023, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 
@@ -40,7 +40,7 @@ class ImageNet(folder.DatasetFolder):
             and checks if the file is a valid file.
         """
         super().__init__(
-            root,
+            str(root),
             loader,
             folder.IMG_EXTENSIONS if is_valid_file is None else None,
             transform=transform,
@@ -91,7 +91,7 @@ class _ReducedImageNet(folder.DatasetFolder):
         is_valid_file: Optional[Callable[[str], bool]] = None,
     ):
         super().__init__(
-            root=root,
+            root=str(root),
             loader=loader,
             extensions=folder.IMG_EXTENSIONS if is_valid_file is None else None,
             transform=transform,

@@ -1,4 +1,4 @@
-# Copyright 2022, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
+# Copyright 2023, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 import string
@@ -382,6 +382,7 @@ class ScndMultiRun(MultiRunMetricsWorkflow):
 
 @pytest.mark.parametrize("load_from_working_dir", [False, True])
 @pytest.mark.usefixtures("cleandir")
+@pytest.mark.filterwarnings("ignore:invalid value encountered in cast")
 def test_multirun_over_jobdir(load_from_working_dir):
     # Runs a standard multirun workflow and then runs
     # a multirun over the resulting folders, loading in
@@ -481,6 +482,8 @@ def test_working_subdirs(
         if k.startswith("hydra") and v is not None
     ]
 
+    # just to keep these from looking like they are unused
+    del hydra_sweep_dir, hydra_sweep_subdir
     wf = GridMetrics()
     wf.run(x=multirun([-1, 0, 1]), y=multirun([-10, 10]), overrides=overrides)
 
@@ -623,21 +626,6 @@ def test_overrides_roundtrip(
         assert xdata.mrun.data.tolist() == mrun
     else:
         assert xdata.mrun.data.tolist() == [str(i) for i in mrun]
-
-
-@pytest.mark.usefixtures("cleandir")
-def test_evaluation_task_is_deprecated():
-    class OldWorkflow(MultiRunMetricsWorkflow):
-        @staticmethod
-        def evaluation_task(a: int):
-            return dict(a=a)
-
-    with pytest.warns(FutureWarning):
-        wf = OldWorkflow()
-
-    wf.run(a=10)
-    out = wf.jobs[0]
-    assert out.return_value == dict(a=10)
 
 
 @pytest.mark.usefixtures("cleandir")

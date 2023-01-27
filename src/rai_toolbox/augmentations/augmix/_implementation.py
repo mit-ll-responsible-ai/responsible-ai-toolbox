@@ -1,7 +1,7 @@
-# Copyright 2022, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
+# Copyright 2023, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
-
+# type: ignore
 """
 An implementation of the AugMix augmentation method specified in:
 
@@ -10,6 +10,7 @@ An implementation of the AugMix augmentation method specified in:
 
 with reference implementation from https://github.com/google-research/augmix
 """
+
 from numbers import Real
 from typing import Callable, Optional, Sequence, Tuple, TypeVar, Union
 

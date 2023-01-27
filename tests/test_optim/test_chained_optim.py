@@ -1,4 +1,4 @@
-# Copyright 2022, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
+# Copyright 2023, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 from typing import List, Type
@@ -7,7 +7,7 @@ import hypothesis.extra.numpy as hnp
 import hypothesis.strategies as st
 import torch as tr
 from hypothesis import given
-from torch.testing import assert_close as assert_allclose  # type: ignore
+from torch.testing import assert_close
 
 from rai_toolbox.optim import (
     ChainedParamTransformingOptimizer,
@@ -106,5 +106,5 @@ def test_chained_optim(x: tr.Tensor, chain: List[Type[PreMul2Grad]]):
     for opt in chain:
         opt._post_step_transform_(None, expected, {})  # type: ignore
 
-    assert_allclose(actual=x, expected=expected)
-    assert_allclose(actual=x.grad, expected=expected.grad)
+    assert_close(actual=x, expected=expected)
+    assert_close(actual=x.grad, expected=expected.grad)

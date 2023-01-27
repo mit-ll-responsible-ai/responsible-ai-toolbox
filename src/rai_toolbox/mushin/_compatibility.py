@@ -1,4 +1,4 @@
-# Copyright 2022, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
+# Copyright 2023, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 
@@ -28,4 +28,4 @@ def _get_version(ver_str: str) -> Version:
     return Version(major=major, minor=minor, patch=int(patch_str))
 
 
-PL_VERSION: Final = _get_version(pytorch_lightning.__version__)  # type: ignore
+PL_VERSION: Final = _get_version(pytorch_lightning.__version__)

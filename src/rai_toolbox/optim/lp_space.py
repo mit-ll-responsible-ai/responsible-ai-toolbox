@@ -1,4 +1,4 @@
-# Copyright 2022, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
+# Copyright 2023, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 
@@ -10,8 +10,7 @@ from torch import Generator, Tensor, default_generator
 from torch.optim import SGD
 from typing_extensions import Final
 
-from rai_toolbox._typing import Optimizer as Opt
-from rai_toolbox._typing import OptimizerType, OptimParams, Partial
+from rai_toolbox._typing import Optimizer as Opt, OptimizerType, OptimParams, Partial
 from rai_toolbox._utils import check_param_group_value, value_check
 
 from .misc import TopQGradientOptimizer

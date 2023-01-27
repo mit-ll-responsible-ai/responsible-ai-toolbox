@@ -9,7 +9,7 @@
     <img src="https://img.shields.io/pypi/v/rai-toolbox.svg" alt="PyPI" />
   </a>
   <a>
-    <img src="https://img.shields.io/badge/python-3.7%20&#8208;%203.9-blue.svg" alt="Python version support" />
+    <img src="https://img.shields.io/badge/python-3.7%20&#8208;%203.10-blue.svg" alt="Python version support" />
   </a>
   <a href="https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox/actions?query=workflow%3ATests+branch%3Amain">
     <img src="https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox/workflows/Tests/badge.svg" alt="GitHub Actions" />
@@ -54,7 +54,7 @@ If you would like to contribute to this repo, please refer to our `CONTRIBUTING.
 
 DISTRIBUTION STATEMENT A. Approved for public release. Distribution is unlimited.
 
-© 2022 MASSACHUSETTS INSTITUTE OF TECHNOLOGY
+© 2023 MASSACHUSETTS INSTITUTE OF TECHNOLOGY
 
 - Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014)
 - SPDX-License-Identifier: MIT

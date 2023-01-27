@@ -1,4 +1,4 @@
-# Copyright 2022, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
+# Copyright 2023, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 
@@ -13,7 +13,7 @@ from hypothesis import assume, given, note, settings, strategies as st
 from hypothesis.extra import numpy as hnp
 from torch import Tensor
 from torch.optim import SGD, Adam
-from torch.testing import assert_close as assert_allclose  # type: ignore
+from torch.testing import assert_close
 
 from rai_toolbox import to_batch
 from rai_toolbox._typing import Partial
@@ -489,7 +489,7 @@ def test_grad_transform_optim_param_ndim_equivalence(Optimizer, param):
     assert t1.ndim == t2.ndim + 1
 
     # Ensure optimizer produces identical results
-    assert_allclose(t1, t2[None])
+    assert_close(t1, t2[None])
 
 
 @given(
@@ -513,14 +513,14 @@ def test_l2_normed_grad_for_arbitrary_param_ndim(param, data: st.DataObject):
     optimizer.step()
 
     if param_ndim is None or param_ndim == x.ndim:
-        assert_allclose(tr.norm(x.grad, p=2).item(), 1.0)  # type: ignore
+        assert_close(tr.norm(x.grad, p=2).item(), 1.0)  # type: ignore
         return
 
     if param_ndim < 0:
         param_ndim += x.ndim
 
     if param_ndim == 0:
-        assert_allclose(tr.sign(x_orig), x.grad)
+        assert_close(tr.sign(x_orig), x.grad)
         return
 
     assert x.grad is not None
@@ -531,7 +531,7 @@ def test_l2_normed_grad_for_arbitrary_param_ndim(param, data: st.DataObject):
     # dimensions. Each D-dim vector should have been normalized by the optimizer
     x_grad = x.grad.view(-1, *x.grad.shape[-param_ndim:]).flatten(1)
     norms = tr.norm(x_grad, p=2, dim=1)  # type: ignore
-    assert_allclose(norms, tr.ones_like(norms))
+    assert_close(norms, tr.ones_like(norms))
 
 
 @pytest.mark.parametrize(
@@ -678,8 +678,8 @@ def test_grad_scale_and_bias(
     g2_unnormed = (x2.grad - b2) / s2
     g3_unnormed = (x3.grad - b3) / s3
 
-    assert_allclose(g1_unnormed, g2_unnormed)
-    assert_allclose(g1_unnormed, g3_unnormed)
+    assert_close(g1_unnormed, g2_unnormed)
+    assert_close(g1_unnormed, g3_unnormed)
 
 
 def test_l1q_regression():
@@ -690,12 +690,4 @@ def test_l1q_regression():
     opt = L1qNormedGradientOptim([p], q=0.5, param_ndim=1, lr=1)
     p.backward(g)
     opt.step()
-    assert_allclose(actual=p.grad, expected=tr.tensor([0.0, -0.5, 0.5, 0.0]))
-
-
-def test_project_is_deprecated():
-    x = tr.tensor(1.0, requires_grad=True)
-    optim = L2ProjectedOptim([x], lr=1.0, epsilon=2.0, param_ndim=None)
-
-    with pytest.warns(FutureWarning):
-        optim.project()
+    assert_close(actual=p.grad, expected=tr.tensor([0.0, -0.5, 0.5, 0.0]))

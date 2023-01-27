@@ -1,4 +1,4 @@
-# Copyright 2022, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
+# Copyright 2023, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 
@@ -10,9 +10,8 @@ import logging
 from typing import Optional
 
 import hydra
+from hydra_zen import zen
 from pytorch_lightning import LightningDataModule, LightningModule, Trainer
-
-from ..hydra import zen
 
 log = logging.getLogger(__name__)
 
@@ -36,7 +35,7 @@ def task(
         trainer.fit(module, datamodule=datamodule)
 
 
-@hydra.main(config_path=None, config_name="config")
+@hydra.main(config_path=None, config_name="config", version_base="1.1")
 def main(cfg):
     zen(task)(cfg)
 

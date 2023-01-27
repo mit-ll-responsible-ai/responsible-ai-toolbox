@@ -1,8 +1,7 @@
-# Copyright 2022, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
+# Copyright 2023, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 
-import warnings
 from collections import UserList, defaultdict
 from inspect import getattr_static
 from pathlib import Path
@@ -26,14 +25,12 @@ import numpy as np
 import torch as tr
 from hydra.core.override_parser.overrides_parser import OverridesParser
 from hydra.core.utils import JobReturn
-from hydra_zen import launch, load_from_yaml, make_config
+from hydra_zen import launch, load_from_yaml, make_config, zen
 from hydra_zen._compatibility import HYDRA_VERSION
 from hydra_zen._launch import _NotSet
 from typing_extensions import Self, TypeAlias, TypeGuard
 
 from rai_toolbox._utils import value_check
-
-from .hydra import zen
 
 LoadedValue: TypeAlias = Union[str, int, float, bool, List[Any], Dict[str, Any]]
 
@@ -56,14 +53,10 @@ _VERSION_BASE_DEFAULT = _NotSet if HYDRA_VERSION < (1, 2, 0) else "1.1"
 class multirun(UserList):
     """Signals that a sequence is to be iterated over in a multirun"""
 
-    pass
-
 
 class hydra_list(UserList):
     """Signals that a sequence is provided as a single configured value (i.e. it is not
     to be iterated over during a multirun)"""
-
-    pass
 
 
 def _sort_x_by_k(x: T, k: Iterable[Any]) -> T:
@@ -138,17 +131,6 @@ class BaseWorkflow:
         self._multirun_task_overrides = {}
         self.jobs = []
         self._working_dir = None
-
-        if hasattr(self, "evaluation_task"):
-            warnings.warn(
-                "The static method `evaluation_task` is deprecated in favor of the "
-                "static method  `task`. Support for `evaluation_task` will be removed "
-                "in version 0.3.0 of rai-toolbox. To fix this, simply rename "
-                "`evaluation_task` method to `task`.",
-                FutureWarning,
-                stacklevel=2,
-            )
-            self.task = self.evaluation_task  # type: ignore
 
     @property
     def working_dir(self) -> Path:
@@ -243,9 +225,8 @@ class BaseWorkflow:
         -----
         This function is automatically wrapped by `zen`, which is responsible
         for parsing the function's signature and then extracting and instantiating
-        the correspending fields from a Hydra config object – passing them to the
+        the corresponding fields from a Hydra config object – passing them to the
         function. This behavior can be modified by `self.run(pre_task_fn_wrapper=...)`"""
-        pass
 
     @staticmethod
     def task(*args: Any, **kwargs: Any) -> Any:
@@ -271,13 +252,13 @@ class BaseWorkflow:
         -----
         This function is automatically wrapped by `zen`, which is responsible
         for parsing the function's signature and then extracting and instantiating
-        the correspending fields from a Hydra config object – passing them to the
+        the corresponding fields from a Hydra config object – passing them to the
         function. This behavior can be modified by `self.run(task_fn_wrapper=...)`
         """
         raise NotImplementedError()
 
     def validate(self, include_pre_task: bool = True):
-        """Valide the configuration will execute with the user defined evaluation task"""
+        """Validates that the configuration will execute with the user-defined evaluation task"""
         if include_pre_task:
             zen(self.pre_task).validate(self.eval_task_cfg)
 
@@ -458,7 +439,7 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
     """Abstract class for workflows that record metrics using Hydra multirun.
 
     This workflow creates subdirectories of multirun experiments using Hydra.  These directories
-    contain the Hydra YAML configuration and any saved metrics file (defined by the evaulation task)::
+    contain the Hydra YAML configuration and any saved metrics file (defined by the evaluationf task)::
 
         ├── working_dir
         │    ├── <experiment directory name: 0>
@@ -1096,7 +1077,7 @@ class RobustnessCurve(MultiRunMetricsWorkflow):
             These parameters represent the values for configurations to use for the
             experiment.
 
-            These values will be appeneded to the `overrides` for the Hydra job.
+            These values will be appended to the `overrides` for the Hydra job.
         """
 
         if not isinstance(epsilon, str):

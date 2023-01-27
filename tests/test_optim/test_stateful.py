@@ -1,4 +1,4 @@
-# Copyright 2022, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
+# Copyright 2023, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 
@@ -8,7 +8,7 @@ from typing import Optional
 
 import torch as tr
 from torch.optim import Adam
-from torch.testing import assert_allclose
+from torch.testing import assert_close
 
 from rai_toolbox._typing import Optimizer
 from rai_toolbox.optim import (
@@ -106,17 +106,17 @@ def test_ChainedParamTransformingOptimizer_state_mirrors_InnerOpt():
     optim1.step()
 
     # param_ndim: None
-    assert_allclose(x1.grad, tr.tensor([[0.7071, -0.7071]]), rtol=1e-4, atol=1e-4)
+    assert_close(x1.grad, tr.tensor([[0.7071, -0.7071]]), rtol=1e-4, atol=1e-4)
 
     # param_ndim: 0
-    assert_allclose(x2.grad, tr.tensor([[1.0, -1.0]]), rtol=1e-4, atol=1e-4)
+    assert_close(x2.grad, tr.tensor([[1.0, -1.0]]), rtol=1e-4, atol=1e-4)
 
     # clamp_min: 0.0
-    assert_allclose(x3.grad, tr.tensor([[1.0, 0.0]]), rtol=1e-4, atol=1e-4)
+    assert_close(x3.grad, tr.tensor([[1.0, 0.0]]), rtol=1e-4, atol=1e-4)
 
-    assert_allclose(x1, tr.tensor([[0.8586, -0.8586]]), rtol=1e-4, atol=1e-4)
-    assert_allclose(x2, tr.tensor([[0.9000, -0.9000]]), rtol=1e-4, atol=1e-4)
-    assert_allclose(x3, tr.tensor([[0.8000, -1.0000]]), rtol=1e-4, atol=1e-4)
+    assert_close(x1, tr.tensor([[0.8586, -0.8586]]), rtol=1e-4, atol=1e-4)
+    assert_close(x2, tr.tensor([[0.9000, -0.9000]]), rtol=1e-4, atol=1e-4)
+    assert_close(x3, tr.tensor([[0.8000, -1.0000]]), rtol=1e-4, atol=1e-4)
 
     _check_consistency(optim1)
 

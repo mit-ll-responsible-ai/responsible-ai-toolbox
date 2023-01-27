@@ -8,6 +8,35 @@ Changelog
 This is a record of all past rAI-toolbox releases and what went into them, in reverse 
 chronological order. All previous releases should still be available on pip.
 
+.. _v0.3.0:
+
+------------------
+0.3.0 - 2023-XX-XX
+------------------
+
+.. note:: This is documentation for an unreleased version of the rai-toolbox.
+
+Improvements
+------------
+- Python 3.10 is officially supported.
+- `rai_experiments` v0.2.0 is available via pypi.
+    - `rai_experiments.models.pretrained.load_model` was added as a means download/cache model weights for rai-toolbox examples and tutorials.
+- Updated `Optimizer` protocol for compatibility with torch 1.12.0+.
+- Improved documentation formatting and fixed typos.
+- Added format and spell checking to CI.
+
+Compatibility-Breaking changes
+------------------------------
+- Support for `MultiRunMetricsWorkflow.evaluation_task` was deprecated in v0.2.0 and is now removed.
+- `ParamTransformingOptimizer.project` was deprecated in v0.2.0 and is now removed.
+- The minimum supported version of PyTorch is now 1.10.0.
+- The minimum supported version of `hydra-zen <https://github.com/mit-ll-responsible-ai/hydra-zen>`_ is now 0.9.0.
+
+Deprecations
+------------
+- `rai_toolbox.mushin.zen` has been deprecated. Use `hydra_zen.zen` instead.
+
+
 .. _v0.2.1:
 
 ------------------
@@ -31,7 +60,7 @@ Improvements to `MultiRunMetricsWorkflow`
 -----------------------------------------
 - A `pre_task` step can be defined for a workflow; this is useful for seeding random number generators prior to the task's instantiation phase. See :ref:`this how-to guide <how-to-deterministic>` for examples.
 - Loaded workflow overrides now roundtrip appropriately. See :pull:`61`.
-- `metric_load_fn` can be overriden to customize how `~MultiRunMetricsWorkflow` loads metric files; the default behavior is to use `torch.load`. See :pull:`63`.
+- `metric_load_fn` can be overridden to customize how `~MultiRunMetricsWorkflow` loads metric files; the default behavior is to use `torch.load`. See :pull:`63`.
 - `working_subdir` can be included as a data-variable in a workflow's xarray; this enables users to lookup subdirs by override values. See :pull:`52`.
 - `to_xarray` works on lists of array-likes, not just lists of numpy arrays
 - `load_metrics` can be called directly from `~MultiRunMetricsWorkflow`.
@@ -63,7 +92,7 @@ Deprecations
 This patch fixes two bugs in ``rai_toolbox.perturbations.init``:
 
 - `~rai_toolbox.perturbations.uniform_like_l1_n_ball_` was not correctly symmeterized; the drawn values only had components in the direction of the positive hemisphere of the :math:`L^1` ball.
-- Passing an on-gpu tensor to the in-place init functions would cause a device mis-match error with the default random number generator, which is on CPU.
+- Passing an on-gpu tensor to the in-place init functions would cause a device mismatch error with the default random number generator, which is on CPU.
 
 
 .. _v0.1.0:
