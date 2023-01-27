@@ -22,12 +22,12 @@ license = { file = "LICENSE.txt" }
 keywords = ["machine learning", "robustness", "pytorch", "responsible", "AI"]
 
 authors = [
-    { name = "Ryan Soklaski", email = "ryan.soklaski@ll.mit.edu" },
+    { name = "Ryan Soklaski", email = "rsoklaski@gmail.com" },
     { name = "Justin Goodwin", email = "jgoodwin@ll.mit.edu" },
     { name = "Olivia Brown" },
     { name = "Michael Yee" },
 ]
-maintainers = [{ name = "Ryan Soklaski", email = "ryan.soklaski@ll.mit.edu" }]
+maintainers = [{ name = "Ryan Soklaski", email = "rsoklaski@gmail.com" }]
 
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -181,6 +181,20 @@ extras =
     mushin
     datasets
 basepython = python3.9
+
+
+[testenv:pyright]  # test against pre-releases of dependencies
+description = Scans src/ tests/ with pinned version of pyright
+extras = 
+    tests
+    mushin
+    datasets
+deps = 
+    --requirement deps/requirements-pyright.txt
+basepython = python3.9
+
+commands = pyright --lib tests/ src/
+
 
 [testenv:auto-format]
 skip_install=true

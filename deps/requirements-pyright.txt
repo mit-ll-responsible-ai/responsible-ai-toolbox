@@ -1,0 +1,2 @@
+pyright==1.1.291
+matplotlib==3.6.3
