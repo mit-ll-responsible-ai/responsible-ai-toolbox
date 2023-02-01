@@ -402,7 +402,6 @@ class dummy_stateful_solver:
 @settings(deadline=None)
 @given(repeats=st.integers(1, 10), targeted=st.booleans())
 def test_random_restart_targeted(repeats, targeted: bool):
-
     fn1 = dummy_stateful_solver()
     xadv, loss = random_restart(fn1, repeats=repeats)(targeted=targeted)
     if targeted:

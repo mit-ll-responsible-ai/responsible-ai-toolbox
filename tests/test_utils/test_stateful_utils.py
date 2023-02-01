@@ -89,7 +89,6 @@ freezables = (
     "freeze_methodology", [via_freeze, via_frozen_context, via_frozen_decorator]
 )
 def test_freeze(targets, freeze_methodology):
-
     target_tensors = []
     for target in targets:
         if isinstance(target, tr.nn.Module):

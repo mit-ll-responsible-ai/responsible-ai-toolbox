@@ -183,7 +183,6 @@ def test_ddp_with_hydra_with_datamodule():
 @pytest.mark.usefixtures("cleandir")
 @pytest.mark.parametrize("num_jobs", [1, 2])
 def test_ddp_with_hydra_runjob(num_jobs):
-
     overrides = []
     multirun = False
     if num_jobs > 1:

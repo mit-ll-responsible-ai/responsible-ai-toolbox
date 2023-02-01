@@ -186,7 +186,6 @@ class TopQGradientOptimizer(ParamTransformingOptimizer):
         generator: Generator = default_generator,
         **inner_opt_kwargs,
     ):
-
         r"""
         Parameters
         ----------
@@ -346,7 +345,6 @@ class TopQGradientOptimizer(ParamTransformingOptimizer):
         self._generator = value_check("generator", generator, type_=torch.Generator)
 
     def _pre_step_transform_(self, param: Tensor, optim_group: Dict[str, Any]) -> None:
-
         if param.grad is None:  # pragma: no cover
             return
 

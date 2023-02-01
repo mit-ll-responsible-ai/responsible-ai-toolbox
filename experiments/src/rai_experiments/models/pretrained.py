@@ -129,7 +129,6 @@ def load_model(model_name: _MODEL_NAMES):
         "mitll_restricted_imagenet_l2_3_0.pt",
         "imagenet_nat.pt",
     }:
-
         model = partial(resnet50, num_classes=9 if "restricted" in model_name else 1000)
         norm = transforms.Normalize(
             mean=[0.485, 0.456, 0.406],
