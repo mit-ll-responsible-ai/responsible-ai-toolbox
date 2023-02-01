@@ -63,7 +63,6 @@ def check_optim_compatibilities():
 
 
 def check_negate():
-
     # pyright should flag:
     negate(lambda x: None)  # type: ignore
     # because `None` is not negateable. But the following should be OK:

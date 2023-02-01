@@ -244,7 +244,6 @@ class FourierPerturbation(tr.nn.Module):
         return cast(_T, img)
 
     def __repr__(self) -> str:
-
         return (
             self.__class__.__name__
             + f"(norm_scale={self._norm_bnds}, rand_flip_per_channel={self.rand_flip_per_channel}, radii_bounds={self.radii_bounds})"

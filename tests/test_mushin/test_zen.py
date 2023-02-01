@@ -81,7 +81,6 @@ def test_zen_validation(cfg, func):
 )
 @pytest.mark.filterwarnings("ignore:rai_toolbox.mushin.zen will be removed")
 def test_zen_call(x: int, y: int, kwargs: dict, instantiate_cfg, func):
-
     cfg = make_config(x=x, y=y, **kwargs)
     if instantiate_cfg:
         cfg = cfg()

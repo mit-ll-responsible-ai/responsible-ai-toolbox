@@ -470,7 +470,6 @@ def test_lp_fw_constraint_sets(
     ).map(lambda x: x.tolist())
 )
 def test_grad_transform_optim_param_ndim_equivalence(Optimizer, param):
-
     # Default: use param of shape (N=1, D0, ...)
     t1 = tr.tensor([param], requires_grad=True)
     # Test against: param of shape (D0, ...)
@@ -683,7 +682,6 @@ def test_grad_scale_and_bias(
 
 
 def test_l1q_regression():
-
     g = tr.tensor([-1.0, -2.0, 3.0, 0.5])
     p = tr.ones_like(g, requires_grad=True)
 

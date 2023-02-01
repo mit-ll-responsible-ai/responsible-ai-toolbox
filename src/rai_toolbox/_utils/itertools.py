@@ -15,7 +15,6 @@ def flatten_params(
         tr.Tensor, Iterable[tr.Tensor], Iterable[Mapping[str, Iterable[tr.Tensor]]]
     ]
 ) -> List[tr.Tensor]:
-
     if isinstance(iter_params_or_groups, tr.Tensor):
         return [iter_params_or_groups]
 
