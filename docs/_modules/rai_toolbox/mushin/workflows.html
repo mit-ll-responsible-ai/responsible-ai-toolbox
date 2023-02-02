@@ -539,7 +539,6 @@
 <span class="sd">        {&#39;foo&#39;: [&#39;val&#39;], &#39;bar&#39;: multirun([&#39;a&#39;, &#39;b&#39;]), &#39;apple&#39;: 1}</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_multirun_task_overrides</span><span class="p">:</span>
-
             <span class="n">overrides</span> <span class="o">=</span> <span class="n">load_from_yaml</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span> <span class="o">/</span> <span class="s2">&quot;multirun.yaml&quot;</span>
             <span class="p">)</span><span class="o">.</span><span class="n">hydra</span><span class="o">.</span><span class="n">overrides</span><span class="o">.</span><span class="n">task</span>
@@ -562,7 +561,8 @@
 <span class="sd">        This function is automatically wrapped by `zen`, which is responsible</span>
 <span class="sd">        for parsing the function&#39;s signature and then extracting and instantiating</span>
 <span class="sd">        the corresponding fields from a Hydra config object – passing them to the</span>
-<span class="sd">        function. This behavior can be modified by `self.run(pre_task_fn_wrapper=...)`&quot;&quot;&quot;</span>
+<span class="sd">        function. This behavior can be modified by `self.run(pre_task_fn_wrapper=...)`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="BaseWorkflow.task"><a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.BaseWorkflow.html#rai_toolbox.mushin.BaseWorkflow.task">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">task</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
@@ -1316,7 +1316,6 @@
 
             <span class="n">k_coords</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">orig_coords</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">datum</span><span class="o">.</span><span class="n">ndim</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">orig_coords</span><span class="p">)):</span>
-
                 <span class="k">if</span> <span class="n">coord_from_metrics</span> <span class="ow">and</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">metric_coords</span><span class="p">):</span>
                     <span class="c1"># Assume the first coordinate of the metric is the metric coordinate dimension</span>
                     <span class="n">k_coords</span> <span class="o">+=</span> <span class="nb">list</span><span class="p">(</span><span class="n">metric_coords</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
@@ -1342,7 +1341,6 @@
                         <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">v</span><span class="p">)))</span> <span class="o">&gt;</span> <span class="mi">1</span>
                         <span class="ow">or</span> <span class="n">non_multirun_params_as_singleton_dims</span>
                     <span class="p">):</span>
-
                         <span class="n">coords</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
                             <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_JOBDIR_NAME</span><span class="p">],</span>
                             <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_sanitize_coordinate_for_xarray</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">v</span><span class="p">],</span>

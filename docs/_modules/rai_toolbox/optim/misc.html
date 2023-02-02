@@ -522,7 +522,6 @@
         <span class="n">generator</span><span class="p">:</span> <span class="n">Generator</span> <span class="o">=</span> <span class="n">default_generator</span><span class="p">,</span>
         <span class="o">**</span><span class="n">inner_opt_kwargs</span><span class="p">,</span>
     <span class="p">):</span>
-
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -682,7 +681,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_generator</span> <span class="o">=</span> <span class="n">value_check</span><span class="p">(</span><span class="s2">&quot;generator&quot;</span><span class="p">,</span> <span class="n">generator</span><span class="p">,</span> <span class="n">type_</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">Generator</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_pre_step_transform_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">optim_group</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-
         <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">grad</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
             <span class="k">return</span>
 
