@@ -203,7 +203,6 @@ class BaseWorkflow:
         {'foo': ['val'], 'bar': multirun(['a', 'b']), 'apple': 1}
         """
         if not self._multirun_task_overrides:
-
             overrides = load_from_yaml(
                 self.working_dir / "multirun.yaml"
             ).hydra.overrides.task
@@ -226,7 +225,8 @@ class BaseWorkflow:
         This function is automatically wrapped by `zen`, which is responsible
         for parsing the function's signature and then extracting and instantiating
         the corresponding fields from a Hydra config object – passing them to the
-        function. This behavior can be modified by `self.run(pre_task_fn_wrapper=...)`"""
+        function. This behavior can be modified by `self.run(pre_task_fn_wrapper=...)`
+        """
 
     @staticmethod
     def task(*args: Any, **kwargs: Any) -> Any:
@@ -980,7 +980,6 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
 
             k_coords = list(orig_coords)
             for n in range(datum.ndim - len(orig_coords)):
-
                 if coord_from_metrics and n < len(metric_coords):
                     # Assume the first coordinate of the metric is the metric coordinate dimension
                     k_coords += list(metric_coords.keys())
@@ -1006,7 +1005,6 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
                         len(set(np.unique(v))) > 1
                         or non_multirun_params_as_singleton_dims
                     ):
-
                         coords[k] = (
                             [self._JOBDIR_NAME],
                             [self._sanitize_coordinate_for_xarray(item) for item in v],

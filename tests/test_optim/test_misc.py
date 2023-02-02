@@ -92,7 +92,6 @@ def test_top_q_grad(q):
 
 @pytest.mark.parametrize("generator_device", avail_devices)
 def test_top_q_grad_generator(generator_device):
-
     seed = 15873642
     Optim = partial(
         TopQGradientOptimizer,

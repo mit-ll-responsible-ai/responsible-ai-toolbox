@@ -63,7 +63,6 @@ def imshow(
 
 
 def plot_heatmaps(results: Dict[str, Any]):
-
     heatmaps = {}
     for metric_name, metrics in results.items():
         heatmap = np.zeros((32, 32))
