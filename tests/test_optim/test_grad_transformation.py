@@ -148,7 +148,7 @@ def test_optimizers_descend_quadratic_curve(
 
     trail = [x.item()]
     for _ in range(100):
-        optimizer.step(closure)  # type: ignore
+        optimizer.step(closure)  # pyright: ignore
         trail.append(x.item())
     assert abs(x.item()) < 0.01, (optimizer, trail[::10])
     assert x.grad is not None
@@ -164,7 +164,7 @@ def test_lp_optimizer_uses_correct_norms(p: float, max_norm: float):
     optim = MyLpOpt([x.clone()], SGD, lr=0.1)
 
     # ensure per-datum norm is as-expected
-    assert tr.allclose(optim.per_datum_norm(x), tr.norm(x, p=p, dim=1))  # type: ignore
+    assert tr.allclose(optim.per_datum_norm(x), tr.norm(x, p=p, dim=1))
 
 
 x = tr.tensor([[1.0]])
@@ -444,7 +444,7 @@ def test_lp_fw_constraint_sets(
     # Ensure step is performed in same direction as initial displacement
     assert tr.all(tr.einsum("nd,nd", x, orig) > 0.0)
     # Ensure result of step resides on Lp-ball
-    assert tr.allclose(tr.norm(x, p=p, dim=1), tr.tensor(epsilon))  # type: ignore
+    assert tr.allclose(tr.norm(x, p=p, dim=1), tr.tensor(epsilon))
 
 
 @pytest.mark.parametrize(
@@ -512,7 +512,7 @@ def test_l2_normed_grad_for_arbitrary_param_ndim(param, data: st.DataObject):
     optimizer.step()
 
     if param_ndim is None or param_ndim == x.ndim:
-        assert_close(tr.norm(x.grad, p=2).item(), 1.0)  # type: ignore
+        assert_close(tr.norm(x.grad, p=2).item(), 1.0)
         return
 
     if param_ndim < 0:
@@ -529,7 +529,7 @@ def test_l2_normed_grad_for_arbitrary_param_ndim(param, data: st.DataObject):
     # Reshapes to (N, D) where D is the size of the trailing `param_ndim`
     # dimensions. Each D-dim vector should have been normalized by the optimizer
     x_grad = x.grad.view(-1, *x.grad.shape[-param_ndim:]).flatten(1)
-    norms = tr.norm(x_grad, p=2, dim=1)  # type: ignore
+    norms = tr.norm(x_grad, p=2, dim=1)
     assert_close(norms, tr.ones_like(norms))
 
 
