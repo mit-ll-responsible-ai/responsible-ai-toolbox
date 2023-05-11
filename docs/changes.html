@@ -342,12 +342,8 @@
 <h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this heading">#</a></h1>
 <p>This is a record of all past rAI-toolbox releases and what went into them, in reverse
 chronological order. All previous releases should still be available on pip.</p>
-<section id="xx-xx">
-<span id="v0-3-0"></span><h2>0.3.0 - 2023-XX-XX<a class="headerlink" href="#xx-xx" title="Permalink to this heading">#</a></h2>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>This is documentation for an unreleased version of the rai-toolbox.</p>
-</div>
+<section id="v0-3-0">
+<span id="id1"></span><h2>0.3.0 - 2023-05-11<a class="headerlink" href="#v0-3-0" title="Permalink to this heading">#</a></h2>
 <section id="improvements">
 <h3>Improvements<a class="headerlink" href="#improvements" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
@@ -381,7 +377,7 @@ chronological order. All previous releases should still be available on pip.</p>
 </section>
 </section>
 <section id="v0-2-1">
-<span id="id1"></span><h2>0.2.1 - 2022-06-16<a class="headerlink" href="#v0-2-1" title="Permalink to this heading">#</a></h2>
+<span id="id2"></span><h2>0.2.1 - 2022-06-16<a class="headerlink" href="#v0-2-1" title="Permalink to this heading">#</a></h2>
 <p>This patch fixes the following bugs:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">TopQGradient</span></code> device mismatch with user-specified RNG (see <a class="reference external" href="https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox/pull/64">pull request #64</a>)</p></li>
@@ -389,7 +385,7 @@ chronological order. All previous releases should still be available on pip.</p>
 </ul>
 </section>
 <section id="v0-2-0">
-<span id="id2"></span><h2>0.2.0 - 2022-06-01<a class="headerlink" href="#v0-2-0" title="Permalink to this heading">#</a></h2>
+<span id="id3"></span><h2>0.2.0 - 2022-06-01<a class="headerlink" href="#v0-2-0" title="Permalink to this heading">#</a></h2>
 <p>This release predominantly focuses on improvements to <a class="reference internal" href="generated/rai_toolbox.mushin.MultiRunMetricsWorkflow.html#rai_toolbox.mushin.MultiRunMetricsWorkflow" title="rai_toolbox.mushin.MultiRunMetricsWorkflow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rai_toolbox.mushin.MultiRunMetricsWorkflow</span></code></a>, which is still in early-beta and may be subject to substantial future changes</p>
 <section id="improvements-to-multirunmetricsworkflow">
 <h3>Improvements to <code class="xref py py-obj docutils literal notranslate"><span class="pre">MultiRunMetricsWorkflow</span></code><a class="headerlink" href="#improvements-to-multirunmetricsworkflow" title="Permalink to this heading">#</a></h3>
@@ -410,12 +406,12 @@ chronological order. All previous releases should still be available on pip.</p>
 <li><p>The project’s CI now has a nightly job that runs our test suite against pre-releases of its dependencies</p></li>
 </ul>
 </section>
-<section id="id3">
-<h3>Compatibility-Breaking changes<a class="headerlink" href="#id3" title="Permalink to this heading">#</a></h3>
+<section id="id4">
+<h3>Compatibility-Breaking changes<a class="headerlink" href="#id4" title="Permalink to this heading">#</a></h3>
 <p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rai_toolbox.mushin.hydra.launch</span></code> was removed. Use <code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra_zen.launch</span></code> instead.</p>
 </section>
-<section id="id4">
-<h3>Deprecations<a class="headerlink" href="#id4" title="Permalink to this heading">#</a></h3>
+<section id="id5">
+<h3>Deprecations<a class="headerlink" href="#id5" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">MultiRunMetricsWorkflow.evaluation_task</span></code> is deprecated in favor of <code class="xref py py-obj docutils literal notranslate"><span class="pre">MultiRunMetricsWorkflow.task</span></code>. It will be removed in rAI-toolbox v0.3.0. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox/pull/62">pull request #62</a>.</p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParamTransformingOptimizer.project</span></code> is now deprecated in favor of <code class="xref py py-obj docutils literal notranslate"><span class="pre">ParamTransformingOptimizer._post_step_transform_</span></code>. It will be removed in rAI-toolbox v0.3.0. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox/pull/54">pull request #54</a> and <a class="reference external" href="https://github.com/mit-ll-responsible-ai/responsible-ai-toolbox/pull/59">pull request #59</a> for details.</p></li>
@@ -423,7 +419,7 @@ chronological order. All previous releases should still be available on pip.</p>
 </section>
 </section>
 <section id="v0-1-1">
-<span id="id5"></span><h2>0.1.1 - 2022-05-10<a class="headerlink" href="#v0-1-1" title="Permalink to this heading">#</a></h2>
+<span id="id6"></span><h2>0.1.1 - 2022-05-10<a class="headerlink" href="#v0-1-1" title="Permalink to this heading">#</a></h2>
 <p>This patch fixes two bugs in <code class="docutils literal notranslate"><span class="pre">rai_toolbox.perturbations.init</span></code>:</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="generated/rai_toolbox.perturbations.uniform_like_l1_n_ball_.html#rai_toolbox.perturbations.uniform_like_l1_n_ball_" title="rai_toolbox.perturbations.uniform_like_l1_n_ball_"><code class="xref py py-obj docutils literal notranslate"><span class="pre">uniform_like_l1_n_ball_</span></code></a> was not correctly symmeterized; the drawn values only had components in the direction of the positive hemisphere of the <span class="math notranslate nohighlight">\(L^1\)</span> ball.</p></li>
@@ -431,7 +427,7 @@ chronological order. All previous releases should still be available on pip.</p>
 </ul>
 </section>
 <section id="v0-1-0">
-<span id="id6"></span><h2>0.1.0 - 2022-05-04<a class="headerlink" href="#v0-1-0" title="Permalink to this heading">#</a></h2>
+<span id="id7"></span><h2>0.1.0 - 2022-05-04<a class="headerlink" href="#v0-1-0" title="Permalink to this heading">#</a></h2>
 <p>This is rAI-toolbox’s first stable release on PyPI! Please check out the rest of our
 docs to see what the toolbox has to offer.</p>
 <p>We plan to have an aggressive release schedule for compatibility-preserving patches of
@@ -473,8 +469,8 @@ significant changes in future releases are documented as such.</p>
 <nav id="bd-toc-nav" class="page-toc">
     <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#xx-xx">
-   0.3.0 - 2023-XX-XX
+  <a class="reference internal nav-link" href="#v0-3-0">
+   0.3.0 - 2023-05-11
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
@@ -520,12 +516,12 @@ significant changes in future releases are documented as such.</p>
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#id3">
+    <a class="reference internal nav-link" href="#id4">
      Compatibility-Breaking changes
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#id4">
+    <a class="reference internal nav-link" href="#id5">
      Deprecations
     </a>
    </li>

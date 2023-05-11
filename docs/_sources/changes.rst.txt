@@ -11,10 +11,8 @@ chronological order. All previous releases should still be available on pip.
 .. _v0.3.0:
 
 ------------------
-0.3.0 - 2023-XX-XX
+0.3.0 - 2023-05-11
 ------------------
-
-.. note:: This is documentation for an unreleased version of the rai-toolbox.
 
 Improvements
 ------------
