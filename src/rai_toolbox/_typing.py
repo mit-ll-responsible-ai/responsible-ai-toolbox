@@ -13,11 +13,9 @@ from typing import (
     Iterable,
     Mapping,
     Optional,
-    Sequence,
     Type,
     TypeVar,
     Union,
-    overload,
 )
 
 import numpy as np
@@ -137,20 +135,6 @@ Scalar = Union[
 ]
 
 
-class _SupportsArray(Protocol):  # pragma: no cover
-    @overload
-    def __array__(self, __dtype: Any = ...) -> np.ndarray:  # type: ignore
+class ArrayLike(Protocol):
+    def __array__(self, dtype: Any = ...) -> Any:
         ...
-
-    @overload
-    def __array__(self, dtype: Any = ...) -> np.ndarray:  # type: ignore
-        ...
-
-
-# mypy doesn't support recursive types
-ArrayLike = Union[
-    Scalar,
-    Sequence[Scalar],
-    Sequence[Sequence[Any]],
-    _SupportsArray,
-]
