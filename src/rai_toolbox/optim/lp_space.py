@@ -126,7 +126,7 @@ class _LpNormOptimizer(ParamTransformingOptimizer):
         return self._p
 
     def per_datum_norm(self, x: torch.Tensor) -> torch.Tensor:
-        return torch.norm(x, p=self.p, dim=1)  # type: ignore
+        return torch.norm(x, p=self.p, dim=1)
 
     def _pre_step_transform_(self, param: Tensor, **_unused_kwargs) -> None:
         if param.grad is None:  # pragma: no cover

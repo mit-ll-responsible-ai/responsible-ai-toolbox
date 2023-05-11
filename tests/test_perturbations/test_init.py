@@ -38,7 +38,7 @@ def test_uniform_like_l2_n_ball(dshape, param_ndim):
     n, d = samples.shape
     assert tr.allclose(samples.mean(dim=0), tr.tensor(0.0), atol=0.1)
 
-    norms = tr.norm(samples, p=2, dim=1)  # type: ignore
+    norms = tr.norm(samples, p=2, dim=1)
     assert tr.all(norms >= 0)
     assert tr.all(norms <= 1)
 
@@ -63,7 +63,7 @@ def test_uniform_like_l1_n_ball(dshape):
     # This ensures that all points fall within the simplex
     assert tr.all(samples.abs().sum(1) <= 1)
 
-    norms = tr.norm(samples, p=1, dim=1)  # type: ignore
+    norms = tr.norm(samples, p=1, dim=1)
     assert tr.all(norms >= 0)
     assert tr.all(norms <= 1)
 

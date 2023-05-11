@@ -226,7 +226,7 @@ def gradient_ascent(
         criterion = negate(criterion)
 
     if instantiates_to(perturbation_model, PerturbationModel):
-        pmodel = perturbation_model(data)  # type: ignore
+        pmodel = perturbation_model(data)
     else:
         if not isinstance(perturbation_model, PerturbationModel):
             raise TypeError(
