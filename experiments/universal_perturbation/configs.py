@@ -119,7 +119,7 @@ Solver = builds(
 
 Trainer = builds(
     pl.Trainer,
-    gpus="${gpus}",
+    devices="${gpus}",
     max_epochs="${max_epochs}",
     accelerator="gpu",
     strategy=builds(HydraDDP),
@@ -162,7 +162,7 @@ DatasetCfg = make_config(
 
 ModelCfg = make_config(ckpt="mitll_cifar_l2_1_0", model=CIFARModel)
 SolverCfg = make_config(lr=0.1, epsilon=0.0, init_fn=None, module=Solver)
-TrainerCfg = make_config(max_epochs=40, gpus=2, trainer=Trainer)
+TrainerCfg = make_config(max_epochs=40, devices=2, trainer=Trainer)
 Config = make_config(
     defaults=[
         "_self_",
