@@ -189,7 +189,7 @@ def uniform_like_l2_n_ball_(
 
     z = torch.empty((nbatch, ndim + 2), dtype=xflat.dtype, device=generator.device)
     z.normal_(generator=generator)
-    r = z.norm(p=2, dim=1, keepdim=True)  # type: ignore
+    r = z.norm(p=2, dim=1, keepdim=True)
     x.copy_(epsilon * (z / r)[:, :ndim].reshape(x.shape))
 
 

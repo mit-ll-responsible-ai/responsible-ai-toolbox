@@ -2,7 +2,7 @@
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 
-from collections import UserList, defaultdict
+from collections import defaultdict
 from inspect import getattr_static
 from pathlib import Path
 from typing import (
@@ -25,7 +25,7 @@ import numpy as np
 import torch as tr
 from hydra.core.override_parser.overrides_parser import OverridesParser
 from hydra.core.utils import JobReturn
-from hydra_zen import launch, load_from_yaml, make_config, zen
+from hydra_zen import hydra_list, launch, load_from_yaml, make_config, multirun, zen
 from hydra_zen._compatibility import HYDRA_VERSION
 from hydra_zen._launch import _NotSet
 from typing_extensions import Self, TypeAlias, TypeGuard
@@ -38,8 +38,6 @@ __all__ = [
     "BaseWorkflow",
     "RobustnessCurve",
     "MultiRunMetricsWorkflow",
-    "multirun",
-    "hydra_list",
 ]
 
 
@@ -48,15 +46,6 @@ T1 = TypeVar("T1")
 
 
 _VERSION_BASE_DEFAULT = _NotSet if HYDRA_VERSION < (1, 2, 0) else "1.1"
-
-
-class multirun(UserList):
-    """Signals that a sequence is to be iterated over in a multirun"""
-
-
-class hydra_list(UserList):
-    """Signals that a sequence is provided as a single configured value (i.e. it is not
-    to be iterated over during a multirun)"""
 
 
 def _sort_x_by_k(x: T, k: Iterable[Any]) -> T:
