@@ -32,10 +32,9 @@ from typing import (
     List,
     Optional,
     Tuple,
-    cast,
     Union,
+    cast,
 )
-from typing_extensions import Self
 
 import torch as tr
 import torch.distributed as dist
@@ -45,7 +44,7 @@ from torch.utils.data.distributed import DistributedSampler
 from torchmetrics.classification import MulticlassAccuracy
 from torchvision import datasets, transforms
 from tqdm.auto import tqdm
-from typing_extensions import Protocol, TypedDict
+from typing_extensions import Protocol, Self, TypedDict
 
 from rai_experiments.models.pretrained import _MODEL_NAMES, load_model
 from rai_toolbox import evaluating
@@ -166,6 +165,8 @@ def adversarial_attack_l2(
         Maximum perturbation norm. Default: 0.0.
     lr : float, optional
         Learning rate. Default: 1.0.
+    **kwargs : Any
+        Additional keyword arguments for `gradient_ascent`.
 
     Returns
     -------
@@ -211,7 +212,7 @@ def evaluate(
         Dataset to evaluate on.
     perturbation : Perturbation
         Perturbation to apply to the data.
-    device : str, optional
+    device : int | str
         Device to use. Default: `cpu`.
     **kwargs : Any
         Keyword arguments to pass to the perturbation.
@@ -233,10 +234,11 @@ def evaluate(
 
     accuracy = MulticlassAccuracy(num_classes=10)
     accuracy.to(device)
-    from tqdm.auto import tqdm
 
-    for batch in tqdm(data):
-        batch = {k: v.to(device=device) for k, v in batch.items() if isinstance(v, Tensor)}
+    for batch in data:
+        batch = {
+            k: v.to(device=device) for k, v in batch.items() if isinstance(v, Tensor)
+        }
 
         if TYPE_CHECKING:
             assert isinstance(model, tr.nn.Module)
@@ -269,6 +271,10 @@ def main(
         Number of examples to evaluate on. Default: 100.
     epsilons : List[float]
         List of perturbation norms to evaluate. Default: [0.001, 0.25, 0.5, 1.0, 2.0].
+    steps : int
+        Number of steps to run the attack. Default: 20.
+    batch_size : int
+        Batch size. Default: 32.
     """
     model = load_model(model_info["ckpt"])
     dataset = load_cifar10(num_examples, batch_size=batch_size)
@@ -284,7 +290,7 @@ def main(
             device = tr.device(f"cuda:{local_rank}")
             world_size = dist.get_world_size()
             print(
-                f"**** Intializing Torch Distributed {local_rank + 1} / {world_size} ****"
+                f"**** Intializing Torch Distributed: {local_rank} / {world_size} (Local Rank / World Size) ****"
             )
 
     if TYPE_CHECKING:
