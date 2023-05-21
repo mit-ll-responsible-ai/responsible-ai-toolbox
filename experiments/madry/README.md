@@ -29,23 +29,24 @@ Experiment Configurations:
 1. CPU (single process)
 
 ```bash
-$ python reproduce_table.py +experiment=standard_fast
+$ python madry.py +experiment=standard_fast
 standard [tensor(0.9570), tensor(0.1063), tensor(0.0216), tensor(0.), tensor(0.)]
 
-$ python reproduce_table.py +experiment=robust_fast
+$ python madry.py +experiment=robust_fast
 robust [tensor(0.8251), tensor(0.7855), tensor(0.6789), tensor(0.4522), tensor(0.1719)]
 ```
 
 2. Torch Distributed (2 GPU)
 
 ```bash
-$ torchrun --nproc_per_node=2 reproduce_table.py +experiment=standard_fast
-standard [tensor(0.9570), tensor(0.1063), tensor(0.0216), tensor(0.), tensor(0.)]
+$ torchrun --nproc_per_node=2 madry.py +experiment=standard_fast
+standard [tensor(0.9570, device='cuda:0'), tensor(0.0895, device='cuda:0'), tensor(0.0091, device='cuda:0'), tensor(0., device='cuda:0'), tensor(0., device='cuda:0')]
 
-$ torchrun --nproc_per_node=2 reproduce_table.py +experiment=standard_fast
+$ torchrun --nproc_per_node=2 madry.py +experiment=standard_fast
+robust [tensor(0.8251, device='cuda:0'), tensor(0.7855, device='cuda:0'), tensor(0.6726, device='cuda:0'), tensor(0.4431, device='cuda:0'), tensor(0.1719, device='cuda:0')]
 ```
 
-#### Results (TODO: Haven't ran full dataset yet)
+#### Results
 
 |Test-eps | Expected | rai_toolbox    |
 |---------|----------|----------------|

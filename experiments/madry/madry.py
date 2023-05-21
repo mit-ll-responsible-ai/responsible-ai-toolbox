@@ -8,17 +8,17 @@ Experiment Configurations:
     - robust_fast: adversarial training with only 100 examples
 
 1. CPU (single process)
-$ python reproduce_table.py +experiment=standard_fast
+$ python madry.py +experiment=standard_fast
 standard [tensor(0.9570), tensor(0.1063), tensor(0.0216), tensor(0.), tensor(0.)]
 
-$ python reproduce_table.py +experiment=robust_fast
+$ python madry.py +experiment=robust_fast
 robust [tensor(0.8251), tensor(0.7855), tensor(0.6789), tensor(0.4522), tensor(0.1719)]
 
 2. Torch Distributed (2 GPU)
-$ torchrun --nproc_per_node=2 reproduce_table.py +experiment=standard_fast
+$ torchrun --nproc_per_node=2 madry.py +experiment=standard_fast
 standard [tensor(0.9570), tensor(0.1063), tensor(0.0216), tensor(0.), tensor(0.)]
 
-$ torchrun --nproc_per_node=2 reproduce_table.py +experiment=standard_fast
+$ torchrun --nproc_per_node=2 madry.py +experiment=standard_fast
 robust [tensor(0.8251), tensor(0.7855), tensor(0.6789), tensor(0.4522), tensor(0.1719)]
 """
 
@@ -33,7 +33,9 @@ from typing import (
     Optional,
     Tuple,
     cast,
+    Union,
 )
+from typing_extensions import Self
 
 import torch as tr
 import torch.distributed as dist
@@ -63,7 +65,7 @@ class ImageClassificationData(TypedDict):
 class ImageClassifier(Protocol):
     """Protocol for image classifiers."""
 
-    def to(self, device: int | str | tr.device) -> None:
+    def to(self, device: Optional[Union[int, tr.device]] = ...) -> Self:
         """Move the model to a device."""
         ...
 
@@ -195,7 +197,7 @@ def evaluate(
     model: ImageClassifier,
     data: Iterable[ImageClassificationData],
     perturbation: Perturbation,
-    device: str = "cpu",
+    device: Union[int, tr.device] = tr.device("cpu"),
     **kwargs,
 ):
     """
@@ -226,10 +228,15 @@ def evaluate(
     """
     model.to(device)
 
+    if dist.is_initialized():
+        model = tr.nn.parallel.DistributedDataParallel(model)
+
     accuracy = MulticlassAccuracy(num_classes=10)
     accuracy.to(device)
-    for batch in data:
-        batch = {k: v.to(device) for k, v in batch.items()}
+    from tqdm.auto import tqdm
+
+    for batch in tqdm(data):
+        batch = {k: v.to(device=device) for k, v in batch.items() if isinstance(v, Tensor)}
 
         if TYPE_CHECKING:
             assert isinstance(model, tr.nn.Module)
@@ -241,13 +248,15 @@ def evaluate(
             logits = model(batch["image"])
             accuracy.update(logits, batch["label"])
 
-    return accuracy.compute()
+    return accuracy.compute().item()
 
 
 def main(
     model_info: Dict[str, _MODEL_NAMES],
     num_examples: int = 100,
     epsilons: List[float] = [0.001, 0.25, 0.5, 1.0, 2.0],
+    steps: int = 20,
+    batch_size: int = 32,
 ):
     """
     Calculate the accuracy of a model on CIFAR10 against a perturbation.
@@ -262,27 +271,25 @@ def main(
         List of perturbation norms to evaluate. Default: [0.001, 0.25, 0.5, 1.0, 2.0].
     """
     model = load_model(model_info["ckpt"])
-    dataset = load_cifar10(num_examples)
+    dataset = load_cifar10(num_examples, batch_size=batch_size)
 
     local_rank = os.environ.get("LOCAL_RANK", None)
-    device = "cpu"
+    device = tr.device("cpu")
 
     if local_rank is not None:
         local_rank = int(local_rank)
 
         if tr.cuda.is_available():
             dist.init_process_group(backend="nccl")
-            device = f"cuda:{local_rank}"
+            device = tr.device(f"cuda:{local_rank}")
             world_size = dist.get_world_size()
             print(
-                f"**** Intializing Torch Distributed {local_rank} / {world_size} ****"
+                f"**** Intializing Torch Distributed {local_rank + 1} / {world_size} ****"
             )
-            model = tr.nn.parallel.DistributedDataParallel(model)
 
     if TYPE_CHECKING:
         assert isinstance(model, ImageClassifier)
 
-    steps = 20
     result = [
         evaluate(
             model,
@@ -302,13 +309,13 @@ if __name__ == "__main__":
     import hydra_zen
 
     hydra_zen.store(
-        hydra_zen.make_config(ckpt="mitll_cifar_nat.pt", name="standard"),
+        hydra_zen.builds(dict, ckpt="mitll_cifar_nat.pt", name="standard"),
         group="model_info",
         name="standard",
     )
 
     hydra_zen.store(
-        hydra_zen.make_config(ckpt="mitll_cifar_l2_1_0.pt", name="robust"),
+        hydra_zen.builds(dict, ckpt="mitll_cifar_l2_1_0.pt", name="robust"),
         group="model_info",
         name="robust",
     )
@@ -317,6 +324,7 @@ if __name__ == "__main__":
         hydra_defaults=["_self_", {"model_info": "standard"}],
         model_info=hydra_zen.MISSING,
         num_examples=100,
+        batch_size=64,
     )
     hydra_zen.store(Config, name="config")
 
@@ -355,4 +363,6 @@ if __name__ == "__main__":
     )
 
     hydra_zen.store.add_to_hydra_store()
-    hydra_zen.zen(main).hydra_main(config_path=None, config_name="config", version_base="1.3")
+    hydra_zen.zen(main).hydra_main(
+        config_path=None, config_name="config", version_base="1.3"
+    )
