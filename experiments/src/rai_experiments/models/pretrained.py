@@ -72,7 +72,7 @@ def get_path_to_checkpoint(model_name: _MODEL_NAMES) -> str:
     return _pre_trained_manager.fetch(model_name, progressbar=(tqdm is not None))
 
 
-def load_model(model_name: _MODEL_NAMES):
+def load_model(model_name: _MODEL_NAMES, **model_kwargs):
     r"""
     Loads pre-trained model weights. This function takes care of downloading and caching
     weights.
@@ -140,7 +140,7 @@ def load_model(model_name: _MODEL_NAMES):
         )
 
     base_model = load_from_checkpoint(
-        model=model(),
+        model=model(**model_kwargs),
         ckpt=get_path_to_checkpoint(model_name),
         weights_key="state_dict" if model_name != "imagenet_nat.pt" else "model",
     )
