@@ -20,6 +20,12 @@ standard [tensor(0.9570), tensor(0.1063), tensor(0.0216), tensor(0.), tensor(0.)
 
 $ torchrun --nproc_per_node=2 madry.py +experiment=standard_fast
 robust [tensor(0.8251), tensor(0.7855), tensor(0.6789), tensor(0.4522), tensor(0.1719)]
+
+3. Run multiple experiments (2 GPU)
+torchrun --nproc_per_node=2 madry.py +experiment=robust,standard --multirun
+
+4. Run multiple experiments (2 GPU) with different seeds
+torchrun --nproc_per_node=2 madry.py +experiment=robust,standard --multirun --seed=1,2
 """
 
 import os
@@ -32,7 +38,6 @@ from typing import (
     List,
     Optional,
     Tuple,
-    Union,
     cast,
 )
 
@@ -64,7 +69,7 @@ class ImageClassificationData(TypedDict):
 class ImageClassifier(Protocol):
     """Protocol for image classifiers."""
 
-    def to(self, device: Optional[Union[int, tr.device]] = ...) -> Self:
+    def to(self, device: Optional[tr.device] = ...) -> Self:
         """Move the model to a device."""
         ...
 
@@ -131,6 +136,7 @@ def load_cifar10(
 
     sampler = None
     if dist.is_initialized():
+        print("*** Using DistributedSampler ***")
         sampler = DistributedSampler(dataset)
 
     return DataLoader(
@@ -198,7 +204,7 @@ def evaluate(
     model: ImageClassifier,
     data: Iterable[ImageClassificationData],
     perturbation: Perturbation,
-    device: Union[int, tr.device] = tr.device("cpu"),
+    device: tr.device = tr.device("cpu"),
     **kwargs,
 ):
     """
@@ -234,6 +240,7 @@ def evaluate(
 
     accuracy = MulticlassAccuracy(num_classes=10)
     accuracy.to(device)
+    accuracy.reset()
 
     for batch in data:
         batch = {
@@ -276,9 +283,6 @@ def main(
     batch_size : int
         Batch size. Default: 32.
     """
-    model = load_model(model_info["ckpt"])
-    dataset = load_cifar10(num_examples, batch_size=batch_size)
-
     local_rank = os.environ.get("LOCAL_RANK", None)
     device = tr.device("cpu")
 
@@ -286,16 +290,27 @@ def main(
         local_rank = int(local_rank)
 
         if tr.cuda.is_available():
-            dist.init_process_group(backend="nccl")
-            device = tr.device(f"cuda:{local_rank}")
-            world_size = dist.get_world_size()
-            print(
-                f"**** Intializing Torch Distributed: {local_rank} / {world_size} (Local Rank / World Size) ****"
-            )
+            if not dist.is_initialized():
+                dist.init_process_group(backend="nccl")
+                device = tr.device(f"cuda:{local_rank}")
+                world_size = dist.get_world_size()
+                print(
+                    f"**** Intializing Torch Distributed: {local_rank} / {world_size} (Local Rank / World Size) ****"
+                )
+            else:
+                world_size = dist.get_world_size()
+                device = tr.device(f"cuda:{local_rank}")
+                print(
+                    f"**** Using Existing Torch Distributed: {local_rank} / {world_size} (Local Rank / World Size) ****"
+                )
 
-    if TYPE_CHECKING:
-        assert isinstance(model, ImageClassifier)
+    elif tr.cuda.is_available():
+        device = tr.device("cuda")
 
+    model = load_model(model_info["ckpt"])
+    dataset = load_cifar10(num_examples, batch_size=batch_size)
+
+    iterator = tqdm(epsilons) if local_rank in (0, None) else epsilons
     result = [
         evaluate(
             model,
@@ -306,14 +321,33 @@ def main(
             steps=steps,
             lr=2.5 * e / steps,
         )
-        for e in tqdm(epsilons)
+        for e in iterator
     ]
-    print(model_info["name"], result)
+
+    if local_rank in (0, None):
+        print(model_info["name"], result)
 
 
 if __name__ == "__main__":
     import hydra_zen
+    from hydra.conf import HydraConf, JobConf, RunDir, SweepDir
 
+    # Define hydra directories
+    # --- We define a seperate directory for each rank to demonstrate both processes running.
+    # --- You do not need to do this in your own code, the logs will show both processes running.
+    local_rank = os.environ.get("LOCAL_RANK", None)
+    hydra_zen.store(
+        HydraConf(
+            job=JobConf(chdir=True),
+            run=RunDir("outputs/${now:%Y-%m-%d-%H-%M-%S}" + f"/rank_{local_rank}"),
+            sweep=SweepDir(
+                dir="multirun/${now:%Y-%m-%d-%H-%M-%S}",
+                subdir="${hydra.job.id}" + f"/rank_{local_rank}",
+            ),
+        )
+    )
+
+    # Configure experiments
     hydra_zen.store(
         hydra_zen.builds(dict, ckpt="mitll_cifar_nat.pt", name="standard"),
         group="model_info",
@@ -334,6 +368,9 @@ if __name__ == "__main__":
     )
     hydra_zen.store(Config, name="config")
 
+    # Define experiments
+    # --- We define a seperate experiment store both standard and robust models
+    # --- while also providing fast versions of each for testing.
     experiment_store = hydra_zen.store(group="experiment", package="_global_")
     experiment_store(
         hydra_zen.make_config(
