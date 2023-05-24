@@ -234,5 +234,4 @@ commands =
    pytest experiments/adversarial_training/test_experiment.py
    pytest experiments/madry/test_experiment.py
    pytest experiments/universal_perturbation/test_experiment.py
-   pytest experiments/xai/test_experiment.py
 """
