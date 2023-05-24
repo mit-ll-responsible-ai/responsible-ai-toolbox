@@ -30,23 +30,36 @@ Experiment Configurations:
 
 ```bash
 $ python madry.py +experiment=standard_fast
-standard [tensor(0.9570), tensor(0.1063), tensor(0.0216), tensor(0.), tensor(0.)]
+standard [0.9570, 0.1063, 0.0216, 0., 0.]
 
 $ python madry.py +experiment=robust_fast
-robust [tensor(0.8251), tensor(0.7855), tensor(0.6789), tensor(0.4522), tensor(0.1719)]
+robust [0.8251, 0.7855, 0.6789, 0.4522, 0.1719]
 ```
 
 2. Torch Distributed (2 GPU)
 
 ```bash
 $ torchrun --nproc_per_node=2 madry.py +experiment=standard_fast
-standard [tensor(0.9570, device='cuda:0'), tensor(0.0895, device='cuda:0'), tensor(0.0091, device='cuda:0'), tensor(0., device='cuda:0'), tensor(0., device='cuda:0')]
+standard [0.9570, 0.0895, 0.0091, 0., 0.]
 
 $ torchrun --nproc_per_node=2 madry.py +experiment=standard_fast
-robust [tensor(0.8251, device='cuda:0'), tensor(0.7855, device='cuda:0'), tensor(0.6726, device='cuda:0'), tensor(0.4431, device='cuda:0'), tensor(0.1719, device='cuda:0')]
+robust [0.8251, 0.7855, 0.6726, 0.4431, 0.1719]
 ```
 
+3. Multiple Experiments (2 GPU)
+
+```bash
+$ torchrun --nproc_per_node=2 madry.py +experiment=robust,standard --multirun
+[2023-05-24 16:27:48,649][HYDRA] Launching 2 jobs locally
+[2023-05-24 16:27:48,649][HYDRA]        #0 : +experiment=robust
+robust [0.8158999681472778, 0.7568999528884888, 0.6894999742507935, 0.5347999334335327, 0.19189998507499695]
+
+[2023-05-24 16:28:00,911][HYDRA]        #1 : +experiment=standard
+standard [0.950700044631958, 0.09849999845027924, 0.002500000176951289, 0.0, 0.0]
+```
 #### Results
+
+Here are the results from the Madry Lab's Robustness Toolbox and the results from this experiment.
 
 |Test-eps | Expected | rai_toolbox    |
 |---------|----------|----------------|
