@@ -96,7 +96,7 @@ We will use an `SGD` step with `lr=0.1` and a momentum of 0.9; we pick :math:`\e
    )
 
 .. code-block:: pycon
-   :caption: Inspecting the optmizer
+   :caption: Inspecting the optimizer
    
    >>> optim
    L2ProjectedOptim [SGD](
