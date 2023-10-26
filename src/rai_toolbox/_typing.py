@@ -5,18 +5,7 @@
 # pyright: strict
 import functools
 import inspect
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    Generic,
-    Iterable,
-    Mapping,
-    Optional,
-    Type,
-    TypeVar,
-    Union,
-)
+from typing import Any, Callable, Dict, Generic, Iterable, Mapping, Type, TypeVar, Union
 
 import numpy as np
 from torch import Tensor
@@ -64,7 +53,8 @@ class Optimizer(Protocol):  # pragma: no cover
         # - torch <1.12 annotates `set_to_none: Optional[bool]`
         ...
 
-    def step(self, closure: Optional[Callable[[], Any]] = None) -> Optional[Any]:
+    # def step(self, closure: Optional[Callable[[], float]] = None) -> Optional[float]:
+    def step(self, closure: Any = None) -> Any:
         ...
 
     def add_param_group(self, param_group: Any) -> None:
@@ -81,7 +71,7 @@ OptimizerType: TypeAlias = Callable[..., Optimizer]
 OptimParams = Union[Iterable[Tensor], Iterable[Parameter], Iterable[ParamGroup]]
 
 
-InstantiatesTo = Union[Type[T_co], Partial[T_co]]
+InstantiatesTo = Callable[..., T]
 
 
 def _is_protocol(cls: Any) -> bool:

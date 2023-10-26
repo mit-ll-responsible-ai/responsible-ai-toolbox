@@ -191,7 +191,7 @@ extras =
 deps = 
     --requirement deps/requirements-pyright.txt
 basepython = python3.9
-commands = pyright --lib tests/ src/
+commands = pyright tests/ src/
 
 
 [testenv:auto-format]

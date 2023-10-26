@@ -15,9 +15,6 @@ from typing_extensions import Protocol, runtime_checkable
 class PerturbationModel(Protocol):
     """Protocol for Perturbation Models."""
 
-    def __init__(self, *args, **kwargs) -> None:  # pragma: no cover
-        ...
-
     @abstractmethod
     def __call__(self, data: Tensor) -> Tensor:  # pragma: no cover
         """A perturbation model should take data as the input and output the
@@ -40,7 +37,7 @@ class PerturbationModel(Protocol):
         ...
 
 
-class AdditivePerturbation(nn.Module, PerturbationModel):
+class AdditivePerturbation(nn.Module):
     r"""Modifies a piece or batch of data by adding a perturbation: :math:`x \rightarrow x+\delta`.
 
 
