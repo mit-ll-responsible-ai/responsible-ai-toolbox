@@ -663,7 +663,7 @@ def test_grad_scale_and_bias(
         lr=1.0,
         param_ndim=None,
         defaults=defaults,
-        **kw,
+        **kw,  # type: ignore
     )
 
     (x1**2 + x2**2 + x3**2).sum().backward()
