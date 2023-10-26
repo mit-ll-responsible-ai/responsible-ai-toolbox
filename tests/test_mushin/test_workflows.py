@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 import string
 from pathlib import Path
-from typing import Optional, Sequence
+from typing import Any, Optional, Sequence
 
 import hypothesis.strategies as st
 import matplotlib.pyplot as plt
@@ -605,7 +605,7 @@ def test_overrides_roundtrip(
             pass
 
     wf = WorkFlow()
-    overrides = dict(
+    overrides: dict[str, Any] = dict(
         int_=int_,
         float_=float_,
         str_=str_,

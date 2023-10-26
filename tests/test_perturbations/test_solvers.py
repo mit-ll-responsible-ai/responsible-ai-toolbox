@@ -317,7 +317,7 @@ def test_various_forms_of_pert_model(pert_model, optim, x: float):
     if optim == "instance":
         if pert_model != "instance":
             pytest.skip("known invalid scenario")
-        kwargs = dict(optimizer=SGD(pert_model.parameters(), lr=1.0))
+        kwargs = dict(optimizer=SGD(pert_model.parameters(), lr=1.0))  # type: ignore
 
     else:
         kwargs = dict(optimizer=optim, lr=1.0)
@@ -328,7 +328,7 @@ def test_various_forms_of_pert_model(pert_model, optim, x: float):
         target=torch.tensor([0.0]),
         steps=1,
         criterion=lambda pred, target: (pred - target) ** 2,
-        perturbation_model=pert_model,
+        perturbation_model=pert_model,  # type: ignore
         **kwargs,  # type: ignore
     )
 
