@@ -575,6 +575,9 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
         task_fn_wrapper: Union[
             Callable[[Callable[..., T1]], Callable[[Any], T1]], None
         ] = zen,
+        pre_task_fn_wrapper: Union[
+            Callable[[Callable[..., None]], Callable[[Any], None]], None
+        ] = zen,
         working_dir: Optional[str] = None,
         sweeper: Optional[str] = None,
         launcher: Optional[str] = None,
@@ -606,11 +609,12 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
             workflow_overrides[self._JOBDIR_NAME] = target_job_dirs
 
         return super().run(
-            task_fn_wrapper=task_fn_wrapper,
             working_dir=working_dir,
             sweeper=sweeper,
             launcher=launcher,
             overrides=overrides,
+            task_fn_wrapper=task_fn_wrapper,
+            pre_task_fn_wrapper=pre_task_fn_wrapper,
             version_base=version_base,
             to_dictconfig=to_dictconfig,
             config_name=config_name,
@@ -1021,12 +1025,19 @@ class RobustnessCurve(MultiRunMetricsWorkflow):
         task_fn_wrapper: Union[
             Callable[[Callable[..., T1]], Callable[[Any], T1]], None
         ] = zen,
+        pre_task_fn_wrapper: Union[
+            Callable[[Callable[..., None]], Callable[[Any], None]], None
+        ] = zen,
         target_job_dirs: Optional[Sequence[Union[str, Path]]] = None,  # TODO: add docs
         version_base: Optional[Union[str, Type[_NotSet]]] = _VERSION_BASE_DEFAULT,
         working_dir: Optional[str] = None,
         sweeper: Optional[str] = None,
         launcher: Optional[str] = None,
         overrides: Optional[List[str]] = None,
+        to_dictconfig: bool = False,
+        config_name: str = "rai_workflow",
+        job_name: str = "rai_workflow",
+        with_log_configuration: bool = True,
         **workflow_overrides: Union[str, int, float, bool, multirun, hydra_list],
     ):
         """Run the experiment for varying value `epsilon`.
@@ -1072,11 +1083,16 @@ class RobustnessCurve(MultiRunMetricsWorkflow):
 
         return super().run(
             task_fn_wrapper=task_fn_wrapper,
+            pre_task_fn_wrapper=pre_task_fn_wrapper,
             working_dir=working_dir,
             sweeper=sweeper,
             launcher=launcher,
             version_base=version_base,
             overrides=overrides,
+            to_dictconfig=to_dictconfig,
+            config_name=config_name,
+            job_name=job_name,
+            with_log_configuration=with_log_configuration,
             **workflow_overrides,
             # for multiple multi-run params, epsilon should fastest-varying param;
             # i.e. epsilon should be the trailing dim in the multi-dim array of results

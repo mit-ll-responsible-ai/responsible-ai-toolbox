@@ -122,7 +122,7 @@ class FourierPerturbation(tr.nn.Module):
         if isinstance(size, (int, Number)):
             size = (int(size), int(size))
 
-        if not isinstance(norm_scale, (float, Number)):
+        if isinstance(norm_scale, tuple):
             lo, hi = norm_scale
             assert 0 <= lo <= hi, norm_scale
             self._norm_bnds = (lo, hi)
