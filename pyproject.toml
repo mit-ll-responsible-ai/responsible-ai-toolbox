@@ -165,7 +165,7 @@ commands = pytest -n auto --hypothesis-profile ci tests
 [testenv:coverage]
 setenv = NUMBA_DISABLE_JIT=1
 usedevelop = true
-basepython = python3.9
+basepython = python3.11
 extras = tests
          mushin
          datasets
