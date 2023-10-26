@@ -37,6 +37,7 @@ classifiers = [
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
     "Topic :: Scientific/Engineering",
     "Programming Language :: Python :: 3 :: Only",
 ]
@@ -126,13 +127,14 @@ filterwarnings = [
 legacy_tox_ini = """
 [tox]
 isolated_build = True
-envlist = py38, py39, py310
+envlist = py38, py39, py310, py311
 
 [gh-actions]
 python =
   3.8: py38
   3.9: py39
   3.10: py310
+  3.11: py311
 
 [testenv]
 deps = pytest
@@ -161,7 +163,7 @@ commands = pytest -n auto --hypothesis-profile ci tests
 [testenv:coverage]
 setenv = NUMBA_DISABLE_JIT=1
 usedevelop = true
-basepython = python3.9
+basepython = python3.11
 extras = tests
          mushin
          datasets

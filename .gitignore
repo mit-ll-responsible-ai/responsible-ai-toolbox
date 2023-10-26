@@ -147,3 +147,4 @@ cython_debug/
 
 scratch/
 **/_build/
+.DS_Store
