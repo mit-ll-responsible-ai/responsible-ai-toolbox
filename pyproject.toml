@@ -38,6 +38,7 @@ classifiers = [
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
     "Topic :: Scientific/Engineering",
     "Programming Language :: Python :: 3 :: Only",
 ]
@@ -127,7 +128,7 @@ filterwarnings = [
 legacy_tox_ini = """
 [tox]
 isolated_build = True
-envlist = py37, py38, py39, py310
+envlist = py37, py38, py39, py310, py311
 
 [gh-actions]
 python =
@@ -135,6 +136,7 @@ python =
   3.8: py38
   3.9: py39
   3.10: py310
+  3.11: py311
 
 [testenv]
 deps = pytest
