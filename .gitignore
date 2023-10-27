@@ -1,3 +1,5 @@
+src/rai_toolbox/_version.py
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -145,3 +147,4 @@ cython_debug/
 
 scratch/
 **/_build/
+.DS_Store

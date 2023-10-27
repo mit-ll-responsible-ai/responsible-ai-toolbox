@@ -1,8 +1,10 @@
 # Copyright 2023, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
+from __future__ import annotations
+
 from functools import partial
-from typing import Optional
+from typing import Any, Optional
 
 import hypothesis.strategies as st
 import pytest
@@ -32,7 +34,7 @@ def test_clamped_grad_optim(a: Optional[float], b: Optional[float]):
     grad = tr.arange(-1000.0, 1000.0)
     x = tr.ones_like(grad, requires_grad=True)
 
-    kwargs = (
+    kwargs: dict[str, Any] = (
         dict(clamp_min=a, clamp_max=b)
         if b is not None and a is not None and a < b
         else dict(clamp_min=b, clamp_max=a)
@@ -56,7 +58,7 @@ def test_clamped_param_optim(a: Optional[float], b: Optional[float]):
     x = tr.arange(-1000.0, 1000.0, requires_grad=True)
     grad = tr.zeros_like(x)
 
-    kwargs = (
+    kwargs: dict[str, Any] = (
         dict(clamp_min=a, clamp_max=b)
         if b is not None and a is not None and a < b
         else dict(clamp_min=b, clamp_max=a)
@@ -92,7 +94,6 @@ def test_top_q_grad(q):
 
 @pytest.mark.parametrize("generator_device", avail_devices)
 def test_top_q_grad_generator(generator_device):
-
     seed = 15873642
     Optim = partial(
         TopQGradientOptimizer,

@@ -72,7 +72,7 @@ def get_path_to_checkpoint(model_name: _MODEL_NAMES) -> str:
     return _pre_trained_manager.fetch(model_name, progressbar=(tqdm is not None))
 
 
-def load_model(model_name: _MODEL_NAMES):
+def load_model(model_name: _MODEL_NAMES, **model_kwargs):
     r"""
     Loads pre-trained model weights. This function takes care of downloading and caching
     weights.
@@ -129,7 +129,6 @@ def load_model(model_name: _MODEL_NAMES):
         "mitll_restricted_imagenet_l2_3_0.pt",
         "imagenet_nat.pt",
     }:
-
         model = partial(resnet50, num_classes=9 if "restricted" in model_name else 1000)
         norm = transforms.Normalize(
             mean=[0.485, 0.456, 0.406],
@@ -141,7 +140,7 @@ def load_model(model_name: _MODEL_NAMES):
         )
 
     base_model = load_from_checkpoint(
-        model=model(),
+        model=model(**model_kwargs),
         ckpt=get_path_to_checkpoint(model_name),
         weights_key="state_dict" if model_name != "imagenet_nat.pt" else "model",
     )

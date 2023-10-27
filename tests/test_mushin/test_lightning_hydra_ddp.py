@@ -183,7 +183,6 @@ def test_ddp_with_hydra_with_datamodule():
 @pytest.mark.usefixtures("cleandir")
 @pytest.mark.parametrize("num_jobs", [1, 2])
 def test_ddp_with_hydra_runjob(num_jobs):
-
     overrides = []
     multirun = False
     if num_jobs > 1:
@@ -200,7 +199,7 @@ def test_ddp_with_hydra_runjob(num_jobs):
     module = builds(SimpleLightningModule)
     Config = make_config(trainer=TrainerConfig, module=module, devices=2)
     launch_job = launch(
-        Config, task_fn, overrides, multirun=multirun, version_base="1.1"
+        Config, task_fn, overrides, multirun=multirun, version_base="1.1"  # type: ignore
     )
 
     if multirun:

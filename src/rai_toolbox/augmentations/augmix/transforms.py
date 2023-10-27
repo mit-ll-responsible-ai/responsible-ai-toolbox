@@ -5,13 +5,14 @@
 from numbers import Integral
 from typing import Any, Callable, Optional, Sequence, Tuple, TypeVar, Union
 
-import numpy as np
 import torch as tr
+
+from rai_toolbox._typing import ArrayLike
 
 from ._implementation import augment_and_mix
 
 _T1 = TypeVar("_T1")
-_T2 = TypeVar("_T2", np.ndarray, tr.Tensor, float)
+_T2 = TypeVar("_T2", bound=ArrayLike)
 
 __all__ = ["AugMix", "Fork", "augment_and_mix"]
 

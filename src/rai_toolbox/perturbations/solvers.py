@@ -115,7 +115,7 @@ def gradient_ascent(
         set to `torch.mean` when solving for a "universal" perturbation.
 
     **optim_kwargs : Any
-       Keyword arguments passed to `optimizer` when it is instatiated.
+       Keyword arguments passed to `optimizer` when it is instantiated.
 
     Returns
     -------

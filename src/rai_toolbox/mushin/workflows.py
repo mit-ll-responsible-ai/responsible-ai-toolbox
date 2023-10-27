@@ -2,8 +2,7 @@
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
 
-import warnings
-from collections import UserList, defaultdict
+from collections import defaultdict
 from inspect import getattr_static
 from pathlib import Path
 from typing import (
@@ -26,14 +25,12 @@ import numpy as np
 import torch as tr
 from hydra.core.override_parser.overrides_parser import OverridesParser
 from hydra.core.utils import JobReturn
-from hydra_zen import launch, load_from_yaml, make_config
+from hydra_zen import hydra_list, launch, load_from_yaml, make_config, multirun, zen
 from hydra_zen._compatibility import HYDRA_VERSION
 from hydra_zen._launch import _NotSet
 from typing_extensions import Self, TypeAlias, TypeGuard
 
 from rai_toolbox._utils import value_check
-
-from .hydra import zen
 
 LoadedValue: TypeAlias = Union[str, int, float, bool, List[Any], Dict[str, Any]]
 
@@ -41,8 +38,6 @@ __all__ = [
     "BaseWorkflow",
     "RobustnessCurve",
     "MultiRunMetricsWorkflow",
-    "multirun",
-    "hydra_list",
 ]
 
 
@@ -51,15 +46,6 @@ T1 = TypeVar("T1")
 
 
 _VERSION_BASE_DEFAULT = _NotSet if HYDRA_VERSION < (1, 2, 0) else "1.1"
-
-
-class multirun(UserList):
-    """Signals that a sequence is to be iterated over in a multirun"""
-
-
-class hydra_list(UserList):
-    """Signals that a sequence is provided as a single configured value (i.e. it is not
-    to be iterated over during a multirun)"""
 
 
 def _sort_x_by_k(x: T, k: Iterable[Any]) -> T:
@@ -135,17 +121,6 @@ class BaseWorkflow:
         self.jobs = []
         self._working_dir = None
 
-        if hasattr(self, "evaluation_task"):
-            warnings.warn(
-                "The static method `evaluation_task` is deprecated in favor of the "
-                "static method  `task`. Support for `evaluation_task` will be removed "
-                "in version 0.3.0 of rai-toolbox. To fix this, simply rename "
-                "`evaluation_task` method to `task`.",
-                FutureWarning,
-                stacklevel=2,
-            )
-            self.task = self.evaluation_task  # type: ignore
-
     @property
     def working_dir(self) -> Path:
         if self._working_dir is None:
@@ -217,7 +192,6 @@ class BaseWorkflow:
         {'foo': ['val'], 'bar': multirun(['a', 'b']), 'apple': 1}
         """
         if not self._multirun_task_overrides:
-
             overrides = load_from_yaml(
                 self.working_dir / "multirun.yaml"
             ).hydra.overrides.task
@@ -240,7 +214,8 @@ class BaseWorkflow:
         This function is automatically wrapped by `zen`, which is responsible
         for parsing the function's signature and then extracting and instantiating
         the corresponding fields from a Hydra config object – passing them to the
-        function. This behavior can be modified by `self.run(pre_task_fn_wrapper=...)`"""
+        function. This behavior can be modified by `self.run(pre_task_fn_wrapper=...)`
+        """
 
     @staticmethod
     def task(*args: Any, **kwargs: Any) -> Any:
@@ -600,6 +575,9 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
         task_fn_wrapper: Union[
             Callable[[Callable[..., T1]], Callable[[Any], T1]], None
         ] = zen,
+        pre_task_fn_wrapper: Union[
+            Callable[[Callable[..., None]], Callable[[Any], None]], None
+        ] = zen,
         working_dir: Optional[str] = None,
         sweeper: Optional[str] = None,
         launcher: Optional[str] = None,
@@ -631,11 +609,12 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
             workflow_overrides[self._JOBDIR_NAME] = target_job_dirs
 
         return super().run(
-            task_fn_wrapper=task_fn_wrapper,
             working_dir=working_dir,
             sweeper=sweeper,
             launcher=launcher,
             overrides=overrides,
+            task_fn_wrapper=task_fn_wrapper,
+            pre_task_fn_wrapper=pre_task_fn_wrapper,
             version_base=version_base,
             to_dictconfig=to_dictconfig,
             config_name=config_name,
@@ -994,7 +973,6 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
 
             k_coords = list(orig_coords)
             for n in range(datum.ndim - len(orig_coords)):
-
                 if coord_from_metrics and n < len(metric_coords):
                     # Assume the first coordinate of the metric is the metric coordinate dimension
                     k_coords += list(metric_coords.keys())
@@ -1020,7 +998,6 @@ class MultiRunMetricsWorkflow(BaseWorkflow):
                         len(set(np.unique(v))) > 1
                         or non_multirun_params_as_singleton_dims
                     ):
-
                         coords[k] = (
                             [self._JOBDIR_NAME],
                             [self._sanitize_coordinate_for_xarray(item) for item in v],
@@ -1048,12 +1025,19 @@ class RobustnessCurve(MultiRunMetricsWorkflow):
         task_fn_wrapper: Union[
             Callable[[Callable[..., T1]], Callable[[Any], T1]], None
         ] = zen,
+        pre_task_fn_wrapper: Union[
+            Callable[[Callable[..., None]], Callable[[Any], None]], None
+        ] = zen,
         target_job_dirs: Optional[Sequence[Union[str, Path]]] = None,  # TODO: add docs
         version_base: Optional[Union[str, Type[_NotSet]]] = _VERSION_BASE_DEFAULT,
         working_dir: Optional[str] = None,
         sweeper: Optional[str] = None,
         launcher: Optional[str] = None,
         overrides: Optional[List[str]] = None,
+        to_dictconfig: bool = False,
+        config_name: str = "rai_workflow",
+        job_name: str = "rai_workflow",
+        with_log_configuration: bool = True,
         **workflow_overrides: Union[str, int, float, bool, multirun, hydra_list],
     ):
         """Run the experiment for varying value `epsilon`.
@@ -1099,11 +1083,16 @@ class RobustnessCurve(MultiRunMetricsWorkflow):
 
         return super().run(
             task_fn_wrapper=task_fn_wrapper,
+            pre_task_fn_wrapper=pre_task_fn_wrapper,
             working_dir=working_dir,
             sweeper=sweeper,
             launcher=launcher,
             version_base=version_base,
             overrides=overrides,
+            to_dictconfig=to_dictconfig,
+            config_name=config_name,
+            job_name=job_name,
+            with_log_configuration=with_log_configuration,
             **workflow_overrides,
             # for multiple multi-run params, epsilon should fastest-varying param;
             # i.e. epsilon should be the trailing dim in the multi-dim array of results

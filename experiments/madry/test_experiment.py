@@ -3,13 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 
-def test_configs():
-    from configs import Config  # runs config validation for all configs
-
-    assert Config  # touch for no unused imports
-
-
-def test_run():
-    from run import main  # tests imports
+def test_madry():
+    from madry import main  # tests imports
 
     assert main  # touch for no unused imports

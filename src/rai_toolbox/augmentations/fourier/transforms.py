@@ -57,10 +57,10 @@ class FourierPerturbation(tr.nn.Module):
 
         if isinstance(self._norm_bnds, tuple):
             norm = np.random.uniform(*self._norm_bnds, size=1).item()
-            return self.bases[index] * norm
+            return cast(Tensor, self.bases[index] * norm)
         else:
             # norm was already applied to all bases in __init__
-            return self.bases[index]
+            return cast(Tensor, self.bases[index])
 
     def __init__(
         self,
@@ -122,7 +122,7 @@ class FourierPerturbation(tr.nn.Module):
         if isinstance(size, (int, Number)):
             size = (int(size), int(size))
 
-        if not isinstance(norm_scale, (float, Number)):
+        if isinstance(norm_scale, tuple):
             lo, hi = norm_scale
             assert 0 <= lo <= hi, norm_scale
             self._norm_bnds = (lo, hi)
@@ -203,7 +203,7 @@ class FourierPerturbation(tr.nn.Module):
         self._sample_probs = np.concatenate([1 / _radii] * num_distinct_phases)
         self._sample_probs /= self._sample_probs.sum()
 
-    def forward(self, img: _T) -> _T:
+    def forward(self, img: _T) -> _T:  # type: ignore
         """
         Parameters
         ----------
@@ -244,7 +244,6 @@ class FourierPerturbation(tr.nn.Module):
         return cast(_T, img)
 
     def __repr__(self) -> str:
-
         return (
             self.__class__.__name__
             + f"(norm_scale={self._norm_bnds}, rand_flip_per_channel={self.rand_flip_per_channel}, radii_bounds={self.radii_bounds})"

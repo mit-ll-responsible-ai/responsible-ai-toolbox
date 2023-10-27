@@ -2,7 +2,7 @@
 requires = [
     "setuptools >= 35.0.2",
     "wheel >= 0.29.0",
-    "setuptools_scm[toml]==7.0.5",
+    "setuptools_scm[toml]",
 ]
 build-backend = "setuptools.build_meta"
 
@@ -12,7 +12,7 @@ name = "rai_toolbox"
 dynamic = ["version"]
 description = "PyTorch-centric library for evaluating and enhancing the robustness of AI technologies"
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 dependencies = [
     "torch >= 1.10.0",
     "torchmetrics >= 0.6.0",
@@ -22,22 +22,22 @@ license = { file = "LICENSE.txt" }
 keywords = ["machine learning", "robustness", "pytorch", "responsible", "AI"]
 
 authors = [
-    { name = "Ryan Soklaski", email = "ryan.soklaski@ll.mit.edu" },
+    { name = "Ryan Soklaski", email = "rsoklaski@gmail.com" },
     { name = "Justin Goodwin", email = "jgoodwin@ll.mit.edu" },
     { name = "Olivia Brown" },
     { name = "Michael Yee" },
 ]
-maintainers = [{ name = "Ryan Soklaski", email = "ryan.soklaski@ll.mit.edu" }]
+maintainers = [{ name = "Ryan Soklaski", email = "rsoklaski@gmail.com" }]
 
 classifiers = [
     "Development Status :: 4 - Beta",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Intended Audience :: Science/Research",
-    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
     "Topic :: Scientific/Engineering",
     "Programming Language :: Python :: 3 :: Only",
 ]
@@ -48,7 +48,6 @@ tests = [
     "hypothesis >= 6.41.0, < 6.49.0",
     "mygrad >= 2.0.0",
     "omegaconf >= 2.1.1",
-    "netCDF4 >= 1.5.8",
 ]
 
 mushin = [
@@ -56,6 +55,7 @@ mushin = [
     "hydra-zen >= 0.9.0",
     "xarray >= 0.19.0",
     "matplotlib >= 3.3",
+    "netCDF4 >= 1.5.8",
     "protobuf <= 3.20.1",         # strict TODO: Remove after tensorboard gets compatible https://github.com/tensorflow/tensorboard/issues/5708
 ]
 
@@ -119,6 +119,7 @@ filterwarnings = [
    "ignore:Future Hydra versions will no longer change working directory at job runtime by default.",
    "ignore:distutils Version classes are deprecated",
    "ignore:numpy.ndarray size changed, may indicate binary incompatibility",
+   "ignore:rai_toolbox.mushin.zen will be removed",
  ]
 
 
@@ -126,32 +127,32 @@ filterwarnings = [
 legacy_tox_ini = """
 [tox]
 isolated_build = True
-envlist = py37, py38, py39, py310
+envlist = py38, py39, py310, py311
 
 [gh-actions]
 python =
-  3.7: py37
   3.8: py38
   3.9: py39
   3.10: py310
+  3.11: py311
 
 [testenv]
-deps = pytest-xdist
+deps = pytest
+       pytest-xdist
+       hypothesis
 extras = 
     tests
-    mushin
-commands = pytest -n auto --hypothesis-profile ci tests
+commands = pytest tests/ {posargs: --hypothesis-profile ci -n auto --maxprocesses=4}
+
 
 [testenv:min-deps]  # test against minimum dependency versions
 deps = 
     {[testenv]deps}
     setuptools==59.5.0
     torch==1.10.0
-    torchmetrics==0.6.0
     typing-extensions==4.1.1
-    hydra-zen==0.7.0
-    pytorch-lightning==1.5.0
-basepython = python3.7
+    torchmetrics==0.6.0
+basepython = python3.8
 
 [testenv:no-mushin]
 extras = 
@@ -162,15 +163,14 @@ commands = pytest -n auto --hypothesis-profile ci tests
 [testenv:coverage]
 setenv = NUMBA_DISABLE_JIT=1
 usedevelop = true
-basepython = python3.9
-extras = 
-    tests
-    mushin
-    datasets
+basepython = python3.11
+extras = tests
+         mushin
+         datasets
 deps = {[testenv]deps}
        coverage
        pytest-cov
-commands = pytest -n auto --cov-report term-missing --cov-config=pyproject.toml --cov-branch --cov=rai_toolbox --hypothesis-profile ci tests
+commands = pytest -n auto --cov-report term-missing --cov-config=pyproject.toml --cov-branch --cov=rai_toolbox --hypothesis-profile ci tests {posargs: -n auto --maxprocesses=4}
 
 
 [testenv:pre-release]  # test against pre-releases of dependencies
@@ -180,6 +180,19 @@ extras =
     mushin
     datasets
 basepython = python3.9
+
+
+[testenv:pyright]  # test against pre-releases of dependencies
+description = Scans src/ tests/ with pinned version of pyright
+extras = 
+    tests
+    mushin
+    datasets
+deps = 
+    --requirement deps/requirements-pyright.txt
+basepython = python3.9
+commands = pyright tests/ src/
+
 
 [testenv:auto-format]
 skip_install=true
@@ -221,5 +234,4 @@ commands =
    pytest experiments/adversarial_training/test_experiment.py
    pytest experiments/madry/test_experiment.py
    pytest experiments/universal_perturbation/test_experiment.py
-   pytest experiments/xai/test_experiment.py
 """

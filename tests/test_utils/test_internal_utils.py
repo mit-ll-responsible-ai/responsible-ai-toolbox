@@ -22,6 +22,10 @@ def everything_except(excluded_types):
 any_types = st.from_type(type)
 
 
+@pytest.mark.skipif(
+    platform.system() == "Windows",
+    reason="Weird flakiness involving " "Hypothesis, Python 3.10 and `zoneinfo`",
+)
 @settings(max_examples=10)
 @given(
     name=st.sampled_from(["name_a", "name_b"]),
@@ -34,7 +38,7 @@ def test_type_catches_bad_type(name, target_type, value):
 
 
 @pytest.mark.skipif(
-    platform.system == "Windows",
+    platform.system() == "Windows",
     reason="Weird flakiness involving " "Hypothesis, Python 3.10 and `zoneinfo`",
 )
 @given(

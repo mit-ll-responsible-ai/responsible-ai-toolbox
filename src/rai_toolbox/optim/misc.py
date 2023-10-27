@@ -1,6 +1,7 @@
 # Copyright 2023, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
+from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Union
 
@@ -28,7 +29,7 @@ class _ClampedOptim(ParamTransformingOptimizer):
     def __init__(
         self,
         params: Optional[OptimParams] = None,
-        InnerOpt: Union[Opt, Partial[Opt], OptimizerType] = SGD,
+        InnerOpt: OptimizerType | Opt = SGD,
         *,
         clamp_min: Optional[float] = None,
         clamp_max: Optional[float] = None,
@@ -186,7 +187,6 @@ class TopQGradientOptimizer(ParamTransformingOptimizer):
         generator: Generator = default_generator,
         **inner_opt_kwargs,
     ):
-
         r"""
         Parameters
         ----------
@@ -346,7 +346,6 @@ class TopQGradientOptimizer(ParamTransformingOptimizer):
         self._generator = value_check("generator", generator, type_=torch.Generator)
 
     def _pre_step_transform_(self, param: Tensor, optim_group: Dict[str, Any]) -> None:
-
         if param.grad is None:  # pragma: no cover
             return
 

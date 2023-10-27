@@ -60,21 +60,20 @@ def jensen_shannon_divergence(
     >>> jensen_shannon_divergence(P1, P3, P2)
     tensor(0.4621)
     """
+    list_probs = [tr.as_tensor(p) for p in probs]
 
-    probs = tuple(tr.as_tensor(p) for p in probs)
-
-    if len(probs) < 2 or any(
-        not isinstance(p, tr.Tensor) or p.dim() != 2 for p in probs
+    if len(list_probs) < 2 or any(
+        not isinstance(p, tr.Tensor) or p.dim() != 2 for p in list_probs
     ):
         raise ValueError(
             f"*probs must consist of at least two Tensors, and each tensor must have a shape of (N, D). Got {probs}"
         )
 
-    zero = tr.tensor(0.0).type_as(probs[0])
+    zero = tr.tensor(0.0).type_as(list_probs[0])
     # Clamp mixture distribution to avoid exploding KL divergence
-    log_p_mixture = tr.clamp(sum(probs, zero) / len(probs), 1e-7, 1).log()
+    log_p_mixture = tr.clamp(sum(list_probs, zero) / len(list_probs), 1e-7, 1).log()
     loss = sum(
-        (F.kl_div(log_p_mixture, p, reduction="batchmean") for p in probs), zero
+        (F.kl_div(log_p_mixture, p, reduction="batchmean") for p in list_probs), zero
     ) / len(probs)
 
     if weight is not None:

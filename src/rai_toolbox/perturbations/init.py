@@ -89,20 +89,20 @@ def uniform_like_l1_n_ball_(
     xflat = _to_batch(x, param_ndim=param_ndim).flatten(1)
     nbatch, ndim = xflat.shape
 
-    u = torch.empty((nbatch, ndim), **tensor_kwargs)
+    u = torch.empty((nbatch, ndim), **tensor_kwargs)  # type: ignore
     u.uniform_(generator=generator)
 
     v = u.sort(dim=1).values
     vp = torch.cat(
         (
-            torch.zeros((nbatch, 1), **tensor_kwargs),
+            torch.zeros((nbatch, 1), **tensor_kwargs),  # type: ignore
             v[:, : ndim - 1],
         ),
         dim=1,
     )
     assert v.shape == vp.shape
     z = v - vp
-    sign = torch.empty((nbatch, ndim), **tensor_kwargs)
+    sign = torch.empty((nbatch, ndim), **tensor_kwargs)  # type: ignore
     sign.uniform_(-1, 1, generator=generator)
     sign = sign.sign()
     x.copy_(epsilon * (sign * z).reshape(x.shape))
@@ -189,7 +189,7 @@ def uniform_like_l2_n_ball_(
 
     z = torch.empty((nbatch, ndim + 2), dtype=xflat.dtype, device=generator.device)
     z.normal_(generator=generator)
-    r = z.norm(p=2, dim=1, keepdim=True)  # type: ignore
+    r = z.norm(p=2, dim=1, keepdim=True)
     x.copy_(epsilon * (z / r)[:, :ndim].reshape(x.shape))
 
 

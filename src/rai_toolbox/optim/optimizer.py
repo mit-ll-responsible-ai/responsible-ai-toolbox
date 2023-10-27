@@ -1,16 +1,16 @@
 # Copyright 2023, MASSACHUSETTS INSTITUTE OF TECHNOLOGY
 # Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014).
 # SPDX-License-Identifier: MIT
+from __future__ import annotations
 
 import inspect
-import warnings
 from abc import ABCMeta
 from typing import Any, Callable, Dict, List, Optional, TypeVar, Union, cast, overload
 
 import torch
 from torch import Tensor
 from torch.optim import SGD, Optimizer
-from typing_extensions import TypedDict
+from typing_extensions import ParamSpec, TypedDict
 
 from rai_toolbox._typing import (
     InstantiatesTo,
@@ -23,6 +23,7 @@ from rai_toolbox._typing import (
 from rai_toolbox._utils import validate_param_ndim as _validate_param_ndim
 
 _T = TypeVar("_T", bound=Optional[Union[Tensor, float]])
+P = ParamSpec("P")
 
 __all__ = ["ParamTransformingOptimizer", "ChainedParamTransformingOptimizer"]
 
@@ -182,7 +183,7 @@ class ParamTransformingOptimizer(Optimizer, metaclass=ABCMeta):
     def __init__(
         self,
         params: Optional[OptimParams] = None,
-        InnerOpt: Union[Opt, Partial[Opt], OptimizerType] = SGD,
+        InnerOpt: Opt | OptimizerType = SGD,
         *,
         param_ndim: Union[int, None] = -1,
         grad_scale: float = 1.0,
@@ -384,7 +385,7 @@ class ParamTransformingOptimizer(Optimizer, metaclass=ABCMeta):
                     "optimizer type."
                 )
             super().__init__(params, defaults)  # type: ignore
-            self.inner_opt = InnerOpt(self.param_groups, **inner_opt_kwargs)  # type: ignore
+            self.inner_opt = InnerOpt(self.param_groups, **inner_opt_kwargs)
         elif isinstance(InnerOpt, Optimizer):
             self.inner_opt = InnerOpt
             super().__init__(self.inner_opt.param_groups, defaults)
@@ -404,7 +405,7 @@ class ParamTransformingOptimizer(Optimizer, metaclass=ABCMeta):
         )
 
         # state of `self` must mirror that of inner-opt
-        self.__setstate__(self.inner_opt.__getstate__())  # type: ignore
+        self.__setstate__(self.inner_opt.__getstate__())
 
         for group in self.param_groups:
             param_ndim = group["param_ndim"]
@@ -430,10 +431,10 @@ class ParamTransformingOptimizer(Optimizer, metaclass=ABCMeta):
 
     def __setstate__(self, state: dict):
         self.inner_opt.__setstate__(state)
-        super().__setstate__(self.inner_opt.__getstate__())  # type: ignore
+        super().__setstate__(self.inner_opt.__getstate__())
 
     def __getstate__(self) -> dict:
-        return self.inner_opt.__getstate__()  # type: ignore
+        return self.inner_opt.__getstate__()
 
     def __repr__(self) -> str:
         return super().__repr__().replace("(", f"[{type(self.inner_opt).__name__}](", 1)
@@ -528,26 +529,6 @@ class ParamTransformingOptimizer(Optimizer, metaclass=ABCMeta):
             for p in group["params"]:
                 p = _to_batch(p, param_ndim)
                 self._post_step_transform_(param=p, optim_group=group)
-
-    def project(self):
-        """
-        .. deprecated:: 0.2.0
-          `project` will be removed in rai-toolbox 0.3.0, it is replaced by
-          `_apply_post_step_transform_`
-
-        Update each parameter in-place by calling `_post_step_transform_` on the
-        parameter.
-
-        This is called automatically by `.step()` after `InnerOpt.step()` has been
-        called."""
-        warnings.warn(
-            FutureWarning(
-                "`project` will be removed in rai-toolbox 0.3.0, it is replaced by "
-                "`_apply_post_step_transform_`"
-            ),
-            stacklevel=2,
-        )
-        return self._apply_post_step_transform_()
 
     @torch.no_grad()
     def _apply_pre_step_transform_(self):
@@ -850,7 +831,7 @@ class ChainedParamTransformingOptimizer(ParamTransformingOptimizer):
         # synchornize state between `self`, members of `self._chain`,
         # and `self.inner_opt`
         self.inner_opt.__setstate__(state)
-        state = self.inner_opt.__getstate__()  # type: ignore
+        state = self.inner_opt.__getstate__()
         for c in self._chain:
             c.__setstate__(state)
         super().__setstate__(state)

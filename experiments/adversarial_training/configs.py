@@ -115,7 +115,7 @@ Solver = builds(
 
 Trainer = builds(
     pl.Trainer,
-    gpus="${gpus}",
+    devices="${gpus}",
     max_epochs="${max_epochs}",
     strategy=builds(HydraDDP),
     callbacks=[
@@ -174,7 +174,7 @@ ModuleCfg = make_config(
     module=Solver,
 )
 
-TrainerCfg = make_config(max_epochs=100, gpus=2, trainer=Trainer)
+TrainerCfg = make_config(max_epochs=100, devices=2, trainer=Trainer)
 
 Config = make_config(
     random_seed=234,
