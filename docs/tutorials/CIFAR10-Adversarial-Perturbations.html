@@ -29,21 +29,21 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
-    <link rel="icon" sizes="16x16" type="image/png" href="../_static/favicon-16x16.png" />
-    <link rel="icon" sizes="32x32" type="image/png" href="../_static/favicon-32x32.png" />
-    <link rel="apple-touch-icon" sizes="180x180" type="image/png" href="../_static/apple-touch-icon.png" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="icon" sizes="16x16" type="image/png" href="../_static/favicon-16x16.png?v=e7d2fd79" />
+    <link rel="icon" sizes="32x32" type="image/png" href="../_static/favicon-32x32.png?v=f6e94bc1" />
+    <link rel="apple-touch-icon" sizes="180x180" type="image/png" href="../_static/apple-touch-icon.png?v=cfad7531" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/sphinx_highlight.js"></script>
-    <script src="../_static/clipboard.min.js"></script>
-    <script src="../_static/copybutton.js"></script>
+    <script src="../_static/documentation_options.js?v=8a448e45"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=30646c52"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -669,7 +669,7 @@ div.rendered_html tbody tr:hover {
 </div>
 </div></blockquote>
 <section id="Generating-Adversarial-Perturbations">
-<h1>Generating Adversarial Perturbations<a class="headerlink" href="#Generating-Adversarial-Perturbations" title="Permalink to this heading">#</a></h1>
+<h1>Generating Adversarial Perturbations<a class="headerlink" href="#Generating-Adversarial-Perturbations" title="Link to this heading">#</a></h1>
 <p>Solving for adversarial perturbations is a common task in Robust AI. An adversarial perturbation for a given input, <span class="math notranslate nohighlight">\(x\)</span>, with corresponding label, <span class="math notranslate nohighlight">\(y\)</span>, can be computed by solving the following optimization objective:</p>
 <div class="math notranslate nohighlight">
 \[\max_{||\delta||_p&lt;\epsilon} \mathcal{L}\left(f_\theta(x+\delta), y\right)\]</div>
@@ -677,12 +677,12 @@ div.rendered_html tbody tr:hover {
 <p>This tutorial demonstrates how to use <a class="reference external" href="https://mit-ll-responsible-ai.github.io/responsible-ai-toolbox/generated/rai_toolbox.perturbations.gradient_ascent.html#rai_toolbox.perturbations.gradient_ascent">rai_toolbox.perturbations.gradient_ascent</a> to generate <span class="math notranslate nohighlight">\(L^2\)</span>-norm-constrained adversarial perturbations using projected gradient descent (PGD) for images from the <a class="reference external" href="https://www.cs.toronto.edu/~kriz/cifar.html">CIFAR-10</a> dataset, based on both a standard classification model and a robust
 (i.e., adversarially-trained) model. We then compute adversarial accuracy for a few batches of samples from the test set, and use this to generate robustness curves for increasing values of perturbation size, <span class="math notranslate nohighlight">\(\epsilon\)</span>.</p>
 <section id="Getting-Started">
-<h2>Getting Started<a class="headerlink" href="#Getting-Started" title="Permalink to this heading">#</a></h2>
+<h2>Getting Started<a class="headerlink" href="#Getting-Started" title="Link to this heading">#</a></h2>
 <p>We will install the rAI-toolbox and then we will create a Jupyter notebook in which we will complete this tutorial.</p>
 <section id="Installing-rai_toolbox">
-<h3>Installing <code class="docutils literal notranslate"><span class="pre">rai_toolbox</span></code><a class="headerlink" href="#Installing-rai_toolbox" title="Permalink to this heading">#</a></h3>
+<h3>Installing <code class="docutils literal notranslate"><span class="pre">rai_toolbox</span></code><a class="headerlink" href="#Installing-rai_toolbox" title="Link to this heading">#</a></h3>
 <p>To install the toolbox (along with its <code class="docutils literal notranslate"><span class="pre">mushin</span></code> capabilities) in your Python environment, run the following command in your terminal:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pip install rai-toolbox<span class="o">[</span>mushin<span class="o">]</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pip<span class="w"> </span>install<span class="w"> </span>rai-toolbox<span class="o">[</span>mushin<span class="o">]</span>
 </pre></div>
 </div>
 <p>To verify that the toolbox is installed as expected, open a Python console and try importing <code class="docutils literal notranslate"><span class="pre">rai_toolbox</span></code>.</p>
@@ -695,9 +695,9 @@ div.rendered_html tbody tr:hover {
 <p>If no errors are returned, <code class="docutils literal notranslate"><span class="pre">rai_toolbox</span></code> is successfully installed.</p>
 </section>
 <section id="Installing-rai_experiments">
-<h3>Installing <code class="docutils literal notranslate"><span class="pre">rai_experiments</span></code><a class="headerlink" href="#Installing-rai_experiments" title="Permalink to this heading">#</a></h3>
+<h3>Installing <code class="docutils literal notranslate"><span class="pre">rai_experiments</span></code><a class="headerlink" href="#Installing-rai_experiments" title="Link to this heading">#</a></h3>
 <p>This tutorial also requires the installation of the <code class="docutils literal notranslate"><span class="pre">rai_experiments</span></code> library:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pip install rai-experiments
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pip<span class="w"> </span>install<span class="w"> </span>rai-experiments
 </pre></div>
 </div>
 <p>To verify the <code class="docutils literal notranslate"><span class="pre">rai_experiments</span></code> library is installed as expected, open a Python console and try importing <code class="docutils literal notranslate"><span class="pre">rai_experiments</span></code>.</p>
@@ -710,9 +710,9 @@ div.rendered_html tbody tr:hover {
 <p>If no errors are returned, <code class="docutils literal notranslate"><span class="pre">rai_experiments</span></code> is successfully installed.</p>
 </section>
 <section id="Installing-ipywidgets">
-<h3>Installing <code class="docutils literal notranslate"><span class="pre">ipywidgets</span></code><a class="headerlink" href="#Installing-ipywidgets" title="Permalink to this heading">#</a></h3>
+<h3>Installing <code class="docutils literal notranslate"><span class="pre">ipywidgets</span></code><a class="headerlink" href="#Installing-ipywidgets" title="Link to this heading">#</a></h3>
 <p>You may also need to install the <code class="docutils literal notranslate"><span class="pre">ipywidgets</span></code> package in your Python environment to configure the Jupyter notebook to display ipywidgets:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pip install ipywidgets
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pip<span class="w"> </span>install<span class="w"> </span>ipywidgets
 </pre></div>
 </div>
 <p>To verify the <code class="docutils literal notranslate"><span class="pre">ipywidgets</span></code> library is installed as expected, open a Python console and try importing <code class="docutils literal notranslate"><span class="pre">ipywidgets</span></code>.</p>
@@ -726,14 +726,14 @@ div.rendered_html tbody tr:hover {
 </section>
 </section>
 <section id="Opening-a-Jupyter-notebook">
-<h2>Opening a Jupyter notebook<a class="headerlink" href="#Opening-a-Jupyter-notebook" title="Permalink to this heading">#</a></h2>
+<h2>Opening a Jupyter notebook<a class="headerlink" href="#Opening-a-Jupyter-notebook" title="Link to this heading">#</a></h2>
 <p>If you do not have Jupyter Notebook or Jupyter Lab installed in your Python environment, please follow <a class="reference external" href="https://docs.jupyter.org/en/latest/install/notebook-classic.html">these instructions</a>.</p>
 <p>After installation, open a terminal on your computer and <a class="reference external" href="https://docs.jupyter.org/en/latest/running.html">start a notebook/lab session</a>.</p>
 <p>A file-viewer will open in an internet browser. Pick a directory where you are okay with saving some PyTorch model weights. Create a notebook called <code class="docutils literal notranslate"><span class="pre">CIFAR10-Adversarial-Perturbations.ipynb</span></code>.</p>
 <p>You can then follow along with this tutorial by copying, pasting, and running the code blocks below in the cells of your notebook.</p>
 </section>
 <section id="Boilerplate-setup">
-<h2>Boilerplate setup<a class="headerlink" href="#Boilerplate-setup" title="Permalink to this heading">#</a></h2>
+<h2>Boilerplate setup<a class="headerlink" href="#Boilerplate-setup" title="Link to this heading">#</a></h2>
 <p>In the notebook, we will start by importing modules from the toolbox and 3rd party libraries needed for this tutorial. Then we will specify directories where data and models will be stored, and determine if computations will be run on CPU or GPU (depending on the resources available on your machine).</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
@@ -816,7 +816,7 @@ cuda:0
 </div>
 </section>
 <section id="Loading-the-CIFAR-10-dataset">
-<h2>Loading the CIFAR-10 dataset<a class="headerlink" href="#Loading-the-CIFAR-10-dataset" title="Permalink to this heading">#</a></h2>
+<h2>Loading the CIFAR-10 dataset<a class="headerlink" href="#Loading-the-CIFAR-10-dataset" title="Link to this heading">#</a></h2>
 <p>CIFAR-10 is a dataset containing 32x32 RGB images; each image depicts an object or animal belonging to one of ten classes. Here we will load images from the test set and plot a few example images from each class.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
@@ -890,7 +890,7 @@ Classes: [&#39;airplane&#39;, &#39;automobile&#39;, &#39;bird&#39;, &#39;cat&#39
 </div>
 </section>
 <section id="Loading-pre-trained-CIFAR-10-models">
-<h2>Loading pre-trained CIFAR-10 models<a class="headerlink" href="#Loading-pre-trained-CIFAR-10-models" title="Permalink to this heading">#</a></h2>
+<h2>Loading pre-trained CIFAR-10 models<a class="headerlink" href="#Loading-pre-trained-CIFAR-10-models" title="Link to this heading">#</a></h2>
 <p>Next we will define two models: 1. <code class="docutils literal notranslate"><span class="pre">model_robust</span></code> is a classification model that was trained against adversarially-generated training data. 2. <code class="docutils literal notranslate"><span class="pre">model_standard</span></code> is a classification model that was trained against CIFAR-10 using standard (i.e., non-adversarial) data augmentation procedures.</p>
 <p>The weights for both models are derived from Madrylab’s <a class="reference external" href="https://github.com/MadryLab/robustness">robustness</a> library:</p>
 <p>We will use two pre-trained models for these definitions: 1. <code class="docutils literal notranslate"><span class="pre">mitll_cifar_l2_1_0.pt</span></code>: A simplified data structure of the pre-trained model available via the <a class="reference external" href="https://github.com/mit-ll-responsible-ai/data_hosting/releases/download/madrylab_models/mitll_cifar_l2_1_0.pt">mit-ll-responsible-ai/data_hosting repo</a>. This is a ResNet-50 model trained with perturbations generated via PGD using perturbations constrained to <span class="math notranslate nohighlight">\(L^2\)</span>-ball of radius <span class="math notranslate nohighlight">\(\epsilon=1.0\)</span> 2. <code class="docutils literal notranslate"><span class="pre">mitll_cifar_nat.pt</span></code>: A
@@ -922,7 +922,7 @@ simplified data structure of the pre-trained model available via the <a class="r
 </div>
 </section>
 <section id="Obtaining-adversarial-perturbations-for-a-batch-of-data">
-<h2>Obtaining adversarial perturbations for a batch of data<a class="headerlink" href="#Obtaining-adversarial-perturbations-for-a-batch-of-data" title="Permalink to this heading">#</a></h2>
+<h2>Obtaining adversarial perturbations for a batch of data<a class="headerlink" href="#Obtaining-adversarial-perturbations-for-a-batch-of-data" title="Link to this heading">#</a></h2>
 <p>Now we will use the <a class="reference external" href="https://mit-ll-responsible-ai.github.io/responsible-ai-toolbox/generated/rai_toolbox.perturbations.gradient_ascent.html">gradient_ascent</a> function with an <a class="reference external" href="https://mit-ll-responsible-ai.github.io/responsible-ai-toolbox/generated/rai_toolbox.perturbations.AdditivePerturbation.html">AdditivePerturbation</a> model and <a class="reference external" href="https://mit-ll-responsible-ai.github.io/responsible-ai-toolbox/generated/rai_toolbox.optim.L2ProjectedOptim.html">L2ProjectedOptim</a> optimizer from the
 toolbox to solve for <span class="math notranslate nohighlight">\(L^2\)</span>-norm-constrained adversarial perturbations to samples from the dataset. These are perturbations that maximize – within the given constraints – the cross-entropy classification loss measured on our model’s predictions.</p>
 <p><code class="docutils literal notranslate"><span class="pre">AdditivePerturbation</span></code> implements <span class="math notranslate nohighlight">\(x_{adv}=x+\delta\)</span>, where <span class="math notranslate nohighlight">\(\delta\)</span> is the sole trainable parameter of the perturbation model.</p>
@@ -1021,7 +1021,7 @@ toolbox to solve for <span class="math notranslate nohighlight">\(L^2\)</span>-n
 <p>Note that the robust model is making fewer mistakes on the adversarially-perturbed images, and its perturbations also appear to contain more structure.</p>
 </section>
 <section id="Computing-adversarial-accuracy-over-multiple-batches">
-<h2>Computing adversarial accuracy over multiple batches<a class="headerlink" href="#Computing-adversarial-accuracy-over-multiple-batches" title="Permalink to this heading">#</a></h2>
+<h2>Computing adversarial accuracy over multiple batches<a class="headerlink" href="#Computing-adversarial-accuracy-over-multiple-batches" title="Link to this heading">#</a></h2>
 <p>Finally, we’ll compute adversarial accuracy (i.e., accuracy of the model on adversarially-perturbed images) across multiple batches of validation data, and for increasing values of perturbation size, <span class="math notranslate nohighlight">\(\epsilon\)</span>, to generate robustness curves and visualize how quickly performance drops off for each of the models.</p>
 <p>Here we define our own function for iterating over batches and computing accuracy, but note that this can easily been integrated with <a class="reference external" href="https://www.pytorchlightning.ai/">PyTorch Lightning’s</a> framework to save us from writing such boilerplate code.</p>
 <div class="nbinput nblast docutils container">
@@ -1408,7 +1408,7 @@ Epsilon = 2
       
         <div class="footer-item">
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.0.1.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
     <br/>
   </p>
 </div>

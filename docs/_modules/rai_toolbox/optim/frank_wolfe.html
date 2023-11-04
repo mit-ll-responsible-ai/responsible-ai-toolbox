@@ -27,21 +27,21 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css" />
-    <link rel="icon" sizes="16x16" type="image/png" href="../../../_static/favicon-16x16.png" />
-    <link rel="icon" sizes="32x32" type="image/png" href="../../../_static/favicon-32x32.png" />
-    <link rel="apple-touch-icon" sizes="180x180" type="image/png" href="../../../_static/apple-touch-icon.png" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="icon" sizes="16x16" type="image/png" href="../../../_static/favicon-16x16.png?v=e7d2fd79" />
+    <link rel="icon" sizes="32x32" type="image/png" href="../../../_static/favicon-32x32.png?v=f6e94bc1" />
+    <link rel="apple-touch-icon" sizes="180x180" type="image/png" href="../../../_static/apple-touch-icon.png?v=cfad7531" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
-    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-    <script src="../../../_static/doctools.js"></script>
-    <script src="../../../_static/sphinx_highlight.js"></script>
-    <script src="../../../_static/clipboard.min.js"></script>
-    <script src="../../../_static/copybutton.js"></script>
+    <script src="../../../_static/documentation_options.js?v=8a448e45"></script>
+    <script src="../../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=30646c52"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/rai_toolbox/optim/frank_wolfe';</script>
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -409,8 +409,10 @@ document.write(`
 <span class="p">]</span>
 
 
-<div class="viewcode-block" id="FrankWolfe"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.FrankWolfe.html#rai_toolbox.optim.FrankWolfe">[docs]</a><span class="k">class</span> <span class="nc">FrankWolfe</span><span class="p">(</span><span class="n">Optimizer</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Implements the Frank-Wolfe minimization algorithm [1]_.</span>
+<div class="viewcode-block" id="FrankWolfe">
+<a class="viewcode-back" href="../../../generated/rai_toolbox.optim.FrankWolfe.html#rai_toolbox.optim.FrankWolfe">[docs]</a>
+<span class="k">class</span> <span class="nc">FrankWolfe</span><span class="p">(</span><span class="n">Optimizer</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Implements the Frank-Wolfe minimization algorithm [1]_.</span>
 
 <span class="sd">    .. math::</span>
 <span class="sd">        w_{k+1} = (1 - l_r) w_k + l_r * s_k</span>
@@ -426,7 +428,9 @@ document.write(`
 <span class="sd">    ----------</span>
 <span class="sd">    .. [1] https://en.wikipedia.org/wiki/Frank%E2%80%93Wolfe_algorithm#Algorithm&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="FrankWolfe.__init__"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.FrankWolfe.html#rai_toolbox.optim.FrankWolfe.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="FrankWolfe.__init__">
+<a class="viewcode-back" href="../../../generated/rai_toolbox.optim.FrankWolfe.html#rai_toolbox.optim.FrankWolfe.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">params</span><span class="p">:</span> <span class="n">OptimParams</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -435,7 +439,7 @@ document.write(`
         <span class="n">use_default_lr_schedule</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">div_by_zero_eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span><span class="o">.</span><span class="n">tiny</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        params : Iterable</span>
@@ -476,6 +480,7 @@ document.write(`
             <span class="n">max_</span><span class="o">=</span><span class="mf">1.0</span> <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_use_default_lr_schedule</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
         <span class="p">)</span></div>
 
+
     <span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
     <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">closure</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">loss</span> <span class="o">=</span> <span class="kc">None</span>
@@ -509,8 +514,11 @@ document.write(`
         <span class="k">return</span> <span class="n">loss</span></div>
 
 
-<div class="viewcode-block" id="L1qFrankWolfe"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.L1qFrankWolfe.html#rai_toolbox.optim.L1qFrankWolfe">[docs]</a><span class="k">class</span> <span class="nc">L1qFrankWolfe</span><span class="p">(</span><span class="n">L1qNormedGradientOptim</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;A Frank-Wolfe [1]_ optimizer that, when computing the LMO, sparsifies a</span>
+
+<div class="viewcode-block" id="L1qFrankWolfe">
+<a class="viewcode-back" href="../../../generated/rai_toolbox.optim.L1qFrankWolfe.html#rai_toolbox.optim.L1qFrankWolfe">[docs]</a>
+<span class="k">class</span> <span class="nc">L1qFrankWolfe</span><span class="p">(</span><span class="n">L1qNormedGradientOptim</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;A Frank-Wolfe [1]_ optimizer that, when computing the LMO, sparsifies a</span>
 <span class="sd">    parameter&#39;s gradient. Each updated parameter is constrained to fall within an</span>
 <span class="sd">    :math:`\epsilon`-sized ball in :math:`L^1` space, centered on the origin.</span>
 
@@ -535,7 +543,9 @@ document.write(`
 <span class="sd">    .. [2] Roberts, Jay, and Theodoros Tsiligkaridis. Controllably Sparse Perturbations of Robust Classifiers for Explaining Predictions and Probing Learned Concepts. (2021).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="L1qFrankWolfe.__init__"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.L1qFrankWolfe.html#rai_toolbox.optim.L1qFrankWolfe.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="L1qFrankWolfe.__init__">
+<a class="viewcode-back" href="../../../generated/rai_toolbox.optim.L1qFrankWolfe.html#rai_toolbox.optim.L1qFrankWolfe.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">params</span><span class="p">:</span> <span class="n">OptimParams</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -548,7 +558,7 @@ document.write(`
         <span class="n">div_by_zero_eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">_TINY</span><span class="p">,</span>
         <span class="n">generator</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Generator</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">default_generator</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        params : Sequence[Tensor] | Iterable[Mapping[str, Any]]</span>
@@ -648,11 +658,15 @@ document.write(`
             <span class="n">generator</span><span class="o">=</span><span class="n">generator</span><span class="p">,</span>
             <span class="n">lr</span><span class="o">=</span><span class="n">lr</span><span class="p">,</span>
             <span class="n">use_default_lr_schedule</span><span class="o">=</span><span class="n">use_default_lr_schedule</span><span class="p">,</span>
-        <span class="p">)</span></div></div>
+        <span class="p">)</span></div>
+</div>
 
 
-<div class="viewcode-block" id="L1FrankWolfe"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.L1FrankWolfe.html#rai_toolbox.optim.L1FrankWolfe">[docs]</a><span class="k">class</span> <span class="nc">L1FrankWolfe</span><span class="p">(</span><span class="n">ParamTransformingOptimizer</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;A Frank-Wolfe [1]_ optimizer that constrains each updated parameter to fall</span>
+
+<div class="viewcode-block" id="L1FrankWolfe">
+<a class="viewcode-back" href="../../../generated/rai_toolbox.optim.L1FrankWolfe.html#rai_toolbox.optim.L1FrankWolfe">[docs]</a>
+<span class="k">class</span> <span class="nc">L1FrankWolfe</span><span class="p">(</span><span class="n">ParamTransformingOptimizer</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;A Frank-Wolfe [1]_ optimizer that constrains each updated parameter to fall</span>
 <span class="sd">    within an :math:`\epsilon`-sized ball in :math:`L^1` space, centered on the origin.</span>
 
 <span class="sd">    Notes</span>
@@ -673,7 +687,9 @@ document.write(`
 <span class="sd">    .. [1] https://en.wikipedia.org/wiki/Frank%E2%80%93Wolfe_algorithm#Algorithm</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="L1FrankWolfe.__init__"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.L1FrankWolfe.html#rai_toolbox.optim.L1FrankWolfe.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="L1FrankWolfe.__init__">
+<a class="viewcode-back" href="../../../generated/rai_toolbox.optim.L1FrankWolfe.html#rai_toolbox.optim.L1FrankWolfe.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">params</span><span class="p">:</span> <span class="n">OptimParams</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -683,7 +699,7 @@ document.write(`
         <span class="n">param_ndim</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">div_by_zero_eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">_TINY</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        params : Sequence[Tensor] | Iterable[Mapping[str, Any]]</span>
@@ -757,6 +773,7 @@ document.write(`
             <span class="n">div_by_zero_eps</span><span class="o">=</span><span class="n">div_by_zero_eps</span><span class="p">,</span>
         <span class="p">)</span></div>
 
+
     <span class="k">def</span> <span class="nf">_pre_step_transform_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="o">**</span><span class="n">_unused_kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">grad</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
             <span class="k">return</span>
@@ -768,8 +785,11 @@ document.write(`
         <span class="n">param</span><span class="o">.</span><span class="n">grad</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">param</span><span class="p">)),</span> <span class="n">argmax</span><span class="p">]</span> <span class="o">=</span> <span class="n">signs</span></div>
 
 
-<div class="viewcode-block" id="L2FrankWolfe"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.L2FrankWolfe.html#rai_toolbox.optim.L2FrankWolfe">[docs]</a><span class="k">class</span> <span class="nc">L2FrankWolfe</span><span class="p">(</span><span class="n">L2NormedGradientOptim</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;A Frank-Wolfe [1]_ optimizer that constrains each updated parameter to fall</span>
+
+<div class="viewcode-block" id="L2FrankWolfe">
+<a class="viewcode-back" href="../../../generated/rai_toolbox.optim.L2FrankWolfe.html#rai_toolbox.optim.L2FrankWolfe">[docs]</a>
+<span class="k">class</span> <span class="nc">L2FrankWolfe</span><span class="p">(</span><span class="n">L2NormedGradientOptim</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;A Frank-Wolfe [1]_ optimizer that constrains each updated parameter to fall</span>
 <span class="sd">    within an :math:`\epsilon`-sized ball in :math:`L^2` space, centered on the origin.</span>
 
 
@@ -795,7 +815,9 @@ document.write(`
 <span class="sd">    .. [2] Roberts, Jay, and Theodoros Tsiligkaridis. Controllably Sparse Perturbations of Robust Classifiers for Explaining Predictions and Probing Learned Concepts. (2021).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="L2FrankWolfe.__init__"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.L2FrankWolfe.html#rai_toolbox.optim.L2FrankWolfe.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="L2FrankWolfe.__init__">
+<a class="viewcode-back" href="../../../generated/rai_toolbox.optim.L2FrankWolfe.html#rai_toolbox.optim.L2FrankWolfe.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">params</span><span class="p">:</span> <span class="n">OptimParams</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -805,7 +827,7 @@ document.write(`
         <span class="n">param_ndim</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">div_by_zero_eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">_TINY</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        params : Sequence[Tensor] | Iterable[Mapping[str, Any]]</span>
@@ -877,11 +899,15 @@ document.write(`
             <span class="n">use_default_lr_schedule</span><span class="o">=</span><span class="n">use_default_lr_schedule</span><span class="p">,</span>
             <span class="n">param_ndim</span><span class="o">=</span><span class="n">param_ndim</span><span class="p">,</span>
             <span class="n">div_by_zero_eps</span><span class="o">=</span><span class="n">div_by_zero_eps</span><span class="p">,</span>
-        <span class="p">)</span></div></div>
+        <span class="p">)</span></div>
+</div>
 
 
-<div class="viewcode-block" id="LinfFrankWolfe"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.LinfFrankWolfe.html#rai_toolbox.optim.LinfFrankWolfe">[docs]</a><span class="k">class</span> <span class="nc">LinfFrankWolfe</span><span class="p">(</span><span class="n">SignedGradientOptim</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;A Frank-Wolfe [1]_ optimizer that constrains each updated parameter to fall</span>
+
+<div class="viewcode-block" id="LinfFrankWolfe">
+<a class="viewcode-back" href="../../../generated/rai_toolbox.optim.LinfFrankWolfe.html#rai_toolbox.optim.LinfFrankWolfe">[docs]</a>
+<span class="k">class</span> <span class="nc">LinfFrankWolfe</span><span class="p">(</span><span class="n">SignedGradientOptim</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;A Frank-Wolfe [1]_ optimizer that constrains each updated parameter to fall</span>
 <span class="sd">    within an :math:`\epsilon`-sized ball in :math:`L^\infty` space, centered on the origin.</span>
 
 <span class="sd">    Notes</span>
@@ -929,7 +955,9 @@ document.write(`
 <span class="sd">    &gt;&gt;&gt; x</span>
 <span class="sd">    tensor([-1.8000, -1.8000], requires_grad=True)&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="LinfFrankWolfe.__init__"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.LinfFrankWolfe.html#rai_toolbox.optim.LinfFrankWolfe.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="LinfFrankWolfe.__init__">
+<a class="viewcode-back" href="../../../generated/rai_toolbox.optim.LinfFrankWolfe.html#rai_toolbox.optim.LinfFrankWolfe.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">params</span><span class="p">:</span> <span class="n">OptimParams</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -939,7 +967,7 @@ document.write(`
         <span class="n">param_ndim</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">div_by_zero_eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">_TINY</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        params : Sequence[Tensor] | Iterable[Mapping[str, Any]]</span>
@@ -983,7 +1011,9 @@ document.write(`
             <span class="n">use_default_lr_schedule</span><span class="o">=</span><span class="n">use_default_lr_schedule</span><span class="p">,</span>
             <span class="n">param_ndim</span><span class="o">=</span><span class="n">param_ndim</span><span class="p">,</span>
             <span class="n">div_by_zero_eps</span><span class="o">=</span><span class="n">div_by_zero_eps</span><span class="p">,</span>
-        <span class="p">)</span></div></div>
+        <span class="p">)</span></div>
+</div>
+
 </pre></div>
 
                 </article>
@@ -1036,7 +1066,7 @@ document.write(`
       
         <div class="footer-item">
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.0.1.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
     <br/>
   </p>
 </div>

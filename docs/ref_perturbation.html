@@ -29,21 +29,21 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
-    <link rel="icon" sizes="16x16" type="image/png" href="_static/favicon-16x16.png" />
-    <link rel="icon" sizes="32x32" type="image/png" href="_static/favicon-32x32.png" />
-    <link rel="apple-touch-icon" sizes="180x180" type="image/png" href="_static/apple-touch-icon.png" />
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="icon" sizes="16x16" type="image/png" href="_static/favicon-16x16.png?v=e7d2fd79" />
+    <link rel="icon" sizes="32x32" type="image/png" href="_static/favicon-32x32.png?v=f6e94bc1" />
+    <link rel="apple-touch-icon" sizes="180x180" type="image/png" href="_static/apple-touch-icon.png?v=cfad7531" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/doctools.js"></script>
-    <script src="_static/sphinx_highlight.js"></script>
-    <script src="_static/clipboard.min.js"></script>
-    <script src="_static/copybutton.js"></script>
+    <script src="_static/documentation_options.js?v=8a448e45"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=30646c52"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -420,14 +420,14 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <section id="perturbations">
-<span id="pert-reference"></span><h1>Perturbations<a class="headerlink" href="#perturbations" title="Permalink to this heading">#</a></h1>
+<span id="pert-reference"></span><h1>Perturbations<a class="headerlink" href="#perturbations" title="Link to this heading">#</a></h1>
 <p>The rAI-toolbox provides utilities for applying perturbations to data and solving for optimal perturbations. A perturbation model is a <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.nn.Module</span></code> whose parameters are used by its forward pass to perturb a datum or a batch of data.
 E.g., <a class="reference internal" href="generated/rai_toolbox.perturbations.AdditivePerturbation.html#rai_toolbox.perturbations.AdditivePerturbation" title="rai_toolbox.perturbations.AdditivePerturbation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AdditivePerturbation</span></code></a> applies the perturbation <span class="math notranslate nohighlight">\(x \rightarrow x + \delta\)</span> via its forward pass, where <span class="math notranslate nohighlight">\(\delta\)</span> is the sole learnable parameter of this perturbation model.</p>
 <p>Thus solving for perturbations is cast as a standard PyTorch optimization problem, where <a class="reference internal" href="ref_optim.html#optim-reference"><span class="std std-ref">optimizers</span></a> are used to make gradient-based updates to the perturbations.
 In this way, the rAI-toolbox enables adversarial perturbation workflows to be performed by standard training and testing frameworks (e.g. via <a class="reference external" href="https://www.pytorchlightning.ai/">PyTorch-Lightning</a>).
 We also provide some custom solvers, e.g., <a class="reference internal" href="generated/rai_toolbox.perturbations.gradient_ascent.html#rai_toolbox.perturbations.gradient_ascent" title="rai_toolbox.perturbations.gradient_ascent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gradient_ascent</span></code></a>, to facilitate this line of work.</p>
 <section id="models">
-<span id="pert-models"></span><h2>Models<a class="headerlink" href="#models" title="Permalink to this heading">#</a></h2>
+<span id="pert-models"></span><h2>Models<a class="headerlink" href="#models" title="Link to this heading">#</a></h2>
 <table class="autosummary longtable table autosummary">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/rai_toolbox.perturbations.PerturbationModel.html#rai_toolbox.perturbations.PerturbationModel" title="rai_toolbox.perturbations.PerturbationModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PerturbationModel</span></code></a>(*args, **kwargs)</p></td>
@@ -440,7 +440,7 @@ We also provide some custom solvers, e.g., <a class="reference internal" href="g
 </table>
 </section>
 <section id="solvers">
-<span id="pert-solvers"></span><h2>Solvers<a class="headerlink" href="#solvers" title="Permalink to this heading">#</a></h2>
+<span id="pert-solvers"></span><h2>Solvers<a class="headerlink" href="#solvers" title="Link to this heading">#</a></h2>
 <table class="autosummary longtable table autosummary">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/rai_toolbox.perturbations.gradient_ascent.html#rai_toolbox.perturbations.gradient_ascent" title="rai_toolbox.perturbations.gradient_ascent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gradient_ascent</span></code></a>(*, model, data, target, ...)</p></td>
@@ -453,7 +453,7 @@ We also provide some custom solvers, e.g., <a class="reference internal" href="g
 </table>
 </section>
 <section id="initializers">
-<h2>Initializers<a class="headerlink" href="#initializers" title="Permalink to this heading">#</a></h2>
+<h2>Initializers<a class="headerlink" href="#initializers" title="Link to this heading">#</a></h2>
 <table class="autosummary longtable table autosummary">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/rai_toolbox.perturbations.uniform_like_l1_n_ball_.html#rai_toolbox.perturbations.uniform_like_l1_n_ball_" title="rai_toolbox.perturbations.uniform_like_l1_n_ball_"><code class="xref py py-obj docutils literal notranslate"><span class="pre">uniform_like_l1_n_ball_</span></code></a>(x[, epsilon, ...])</p></td>
@@ -563,7 +563,7 @@ We also provide some custom solvers, e.g., <a class="reference internal" href="g
       
         <div class="footer-item">
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.0.1.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
     <br/>
   </p>
 </div>

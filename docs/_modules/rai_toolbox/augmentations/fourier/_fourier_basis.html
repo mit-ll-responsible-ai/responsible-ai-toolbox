@@ -27,21 +27,21 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css" />
-    <link rel="icon" sizes="16x16" type="image/png" href="../../../../_static/favicon-16x16.png" />
-    <link rel="icon" sizes="32x32" type="image/png" href="../../../../_static/favicon-32x32.png" />
-    <link rel="apple-touch-icon" sizes="180x180" type="image/png" href="../../../../_static/apple-touch-icon.png" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="icon" sizes="16x16" type="image/png" href="../../../../_static/favicon-16x16.png?v=e7d2fd79" />
+    <link rel="icon" sizes="32x32" type="image/png" href="../../../../_static/favicon-32x32.png?v=f6e94bc1" />
+    <link rel="apple-touch-icon" sizes="180x180" type="image/png" href="../../../../_static/apple-touch-icon.png?v=cfad7531" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
-    <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
-    <script src="../../../../_static/doctools.js"></script>
-    <script src="../../../../_static/sphinx_highlight.js"></script>
-    <script src="../../../../_static/clipboard.min.js"></script>
-    <script src="../../../../_static/copybutton.js"></script>
+    <script src="../../../../_static/documentation_options.js?v=8a448e45"></script>
+    <script src="../../../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../../_static/copybutton.js?v=30646c52"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/rai_toolbox/augmentations/fourier/_fourier_basis';</script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
@@ -394,8 +394,10 @@ document.write(`
 <span class="kn">from</span> <span class="nn">numpy.typing</span> <span class="kn">import</span> <span class="n">DTypeLike</span>
 
 
-<div class="viewcode-block" id="FourierBasis"><a class="viewcode-back" href="../../../../generated/rai_toolbox.augmentations.fourier.FourierBasis.html#rai_toolbox.augmentations.fourier.FourierBasis">[docs]</a><span class="k">class</span> <span class="nc">FourierBasis</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="FourierBasis">
+<a class="viewcode-back" href="../../../../generated/rai_toolbox.augmentations.fourier.FourierBasis.html#rai_toolbox.augmentations.fourier.FourierBasis">[docs]</a>
+<span class="k">class</span> <span class="nc">FourierBasis</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Describes a 2D planewave generated via:</span>
 
 <span class="sd">    A * cos(2pi * freq_vector @ x + phase_shift)</span>
@@ -428,7 +430,10 @@ document.write(`
     <span class="n">phase_shift</span><span class="p">:</span> <span class="nb">float</span></div>
 
 
-<div class="viewcode-block" id="generate_fourier_bases"><a class="viewcode-back" href="../../../../generated/rai_toolbox.augmentations.fourier.generate_fourier_bases.html#rai_toolbox.augmentations.fourier.generate_fourier_bases">[docs]</a><span class="k">def</span> <span class="nf">generate_fourier_bases</span><span class="p">(</span>
+
+<div class="viewcode-block" id="generate_fourier_bases">
+<a class="viewcode-back" href="../../../../generated/rai_toolbox.augmentations.fourier.generate_fourier_bases.html#rai_toolbox.augmentations.fourier.generate_fourier_bases">[docs]</a>
+<span class="k">def</span> <span class="nf">generate_fourier_bases</span><span class="p">(</span>
     <span class="n">nrows</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">ncols</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLike</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span>
@@ -436,7 +441,7 @@ document.write(`
     <span class="n">factor_2pi_phase_shift</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="n">row_col_coords</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">FourierBasis</span><span class="p">]:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Yields each unique, real-valued 2D array with unit norm, such that its Fourier</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Yields each unique, real-valued 2D array with unit norm, such that its Fourier</span>
 <span class="sd">    transform is supported at each (i, j) and its symmetric position on a shape-(nrows, ncols)</span>
 <span class="sd">    grid in Fourier space, where the lowest frequency component resides at the center of</span>
 <span class="sd">    the grid.</span>
@@ -567,6 +572,7 @@ document.write(`
             <span class="n">sym_position</span><span class="o">=</span><span class="p">(</span><span class="n">sym_i</span><span class="p">,</span> <span class="n">sym_j</span><span class="p">),</span>
             <span class="n">phase_shift</span><span class="o">=</span><span class="n">phase_shift</span><span class="p">,</span>
         <span class="p">)</span></div>
+
 </pre></div>
 
                 </article>
@@ -619,7 +625,7 @@ document.write(`
       
         <div class="footer-item">
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.0.1.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
     <br/>
   </p>
 </div>

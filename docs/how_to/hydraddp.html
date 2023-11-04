@@ -29,21 +29,21 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
-    <link rel="icon" sizes="16x16" type="image/png" href="../_static/favicon-16x16.png" />
-    <link rel="icon" sizes="32x32" type="image/png" href="../_static/favicon-32x32.png" />
-    <link rel="apple-touch-icon" sizes="180x180" type="image/png" href="../_static/apple-touch-icon.png" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="icon" sizes="16x16" type="image/png" href="../_static/favicon-16x16.png?v=e7d2fd79" />
+    <link rel="icon" sizes="32x32" type="image/png" href="../_static/favicon-32x32.png?v=f6e94bc1" />
+    <link rel="apple-touch-icon" sizes="180x180" type="image/png" href="../_static/apple-touch-icon.png?v=cfad7531" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/sphinx_highlight.js"></script>
-    <script src="../_static/clipboard.min.js"></script>
-    <script src="../_static/copybutton.js"></script>
+    <script src="../_static/documentation_options.js?v=8a448e45"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=30646c52"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'how_to/hydraddp';</script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -438,11 +438,11 @@ or <a class="reference external" href="https://mit-ll-responsible-ai.github.io/h
 becomes compatible with interactive environments such as Jupyter Notebooks!</p>
 </div>
 <section id="run-pytorch-lightning-ddp-in-hydra">
-<span id="hydraddp"></span><h1>Run PyTorch Lightning DDP in Hydra<a class="headerlink" href="#run-pytorch-lightning-ddp-in-hydra" title="Permalink to this heading">#</a></h1>
+<span id="hydraddp"></span><h1>Run PyTorch Lightning DDP in Hydra<a class="headerlink" href="#run-pytorch-lightning-ddp-in-hydra" title="Link to this heading">#</a></h1>
 <p>Using Hydra to run <a class="reference external" href="https://pytorch-lightning.readthedocs.io/en/latest/accelerators/gpu_expert.html#what-is-a-strategy/">PyTorch Lightning’s Distributed Data Parallel (DDP) Strategy</a>
 often <a class="reference external" href="https://github.com/PyTorchLightning/pytorch-lightning/issues/11300">has issues</a>
 , in part because the strategy launches subprocesses where the command is derived from
-values in <a class="reference external" href="https://docs.python.org/3/library/sys.html#sys.argv" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sys.argv</span></code></a>.</p>
+values in <a class="reference external" href="https://docs.python.org/3/library/sys.html#sys.argv" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sys.argv</span></code></a>.</p>
 <p>The rAI-toolbox comes with a custom strategy, <a class="reference internal" href="../generated/rai_toolbox.mushin.HydraDDP.html#rai_toolbox.mushin.HydraDDP" title="rai_toolbox.mushin.HydraDDP"><code class="xref py py-func docutils literal notranslate"><span class="pre">HydraDDP()</span></code></a>,
 that addresses the challenge of running Hydra and Lightning together using DDP.</p>
 <p>In this How-To we will:</p>
@@ -455,7 +455,7 @@ that addresses the challenge of running Hydra and Lightning together using DDP.<
 <p>First, in order to use <a class="reference internal" href="../generated/rai_toolbox.mushin.HydraDDP.html#rai_toolbox.mushin.HydraDDP" title="rai_toolbox.mushin.HydraDDP"><code class="xref py py-func docutils literal notranslate"><span class="pre">HydraDDP()</span></code></a>, the Hydra configuration
 must contain the following two sub-configurations:</p>
 <div class="literal-block-wrapper docutils container" id="id2">
-<div class="code-block-caption"><span class="caption-text">1: Define requirements for Hydra configuration</span><a class="headerlink" href="#id2" title="Permalink to this code">#</a></div>
+<div class="code-block-caption"><span class="caption-text">1: Define requirements for Hydra configuration</span><a class="headerlink" href="#id2" title="Link to this code">#</a></div>
 <div class="highlight-reStructuredText notranslate"><div class="highlight"><pre><span></span>Config
  ├── trainer: A <span class="s">``pytorch_lightning.Trainer``</span> configuration
  ├── module: A <span class="s">``pytorch_lightning.LightningModule``</span> configuration
@@ -467,7 +467,7 @@ must contain the following two sub-configurations:</p>
 toolbox-provided task function (<code class="docutils literal notranslate"><span class="pre">rai_toolbox.mushin.lightning._pl_main.py</span></code>) that is
 launched for each subprocess:</p>
 <div class="literal-block-wrapper docutils container" id="id3">
-<div class="code-block-caption"><span class="caption-text">The task function automatically run by each HydraDDP subprocess</span><a class="headerlink" href="#id3" title="Permalink to this code">#</a></div>
+<div class="code-block-caption"><span class="caption-text">The task function automatically run by each HydraDDP subprocess</span><a class="headerlink" href="#id3" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">task</span><span class="p">(</span><span class="n">trainer</span><span class="p">:</span> <span class="n">Trainer</span><span class="p">,</span> <span class="n">module</span><span class="p">:</span> <span class="n">LightningModule</span><span class="p">,</span> <span class="n">pl_testing</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">pl_predicting</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">pl_local_rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">pl_testing</span><span class="p">:</span>
         <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Rank </span><span class="si">{</span><span class="n">pl_local_rank</span><span class="si">}</span><span class="s2">: Launched subprocess using Training.test&quot;</span><span class="p">)</span>
@@ -485,7 +485,7 @@ launched for each subprocess:</p>
 automatically set by <a class="reference internal" href="../generated/rai_toolbox.mushin.HydraDDP.html#rai_toolbox.mushin.HydraDDP" title="rai_toolbox.mushin.HydraDDP"><code class="xref py py-func docutils literal notranslate"><span class="pre">HydraDDP()</span></code></a> before execution.</p>
 <p>Next let’s create an example configuration and task function using <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/">hydra-zen</a>:</p>
 <div class="literal-block-wrapper docutils container" id="id4">
-<div class="code-block-caption"><span class="caption-text">2: Creating hydra-zen configuration and task function for leveraging HydraDDP</span><a class="headerlink" href="#id4" title="Permalink to this code">#</a></div>
+<div class="code-block-caption"><span class="caption-text">2: Creating hydra-zen configuration and task function for leveraging HydraDDP</span><a class="headerlink" href="#id4" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pytorch_lightning</span> <span class="k">as</span> <span class="nn">pl</span>
 
 <span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">builds</span><span class="p">,</span> <span class="n">make_config</span><span class="p">,</span> <span class="n">instantiate</span><span class="p">,</span> <span class="n">launch</span>
@@ -514,7 +514,7 @@ automatically set by <a class="reference internal" href="../generated/rai_toolbo
 <p>Next, we launch the training job. For the purpose of this How-To, we will run only for
 a single epoch and in “fast dev run” mode.</p>
 <div class="literal-block-wrapper docutils container" id="id5">
-<div class="code-block-caption"><span class="caption-text">3: Execute a Hydra-compatible ddp job using two gpus</span><a class="headerlink" href="#id5" title="Permalink to this code">#</a></div>
+<div class="code-block-caption"><span class="caption-text">3: Execute a Hydra-compatible ddp job using two gpus</span><a class="headerlink" href="#id5" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">job</span> <span class="o">=</span> <span class="n">launch</span><span class="p">(</span><span class="n">Config</span><span class="p">,</span> <span class="n">task_function</span><span class="p">,</span>
 <span class="gp">... </span>             <span class="n">overrides</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;trainer.gpus=2&quot;</span><span class="p">,</span>
 <span class="gp">... </span>                        <span class="s2">&quot;trainer.max_epochs=1&quot;</span><span class="p">,</span>
@@ -522,7 +522,7 @@ a single epoch and in “fast dev run” mode.</p>
 <span class="gp">... </span>                       <span class="p">]</span>
 <span class="gp">... </span>             <span class="p">)</span>
 <span class="go">GPU available: True, used: True</span>
-<span class="gp">...</span>
+<span class="go">...</span>
 </pre></div>
 </div>
 </div>
@@ -533,7 +533,7 @@ a single epoch and in “fast dev run” mode.</p>
 </ul>
 <p>The log file should contain the following information:</p>
 <div class="literal-block-wrapper docutils container" id="id6">
-<div class="code-block-caption"><span class="caption-text">4: Output of zen_launch.log</span><a class="headerlink" href="#id6" title="Permalink to this code">#</a></div>
+<div class="code-block-caption"><span class="caption-text">4: Output of zen_launch.log</span><a class="headerlink" href="#id6" title="Link to this code">#</a></div>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>[2022-04-21 20:35:40,794][__main__][INFO] - Rank 1: Launched subprocess using Training.fit
 [2022-04-21 20:35:42,800][torch.distributed.distributed_c10d][INFO] - Added key: store_based_barrier_key:1 to store for rank: 1
 [2022-04-21 20:35:42,801][torch.distributed.distributed_c10d][INFO] - Added key: store_based_barrier_key:1 to store for rank: 0
@@ -544,7 +544,7 @@ a single epoch and in “fast dev run” mode.</p>
 </div>
 <p>Here you can see that the first line in the logged output indicates that the subprocess was launched for the second (Rank 1) GPU as expected.</p>
 <section id="bonus-adding-some-bells-whistles-to-our-hydra-application">
-<h2>Bonus: Adding Some Bells &amp; Whistles to Our Hydra Application<a class="headerlink" href="#bonus-adding-some-bells-whistles-to-our-hydra-application" title="Permalink to this heading">#</a></h2>
+<h2>Bonus: Adding Some Bells &amp; Whistles to Our Hydra Application<a class="headerlink" href="#bonus-adding-some-bells-whistles-to-our-hydra-application" title="Link to this heading">#</a></h2>
 <p>There are a couple of enhancements that we can add to our Hydra-based application,
 which are beyond the scope of this How-To; it is simple to <a class="reference external" href="https://mit-ll-responsible-ai.github.io/hydra-zen/tutorials/add_cli.html">add a command line interface to our code</a> and to make the <a class="reference internal" href="../generated/rai_toolbox.mushin.HydraDDP.html#rai_toolbox.mushin.HydraDDP" title="rai_toolbox.mushin.HydraDDP"><code class="xref py py-func docutils literal notranslate"><span class="pre">HydraDDP()</span></code></a> strategy available
 as <a class="reference external" href="https://mit-ll-responsible-ai.github.io/hydra-zen/tutorials/config_groups.html">a swappable configuration group</a>. We refer the reader to the linked tutorials for
@@ -552,7 +552,7 @@ further explanation and instruction.</p>
 <p>The code from this How-To has been modified accordingly and placed in the script
 <code class="docutils literal notranslate"><span class="pre">pl_trainer.py</span></code>:</p>
 <div class="literal-block-wrapper docutils container" id="id7">
-<div class="code-block-caption"><span class="caption-text">Contents of <code class="docutils literal notranslate"><span class="pre">pl_trainer.py</span></code></span><a class="headerlink" href="#id7" title="Permalink to this code">#</a></div>
+<div class="code-block-caption"><span class="caption-text">Contents of <code class="docutils literal notranslate"><span class="pre">pl_trainer.py</span></code></span><a class="headerlink" href="#id7" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">hydra</span>
 <span class="kn">from</span> <span class="nn">hydra.core.config_store</span> <span class="kn">import</span> <span class="n">ConfigStore</span>
 
@@ -586,7 +586,7 @@ further explanation and instruction.</p>
 </div>
 </div>
 <p>We can configure and run this code from the command line:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python pl_trainer.py +trainer/strategy<span class="o">=</span>hydra_ddp trainer.gpus<span class="o">=</span><span class="m">2</span> trainer.max_epochs<span class="o">=</span><span class="m">1</span> trainer.fast_dev_run<span class="o">=</span>True
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>pl_trainer.py<span class="w"> </span>+trainer/strategy<span class="o">=</span>hydra_ddp<span class="w"> </span>trainer.gpus<span class="o">=</span><span class="m">2</span><span class="w"> </span>trainer.max_epochs<span class="o">=</span><span class="m">1</span><span class="w"> </span>trainer.fast_dev_run<span class="o">=</span>True
 <span class="go">GPU available: True, used: True</span>
 <span class="go">...</span>
 </pre></div>
@@ -685,7 +685,7 @@ further explanation and instruction.</p>
       
         <div class="footer-item">
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.0.1.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
     <br/>
   </p>
 </div>

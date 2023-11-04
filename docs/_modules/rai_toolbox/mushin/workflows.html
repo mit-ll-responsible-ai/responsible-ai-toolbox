@@ -27,21 +27,21 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css" />
-    <link rel="icon" sizes="16x16" type="image/png" href="../../../_static/favicon-16x16.png" />
-    <link rel="icon" sizes="32x32" type="image/png" href="../../../_static/favicon-32x32.png" />
-    <link rel="apple-touch-icon" sizes="180x180" type="image/png" href="../../../_static/apple-touch-icon.png" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="icon" sizes="16x16" type="image/png" href="../../../_static/favicon-16x16.png?v=e7d2fd79" />
+    <link rel="icon" sizes="32x32" type="image/png" href="../../../_static/favicon-32x32.png?v=f6e94bc1" />
+    <link rel="apple-touch-icon" sizes="180x180" type="image/png" href="../../../_static/apple-touch-icon.png?v=cfad7531" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
-    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-    <script src="../../../_static/doctools.js"></script>
-    <script src="../../../_static/sphinx_highlight.js"></script>
-    <script src="../../../_static/clipboard.min.js"></script>
-    <script src="../../../_static/copybutton.js"></script>
+    <script src="../../../_static/documentation_options.js?v=8a448e45"></script>
+    <script src="../../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=30646c52"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/rai_toolbox/mushin/workflows';</script>
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -454,8 +454,10 @@ document.write(`
     <span class="k">return</span> <span class="n">wrapped</span>
 
 
-<div class="viewcode-block" id="BaseWorkflow"><a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.BaseWorkflow.html#rai_toolbox.mushin.BaseWorkflow">[docs]</a><span class="k">class</span> <span class="nc">BaseWorkflow</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Provides an interface for creating a reusable workflow: encapsulated</span>
+<div class="viewcode-block" id="BaseWorkflow">
+<a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.BaseWorkflow.html#rai_toolbox.mushin.BaseWorkflow">[docs]</a>
+<span class="k">class</span> <span class="nc">BaseWorkflow</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Provides an interface for creating a reusable workflow: encapsulated</span>
 <span class="sd">    &quot;boilerplate&quot; for running, aggregating, and analyzing one or more Hydra jobs.</span>
 
 <span class="sd">    Attributes</span>
@@ -484,8 +486,10 @@ document.write(`
     <span class="n">workflow_overrides</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
     <span class="n">jobs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">JobReturn</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">JobReturn</span><span class="p">]</span>
 
-<div class="viewcode-block" id="BaseWorkflow.__init__"><a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.BaseWorkflow.html#rai_toolbox.mushin.BaseWorkflow.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eval_task_cfg</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Workflows and experiments using Hydra.</span>
+<div class="viewcode-block" id="BaseWorkflow.__init__">
+<a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.BaseWorkflow.html#rai_toolbox.mushin.BaseWorkflow.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eval_task_cfg</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Workflows and experiments using Hydra.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -505,6 +509,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_multirun_task_overrides</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">jobs</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_working_dir</span> <span class="o">=</span> <span class="kc">None</span></div>
+
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">working_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
@@ -551,7 +556,7 @@ document.write(`
     <span class="k">def</span> <span class="nf">multirun_task_overrides</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="n">LoadedValue</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">LoadedValue</span><span class="p">]]]:</span>
-        <span class="sd">&quot;&quot;&quot;Returns override param-name -&gt; value.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns override param-name -&gt; value.</span>
 
 <span class="sd">        A sequence of overrides associated with a multirun will</span>
 <span class="sd">        be stored in a `rai_toolbox.mushin.multirun` list. This</span>
@@ -588,7 +593,7 @@ document.write(`
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">pre_task</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Called prior to `task`</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Called prior to `task`</span>
 
 <span class="sd">        This can be useful for doing things like setting random seeds,</span>
 <span class="sd">        which must occur prior to instantiating objects for the evaluation</span>
@@ -602,9 +607,11 @@ document.write(`
 <span class="sd">        function. This behavior can be modified by `self.run(pre_task_fn_wrapper=...)`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="BaseWorkflow.task"><a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.BaseWorkflow.html#rai_toolbox.mushin.BaseWorkflow.task">[docs]</a>    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="BaseWorkflow.task">
+<a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.BaseWorkflow.html#rai_toolbox.mushin.BaseWorkflow.task">[docs]</a>
+    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">task</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;User-defined task that is run by the workflow. This should be</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;User-defined task that is run by the workflow. This should be</span>
 <span class="sd">        a static method.</span>
 
 <span class="sd">        Arguments will be instantiated configuration variables.  For example,</span>
@@ -631,14 +638,17 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
 
+
     <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">include_pre_task</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Validates that the configuration will execute with the user-defined evaluation task&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validates that the configuration will execute with the user-defined evaluation task&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">include_pre_task</span><span class="p">:</span>
             <span class="n">zen</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pre_task</span><span class="p">)</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eval_task_cfg</span><span class="p">)</span>
 
         <span class="n">zen</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">task</span><span class="p">)</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eval_task_cfg</span><span class="p">)</span>
 
-<div class="viewcode-block" id="BaseWorkflow.run"><a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.BaseWorkflow.html#rai_toolbox.mushin.BaseWorkflow.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span>
+<div class="viewcode-block" id="BaseWorkflow.run">
+<a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.BaseWorkflow.html#rai_toolbox.mushin.BaseWorkflow.run">[docs]</a>
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">working_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -658,7 +668,7 @@ document.write(`
         <span class="n">with_log_configuration</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="o">**</span><span class="n">workflow_overrides</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">multirun</span><span class="p">,</span> <span class="n">hydra_list</span><span class="p">],</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Run the experiment.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Run the experiment.</span>
 
 <span class="sd">        Individual workflows can explicitly define `workflow_overrides` to improve</span>
 <span class="sd">        readability and undstanding of what parameters are expected for a particular</span>
@@ -786,17 +796,22 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">jobs</span> <span class="o">=</span> <span class="n">jobs</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">jobs_post_process</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="BaseWorkflow.jobs_post_process"><a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.BaseWorkflow.html#rai_toolbox.mushin.BaseWorkflow.jobs_post_process">[docs]</a>    <span class="k">def</span> <span class="nf">jobs_post_process</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sd">&quot;&quot;&quot;Method to extract attributes and metrics relevant to the workflow.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="BaseWorkflow.jobs_post_process">
+<a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.BaseWorkflow.html#rai_toolbox.mushin.BaseWorkflow.jobs_post_process">[docs]</a>
+    <span class="k">def</span> <span class="nf">jobs_post_process</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Method to extract attributes and metrics relevant to the workflow.&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
 
+
     <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sd">&quot;&quot;&quot;Plot workflow metrics.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot workflow metrics.&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">to_xarray</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sd">&quot;&quot;&quot;Convert workflow data to xArray Dataset or DataArray.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert workflow data to xArray Dataset or DataArray.&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
 
 
 <span class="k">def</span> <span class="nf">_non_str_sequence</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TypeGuard</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
@@ -809,8 +824,10 @@ document.write(`
     <span class="k">return</span> <span class="n">v</span>
 
 
-<div class="viewcode-block" id="MultiRunMetricsWorkflow"><a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.MultiRunMetricsWorkflow.html#rai_toolbox.mushin.MultiRunMetricsWorkflow">[docs]</a><span class="k">class</span> <span class="nc">MultiRunMetricsWorkflow</span><span class="p">(</span><span class="n">BaseWorkflow</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Abstract class for workflows that record metrics using Hydra multirun.</span>
+<div class="viewcode-block" id="MultiRunMetricsWorkflow">
+<a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.MultiRunMetricsWorkflow.html#rai_toolbox.mushin.MultiRunMetricsWorkflow">[docs]</a>
+<span class="k">class</span> <span class="nc">MultiRunMetricsWorkflow</span><span class="p">(</span><span class="n">BaseWorkflow</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract class for workflows that record metrics using Hydra multirun.</span>
 
 <span class="sd">    This workflow creates subdirectories of multirun experiments using Hydra.  These directories</span>
 <span class="sd">    contain the Hydra YAML configuration and any saved metrics file (defined by the evaluationf task)::</span>
@@ -888,12 +905,15 @@ document.write(`
 <span class="sd">        loss        (epsilon, scale) float64 0.01 1.0 0.04 4.0 0.09 9.0</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="MultiRunMetricsWorkflow.__init__"><a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.MultiRunMetricsWorkflow.html#rai_toolbox.mushin.MultiRunMetricsWorkflow.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eval_task_cfg</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">working_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="MultiRunMetricsWorkflow.__init__">
+<a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.MultiRunMetricsWorkflow.html#rai_toolbox.mushin.MultiRunMetricsWorkflow.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eval_task_cfg</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">working_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">eval_task_cfg</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_working_dir</span> <span class="o">=</span> <span class="n">working_dir</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_working_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">load_from_dir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="p">,</span> <span class="n">metrics_filename</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></div>
+
 
     <span class="c1"># TODO: add target_job_dirs example</span>
     <span class="c1">#      Document .swap_dims({&quot;job_dir&quot;: &lt;...&gt;}) and .set_index(job_dir=[...]).unstack(&quot;job_dir&quot;)</span>
@@ -906,15 +926,20 @@ document.write(`
     <span class="c1"># List of all the dirs that the multirun writes to; sorted by job-num</span>
     <span class="n">multirun_working_dirs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Path</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
 
-<div class="viewcode-block" id="MultiRunMetricsWorkflow.task"><a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.MultiRunMetricsWorkflow.html#rai_toolbox.mushin.MultiRunMetricsWorkflow.task">[docs]</a>    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="MultiRunMetricsWorkflow.task">
+<a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.MultiRunMetricsWorkflow.html#rai_toolbox.mushin.MultiRunMetricsWorkflow.task">[docs]</a>
+    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">task</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sd">&quot;&quot;&quot;Abstract `staticmethod` for users to define the task that is configured and</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Abstract `staticmethod` for users to define the task that is configured and</span>
 <span class="sd">        launched by the workflow&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="MultiRunMetricsWorkflow.metric_load_fn"><a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.MultiRunMetricsWorkflow.html#rai_toolbox.mushin.MultiRunMetricsWorkflow.metric_load_fn">[docs]</a>    <span class="nd">@staticmethod</span>
+
+<div class="viewcode-block" id="MultiRunMetricsWorkflow.metric_load_fn">
+<a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.MultiRunMetricsWorkflow.html#rai_toolbox.mushin.MultiRunMetricsWorkflow.metric_load_fn">[docs]</a>
+    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">metric_load_fn</span><span class="p">(</span><span class="n">file_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;Loads a metric file and returns a dictionary of metric-name -&gt; metric-value</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Loads a metric file and returns a dictionary of metric-name -&gt; metric-value</span>
 <span class="sd">        mappings.</span>
 
 <span class="sd">        The default metric load function is `torch.load`.</span>
@@ -954,7 +979,10 @@ document.write(`
 <span class="sd">        dict(a=[1, 2, 3], b=[False, False, False])&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">tr</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="MultiRunMetricsWorkflow.run"><a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.MultiRunMetricsWorkflow.html#rai_toolbox.mushin.MultiRunMetricsWorkflow.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span>
+
+<div class="viewcode-block" id="MultiRunMetricsWorkflow.run">
+<a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.MultiRunMetricsWorkflow.html#rai_toolbox.mushin.MultiRunMetricsWorkflow.run">[docs]</a>
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">task_fn_wrapper</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
@@ -1004,9 +1032,10 @@ document.write(`
             <span class="o">**</span><span class="n">workflow_overrides</span><span class="p">,</span>
         <span class="p">)</span></div>
 
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">target_dir_multirun_overrides</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        For a multirun that sweeps over the target directories of a</span>
 <span class="sd">        previous multirun, `target_dir_multirun_overrides` provides</span>
 <span class="sd">        the flattened overrides for that previous run.</span>
@@ -1114,12 +1143,14 @@ document.write(`
                 <span class="n">metrics</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">metrics</span>
 
-<div class="viewcode-block" id="MultiRunMetricsWorkflow.load_from_dir"><a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.MultiRunMetricsWorkflow.html#rai_toolbox.mushin.MultiRunMetricsWorkflow.load_from_dir">[docs]</a>    <span class="k">def</span> <span class="nf">load_from_dir</span><span class="p">(</span>
+<div class="viewcode-block" id="MultiRunMetricsWorkflow.load_from_dir">
+<a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.MultiRunMetricsWorkflow.html#rai_toolbox.mushin.MultiRunMetricsWorkflow.load_from_dir">[docs]</a>
+    <span class="k">def</span> <span class="nf">load_from_dir</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span>
         <span class="n">working_dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
         <span class="n">metrics_filename</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="kc">None</span><span class="p">],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Loading workflow job data from a given working directory. The workflow</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Loading workflow job data from a given working directory. The workflow</span>
 <span class="sd">        is loaded in-place and &quot;self&quot; is returned by this method.</span>
 
 <span class="sd">        Parameters</span>
@@ -1166,10 +1197,13 @@ document.write(`
 
         <span class="k">return</span> <span class="bp">self</span></div>
 
-<div class="viewcode-block" id="MultiRunMetricsWorkflow.load_metrics"><a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.MultiRunMetricsWorkflow.html#rai_toolbox.mushin.MultiRunMetricsWorkflow.load_metrics">[docs]</a>    <span class="k">def</span> <span class="nf">load_metrics</span><span class="p">(</span>
+
+<div class="viewcode-block" id="MultiRunMetricsWorkflow.load_metrics">
+<a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.MultiRunMetricsWorkflow.html#rai_toolbox.mushin.MultiRunMetricsWorkflow.load_metrics">[docs]</a>
+    <span class="k">def</span> <span class="nf">load_metrics</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">metrics_filename</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
-        <span class="sd">&quot;&quot;&quot;Loads and aggregates across all multirun working dirs, and stores</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Loads and aggregates across all multirun working dirs, and stores</span>
 <span class="sd">        the metrics in `self.metrics`.</span>
 
 <span class="sd">        `self.metric_load_fn` is used to load each job&#39;s metric file(s).</span>
@@ -1236,11 +1270,12 @@ document.write(`
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span></div>
 
+
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_sanitize_coordinate_for_xarray</span><span class="p">(</span>
         <span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">LoadedValue</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">LoadedValue</span><span class="p">]]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]]]:</span>
-        <span class="sd">&quot;&quot;&quot;Nested sequences are not permitted for xarray coordinates. This</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Nested sequences are not permitted for xarray coordinates. This</span>
 <span class="sd">        Returns a list of scalars when `value` is a multi-run or a scalar.</span>
 
 <span class="sd">        Inner sequences are converted to strings&quot;&quot;&quot;</span>
@@ -1251,14 +1286,16 @@ document.write(`
             <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">value</span>  <span class="c1"># type: ignore</span>
 
-<div class="viewcode-block" id="MultiRunMetricsWorkflow.to_xarray"><a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.MultiRunMetricsWorkflow.html#rai_toolbox.mushin.MultiRunMetricsWorkflow.to_xarray">[docs]</a>    <span class="k">def</span> <span class="nf">to_xarray</span><span class="p">(</span>
+<div class="viewcode-block" id="MultiRunMetricsWorkflow.to_xarray">
+<a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.MultiRunMetricsWorkflow.html#rai_toolbox.mushin.MultiRunMetricsWorkflow.to_xarray">[docs]</a>
+    <span class="k">def</span> <span class="nf">to_xarray</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">include_working_subdirs_as_data_var</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">coord_from_metrics</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">non_multirun_params_as_singleton_dims</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">metrics_filename</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Convert workflow data to xarray Dataset.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert workflow data to xarray Dataset.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1384,11 +1421,15 @@ document.write(`
                             <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_sanitize_coordinate_for_xarray</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">v</span><span class="p">],</span>
                         <span class="p">)</span>
             <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">out</span></div></div>
+        <span class="k">return</span> <span class="n">out</span></div>
+</div>
 
 
-<div class="viewcode-block" id="RobustnessCurve"><a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.RobustnessCurve.html#rai_toolbox.mushin.RobustnessCurve">[docs]</a><span class="k">class</span> <span class="nc">RobustnessCurve</span><span class="p">(</span><span class="n">MultiRunMetricsWorkflow</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Abstract class for workflows that measure performance for different perturbation</span>
+
+<div class="viewcode-block" id="RobustnessCurve">
+<a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.RobustnessCurve.html#rai_toolbox.mushin.RobustnessCurve">[docs]</a>
+<span class="k">class</span> <span class="nc">RobustnessCurve</span><span class="p">(</span><span class="n">MultiRunMetricsWorkflow</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract class for workflows that measure performance for different perturbation</span>
 <span class="sd">    values.</span>
 
 <span class="sd">    This workflow requires and uses parameter `epsilon` as the configuration option for</span>
@@ -1399,7 +1440,9 @@ document.write(`
 <span class="sd">    MultiRunMetricsWorkflow</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="RobustnessCurve.run"><a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.RobustnessCurve.html#rai_toolbox.mushin.RobustnessCurve.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span>
+<div class="viewcode-block" id="RobustnessCurve.run">
+<a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.RobustnessCurve.html#rai_toolbox.mushin.RobustnessCurve.run">[docs]</a>
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">epsilon</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]],</span>
@@ -1414,7 +1457,7 @@ document.write(`
         <span class="n">overrides</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">**</span><span class="n">workflow_overrides</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">multirun</span><span class="p">,</span> <span class="n">hydra_list</span><span class="p">],</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Run the experiment for varying value `epsilon`.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Run the experiment for varying value `epsilon`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1469,6 +1512,7 @@ document.write(`
             <span class="n">epsilon</span><span class="o">=</span><span class="n">epsilon</span><span class="p">,</span>
         <span class="p">)</span></div>
 
+
     <span class="k">def</span> <span class="nf">to_xarray</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">include_working_subdirs_as_data_var</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -1476,7 +1520,7 @@ document.write(`
         <span class="n">non_multirun_params_as_singleton_dims</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">metrics_filename</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Convert workflow data to xarray Dataset.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert workflow data to xarray Dataset.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1516,7 +1560,9 @@ document.write(`
             <span class="o">.</span><span class="n">sortby</span><span class="p">(</span><span class="s2">&quot;epsilon&quot;</span><span class="p">)</span>
         <span class="p">)</span>
 
-<div class="viewcode-block" id="RobustnessCurve.plot"><a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.RobustnessCurve.html#rai_toolbox.mushin.RobustnessCurve.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span>
+<div class="viewcode-block" id="RobustnessCurve.plot">
+<a class="viewcode-back" href="../../../generated/rai_toolbox.mushin.RobustnessCurve.html#rai_toolbox.mushin.RobustnessCurve.plot">[docs]</a>
+    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">metric</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">ax</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1525,7 +1571,7 @@ document.write(`
         <span class="n">non_multirun_params_as_singleton_dims</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Plot metrics versus `epsilon`.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot metrics versus `epsilon`.</span>
 
 <span class="sd">        Using the `xarray.Dataset` from `to_xarray`, plot the metrics</span>
 <span class="sd">        against the workflow perturbation parameters.</span>
@@ -1574,7 +1620,9 @@ document.write(`
         <span class="k">if</span> <span class="n">save_filename</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">save_filename</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">plots</span></div></div>
+        <span class="k">return</span> <span class="n">plots</span></div>
+</div>
+
 </pre></div>
 
                 </article>
@@ -1627,7 +1675,7 @@ document.write(`
       
         <div class="footer-item">
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.0.1.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
     <br/>
   </p>
 </div>

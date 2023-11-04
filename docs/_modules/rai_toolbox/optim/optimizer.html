@@ -27,21 +27,21 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css" />
-    <link rel="icon" sizes="16x16" type="image/png" href="../../../_static/favicon-16x16.png" />
-    <link rel="icon" sizes="32x32" type="image/png" href="../../../_static/favicon-32x32.png" />
-    <link rel="apple-touch-icon" sizes="180x180" type="image/png" href="../../../_static/apple-touch-icon.png" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="icon" sizes="16x16" type="image/png" href="../../../_static/favicon-16x16.png?v=e7d2fd79" />
+    <link rel="icon" sizes="32x32" type="image/png" href="../../../_static/favicon-32x32.png?v=f6e94bc1" />
+    <link rel="apple-touch-icon" sizes="180x180" type="image/png" href="../../../_static/apple-touch-icon.png?v=cfad7531" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
-    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-    <script src="../../../_static/doctools.js"></script>
-    <script src="../../../_static/sphinx_highlight.js"></script>
-    <script src="../../../_static/clipboard.min.js"></script>
-    <script src="../../../_static/copybutton.js"></script>
+    <script src="../../../_static/documentation_options.js?v=8a448e45"></script>
+    <script src="../../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=30646c52"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/rai_toolbox/optim/optimizer';</script>
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -426,7 +426,7 @@ document.write(`
 
 
 <span class="k">def</span> <span class="nf">_reshape_to_batch</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">param_ndim</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Reshapes to a shape-`(N, d1, ..., dm)`, where `(d1, ..., dm)` has `param_ndim`</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Reshapes to a shape-`(N, d1, ..., dm)`, where `(d1, ..., dm)` has `param_ndim`</span>
 <span class="sd">    dimensions. Dimensions will be added or consolidated to achieve this.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">param_ndim</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">param_ndim</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">ndim</span>
@@ -460,7 +460,7 @@ document.write(`
 
 
 <span class="k">def</span> <span class="nf">_to_batch</span><span class="p">(</span><span class="n">p</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">param_ndim</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns a view of `p`, reshaped as shape-(N, d0, ...) where (d0, ...)</span>
 <span class="sd">    has `param_ndim` entries.</span>
 
@@ -522,8 +522,10 @@ document.write(`
     <span class="k">return</span> <span class="n">vp</span>
 
 
-<div class="viewcode-block" id="ParamTransformingOptimizer"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer">[docs]</a><span class="k">class</span> <span class="nc">ParamTransformingOptimizer</span><span class="p">(</span><span class="n">Optimizer</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;An optimizer that performs an in-place transformation to</span>
+<div class="viewcode-block" id="ParamTransformingOptimizer">
+<a class="viewcode-back" href="../../../generated/rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer">[docs]</a>
+<span class="k">class</span> <span class="nc">ParamTransformingOptimizer</span><span class="p">(</span><span class="n">Optimizer</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;An optimizer that performs an in-place transformation to</span>
 <span class="sd">    each parameter, both before and after performing the gradient-based update on each</span>
 <span class="sd">    parameter via `InnerOptim.step`::</span>
 
@@ -563,7 +565,9 @@ document.write(`
 
     <span class="n">param_groups</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">DatumParamGroup</span><span class="p">]</span>
 
-<div class="viewcode-block" id="ParamTransformingOptimizer.__init__"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="ParamTransformingOptimizer.__init__">
+<a class="viewcode-back" href="../../../generated/rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">OptimParams</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">InnerOpt</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Opt</span><span class="p">,</span> <span class="n">Partial</span><span class="p">[</span><span class="n">Opt</span><span class="p">],</span> <span class="n">OptimizerType</span><span class="p">]</span> <span class="o">=</span> <span class="n">SGD</span><span class="p">,</span>
@@ -574,7 +578,7 @@ document.write(`
         <span class="n">defaults</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">**</span><span class="n">inner_opt_kwargs</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        params : Sequence[Tensor] | Iterable[ParamGroup]</span>
@@ -809,6 +813,7 @@ document.write(`
                 <span class="n">p</span><span class="p">:</span> <span class="n">Tensor</span>
                 <span class="n">_validate_param_ndim</span><span class="p">(</span><span class="n">param_ndim</span><span class="o">=</span><span class="n">param_ndim</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">p</span><span class="p">)</span></div>
 
+
     <span class="k">def</span> <span class="nf">state_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">inner_opt</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()</span>
 
@@ -822,10 +827,12 @@ document.write(`
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;(&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inner_opt</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">](&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
-<div class="viewcode-block" id="ParamTransformingOptimizer._pre_step_transform_"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer._pre_step_transform_">[docs]</a>    <span class="k">def</span> <span class="nf">_pre_step_transform_</span><span class="p">(</span>
+<div class="viewcode-block" id="ParamTransformingOptimizer._pre_step_transform_">
+<a class="viewcode-back" href="../../../generated/rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer._pre_step_transform_">[docs]</a>
+    <span class="k">def</span> <span class="nf">_pre_step_transform_</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">optim_group</span><span class="p">:</span> <span class="n">DatumParamGroup</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sd">&quot;&quot;&quot;Applies an in-place transform on each parameter in the given param group</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Applies an in-place transform on each parameter in the given param group</span>
 <span class="sd">        **before** that parameter has been updated via `InnerOpt.step`.</span>
 
 <span class="sd">        This defaults to a no-op.</span>
@@ -860,10 +867,13 @@ document.write(`
         <span class="k">del</span> <span class="n">optim_group</span>
         <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="ParamTransformingOptimizer._post_step_transform_"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer._post_step_transform_">[docs]</a>    <span class="k">def</span> <span class="nf">_post_step_transform_</span><span class="p">(</span>
+
+<div class="viewcode-block" id="ParamTransformingOptimizer._post_step_transform_">
+<a class="viewcode-back" href="../../../generated/rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer._post_step_transform_">[docs]</a>
+    <span class="k">def</span> <span class="nf">_post_step_transform_</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">optim_group</span><span class="p">:</span> <span class="n">DatumParamGroup</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sd">&quot;&quot;&quot;Applies an in-place transform on each parameter in the given param group</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Applies an in-place transform on each parameter in the given param group</span>
 <span class="sd">        **after** that parameter has been updated via `InnerOpt.step`.</span>
 
 <span class="sd">        This defaults to a no-op.</span>
@@ -899,9 +909,12 @@ document.write(`
         <span class="k">del</span> <span class="n">optim_group</span>
         <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="ParamTransformingOptimizer._apply_post_step_transform_"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer._apply_post_step_transform_">[docs]</a>    <span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
+
+<div class="viewcode-block" id="ParamTransformingOptimizer._apply_post_step_transform_">
+<a class="viewcode-back" href="../../../generated/rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer._apply_post_step_transform_">[docs]</a>
+    <span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
     <span class="k">def</span> <span class="nf">_apply_post_step_transform_</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Update each parameter in-place by calling `_post_step_transform_` on the</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update each parameter in-place by calling `_post_step_transform_` on the</span>
 <span class="sd">        parameter.</span>
 
 <span class="sd">        This is called automatically by `.step()` after `InnerOpt.step()` has been</span>
@@ -913,9 +926,12 @@ document.write(`
                 <span class="n">p</span> <span class="o">=</span> <span class="n">_to_batch</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">param_ndim</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_post_step_transform_</span><span class="p">(</span><span class="n">param</span><span class="o">=</span><span class="n">p</span><span class="p">,</span> <span class="n">optim_group</span><span class="o">=</span><span class="n">group</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ParamTransformingOptimizer._apply_pre_step_transform_"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer._apply_pre_step_transform_">[docs]</a>    <span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
+
+<div class="viewcode-block" id="ParamTransformingOptimizer._apply_pre_step_transform_">
+<a class="viewcode-back" href="../../../generated/rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer._apply_pre_step_transform_">[docs]</a>
+    <span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
     <span class="k">def</span> <span class="nf">_apply_pre_step_transform_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Update each parameter in-place by calling `_pre_step_transform_` on the</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update each parameter in-place by calling `_pre_step_transform_` on the</span>
 <span class="sd">        parameter.</span>
 
 <span class="sd">        This is called automatically by `.step()` before `InnerOpt.step()` has been</span>
@@ -946,6 +962,7 @@ document.write(`
                         <span class="s2">&quot; </span><span class="se">\n</span><span class="s2">Note that setting `p.grad` directly replaces the&quot;</span>
                         <span class="s2">&quot; tensor, rather than writing to the tensor.&quot;</span>
                     <span class="p">)</span></div>
+
 
     <span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
     <span class="k">def</span> <span class="nf">_create_closure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">closure</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">_T</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">Optional</span><span class="p">[</span><span class="n">_T</span><span class="p">]]:</span>
@@ -986,8 +1003,11 @@ document.write(`
         <span class="k">return</span> <span class="n">loss</span></div>
 
 
-<div class="viewcode-block" id="ChainedParamTransformingOptimizer"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.ChainedParamTransformingOptimizer.html#rai_toolbox.optim.ChainedParamTransformingOptimizer">[docs]</a><span class="k">class</span> <span class="nc">ChainedParamTransformingOptimizer</span><span class="p">(</span><span class="n">ParamTransformingOptimizer</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Chains together an arbitrary number of parameter-transforming optimizers,</span>
+
+<div class="viewcode-block" id="ChainedParamTransformingOptimizer">
+<a class="viewcode-back" href="../../../generated/rai_toolbox.optim.ChainedParamTransformingOptimizer.html#rai_toolbox.optim.ChainedParamTransformingOptimizer">[docs]</a>
+<span class="k">class</span> <span class="nc">ChainedParamTransformingOptimizer</span><span class="p">(</span><span class="n">ParamTransformingOptimizer</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Chains together an arbitrary number of parameter-transforming optimizers,</span>
 <span class="sd">    composing their pre- and post-step transformation functions to modify the parameters</span>
 <span class="sd">    (and their gradients) in-place. `InnerOpt.step()` applies the gradient-based update</span>
 <span class="sd">    to each parameter.</span>
@@ -1007,7 +1027,9 @@ document.write(`
 <span class="sd">    ParamTransformingOptimizer</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="ChainedParamTransformingOptimizer.__init__"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.ChainedParamTransformingOptimizer.html#rai_toolbox.optim.ChainedParamTransformingOptimizer.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="ChainedParamTransformingOptimizer.__init__">
+<a class="viewcode-back" href="../../../generated/rai_toolbox.optim.ChainedParamTransformingOptimizer.html#rai_toolbox.optim.ChainedParamTransformingOptimizer.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="n">transforming_optimizers</span><span class="p">:</span> <span class="n">InstantiatesTo</span><span class="p">[</span><span class="n">ParamTransformingOptimizer</span><span class="p">],</span>
         <span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">OptimParams</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1018,7 +1040,7 @@ document.write(`
         <span class="n">defaults</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">**</span><span class="n">inner_opt_kwargs</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        *transforming_optimizers: InstantiatesTo[ParamTransformingOptimizer],</span>
@@ -1198,6 +1220,7 @@ document.write(`
             <span class="k">for</span> <span class="n">opt</span> <span class="ow">in</span> <span class="n">transforming_optimizers</span>
         <span class="p">)</span></div>
 
+
     <span class="k">def</span> <span class="nf">_pre_step_transform_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">optim_group</span><span class="p">:</span> <span class="n">DatumParamGroup</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># [f1, f2, f3] -&gt; f3(f2(f1(param)))</span>
         <span class="k">for</span> <span class="n">opt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_chain</span><span class="p">:</span>
@@ -1228,6 +1251,7 @@ document.write(`
                 <span class="s2">&quot; ○ &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">c</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_chain</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]),</span>
             <span class="p">)</span>
         <span class="p">)</span></div>
+
 </pre></div>
 
                 </article>
@@ -1280,7 +1304,7 @@ document.write(`
       
         <div class="footer-item">
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.0.1.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
     <br/>
   </p>
 </div>

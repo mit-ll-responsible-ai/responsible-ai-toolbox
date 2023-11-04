@@ -27,21 +27,21 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css" />
-    <link rel="icon" sizes="16x16" type="image/png" href="../../../_static/favicon-16x16.png" />
-    <link rel="icon" sizes="32x32" type="image/png" href="../../../_static/favicon-32x32.png" />
-    <link rel="apple-touch-icon" sizes="180x180" type="image/png" href="../../../_static/apple-touch-icon.png" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="icon" sizes="16x16" type="image/png" href="../../../_static/favicon-16x16.png?v=e7d2fd79" />
+    <link rel="icon" sizes="32x32" type="image/png" href="../../../_static/favicon-32x32.png?v=f6e94bc1" />
+    <link rel="apple-touch-icon" sizes="180x180" type="image/png" href="../../../_static/apple-touch-icon.png?v=cfad7531" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
-    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-    <script src="../../../_static/doctools.js"></script>
-    <script src="../../../_static/sphinx_highlight.js"></script>
-    <script src="../../../_static/clipboard.min.js"></script>
-    <script src="../../../_static/copybutton.js"></script>
+    <script src="../../../_static/documentation_options.js?v=8a448e45"></script>
+    <script src="../../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=30646c52"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/rai_toolbox/optim/lp_space';</script>
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -423,7 +423,7 @@ document.write(`
 
 
 <span class="k">class</span> <span class="nc">_LpNormOptimizer</span><span class="p">(</span><span class="n">ParamTransformingOptimizer</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;A base optimizer whose step normalizes based on the p-norm:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;A base optimizer whose step normalizes based on the p-norm:</span>
 
 <span class="sd">    .. math::</span>
 
@@ -447,7 +447,7 @@ document.write(`
         <span class="n">div_by_zero_eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">_TINY</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        params : Sequence[Tensor] | Iterable[Mapping[str, Any]]</span>
@@ -522,8 +522,10 @@ document.write(`
         <span class="n">param</span><span class="o">.</span><span class="n">grad</span> <span class="o">/=</span> <span class="n">torch</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="n">g_norm</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">div_by_zero_eps</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="SignedGradientOptim"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.SignedGradientOptim.html#rai_toolbox.optim.SignedGradientOptim">[docs]</a><span class="k">class</span> <span class="nc">SignedGradientOptim</span><span class="p">(</span><span class="n">ParamTransformingOptimizer</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;A gradient-tranforming optimizer that takes the elementwise sign</span>
+<div class="viewcode-block" id="SignedGradientOptim">
+<a class="viewcode-back" href="../../../generated/rai_toolbox.optim.SignedGradientOptim.html#rai_toolbox.optim.SignedGradientOptim">[docs]</a>
+<span class="k">class</span> <span class="nc">SignedGradientOptim</span><span class="p">(</span><span class="n">ParamTransformingOptimizer</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;A gradient-tranforming optimizer that takes the elementwise sign</span>
 <span class="sd">    of a parameter&#39;s gradient prior to using `InnerOp.step` to update the</span>
 <span class="sd">    corresponding parameter.</span>
 
@@ -534,7 +536,9 @@ document.write(`
 <span class="sd">    ParamTransformingOptimizer</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="SignedGradientOptim.__init__"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.SignedGradientOptim.html#rai_toolbox.optim.SignedGradientOptim.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="SignedGradientOptim.__init__">
+<a class="viewcode-back" href="../../../generated/rai_toolbox.optim.SignedGradientOptim.html#rai_toolbox.optim.SignedGradientOptim.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">params</span><span class="p">:</span> <span class="n">OptimParams</span><span class="p">,</span>
         <span class="n">InnerOpt</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Partial</span><span class="p">[</span><span class="n">Opt</span><span class="p">],</span> <span class="n">OptimizerType</span><span class="p">]</span> <span class="o">=</span> <span class="n">SGD</span><span class="p">,</span>
@@ -545,7 +549,7 @@ document.write(`
         <span class="n">param_ndim</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">**</span><span class="n">inner_opt_kwargs</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        params : Sequence[Tensor] | Iterable[Mapping[str, Any]]</span>
@@ -612,6 +616,7 @@ document.write(`
             <span class="o">**</span><span class="n">inner_opt_kwargs</span><span class="p">,</span>
         <span class="p">)</span></div>
 
+
     <span class="k">def</span> <span class="nf">_pre_step_transform_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="o">**</span><span class="n">_unused_kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">grad</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
             <span class="k">return</span>
@@ -619,8 +624,11 @@ document.write(`
         <span class="n">torch</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">grad</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">param</span><span class="o">.</span><span class="n">grad</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="L1NormedGradientOptim"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.L1NormedGradientOptim.html#rai_toolbox.optim.L1NormedGradientOptim">[docs]</a><span class="k">class</span> <span class="nc">L1NormedGradientOptim</span><span class="p">(</span><span class="n">_LpNormOptimizer</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;A gradient-tranforming optimizer that normalizes the gradient by</span>
+
+<div class="viewcode-block" id="L1NormedGradientOptim">
+<a class="viewcode-back" href="../../../generated/rai_toolbox.optim.L1NormedGradientOptim.html#rai_toolbox.optim.L1NormedGradientOptim">[docs]</a>
+<span class="k">class</span> <span class="nc">L1NormedGradientOptim</span><span class="p">(</span><span class="n">_LpNormOptimizer</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;A gradient-tranforming optimizer that normalizes the gradient by</span>
 <span class="sd">    its :math:`L^1`-norm prior to using `InnerOp.step` to update the</span>
 <span class="sd">    corresponding parameter.</span>
 
@@ -665,8 +673,11 @@ document.write(`
     <span class="n">_p</span><span class="p">:</span> <span class="n">Final</span> <span class="o">=</span> <span class="mi">1</span></div>
 
 
-<div class="viewcode-block" id="L2NormedGradientOptim"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.L2NormedGradientOptim.html#rai_toolbox.optim.L2NormedGradientOptim">[docs]</a><span class="k">class</span> <span class="nc">L2NormedGradientOptim</span><span class="p">(</span><span class="n">_LpNormOptimizer</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;A gradient-tranforming optimizer that normalizes the gradient by</span>
+
+<div class="viewcode-block" id="L2NormedGradientOptim">
+<a class="viewcode-back" href="../../../generated/rai_toolbox.optim.L2NormedGradientOptim.html#rai_toolbox.optim.L2NormedGradientOptim">[docs]</a>
+<span class="k">class</span> <span class="nc">L2NormedGradientOptim</span><span class="p">(</span><span class="n">_LpNormOptimizer</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;A gradient-tranforming optimizer that normalizes the gradient by</span>
 <span class="sd">    its :math:`L^2`-norm prior to using `InnerOp.step` to update the</span>
 <span class="sd">    corresponding parameter.</span>
 
@@ -713,8 +724,11 @@ document.write(`
     <span class="n">_p</span><span class="p">:</span> <span class="n">Final</span> <span class="o">=</span> <span class="mi">2</span></div>
 
 
-<div class="viewcode-block" id="L2ProjectedOptim"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.L2ProjectedOptim.html#rai_toolbox.optim.L2ProjectedOptim">[docs]</a><span class="k">class</span> <span class="nc">L2ProjectedOptim</span><span class="p">(</span><span class="n">L2NormedGradientOptim</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;A gradient-tranforming optimizer that constrains the updated parameters</span>
+
+<div class="viewcode-block" id="L2ProjectedOptim">
+<a class="viewcode-back" href="../../../generated/rai_toolbox.optim.L2ProjectedOptim.html#rai_toolbox.optim.L2ProjectedOptim">[docs]</a>
+<span class="k">class</span> <span class="nc">L2ProjectedOptim</span><span class="p">(</span><span class="n">L2NormedGradientOptim</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;A gradient-tranforming optimizer that constrains the updated parameters</span>
 <span class="sd">    to lie within an :math:`\epsilon`-sized ball in :math:`L^2` space centered on the</span>
 <span class="sd">    origin.</span>
 
@@ -732,7 +746,9 @@ document.write(`
 <span class="sd">    ParamTransformingOptimizer</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="L2ProjectedOptim.__init__"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.L2ProjectedOptim.html#rai_toolbox.optim.L2ProjectedOptim.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="L2ProjectedOptim.__init__">
+<a class="viewcode-back" href="../../../generated/rai_toolbox.optim.L2ProjectedOptim.html#rai_toolbox.optim.L2ProjectedOptim.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">params</span><span class="p">:</span> <span class="n">OptimParams</span><span class="p">,</span>
         <span class="n">InnerOpt</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Partial</span><span class="p">[</span><span class="n">Opt</span><span class="p">],</span> <span class="n">OptimizerType</span><span class="p">]</span> <span class="o">=</span> <span class="n">SGD</span><span class="p">,</span>
@@ -745,7 +761,7 @@ document.write(`
         <span class="n">div_by_zero_eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">_TINY</span><span class="p">,</span>
         <span class="o">**</span><span class="n">inner_opt_kwargs</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        params : Sequence[Tensor] | Iterable[Mapping[str, Any]]</span>
@@ -842,13 +858,17 @@ document.write(`
         <span class="p">)</span>
         <span class="n">check_param_group_value</span><span class="p">(</span><span class="s2">&quot;epsilon&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_groups</span><span class="p">,</span> <span class="n">min_</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span></div>
 
+
     <span class="k">def</span> <span class="nf">_post_step_transform_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">optim_group</span><span class="p">:</span> <span class="n">_HasEpsilon</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Applies an in-place projection on the given parameter&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Applies an in-place projection on the given parameter&quot;&quot;&quot;</span>
         <span class="n">param</span><span class="o">.</span><span class="n">renorm_</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">maxnorm</span><span class="o">=</span><span class="n">optim_group</span><span class="p">[</span><span class="s2">&quot;epsilon&quot;</span><span class="p">])</span></div>
 
 
-<div class="viewcode-block" id="LinfProjectedOptim"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.LinfProjectedOptim.html#rai_toolbox.optim.LinfProjectedOptim">[docs]</a><span class="k">class</span> <span class="nc">LinfProjectedOptim</span><span class="p">(</span><span class="n">SignedGradientOptim</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;A gradient-tranforming optimizer that constrains the updated parameter values to</span>
+
+<div class="viewcode-block" id="LinfProjectedOptim">
+<a class="viewcode-back" href="../../../generated/rai_toolbox.optim.LinfProjectedOptim.html#rai_toolbox.optim.LinfProjectedOptim">[docs]</a>
+<span class="k">class</span> <span class="nc">LinfProjectedOptim</span><span class="p">(</span><span class="n">SignedGradientOptim</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;A gradient-tranforming optimizer that constrains the updated parameter values to</span>
 <span class="sd">    fall within :math:`[-\epsilon, \epsilon]`.</span>
 
 <span class="sd">    A step with this optimizer takes the elementwise sign of a parameter&#39;s gradient</span>
@@ -862,7 +882,9 @@ document.write(`
 <span class="sd">    ParamTransformingOptimizer</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="LinfProjectedOptim.__init__"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.LinfProjectedOptim.html#rai_toolbox.optim.LinfProjectedOptim.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="LinfProjectedOptim.__init__">
+<a class="viewcode-back" href="../../../generated/rai_toolbox.optim.LinfProjectedOptim.html#rai_toolbox.optim.LinfProjectedOptim.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">params</span><span class="p">:</span> <span class="n">OptimParams</span><span class="p">,</span>
         <span class="n">InnerOpt</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Partial</span><span class="p">[</span><span class="n">Opt</span><span class="p">],</span> <span class="n">OptimizerType</span><span class="p">]</span> <span class="o">=</span> <span class="n">SGD</span><span class="p">,</span>
@@ -874,7 +896,7 @@ document.write(`
         <span class="n">defaults</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">**</span><span class="n">inner_opt_kwargs</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        params : Sequence[Tensor] | Iterable[Mapping[str, Any]]</span>
@@ -952,13 +974,17 @@ document.write(`
 
         <span class="n">check_param_group_value</span><span class="p">(</span><span class="s2">&quot;epsilon&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_groups</span><span class="p">,</span> <span class="n">min_</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span></div>
 
+
     <span class="k">def</span> <span class="nf">_post_step_transform_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">optim_group</span><span class="p">:</span> <span class="n">_HasEpsilon</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">epsilon</span> <span class="o">=</span> <span class="n">optim_group</span><span class="p">[</span><span class="s2">&quot;epsilon&quot;</span><span class="p">]</span>
         <span class="n">param</span><span class="o">.</span><span class="n">clamp_</span><span class="p">(</span><span class="nb">min</span><span class="o">=-</span><span class="n">epsilon</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="n">epsilon</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="L1qNormedGradientOptim"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.L1qNormedGradientOptim.html#rai_toolbox.optim.L1qNormedGradientOptim">[docs]</a><span class="k">class</span> <span class="nc">L1qNormedGradientOptim</span><span class="p">(</span><span class="n">ChainedParamTransformingOptimizer</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;A gradient-transforming optimizer that sparsifies a parameter&#39;s gradient and</span>
+
+<div class="viewcode-block" id="L1qNormedGradientOptim">
+<a class="viewcode-back" href="../../../generated/rai_toolbox.optim.L1qNormedGradientOptim.html#rai_toolbox.optim.L1qNormedGradientOptim">[docs]</a>
+<span class="k">class</span> <span class="nc">L1qNormedGradientOptim</span><span class="p">(</span><span class="n">ChainedParamTransformingOptimizer</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;A gradient-transforming optimizer that sparsifies a parameter&#39;s gradient and</span>
 <span class="sd">    normalizes the gradient to have an :math:`L^1`-norm of `grad_scale`, prior to</span>
 <span class="sd">    updating the parameter using `InnerOpt.step`.</span>
 
@@ -974,7 +1000,9 @@ document.write(`
 <span class="sd">    ParamTransformingOptimizer</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="L1qNormedGradientOptim.__init__"><a class="viewcode-back" href="../../../generated/rai_toolbox.optim.L1qNormedGradientOptim.html#rai_toolbox.optim.L1qNormedGradientOptim.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="L1qNormedGradientOptim.__init__">
+<a class="viewcode-back" href="../../../generated/rai_toolbox.optim.L1qNormedGradientOptim.html#rai_toolbox.optim.L1qNormedGradientOptim.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">params</span><span class="p">:</span> <span class="n">OptimParams</span><span class="p">,</span>
         <span class="n">InnerOpt</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Partial</span><span class="p">[</span><span class="n">Opt</span><span class="p">],</span> <span class="n">OptimizerType</span><span class="p">]</span> <span class="o">=</span> <span class="n">SGD</span><span class="p">,</span>
@@ -989,7 +1017,7 @@ document.write(`
         <span class="n">generator</span><span class="p">:</span> <span class="n">Generator</span> <span class="o">=</span> <span class="n">default_generator</span><span class="p">,</span>
         <span class="o">**</span><span class="n">inner_opt_kwargs</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        params : Sequence[Tensor] | Iterable[Mapping[str, Any]]</span>
@@ -1093,7 +1121,9 @@ document.write(`
             <span class="n">grad_scale</span><span class="o">=</span><span class="n">grad_scale</span><span class="p">,</span>
             <span class="n">grad_bias</span><span class="o">=</span><span class="n">grad_bias</span><span class="p">,</span>
             <span class="o">**</span><span class="n">inner_opt_kwargs</span><span class="p">,</span>
-        <span class="p">)</span></div></div>
+        <span class="p">)</span></div>
+</div>
+
 </pre></div>
 
                 </article>
@@ -1146,7 +1176,7 @@ document.write(`
       
         <div class="footer-item">
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.0.1.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
     <br/>
   </p>
 </div>

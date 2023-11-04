@@ -29,21 +29,21 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
-    <link rel="icon" sizes="16x16" type="image/png" href="_static/favicon-16x16.png" />
-    <link rel="icon" sizes="32x32" type="image/png" href="_static/favicon-32x32.png" />
-    <link rel="apple-touch-icon" sizes="180x180" type="image/png" href="_static/apple-touch-icon.png" />
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="icon" sizes="16x16" type="image/png" href="_static/favicon-16x16.png?v=e7d2fd79" />
+    <link rel="icon" sizes="32x32" type="image/png" href="_static/favicon-32x32.png?v=f6e94bc1" />
+    <link rel="apple-touch-icon" sizes="180x180" type="image/png" href="_static/apple-touch-icon.png?v=cfad7531" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/doctools.js"></script>
-    <script src="_static/sphinx_highlight.js"></script>
-    <script src="_static/clipboard.min.js"></script>
-    <script src="_static/copybutton.js"></script>
+    <script src="_static/documentation_options.js?v=8a448e45"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=30646c52"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -430,7 +430,7 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <section id="optimizers">
-<span id="optim-reference"></span><h1>Optimizers<a class="headerlink" href="#optimizers" title="Permalink to this heading">#</a></h1>
+<span id="optim-reference"></span><h1>Optimizers<a class="headerlink" href="#optimizers" title="Link to this heading">#</a></h1>
 <p>Our optimizers are designed to compose with off-the-shelf <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.optim.Optimizer</span></code> implementations by adding the ability to modify parameters – and their gradients – before and after the optimizer’s step process.
 This is facilitated by <a class="reference internal" href="generated/rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer" title="rai_toolbox.optim.ParamTransformingOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParamTransformingOptimizer</span></code></a>, which is able to compose with any PyTorch optimizer (referred to as <code class="xref py py-obj docutils literal notranslate"><span class="pre">InnerOpt</span></code> throughout the reference docs) and add parameter/gradient-transforming capabilities to it.</p>
 <p>The capabilities and implementations provided here are particularly useful for <a class="reference internal" href="ref_perturbation.html#pert-reference"><span class="std std-ref">solving for data perturbations</span></a>.
@@ -443,7 +443,7 @@ Refer to <a class="reference internal" href="generated/rai_toolbox.optim.ParamTr
 <p>All of our reference documentation features detailed Examples sections; scroll to the bottom of any given reference page to see them.
 For additional instructions for creating your own parameter-transforming optimizer please refer to <a class="reference internal" href="how_to/custom_optim.html#how-to-optim"><span class="std std-ref">our How-To guide</span></a>.</p>
 <section id="base-parameter-transforming-optimizers">
-<span id="built-in-optim"></span><h2>Base Parameter-Transforming Optimizers<a class="headerlink" href="#base-parameter-transforming-optimizers" title="Permalink to this heading">#</a></h2>
+<span id="built-in-optim"></span><h2>Base Parameter-Transforming Optimizers<a class="headerlink" href="#base-parameter-transforming-optimizers" title="Link to this heading">#</a></h2>
 <table class="autosummary longtable table autosummary">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer" title="rai_toolbox.optim.ParamTransformingOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParamTransformingOptimizer</span></code></a>([params, ...])</p></td>
@@ -456,7 +456,7 @@ For additional instructions for creating your own parameter-transforming optimiz
 </table>
 </section>
 <section id="optimizers-with-normed-gradients">
-<h2>Optimizers with Normed Gradients<a class="headerlink" href="#optimizers-with-normed-gradients" title="Permalink to this heading">#</a></h2>
+<h2>Optimizers with Normed Gradients<a class="headerlink" href="#optimizers-with-normed-gradients" title="Link to this heading">#</a></h2>
 <table class="autosummary longtable table autosummary">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/rai_toolbox.optim.L1NormedGradientOptim.html#rai_toolbox.optim.L1NormedGradientOptim" title="rai_toolbox.optim.L1NormedGradientOptim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">L1NormedGradientOptim</span></code></a>(params[, InnerOpt, ...])</p></td>
@@ -475,7 +475,7 @@ For additional instructions for creating your own parameter-transforming optimiz
 </table>
 </section>
 <section id="miscellaneous-gradient-transforming-optimizers">
-<h2>Miscellaneous Gradient-Transforming Optimizers<a class="headerlink" href="#miscellaneous-gradient-transforming-optimizers" title="Permalink to this heading">#</a></h2>
+<h2>Miscellaneous Gradient-Transforming Optimizers<a class="headerlink" href="#miscellaneous-gradient-transforming-optimizers" title="Link to this heading">#</a></h2>
 <table class="autosummary longtable table autosummary">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/rai_toolbox.optim.TopQGradientOptimizer.html#rai_toolbox.optim.TopQGradientOptimizer" title="rai_toolbox.optim.TopQGradientOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TopQGradientOptimizer</span></code></a>(params[, InnerOpt, q, ...])</p></td>
@@ -491,7 +491,7 @@ For additional instructions for creating your own parameter-transforming optimiz
 </table>
 </section>
 <section id="optimizers-with-projections-onto-constraint-sets">
-<h2>Optimizers with Projections Onto Constraint Sets<a class="headerlink" href="#optimizers-with-projections-onto-constraint-sets" title="Permalink to this heading">#</a></h2>
+<h2>Optimizers with Projections Onto Constraint Sets<a class="headerlink" href="#optimizers-with-projections-onto-constraint-sets" title="Link to this heading">#</a></h2>
 <table class="autosummary longtable table autosummary">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/rai_toolbox.optim.L2ProjectedOptim.html#rai_toolbox.optim.L2ProjectedOptim" title="rai_toolbox.optim.L2ProjectedOptim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">L2ProjectedOptim</span></code></a>(params[, InnerOpt, ...])</p></td>
@@ -504,7 +504,7 @@ For additional instructions for creating your own parameter-transforming optimiz
 </table>
 </section>
 <section id="frank-wolfe-optimizers">
-<h2>Frank-Wolfe Optimizers<a class="headerlink" href="#frank-wolfe-optimizers" title="Permalink to this heading">#</a></h2>
+<h2>Frank-Wolfe Optimizers<a class="headerlink" href="#frank-wolfe-optimizers" title="Link to this heading">#</a></h2>
 <table class="autosummary longtable table autosummary">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/rai_toolbox.optim.FrankWolfe.html#rai_toolbox.optim.FrankWolfe" title="rai_toolbox.optim.FrankWolfe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FrankWolfe</span></code></a>(params, *[, lr, ...])</p></td>
@@ -625,7 +625,7 @@ For additional instructions for creating your own parameter-transforming optimiz
       
         <div class="footer-item">
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.0.1.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
     <br/>
   </p>
 </div>

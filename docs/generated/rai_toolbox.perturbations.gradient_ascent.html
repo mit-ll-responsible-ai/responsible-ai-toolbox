@@ -28,21 +28,21 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
-    <link rel="icon" sizes="16x16" type="image/png" href="../_static/favicon-16x16.png" />
-    <link rel="icon" sizes="32x32" type="image/png" href="../_static/favicon-32x32.png" />
-    <link rel="apple-touch-icon" sizes="180x180" type="image/png" href="../_static/apple-touch-icon.png" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="icon" sizes="16x16" type="image/png" href="../_static/favicon-16x16.png?v=e7d2fd79" />
+    <link rel="icon" sizes="32x32" type="image/png" href="../_static/favicon-32x32.png?v=f6e94bc1" />
+    <link rel="apple-touch-icon" sizes="180x180" type="image/png" href="../_static/apple-touch-icon.png?v=cfad7531" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/sphinx_highlight.js"></script>
-    <script src="../_static/clipboard.min.js"></script>
-    <script src="../_static/copybutton.js"></script>
+    <script src="../_static/documentation_options.js?v=8a448e45"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=30646c52"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'generated/rai_toolbox.perturbations.gradient_ascent';</script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -420,10 +420,10 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <section id="rai-toolbox-perturbations-gradient-ascent">
-<h1>rai_toolbox.perturbations.gradient_ascent<a class="headerlink" href="#rai-toolbox-perturbations-gradient-ascent" title="Permalink to this heading">#</a></h1>
+<h1>rai_toolbox.perturbations.gradient_ascent<a class="headerlink" href="#rai-toolbox-perturbations-gradient-ascent" title="Link to this heading">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="rai_toolbox.perturbations.gradient_ascent">
-<span class="sig-prename descclassname"><span class="pre">rai_toolbox.perturbations.</span></span><span class="sig-name descname"><span class="pre">gradient_ascent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perturbation_model=&lt;class</span> <span class="pre">'rai_toolbox.perturbations.models.AdditivePerturbation'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targeted=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_best=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">criterion=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction_fn=&lt;built-in</span> <span class="pre">method</span> <span class="pre">sum</span> <span class="pre">of</span> <span class="pre">type</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**optim_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/perturbations/solvers.html#gradient_ascent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.perturbations.gradient_ascent" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">rai_toolbox.perturbations.</span></span><span class="sig-name descname"><span class="pre">gradient_ascent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perturbation_model=&lt;class</span> <span class="pre">'rai_toolbox.perturbations.models.AdditivePerturbation'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targeted=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_best=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">criterion=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction_fn=&lt;built-in</span> <span class="pre">method</span> <span class="pre">sum</span> <span class="pre">of</span> <span class="pre">type</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**optim_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/perturbations/solvers.html#gradient_ascent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.perturbations.gradient_ascent" title="Link to this definition">#</a></dt>
 <dd><p>Solve for a set of perturbations for a given set of data and a model,
 and then apply those perturbations to the data.</p>
 <p>This performs, for <code class="xref py py-obj docutils literal notranslate"><span class="pre">steps</span></code> iterations, the following optimization:</p>
@@ -467,9 +467,9 @@ applies the perturbation to the data. Default is
 <dt><strong>criterion</strong><span class="classifier">Optional[Callable[[Tensor, Tensor], Tensor]]</span></dt><dd><p>The criterion to use for calculating the loss <strong>per-datum</strong>.  I.e., for a
 shape-(N, …) batch of data, <code class="xref py py-obj docutils literal notranslate"><span class="pre">criterion</span></code> should return a shape-(N,) tensor of
 loss values – one for each datum in the batch.</p>
-<p>If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, then <code class="xref py py-obj docutils literal notranslate"><span class="pre">CrossEntropyLoss(reduction=None)</span></code> is used.</p>
+<p>If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, then <code class="xref py py-obj docutils literal notranslate"><span class="pre">CrossEntropyLoss(reduction=None)</span></code> is used.</p>
 </dd>
-<dt><strong>targeted</strong><span class="classifier">bool (default: False)</span></dt><dd><p>If <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a>, then perturb towards the defined <code class="xref py py-obj docutils literal notranslate"><span class="pre">target</span></code>, otherwise move away from
+<dt><strong>targeted</strong><span class="classifier">bool (default: False)</span></dt><dd><p>If <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a>, then perturb towards the defined <code class="xref py py-obj docutils literal notranslate"><span class="pre">target</span></code>, otherwise move away from
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">target</span></code>.</p>
 <p>Note: Default (<code class="xref py py-obj docutils literal notranslate"><span class="pre">targeted=False</span></code>) implements gradient <em>ascent</em>.
 To perform gradient <em>descent</em>, set <code class="xref py py-obj docutils literal notranslate"><span class="pre">targeted=True</span></code>.</p>
@@ -666,7 +666,7 @@ provide our own instance of <a class="reference internal" href="rai_toolbox.pert
       
         <div class="footer-item">
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.0.1.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
     <br/>
   </p>
 </div>

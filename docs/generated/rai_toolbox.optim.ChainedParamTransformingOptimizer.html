@@ -28,21 +28,21 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
-    <link rel="icon" sizes="16x16" type="image/png" href="../_static/favicon-16x16.png" />
-    <link rel="icon" sizes="32x32" type="image/png" href="../_static/favicon-32x32.png" />
-    <link rel="apple-touch-icon" sizes="180x180" type="image/png" href="../_static/apple-touch-icon.png" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="icon" sizes="16x16" type="image/png" href="../_static/favicon-16x16.png?v=e7d2fd79" />
+    <link rel="icon" sizes="32x32" type="image/png" href="../_static/favicon-32x32.png?v=f6e94bc1" />
+    <link rel="apple-touch-icon" sizes="180x180" type="image/png" href="../_static/apple-touch-icon.png?v=cfad7531" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/sphinx_highlight.js"></script>
-    <script src="../_static/clipboard.min.js"></script>
-    <script src="../_static/copybutton.js"></script>
+    <script src="../_static/documentation_options.js?v=8a448e45"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=30646c52"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'generated/rai_toolbox.optim.ChainedParamTransformingOptimizer';</script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -430,10 +430,10 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <section id="rai-toolbox-optim-chainedparamtransformingoptimizer">
-<h1>rai_toolbox.optim.ChainedParamTransformingOptimizer<a class="headerlink" href="#rai-toolbox-optim-chainedparamtransformingoptimizer" title="Permalink to this heading">#</a></h1>
+<h1>rai_toolbox.optim.ChainedParamTransformingOptimizer<a class="headerlink" href="#rai-toolbox-optim-chainedparamtransformingoptimizer" title="Link to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="rai_toolbox.optim.ChainedParamTransformingOptimizer">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rai_toolbox.optim.</span></span><span class="sig-name descname"><span class="pre">ChainedParamTransformingOptimizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*transforming_optimizers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">InnerOpt=&lt;class</span> <span class="pre">'torch.optim.sgd.SGD'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_ndim=-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grad_scale=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grad_bias=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defaults=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**inner_opt_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/optim/optimizer.html#ChainedParamTransformingOptimizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.optim.ChainedParamTransformingOptimizer" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rai_toolbox.optim.</span></span><span class="sig-name descname"><span class="pre">ChainedParamTransformingOptimizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*transforming_optimizers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">InnerOpt=&lt;class</span> <span class="pre">'torch.optim.sgd.SGD'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_ndim=-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grad_scale=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grad_bias=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defaults=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**inner_opt_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/optim/optimizer.html#ChainedParamTransformingOptimizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.optim.ChainedParamTransformingOptimizer" title="Link to this definition">#</a></dt>
 <dd><p>Chains together an arbitrary number of parameter-transforming optimizers,
 composing their pre- and post-step transformation functions to modify the parameters
 (and their gradients) in-place. <code class="xref py py-obj docutils literal notranslate"><span class="pre">InnerOpt.step()</span></code> applies the gradient-based update
@@ -453,7 +453,7 @@ the user-specified chained gradient-trasnformers, so that their <code class="xre
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">defaults</span></code>, and <code class="xref py py-obj docutils literal notranslate"><span class="pre">state</span></code> are always in sync.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="rai_toolbox.optim.ChainedParamTransformingOptimizer.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*transforming_optimizers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">InnerOpt=&lt;class</span> <span class="pre">'torch.optim.sgd.SGD'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_ndim=-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grad_scale=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grad_bias=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defaults=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**inner_opt_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/optim/optimizer.html#ChainedParamTransformingOptimizer.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.optim.ChainedParamTransformingOptimizer.__init__" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*transforming_optimizers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">InnerOpt=&lt;class</span> <span class="pre">'torch.optim.sgd.SGD'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_ndim=-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grad_scale=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grad_bias=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defaults=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**inner_opt_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rai_toolbox/optim/optimizer.html#ChainedParamTransformingOptimizer.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rai_toolbox.optim.ChainedParamTransformingOptimizer.__init__" title="Link to this definition">#</a></dt>
 <dd><dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
@@ -475,7 +475,7 @@ in a batch-like style.</p>
 <ul class="simple">
 <li><p>A positive number determines the dimensionality of the tensor that the transformation will act on.</p></li>
 <li><p>A negative number indicates the ‘offset’ from the dimensionality of the tensor (see “Notes” for examples).</p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> means that the transformation will be applied directly to the tensor without any broadcasting.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> means that the transformation will be applied directly to the tensor without any broadcasting.</p></li>
 </ul>
 <p>See <a class="reference internal" href="rai_toolbox.optim.ParamTransformingOptimizer.html#rai_toolbox.optim.ParamTransformingOptimizer" title="rai_toolbox.optim.ParamTransformingOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParamTransformingOptimizer</span></code></a> for more details and examples.</p>
 </dd>
@@ -515,7 +515,7 @@ optimizer will be used, with <code class="xref py py-obj docutils literal notran
 transformed gradients.</p>
 <p>We specify <a class="reference internal" href="rai_toolbox.optim.TopQGradientOptimizer.html#rai_toolbox.optim.TopQGradientOptimizer" title="rai_toolbox.optim.TopQGradientOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TopQGradientOptimizer</span></code></a> and then <a class="reference internal" href="rai_toolbox.optim.ClampedGradientOptimizer.html#rai_toolbox.optim.ClampedGradientOptimizer" title="rai_toolbox.optim.ClampedGradientOptimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ClampedGradientOptimizer</span></code></a>; the
 transformations are applied in order from left to right. Providing per-optimizer
-defaults is achieved most naturally using <a class="reference external" href="https://docs.python.org/3/library/functools.html#functools.partial" title="(in Python v3.11)"><code class="xref py py-func docutils literal notranslate"><span class="pre">functools.partial()</span></code></a>.</p>
+defaults is achieved most naturally using <a class="reference external" href="https://docs.python.org/3/library/functools.html#functools.partial" title="(in Python v3.12)"><code class="xref py py-func docutils literal notranslate"><span class="pre">functools.partial()</span></code></a>.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">optim</span> <span class="o">=</span> <span class="n">ChainedParamTransformingOptimizer</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="n">partial</span><span class="p">(</span><span class="n">TopQGradientOptimizer</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="mf">0.33</span><span class="p">),</span>
 <span class="gp">... </span>    <span class="n">partial</span><span class="p">(</span><span class="n">ClampedGradientOptimizer</span><span class="p">,</span> <span class="n">clamp_max</span><span class="o">=</span><span class="mf">2.8</span><span class="p">),</span>
@@ -716,7 +716,7 @@ elements.</p>
       
         <div class="footer-item">
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.0.1.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
     <br/>
   </p>
 </div>
