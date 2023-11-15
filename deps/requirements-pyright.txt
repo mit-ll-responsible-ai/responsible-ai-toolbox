@@ -1,2 +1,2 @@
-pyright==1.1.334
+pyright==1.1.336
 matplotlib==3.8.1
