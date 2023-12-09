@@ -5,6 +5,7 @@
 from ._imagenet_base import ImageNet, ImageNetM10, RestrictedImageNet
 from .cifar10_extensions import CIFAR10P1
 from .cifar_corruptions import CIFAR10C, CIFAR100C
+from .mnist_corruptions import MNISTC
 
 __all__ = [
     "CIFAR10C",
@@ -13,4 +14,5 @@ __all__ = [
     "ImageNet",
     "ImageNetM10",
     "RestrictedImageNet",
+    "MNISTC",
 ]
