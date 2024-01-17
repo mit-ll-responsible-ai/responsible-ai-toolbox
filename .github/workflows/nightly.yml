@@ -24,7 +24,7 @@ jobs:
         pip install tox tox-gh-actions
     - name: Cache tox environments
       id: cache-min-deps
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: .tox
         key: tox-pre-deps-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('tests/conftest.py') }}-${{ hashFiles('.github/workflows/tox.yml') }}

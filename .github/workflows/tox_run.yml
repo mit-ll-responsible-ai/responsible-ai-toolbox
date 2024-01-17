@@ -40,7 +40,7 @@ jobs:
 
     - name: Cache tox environments
       id: cache-windows
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: .tox
         key: tox-td${{ env.TIME_PERIOD }}-py${{ matrix.python-version }}-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('.github/workflows/tox.yml') }}
@@ -67,7 +67,7 @@ jobs:
 
     - name: Cache tox environments
       id: cache-windows
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: .tox
         key: tox-windows-td${{ env.TIME_PERIOD }}-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('tests/conftest.py') }}-${{ hashFiles('.github/workflows/tox.yml') }}
@@ -95,7 +95,7 @@ jobs:
 
     - name: Cache tox environments
       id: cache-tox
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: .tox
 
@@ -121,7 +121,7 @@ jobs:
 
     - name: Cache tox environments
       id: cache-experiments
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: .tox
         # pyproject.toml and pyproject.toml have versioning info that would
@@ -148,7 +148,7 @@ jobs:
 
     - name: Cache tox environments
       id: cache-no-mushin
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: .tox
         key: tox-no-mushin-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('tests/conftest.py') }}-${{ hashFiles('.github/workflows/tox.yml') }}
@@ -171,7 +171,7 @@ jobs:
         pip install tox tox-gh-actions
     - name: Cache tox environments
       id: cache-min-deps
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: .tox
         key: tox-min-deps-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('tests/conftest.py') }}-${{ hashFiles('.github/workflows/tox.yml') }}
@@ -208,7 +208,7 @@ jobs:
         pip install tox tox-gh-actions
     - name: Cache tox environments
       id: cache-pyright
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: .tox
         key: tox-pyright-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('tests/conftest.py') }}-${{ hashFiles('.github/workflows/tox.yml') }}
